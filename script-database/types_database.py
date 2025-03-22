@@ -1,6 +1,7 @@
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 import requests
+import json
 
 def connect_mongo():
     uri = "mongodb+srv://pokesort:yiHocwX695ZaPEit@pokesortcluster.k83vm.mongodb.net/?retryWrites=true&w=majority&appName=PokesortCluster"
@@ -35,7 +36,7 @@ def get_types(data):
     
     return types_dict
 
-def request_pokemon():
+def request_types():
     url = "https://pokeapi.co/api/v2/type"
     response = requests.get(url)
 
@@ -73,7 +74,7 @@ def request_pokemon():
                 types.insert_one(document)
                 print(f"Documento inserido com o nome: {name}")
 
-        # with open("pokemon_data.json", "w") as f:
+        # with open("types.json", "w") as f:
         #     json.dump(data, f, indent=4)
         
         # print("Dados salvos no arquivo types.json")
@@ -81,4 +82,4 @@ def request_pokemon():
         print(f"Erro ao acessar a API: {response.status_code}")
 
 def init():
-    request_pokemon()
+    request_types()
