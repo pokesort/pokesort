@@ -9,50 +9,47 @@ def connect_mongo():
     client = MongoClient(uri, server_api=ServerApi('1'))
     try:
         database = client['pokesort-test']
-        moves = database['moves']
+        abilities = database['abilities']
 
-        return moves
+        return abilities
 
     except Exception as e:
         print(e)
 
-def request_moves():
-    url = "https://pokeapi.co/api/v2/move?limit=919"
+def request_abilities():
+    url = "https://pokeapi.co/api/v2/ability?limit=307"
     response = requests.get(url)
 
     if response.status_code == 200:
         data = response.json()['results']
 
-        moves = connect_mongo()
-        
-        if moves != None:
-            for move in data:
+        abilities = connect_mongo()
 
-                url_move = move['url']
-                move_json = requests.get(url_move).json()
+        if abilities != None:
+            for ability in data:
+                url_ability = ability['url']
+                ability_json = requests.get(url_ability).json()
 
-                id = move_json['id']
-                name = move_json['name']
-                type_id = move_json['type']['url'].split('/')[-2]
+                id = url_ability.split('/')[-2]
+                name = ability_json['name']
 
                 document = {
                     'id': str(id),
-                    'name': name,
-                    'type_id': type_id
+                    'name': name
                 }
 
-                existing_document = moves.find_one({'id': document['id']})
+                existing_document = abilities.find_one({'id': document['id']})
 
                 if existing_document:
                     print(f"Documento com nome {name} já existe. Não inserindo novamente.")
                 else:
-                    moves.insert_one(document)
+                    abilities.insert_one(document)
                     print(f"Documento inserido com o nome: {name}")
 
-        # with open("moves.json", "w") as f:
+        # with open("abilities.json", "w") as f:
         #     json.dump(data, f, indent=4)
         
-        # print("Dados salvos no arquivo moves.json")
+        # print("Dados salvos no arquivo abilities.json")
 
 def init():
-    request_moves()
+    request_abilities()

@@ -5,7 +5,9 @@
 
 import types_database as typesDB
 import moves_database as movesDB
+import abilities_database as abilityDb
 
 if __name__ == "__main__":
     # typesDB.init()
-    movesDB.init()
+    # movesDB.init()
+    abilityDb.init()
