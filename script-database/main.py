@@ -1,13 +1,14 @@
-#Modulos necessários
-#pip install pymongo
-#pip install requests
-#pip install json
-
-import types_database as typesDB
-import moves_database as movesDB
-import abilities_database as abilityDb
+import feed_types as typesDB
+import feed_moves as movesDB
+import feed_abilities as abilityDB
+import feed_evolution_methods as evolutionMethodDB
+from dotenv import load_dotenv
+import os
 
 if __name__ == "__main__":
+    load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '..', '.env'))
+
     # typesDB.init()
     # movesDB.init()
-    abilityDb.init()
+    # abilityDB.init()
+    evolutionMethodDB.init()

@@ -1,20 +1,5 @@
-from pymongo.mongo_client import MongoClient
-from pymongo.server_api import ServerApi
-import requests
-import json
-
-def connect_mongo():
-    uri = "mongodb+srv://pokesort:yiHocwX695ZaPEit@pokesortcluster.k83vm.mongodb.net/?retryWrites=true&w=majority&appName=PokesortCluster"
-
-    client = MongoClient(uri, server_api=ServerApi('1'))
-    try:
-        database = client['pokesort-test']
-        moves = database['moves']
-
-        return moves
-
-    except Exception as e:
-        print(e)
+import database as db
+import requests, json, os
 
 def request_moves():
     url = "https://pokeapi.co/api/v2/move?limit=919"
@@ -23,7 +8,7 @@ def request_moves():
     if response.status_code == 200:
         data = response.json()['results']
 
-        moves = connect_mongo()
+        moves = db.connect("moves")
         
         if moves != None:
             for move in data:
@@ -49,10 +34,10 @@ def request_moves():
                     moves.insert_one(document)
                     print(f"Documento inserido com o nome: {name}")
 
-        # with open("moves.json", "w") as f:
+        # with open("data_moves.json", "w") as f:
         #     json.dump(data, f, indent=4)
         
-        # print("Dados salvos no arquivo moves.json")
+        # print("Dados salvos no arquivo data_moves.json")
 
 def init():
     request_moves()

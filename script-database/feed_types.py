@@ -1,20 +1,5 @@
-from pymongo.mongo_client import MongoClient
-from pymongo.server_api import ServerApi
-import requests
-import json
-
-def connect_mongo():
-    uri = "mongodb+srv://pokesort:yiHocwX695ZaPEit@pokesortcluster.k83vm.mongodb.net/?retryWrites=true&w=majority&appName=PokesortCluster"
-
-    client = MongoClient(uri, server_api=ServerApi('1'))
-    try:
-        database = client['pokesort-test']
-        types = database['types']
-
-        return types
-
-    except Exception as e:
-        print(e)
+import database as db
+import requests, json, os
 
 def update_relation(list_types, mathup_dict, multiplier):
     for type in list_types:
@@ -43,7 +28,7 @@ def request_types():
     if response.status_code == 200:
         data = response.json()
 
-        types = connect_mongo()
+        types = db.connect("types")
 
         if types != None:
             types_dict = get_types(data)
