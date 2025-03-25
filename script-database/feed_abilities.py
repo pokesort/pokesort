@@ -1,20 +1,5 @@
-from pymongo.mongo_client import MongoClient
-from pymongo.server_api import ServerApi
-import requests
-import json
-
-def connect_mongo():
-    uri = "mongodb+srv://pokesort:yiHocwX695ZaPEit@pokesortcluster.k83vm.mongodb.net/?retryWrites=true&w=majority&appName=PokesortCluster"
-
-    client = MongoClient(uri, server_api=ServerApi('1'))
-    try:
-        database = client['pokesort-test']
-        abilities = database['abilities']
-
-        return abilities
-
-    except Exception as e:
-        print(e)
+import database as db
+import requests, json
 
 def request_abilities():
     url = "https://pokeapi.co/api/v2/ability?limit=307"
@@ -23,8 +8,7 @@ def request_abilities():
     if response.status_code == 200:
         data = response.json()['results']
 
-        abilities = connect_mongo()
-
+        abilities = db.connect("abilities")
         if abilities != None:
             for ability in data:
                 url_ability = ability['url']
@@ -46,10 +30,10 @@ def request_abilities():
                     abilities.insert_one(document)
                     print(f"Documento inserido com o nome: {name}")
 
-        # with open("abilities.json", "w") as f:
+        # with open("data_abilities.json", "w") as f:
         #     json.dump(data, f, indent=4)
         
-        # print("Dados salvos no arquivo abilities.json")
+        # print("Dados salvos no arquivo data_abilities.json")
 
 def init():
     request_abilities()
