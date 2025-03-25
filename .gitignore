@@ -4,6 +4,7 @@
 /node_modules
 /.pnp
 /script-database/venv
+__pycache__
 .pnp.*
 .yarn/*
 !.yarn/patches
