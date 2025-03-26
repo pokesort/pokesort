@@ -8,6 +8,7 @@ def generate_methods():
         "LEVEL UP": 0,
         "TRADE": 0,
         "USE ITEM": 0,
+        "GENDER": 0,
         "UNIQUE": 0,
         "HOLD ITEM": 1,
         "KNOW MOVE": 1,
