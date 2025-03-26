@@ -7,6 +7,7 @@ def generate_methods():
     method_names = {
         "LEVEL UP": 0,
         "TRADE": 0,
+        "REGIONAL": 0,
         "USE ITEM": 0,
         "GENDER": 0,
         "UNIQUE": 0,

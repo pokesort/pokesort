@@ -9,10 +9,10 @@ def connect(collection_name):
     client = MongoClient(uri, server_api=ServerApi('1'))
     try:
         database = client['pokesort-test']
-        collction = database[collection_name]
+        collection = database[collection_name]
 
-        print('Connected successfully')
-        return collction
+        print("Retrieved collection '{collection_name}' successfully")
+        return collection
 
     except Exception as e:
         print(e)
