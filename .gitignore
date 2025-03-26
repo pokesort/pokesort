@@ -3,8 +3,6 @@
 # dependencies
 /node_modules
 /.pnp
-/script-database/venv
-__pycache__
 .pnp.*
 .yarn/*
 !.yarn/patches
@@ -41,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# python
+/script-database/*venv
+/script-database/*.json
+/script-database/__pycache__/

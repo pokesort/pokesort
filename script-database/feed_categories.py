@@ -3,7 +3,7 @@ import json
 import database as db
 
 def fill_categories():
-    categories = db.connect()
+    categories = db.connect("categories")
 
     if categories != None:
         possibilities = [
