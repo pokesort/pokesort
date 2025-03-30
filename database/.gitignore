@@ -2,3 +2,4 @@
 *venv
 *.json
 __pycache__/
+reference/
