@@ -141,11 +141,11 @@ def leftover_clause (evolution_csv):
         pokemon = evolution_csv.loc[evolution_csv["evolved_species_id"] == evolution_csv.at[i, "evolved_species_id"]].iloc[0]
 
         evolution_csv.at[i, "identifier"] = pokemon["identifier"]
-        evolution_csv.at[i, "pokemon_id"] = pokemon["id"]
+        evolution_csv.at[i, "pokemon_id"] = pokemon["pokemon_id"]
         evolution_csv.at[i, "evolution_chain_id"] = pokemon["evolution_chain_id"]
         evolution_csv.at[i, "is_split"] = pokemon["is_split"]
 
-    return evolution_csv    
+    return evolution_csv
 
 if __name__ == "__main__":
     fetch_data()
