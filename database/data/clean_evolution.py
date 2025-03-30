@@ -54,8 +54,8 @@ def prepare_dataframe (evolution_csv):
     evolution_csv["pokemon_id"] = None
 
     column_order = evolution_csv.columns.tolist()
-    column_order.insert(column_order.index("id") + 1, "pokemon_id")
-    column_order.insert(column_order.index("pokemon_id") + 1, "identifier")
+    column_order.insert(column_order.index("id") + 1, "identifier")
+    column_order.insert(column_order.index("identifier") + 1, "pokemon_id")
     column_order.insert(column_order.index("evolved_species_id") + 1, "evolution_chain_id")
     column_order.insert(column_order.index("evolution_chain_id") + 1, "is_split")
     column_order = list(dict.fromkeys(column_order))
@@ -68,72 +68,84 @@ def start_cleanup (pokemon_csv, evolution_csv, species_csv):
 
         species = species_csv.loc[species_csv["id"] == pokemon["species_id"]].iloc[0]
         is_split = pd.notna(species["evolves_from_species_id"]) and (species_csv["evolves_from_species_id"] == species["evolves_from_species_id"]).sum() > 1
-        is_split = 1 if is_split else 0
+        pokemon["is_split"] = 1 if is_split else 0
+        pokemon["evolution_chain_id"] = species["evolution_chain_id"]
 
         if pd.isna(species["evolves_from_species_id"]):
             if not (evolution_csv["evolved_species_id"] == pokemon["species_id"]).any():
-                evolution_csv = add_clause(evolution_csv, pokemon, species, is_split)
+                evolution_csv = add_clause(evolution_csv, pokemon)
             else:
-                copy_clause(pokemon)
-        elif pokemon["id"] >= 10000:
-            if (evolution_csv["evolved_species_id"] == pokemon["species_id"]).sum() == 1:
-                copy_clause(pokemon)
-            else:
-                update_clause(pokemon)
+                evolution_csv = copy_clause(evolution_csv, pokemon)
+        elif pokemon["id"] >= 10000 and (evolution_csv["evolved_species_id"] == pokemon["species_id"]).sum() == 1:
+                evolution_csv = copy_clause(evolution_csv, pokemon)
         else:
-            update_clause(pokemon)
+            evolution_csv = update_clause(evolution_csv, pokemon)
 
-    return evolution_csv.sort_values(by=["evolution_chain_id", "pokemon_id"], ascending=True)
-
-# def start_cleanup_old ():
-#     # Percorre pokemons, adicionando os ausentes e os tratando
-#     global pokemon_csv, evolution_csv, species_csv
-#     for _, pokemon in pokemon_csv.iterrows():
-#         if pokemon["id"] >= 10000 and skip_clause(pokemon): continue
-
-#         print(f"> Iterando #{pokemon["id"]}: {pokemon["identifier"]}")
-#         pokemon_id = pokemon["id"]
-#         species_id = pokemon["species_id"]
-#         species = species_csv.loc[species_csv["id"] == species_id].iloc[0]
-#         is_split = pd.notna(species["evolves_from_species_id"]) and (species_csv["evolves_from_species_id"] == species["evolves_from_species_id"]).sum() > 1
-#         is_split = 1 if is_split else 0
-        
-#         if pokemon["id"] < 10000 and not (evolution_csv["evolved_species_id"] == species_id).any():
-#             print(f"Criando nova linha para {pokemon["identifier"]}...")
-#             new_row = {"pokemon_id": pokemon_id, "evolved_species_id": species_id}
-#             evolution_csv = pd.concat([evolution_csv, pd.DataFrame([new_row])], ignore_index=True)
-#         else:
-#             evolution_csv.loc[evolution_csv["evolved_species_id"] == pokemon_id, "pokemon_id"] = pokemon_id
-
-#         print(f"Atualizando linha de {pokemon["identifier"]}...")
-#         evolution_csv.loc[evolution_csv["pokemon_id"] == pokemon_id, "identifier"] = pokemon["identifier"]
-#         evolution_csv.loc[evolution_csv["pokemon_id"] == pokemon_id, "evolved_species_id"] = species_id
-#         evolution_csv.loc[evolution_csv["pokemon_id"] == pokemon_id, "evolution_chain_id"] = species["evolution_chain_id"]
-#         evolution_csv.loc[evolution_csv["pokemon_id"] == pokemon_id, "is_split"] = is_split
-
-#     evolution_csv = evolution_csv.sort_values(by=["evolution_chain_id", "pokemon_id"], ascending=True)
+    evolution_csv = leftover_clause(evolution_csv)
+    evolution_csv = evolution_csv.sort_values(by=["evolution_chain_id", "evolved_species_id", "pokemon_id"], ascending=True)
+    evolution_csv["id"] = range(1, len(evolution_csv) + 1)
+    return evolution_csv
 
 def skip_clause (pokemon):
     # Exclui formas mega, gmax e outras formas
     keywords = ['-mega', '-gmax', '-primal', '-totem', 'pikachu', 'eternatus', 'koraidon', 'miraidon']
     return any(keyword in pokemon["identifier"] for keyword in keywords)
 
-def add_clause (evolution_csv, pokemon, species, is_split=0):
+def add_clause (evolution_csv, pokemon):
+    # Adiciona um evolution step novo
     print(f"Criando nova linha para {pokemon["identifier"]}...")
     new_row = {
         "pokemon_id": pokemon["id"],
-        "evolved_species_id": species["id"],
+        "evolved_species_id": pokemon["species_id"],
         "identifier": pokemon["identifier"],
-        "evolution_chain_id": species["evolution_chain_id"],
-        "is_split": is_split
+        "evolution_chain_id": pokemon["evolution_chain_id"],
+        "is_split": pokemon["is_split"]
     }
     return pd.concat([evolution_csv, pd.DataFrame([new_row])], ignore_index=True)
 
-def copy_clause (pokemon):
-    print("Copy")
+def copy_clause (evolution_csv, pokemon):
+    # Copia o evolution step da forma original deste pokemon
+    print(f"Copiando linha para {pokemon["identifier"]}...")
+    new_row = evolution_csv.loc[evolution_csv["evolved_species_id"] == pokemon["species_id"]].iloc[0]
+    new_row["identifier"] = pokemon["identifier"]
+    new_row["pokemon_id"] = pokemon["id"]
+    new_row["evolution_chain_id"] = pokemon["evolution_chain_id"]
+    new_row["is_split"] = pokemon["is_split"]
+    return pd.concat([evolution_csv, pd.DataFrame([new_row])], ignore_index=True)
 
-def update_clause (pokemon):
-    print("Update")
+def update_clause (evolution_csv, pokemon):
+    # Encontra uma linha apropriada para inserir as informações deste pokemon
+    rows = evolution_csv.loc[evolution_csv["evolved_species_id"] == pokemon["species_id"]]
+    if rows.empty: return evolution_csv
+    print(f"Atualizando linha para {pokemon["identifier"]}...")
+
+    update_index = rows.index[0]
+    for i in rows.index:
+        if pd.isna(evolution_csv.at[i, "identifier"]):
+            update_index = i
+            break
+
+    evolution_csv.at[update_index, "identifier"] = pokemon["identifier"]
+    evolution_csv.at[update_index, "pokemon_id"] = pokemon["id"]
+    evolution_csv.at[update_index, "evolution_chain_id"] = pokemon["evolution_chain_id"]
+    evolution_csv.at[update_index, "is_split"] = pokemon["is_split"]
+    return evolution_csv
+
+def leftover_clause (evolution_csv):
+    # Cuida de métodos de evolução alternativos como milotic e magnezone
+    rows = evolution_csv.loc[pd.isna(evolution_csv["pokemon_id"])]
+    if rows.empty: return evolution_csv
+    print("> Resolvendo evoluções duplicadas...")
+
+    for i in rows.index:
+        pokemon = evolution_csv.loc[evolution_csv["evolved_species_id"] == evolution_csv.at[i, "evolved_species_id"]].iloc[0]
+
+        evolution_csv.at[i, "identifier"] = pokemon["identifier"]
+        evolution_csv.at[i, "pokemon_id"] = pokemon["id"]
+        evolution_csv.at[i, "evolution_chain_id"] = pokemon["evolution_chain_id"]
+        evolution_csv.at[i, "is_split"] = pokemon["is_split"]
+
+    return evolution_csv    
 
 if __name__ == "__main__":
     fetch_data()
@@ -143,4 +155,5 @@ if __name__ == "__main__":
 
     evolution_csv = prepare_dataframe(evolution_csv)
     evolution_csv = start_cleanup(pokemon_csv, evolution_csv, species_csv)
+    print(f"> Salvando csv modificado com {evolution_csv.shape[0]} linhas")
     evolution_csv.to_csv("pokemon_evolution.csv", index=False)
