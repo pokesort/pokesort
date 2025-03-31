@@ -3,23 +3,6 @@ EVOLUTION CHAIN CLEANUP
 
 Este script irá gerar um csv de pokemon_evolution
 remanejado de forma a incluir formas regionais e chain_ids
-
-ALGORITMO
-para cada pokemon:
-    se seu nome possui keywords da skip clause (megas, gmax, totem...):
-        PULAR
-    se 'evolves_from' for vazio (forma inicial):
-        se não existe esta espécie na tabela:
-            ADICIONAR apenas com sua evolution_chain
-        se já existe esta espécia na tabela:
-            COPIAR linha existente e substituir identifier e pokemon_id
-    senão (é forma evoluída) se id > 10000:        
-        se existe mais de uma linha desta espécie na tabela:
-            ATUALIZAR identifier e pokemon_id na linha correta
-        se existe somente uma linha desta espécie na tabela:
-            COPIAR linha existente e substituir identifier e pokemon_id
-    senão:
-        ATUALIZAR identifier e pokemon_id
 '''
 
 import pandas as pd
@@ -52,17 +35,20 @@ def prepare_dataframe (evolution_csv):
     evolution_csv["evolution_chain_id"] = None
     evolution_csv["is_split"] = None
     evolution_csv["pokemon_id"] = None
+    evolution_csv["regional"] = None
 
     column_order = evolution_csv.columns.tolist()
     column_order.insert(column_order.index("id") + 1, "identifier")
     column_order.insert(column_order.index("identifier") + 1, "pokemon_id")
     column_order.insert(column_order.index("evolved_species_id") + 1, "evolution_chain_id")
     column_order.insert(column_order.index("evolution_chain_id") + 1, "is_split")
+    column_order.insert(column_order.index("evolution_trigger_id") + 1, "regional")
     column_order = list(dict.fromkeys(column_order))
     return evolution_csv[column_order]
 
 def start_cleanup (pokemon_csv, evolution_csv, species_csv):
     for _, pokemon in pokemon_csv.iterrows():
+        # if not ('darmanitan' in pokemon["identifier"]): continue
         if pokemon["id"] >= 10000 and skip_clause(pokemon): continue
         print(f"> Iterando #{pokemon["id"]}: {pokemon["identifier"]}")
 
@@ -76,7 +62,7 @@ def start_cleanup (pokemon_csv, evolution_csv, species_csv):
                 evolution_csv = add_clause(evolution_csv, pokemon)
             else:
                 evolution_csv = copy_clause(evolution_csv, pokemon)
-        elif pokemon["id"] >= 10000 and (evolution_csv["evolved_species_id"] == pokemon["species_id"]).sum() == 1:
+        elif pokemon["id"] >= 10000 and ('-zen' in pokemon['identifier'] or (evolution_csv["evolved_species_id"] == pokemon["species_id"]).sum() == 1):
                 evolution_csv = copy_clause(evolution_csv, pokemon)
         else:
             evolution_csv = update_clause(evolution_csv, pokemon)
@@ -84,11 +70,12 @@ def start_cleanup (pokemon_csv, evolution_csv, species_csv):
     evolution_csv = leftover_clause(evolution_csv)
     evolution_csv = evolution_csv.sort_values(by=["evolution_chain_id", "evolved_species_id", "pokemon_id"], ascending=True)
     evolution_csv["id"] = range(1, len(evolution_csv) + 1)
+    evolution_csv = regional_clause(evolution_csv)
     return evolution_csv
 
 def skip_clause (pokemon):
     # Exclui formas mega, gmax e outras formas
-    keywords = ['-mega', '-gmax', '-primal', '-totem', 'pikachu', 'eternatus', 'koraidon', 'miraidon']
+    keywords = ['-mega', '-gmax', '-primal', '-totem', '-dada', 'pikachu', 'eevee', 'rockruff', 'eternatus', 'koraidon', 'miraidon']
     return any(keyword in pokemon["identifier"] for keyword in keywords)
 
 def add_clause (evolution_csv, pokemon):
@@ -106,7 +93,8 @@ def add_clause (evolution_csv, pokemon):
 def copy_clause (evolution_csv, pokemon):
     # Copia o evolution step da forma original deste pokemon
     print(f"Copiando linha para {pokemon["identifier"]}...")
-    new_row = evolution_csv.loc[evolution_csv["evolved_species_id"] == pokemon["species_id"]].iloc[0]
+    special = '-galar-zen' in pokemon["identifier"]
+    new_row = evolution_csv.loc[evolution_csv["evolved_species_id"] == pokemon["species_id"]].iloc[1 if special else 0]
     new_row["identifier"] = pokemon["identifier"]
     new_row["pokemon_id"] = pokemon["id"]
     new_row["evolution_chain_id"] = pokemon["evolution_chain_id"]
@@ -145,6 +133,60 @@ def leftover_clause (evolution_csv):
         evolution_csv.at[i, "evolution_chain_id"] = pokemon["evolution_chain_id"]
         evolution_csv.at[i, "is_split"] = pokemon["is_split"]
 
+    return evolution_csv
+
+def regional_clause (evolution_csv):
+    # Itera novamente pelo dataset colocando formas regionais em suas próprias linhas evolutivas
+    print(f"> Tratando formas regionais...")
+
+    sufixes = ['alola', 'galar', 'hisui', 'paldea', 'white-striped', 'basculegion-male']
+    regions = ['alola', 'galar', 'hisui', 'paldea']
+    special_bois = {
+        862: regions[1],
+        863: regions[1],
+        865: regions[1],
+        864: regions[1],
+        866: regions[1],
+        867: regions[1],
+        899: regions[2],
+        900: regions[2],
+        901: regions[2],
+        902: regions[2],
+        10248: regions[2],
+        903: regions[2],
+        904: regions[2],
+        980: regions[3],
+        10272: regions[3],
+    }
+    new_line = {}
+
+    for i in evolution_csv["id"].unique():
+        pokemon = evolution_csv.loc[evolution_csv['id'] == i].iloc[0]
+        chain_id = pokemon["evolution_chain_id"]
+        if chain_id not in new_line:
+            new_line[chain_id] = False
+
+        if any(sufix in pokemon["identifier"] for sufix in sufixes):
+            print(f"Tratando {pokemon['identifier']}")
+            
+            sufix = 'hisui'
+            for region in regions:
+                if (region in pokemon["identifier"]): sufix = region
+
+            if pd.isna(pokemon["evolution_trigger_id"]) or new_line[chain_id]:
+                evolution_csv.loc[evolution_csv['id'] == pokemon["id"], "evolution_chain_id"] = f"{chain_id}-{sufix}"
+                new_line[chain_id] = True
+            evolution_csv.loc[evolution_csv['id'] == pokemon["id"], "regional"] = sufix
+        elif pokemon["pokemon_id"] in special_bois.keys():
+            print(f"Tratando {pokemon['identifier']}")
+
+            sufix = special_bois[pokemon["pokemon_id"]]
+            if new_line[chain_id]:
+                evolution_csv.loc[evolution_csv['id'] == pokemon["id"], "evolution_chain_id"] = f"{chain_id}-{sufix}"
+            evolution_csv.loc[evolution_csv['id'] == pokemon["id"], "regional"] = sufix
+
+    evolution_csv = evolution_csv.sort_values(by=["evolution_chain_id", "evolved_species_id", "pokemon_id"], ascending=True)
+    evolution_csv["id"] = range(1, len(evolution_csv) + 1)
     return evolution_csv
 
 if __name__ == "__main__":
