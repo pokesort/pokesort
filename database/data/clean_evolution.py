@@ -35,11 +35,13 @@ def prepare_dataframe (evolution_csv):
     evolution_csv["evolution_chain_id"] = None
     evolution_csv["is_split"] = None
     evolution_csv["pokemon_id"] = None
+    evolution_csv["step_id"] = 0
     evolution_csv["regional"] = None
 
     column_order = evolution_csv.columns.tolist()
     column_order.insert(column_order.index("id") + 1, "identifier")
     column_order.insert(column_order.index("identifier") + 1, "pokemon_id")
+    column_order.insert(column_order.index("pokemon_id") + 1, "step_id")
     column_order.insert(column_order.index("evolved_species_id") + 1, "evolution_chain_id")
     column_order.insert(column_order.index("evolution_chain_id") + 1, "is_split")
     column_order.insert(column_order.index("evolution_trigger_id") + 1, "regional")
@@ -68,9 +70,17 @@ def start_cleanup (pokemon_csv, evolution_csv, species_csv):
             evolution_csv = update_clause(evolution_csv, pokemon)
 
     evolution_csv = leftover_clause(evolution_csv)
-    evolution_csv = evolution_csv.sort_values(by=["evolution_chain_id", "evolved_species_id", "pokemon_id"], ascending=True)
+    evolution_csv = evolution_csv.sort_values(by=["evolution_chain_id", "evolved_species_id", "pokemon_id"], ascending=True).reset_index(drop=True)
     evolution_csv["id"] = range(1, len(evolution_csv) + 1)
-    evolution_csv = regional_clause(evolution_csv)
+    evolution_csv = handle_regionals(evolution_csv)
+    
+    print(f"> Atualizando step_ids...")
+    for i in evolution_csv.loc[pd.isna(evolution_csv["evolution_trigger_id"])].index:
+        pokemon = evolution_csv.iloc[i]
+        evolution_csv = handle_steps(evolution_csv, species_csv, pokemon["pokemon_id"])
+    evolution_csv = evolution_csv.sort_values(by=["evolution_chain_id", "step_id", "evolved_species_id", "pokemon_id"], ascending=True).reset_index(drop=True)
+    evolution_csv["id"] = range(1, len(evolution_csv) + 1)    
+
     return evolution_csv
 
 def skip_clause (pokemon):
@@ -86,7 +96,8 @@ def add_clause (evolution_csv, pokemon):
         "evolved_species_id": pokemon["species_id"],
         "identifier": pokemon["identifier"],
         "evolution_chain_id": pokemon["evolution_chain_id"],
-        "is_split": pokemon["is_split"]
+        "is_split": pokemon["is_split"],
+        "step_id": 0
     }
     return pd.concat([evolution_csv, pd.DataFrame([new_row])], ignore_index=True)
 
@@ -135,7 +146,7 @@ def leftover_clause (evolution_csv):
 
     return evolution_csv
 
-def regional_clause (evolution_csv):
+def handle_regionals (evolution_csv):
     # Itera novamente pelo dataset colocando formas regionais em suas próprias linhas evolutivas
     print(f"> Tratando formas regionais...")
 
@@ -158,13 +169,14 @@ def regional_clause (evolution_csv):
         980: regions[3],
         10272: regions[3],
     }
+    mime_case = [57]
     new_line = {}
 
     for i in evolution_csv["id"].unique():
         pokemon = evolution_csv.loc[evolution_csv['id'] == i].iloc[0]
         chain_id = pokemon["evolution_chain_id"]
         if chain_id not in new_line:
-            new_line[chain_id] = False
+            new_line[chain_id] = chain_id in mime_case
 
         if any(sufix in pokemon["identifier"] for sufix in sufixes):
             print(f"Tratando {pokemon['identifier']}")
@@ -185,8 +197,23 @@ def regional_clause (evolution_csv):
                 evolution_csv.loc[evolution_csv['id'] == pokemon["id"], "evolution_chain_id"] = f"{chain_id}-{sufix}"
             evolution_csv.loc[evolution_csv['id'] == pokemon["id"], "regional"] = sufix
 
-    evolution_csv = evolution_csv.sort_values(by=["evolution_chain_id", "evolved_species_id", "pokemon_id"], ascending=True)
-    evolution_csv["id"] = range(1, len(evolution_csv) + 1)
+    return evolution_csv
+
+def handle_steps (evolution_csv, species_csv, id, step=0):
+    # Adiciona recursivamente o id dos steps de cada linha evolutiva
+    
+    evolution_csv.loc[evolution_csv["pokemon_id"] == id, "step_id"] = step
+    pokemon = evolution_csv.loc[evolution_csv["pokemon_id"] == id].iloc[0]
+    next_ids = species_csv.loc[species_csv["evolves_from_species_id"] == pokemon["evolved_species_id"], "id"].tolist()
+    next_mons = evolution_csv.loc[
+        (evolution_csv["evolved_species_id"].isin(next_ids)) & 
+        (evolution_csv["evolution_chain_id"] == pokemon["evolution_chain_id"]), 
+        "pokemon_id"
+    ].tolist()
+
+    for next_id in next_mons:
+        evolution_csv = handle_steps(evolution_csv, species_csv, next_id, step+1)
+
     return evolution_csv
 
 if __name__ == "__main__":
