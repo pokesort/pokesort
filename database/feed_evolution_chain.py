@@ -1,68 +1,89 @@
 import database as db
-import requests, json
+import pandas as pd
+import requests
 
-def request_chains():
-    url = "https://pokeapi.co/api/v2/evolution-chain?limit=20"
-    response = requests.get(url)
+def check_unique(pokemon):
 
-    if response.status_code == 200:
-        data = response.json()['results']
+    is_unique = False
+    unique_columns = [
+        'relative_physical_stats',
+        'party_species_id',
+        'party_type_id',
+        'trade_species_id',
+        'needs_overworld_rain',
+        'turn_upside_down'
+    ]
+    for col in unique_columns:
+        is_unique = is_unique or not (pd.isna(pokemon[col]) or pokemon[col] == 0)
 
-        global methods, evolution_chain, evolution_step
-        methods = db.connect("evolution_methods")
-        evolution_chain = db.connect("evolution_chain")
-        evolution_step = db.connect("evolution_step")
+    is_unique = is_unique or pokemon["time_of_day"] == "dusk"
 
-        if evolution_chain is None or evolution_step is None:
-            return
+    return is_unique
 
-        for chain in data:
-            
-            url_chain = chain['url']
-            chain_json = requests.get(url_chain).json()
+def fill_methods(pokemon):
 
-            existing_document = evolution_chain.find_one({'id': chain_json['id']})
-            if existing_document:
-                print(f"Documento com id {chain_json['id']} já existe. Não inserindo novamente.")
-                continue
-            
-            global chain_document
-            chain_document = {
-                'id': chain_json['id'],
-                'steps': []
-            }
-            
-
-            generate_step(chain_json['id'], chain_json['chain'])
-
-            evolution_chain.insert_one(chain_document)
-            print(f"Documento de chain inserido com o id: {chain_document['id']}")
-
-def generate_step (chain_id, data, step=0):
-    pokemon_id = data['species']['url'].split('/')[-2]    
-
-    step_document = {
-        "chain_id": chain_id,
-        "step": step,
-        "pokemon": pokemon_id,
-        "methods": generate_methods(data)
-    }
-    
-    inserted = evolution_step.insert_one(step_document)
-    chain_document["steps"].append(inserted.inserted_id)
-    print(f"Documento de step inserido com o id: {inserted.inserted_id}")
-    print(step_document)
-
-    for next in data['evolves_to']:
-        generate_step(chain_id, next, step+1)
-
-def generate_methods (data):
     methods = []
 
-    # if (len(data['evolution_details']) < 1):
+    if pd.isna(pokemon['evolution_trigger_id']):
+        return methods
+    if pokemon['evolution_trigger_id'] == 1.0:
+        methods.append(1)
+    if pokemon['evolution_trigger_id'] == 2.0:
+        methods.append(2)
+    if pokemon['evolution_trigger_id'] == 3.0:
+        methods.append(4)
+    if pokemon['evolution_trigger_id'] > 3.0:
+        methods.append(3)
+    if not pd.isna(pokemon['regional']):
+        methods.append(3)
+    if pokemon['evolution_trigger_id'] != 3 and not pd.isna(pokemon['trigger_item_id']):
+        methods.append(7)
+    if not pd.isna(pokemon['gender_id']):
+        methods.append(5)
+    if not pd.isna(pokemon['known_move_id']) or not pd.isna(pokemon['known_move_type_id']):
+        methods.append(8)
+    if not pd.isna(pokemon['minimum_happiness']):
+        methods.append(9)
+    if pokemon['time_of_day'] == 'day':
+        methods.append(10)
+    if pokemon['time_of_day'] == 'night':
+        methods.append(11)
+    if 3 not in methods and check_unique(pokemon):
+        methods.append(3)
 
+    return list(set(methods))
 
-    return methods
+def generate_chains():
 
+    pokemon_csv = pd.read_csv("data/pokemon_evolution.csv")
+
+    methods = db.connect("evolution_methods")
+    steps = db.connect("evolution_steps")
+    chains = db.connect("evolution_chains")
+
+    for _, pokemon in pokemon_csv.iterrows():
+
+        methods = fill_methods(pokemon)
+
+        id = f"{pokemon['evolution_chain_id']}-{pokemon['step_id']}"
+        document = {
+            'id': id,
+            'step' : pokemon['step_id'],
+            'is_split': pokemon['is_split'],
+            'pokemon': pokemon['pokemon_id'],
+            'methods': methods
+        }
+
+        print(document)
+
+        # existing_document = methods.find_one({"id": index})
+
+        # if existing_document:
+        #     print(f"Documento com nome {name} já existe. Não inserindo novamente.")
+        # else:
+        #     methods.insert_one(document)
+        #     print(f"Documento inserido com o nome: {name}")
+
+    
 def init():
-    request_chains()
+    generate_chains()

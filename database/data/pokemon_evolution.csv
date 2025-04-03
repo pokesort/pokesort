@@ -1174,8 +1174,8 @@ id,identifier,pokemon_id,step_id,evolved_species_id,evolution_chain_id,is_split,
 1173,muk-alola,10113,1,89,38-alola,0,1.0,alola,,38.0,,,,,,,,,,,,,,0.0,0.0
 1174,voltorb-hisui,10231,0,100,44-hisui,0,,hisui,,,,,,,,,,,,,,,,,
 1175,electrode-hisui,10232,1,101,44-hisui,0,1.0,hisui,,30.0,,,,,,,,,,,,,,0.0,0.0
-1176,mr-mime-galar,10168,0,122,57-galar,0,1.0,galar,,,,,,,102.0,,,,,,,,,0.0,0.0
-1177,mr-rime,866,0,866,57-galar,0,1.0,galar,,42.0,,,,,,,,,,,,,,0.0,0.0
+1176,mr-mime-galar,10168,1,122,57-galar,0,1.0,galar,,,,,,,102.0,,,,,,,,,0.0,0.0
+1177,mr-rime,866,2,866,57-galar,0,1.0,galar,,42.0,,,,,,,,,,,,,,0.0,0.0
 1178,tauros-paldea-combat-breed,10250,0,128,63-paldea,0,,paldea,,,,,,,,,,,,,,,,,
 1179,tauros-paldea-blaze-breed,10251,0,128,63-paldea,0,,paldea,,,,,,,,,,,,,,,,,
 1180,tauros-paldea-aqua-breed,10252,0,128,63-paldea,0,,paldea,,,,,,,,,,,,,,,,,

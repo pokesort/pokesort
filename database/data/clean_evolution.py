@@ -211,6 +211,10 @@ def handle_steps (evolution_csv, species_csv, id, step=0):
         "pokemon_id"
     ].tolist()
 
+    # Tratar mime jr
+    if (id == 439):
+        next_mons.append(10168)
+
     for next_id in next_mons:
         evolution_csv = handle_steps(evolution_csv, species_csv, next_id, step+1)
 
