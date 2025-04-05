@@ -8,6 +8,10 @@ remanejado de forma a incluir formas regionais e chain_ids
 import pandas as pd
 import os, requests
 
+MILOTIC_SPECIES = 350
+PROBOPASS_SPECIES = 476
+MIMEJR_CHAIN = 57
+
 def fetch_data ():
     # Se os arquivos csv não existirem, buscá-los do github
     files = {
@@ -69,7 +73,7 @@ def start_cleanup (pokemon_csv, evolution_csv, species_csv):
         else:
             evolution_csv = update_clause(evolution_csv, pokemon)
 
-    evolution_csv = leftover_clause(evolution_csv)
+    evolution_csv = leftover_clause(evolution_csv, species_csv)
     evolution_csv = evolution_csv.sort_values(by=["evolution_chain_id", "evolved_species_id", "pokemon_id"], ascending=True).reset_index(drop=True)
     evolution_csv["id"] = range(1, len(evolution_csv) + 1)
     evolution_csv = handle_regionals(evolution_csv)
@@ -130,21 +134,32 @@ def update_clause (evolution_csv, pokemon):
     evolution_csv.at[update_index, "is_split"] = pokemon["is_split"]
     return evolution_csv
 
-def leftover_clause (evolution_csv):
+def leftover_clause (evolution_csv, species_csv):
     # Cuida de métodos de evolução alternativos como milotic e magnezone
-    rows = evolution_csv.loc[pd.isna(evolution_csv["pokemon_id"])]
-    if rows.empty: return evolution_csv
+    output_csv = evolution_csv
+    species = output_csv.loc[pd.isna(evolution_csv["pokemon_id"]), "evolved_species_id"].unique()
+
+    if species.size == 0: return evolution_csv
     print("> Resolvendo evoluções duplicadas...")
 
-    for i in rows.index:
-        pokemon = evolution_csv.loc[evolution_csv["evolved_species_id"] == evolution_csv.at[i, "evolved_species_id"]].iloc[0]
+    for specie in species:
+        rows = output_csv.loc[evolution_csv["evolved_species_id"] == specie]
+        pokemon = rows.iloc[0]
 
-        evolution_csv.at[i, "identifier"] = pokemon["identifier"]
-        evolution_csv.at[i, "pokemon_id"] = pokemon["pokemon_id"]
-        evolution_csv.at[i, "evolution_chain_id"] = pokemon["evolution_chain_id"]
-        evolution_csv.at[i, "is_split"] = pokemon["is_split"]
+        for i in rows.index:
+            if i == rows.index[-2 if specie == MILOTIC_SPECIES else -1]:
+                output_csv.at[i, "identifier"] = pokemon["identifier"]
+                output_csv.at[i, "pokemon_id"] = pokemon["pokemon_id"]
+                output_csv.at[i, "evolution_chain_id"] = pokemon["evolution_chain_id"]
+                output_csv.at[i, "is_split"] = pokemon["is_split"]
 
-    return evolution_csv
+                if (specie == PROBOPASS_SPECIES):
+                    output_csv.at[i, "evolution_trigger_id"] = 3
+                    output_csv.at[i, "trigger_item_id"] = 83
+            else:
+                output_csv = output_csv.drop(i)
+
+    return output_csv
 
 def handle_regionals (evolution_csv):
     # Itera novamente pelo dataset colocando formas regionais em suas próprias linhas evolutivas
@@ -169,7 +184,7 @@ def handle_regionals (evolution_csv):
         980: regions[3],
         10272: regions[3],
     }
-    mime_case = [57]
+    mime_case = [MIMEJR_CHAIN]
     new_line = {}
 
     for i in evolution_csv["id"].unique():

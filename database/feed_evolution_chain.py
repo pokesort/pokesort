@@ -61,47 +61,46 @@ def generate_chains():
     chains = db.connect("evolution_chains")
     steps_dict = {}
 
-    for _, pokemon in pokemon_csv.iloc[:101].iterrows():
+    for _, pokemon in pokemon_csv.iterrows():
 
-        chain_id = pokemon["evolution_chain_id"]
-        if chain_id not in steps_dict:
-            steps_dict[chain_id] = []
+        # chain_id = pokemon["evolution_chain_id"]
+        # if chain_id not in steps_dict:
+        #     steps_dict[chain_id] = []
         methods = fill_methods(pokemon)
 
         id = f"{pokemon['evolution_chain_id']}-{pokemon['step_id']}"
         document = {
             'id': id,
+            'chain_id': pokemon['evolution_chain_id'],
             'step' : pokemon['step_id'],
             'is_split': pokemon['is_split'],
             'pokemon': pokemon['pokemon_id'],
             'methods': methods
         }
 
-        print(document)
-
         existing_document = steps.find_one({"id": id, "pokemon": pokemon['pokemon_id']})
 
         if existing_document:
-            steps_dict[chain_id].append(existing_document["_id"])
+            # steps_dict[chain_id].append(existing_document["_id"])
             print(f"Evolution step com id {id} já existe. Não inserindo novamente.")
         else:
             result = steps.insert_one(document)
-            steps_dict[chain_id].append(result.inserted_id)
-            print(f"Evolution step inseridi com o id: {id}")
+            # steps_dict[chain_id].append(result.inserted_id)
+            print(f"Evolution step inserido com o id: {id}")
 
-    for chain_id, steps in steps_dict.items():
-        document = {
-            'id': chain_id,
-            'steps': steps
-        }
+    # for chain_id, steps in steps_dict.items():
+    #     document = {
+    #         'id': chain_id,
+    #         'steps': steps
+    #     }
 
-        existing_document = chains.find_one({"id": chain_id})
+    #     existing_document = chains.find_one({"id": chain_id})
 
-        if existing_document:
-            print(f"Evolution chain com id {chain_id} já existe. Não inserindo novamente.")
-        else:
-            chains.insert_one(document)
-            print(f"Evolution chain inserido com o id: {chain_id}")
+    #     if existing_document:
+    #         print(f"Evolution chain com id {chain_id} já existe. Não inserindo novamente.")
+    #     else:
+    #         chains.insert_one(document)
+    #         print(f"Evolution chain inserido com o id: {chain_id}")
     
 def init():
     generate_chains()
