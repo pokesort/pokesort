@@ -1,5 +1,3 @@
-import requests
-import json
 import database as db
 
 def fill_categories():
@@ -11,6 +9,7 @@ def fill_categories():
             "isMythical",
             "isLegendary",
             "MegaEvolves",
+            "isMegaEvolution",
             "hasGigantamax",
             "hasExclusiveZMove",
             "isRegionalForm",

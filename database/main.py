@@ -4,6 +4,7 @@ import feed_moves as movesDB
 import feed_abilities as abilityDB
 import feed_evolution_chain as evolutionChainDB
 import feed_evolution_methods as evolutionMethodDB
+import feed_pokemon as pokemon
 from dotenv import load_dotenv
 import os
 
@@ -16,4 +17,5 @@ if __name__ == "__main__":
     # categoriesDB.init()
     # abilityDB.init()
     # evolutionMethodDB.init()
-    evolutionChainDB.init()
+    # evolutionChainDB.init()
+    pokemon.init()
