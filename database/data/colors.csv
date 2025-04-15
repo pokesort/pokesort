@@ -159,8 +159,8 @@ goldeen,red
 seaking,red
 staryu,brown
 starmie,purple
-mr.-mime,pink
-mr.-mime-galar,white
+mr-mime,pink
+mr-mime-galar,white
 scyther,green
 jynx,red
 electabuzz,yellow
@@ -538,7 +538,7 @@ skuntank,purple
 bronzor,green
 bronzong,green
 bonsly,brown
-mime-jr.,pink
+mime-jr,pink
 happiny,pink
 chatot,black
 spiritomb,purple
@@ -902,7 +902,7 @@ vikavolt,blue
 crabrawler,purple
 crabominable,white
 oricorio-baile,red
-oricorio-pa'u,pink
+oricorio-pau,pink
 oricorio-pom-pom,yellow
 oricorio-sensu,purple
 cutiefly,yellow
@@ -975,8 +975,8 @@ celesteela,green
 kartana,white
 guzzlord,black
 necrozma,black
-necrozma-dusk-mane,yellow
-necrozma-dawn-wings,blue
+necrozma-dusk,yellow
+necrozma-dawn,blue
 necrozma-ultra,yellow
 magearna,gray
 magearna-original-color,red
@@ -1045,7 +1045,7 @@ obstagoon,gray
 perrserker,brown
 cursola,white
 sirfetch'd,white
-mr.-rime,purple
+mr-rime,purple
 runerigus,gray
 milcery,white
 alcremie-vacr/sacr,white
@@ -1054,6 +1054,7 @@ alcremie-macr,green
 alcremie-micr,blue
 alcremie-lecr/rusw/rasw,yellow
 alcremie-casw,brown
+alcremie,white
 falinks,yellow
 pincurchin,purple
 snom,white
