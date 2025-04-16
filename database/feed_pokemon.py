@@ -1,5 +1,6 @@
 import database as db
 import requests, json, os
+import pandas as pd
 
 REGIONS = {
         '1': "kanto",
@@ -18,7 +19,7 @@ HISUIAN = [
 ]
 
 def request_moves():
-    url = "https://pokeapi.co/api/v2/pokemon?limit=15"
+    url = "https://pokeapi.co/api/v2/pokemon?limit=3000"
     response = requests.get(url)
 
     if response.status_code != 200:
@@ -35,36 +36,39 @@ def request_moves():
     if evolution_steps == None:
         print("Erro de fetch")
         return
+    
+    colors = pd.read_csv('data/colors.csv')
 
     for pokemon in data:
         pokemon_json = requests.get(pokemon['url']).json()
-        species_json = requests.get(pokemon_json['species']['url']).json()
+
+        # species_json = requests.get(pokemon_json['species']['url']).json()
 
         document = {
-            "id": pokemon_json["id"],
-            "is_default": pokemon_json["is_default"],
-            "name": pokemon_json["name"],
-            "types": getTypes(pokemon_json),
-            "moves": getMoves(pokemon_json),
-            "egg_groups": getEggGroups(species_json),
-            "evolution_step": getEvolutionStep(pokemon_json["id"], evolution_steps),
-            "categories": getCategories(pokemon_json, species_json),
-            "generation": getGeneration(pokemon_json, species_json),
-            "region": getRegion(pokemon_json, species_json),
-            "abilities": getAbilities(pokemon_json),
-            "other_forms": getOtherForms(species_json, pokemon_json["id"]),
-            "habitat": getHabitat(species_json),
-            "shape": species_json["shape"]["name"],
-            "color": getColor(species_json, pokemon_json["id"])
+            # "id": pokemon_json["id"],
+            # "is_default": pokemon_json["is_default"],
+            # "name": pokemon_json["name"],
+            # "types": getTypes(pokemon_json),
+            # "moves": getMoves(pokemon_json),
+            # "egg_groups": getEggGroups(species_json),
+            # "evolution_step": getEvolutionStep(pokemon_json["id"], evolution_steps),
+            # "categories": getCategories(pokemon_json, species_json),
+            # "generation": getGeneration(pokemon_json, species_json),
+            # "region": getRegion(pokemon_json, species_json),
+            # "abilities": getAbilities(pokemon_json),
+            # "other_forms": getOtherForms(species_json, pokemon_json["id"]),
+            # "habitat": getHabitat(species_json),
+            # "shape": species_json["shape"]["name"],
+            "color": getColor(pokemon_json["name"], colors)
         }
 
-        existing_document = pokemons.find_one({'id': document['id']})
+        # existing_document = pokemons.find_one({'id': document['id']})
 
-        if existing_document:
-            print(f"Documento com nome {document["name"]} já existe. Não inserindo novamente.")
-        else:
-            pokemons.insert_one(document)
-            print(f"Documento inserido com o nome: {document["name"]}")
+        # if existing_document:
+        #     print(f"Documento com nome {document["name"]} já existe. Não inserindo novamente.")
+        # else:
+        #     pokemons.insert_one(document)
+        #     print(f"Documento inserido com o nome: {document["name"]}")
 
 def getTypes (pokemon_json):
     types = []
@@ -119,12 +123,14 @@ def getEvolutionStep (id, evolution_steps):
     
     return document["id"]
 
-def getColor (species_json, id):
-    color = species_json["color"]["name"]
-
-    # Falta tratamento das fromas alternativas
-
-    return color
+def getColor (name, colors):
+    color =  colors.loc[colors['Pokemon'] == name, 'Color']
+    if color.empty:
+        print(f'Nome diferente do csv: {name}')
+        return 'color'
+    else:
+        # print(f'Nome encontrado do csv: {name}')
+        return color.values[0]
 
 def getGeneration (pokemon_json, species_json):
     generation = species_json["generation"]["url"].split('/')[-2]

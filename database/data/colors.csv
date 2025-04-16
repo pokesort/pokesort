@@ -38,10 +38,10 @@ sandshrew,yellow
 sandshrew-alola,white
 sandslash,yellow
 sandslash-alola,blue
-nidoran-female,blue
+nidoran-f,blue
 nidorina,blue
 nidoqueen,blue
-nidoran-male,purple
+nidoran-m,purple
 nidorino,purple
 nidoking,purple
 clefairy,pink
@@ -110,8 +110,8 @@ slowbro-mega,pink
 slowbro-galar,pink
 magnemite,gray
 magneton,gray
-farfetch'd,brown
-farfetch'd-galar,brown
+farfetchd,brown
+farfetchd-galar,brown
 doduo,brown
 dodrio,brown
 seel,white
