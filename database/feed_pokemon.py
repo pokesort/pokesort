@@ -27,7 +27,7 @@ def request_moves():
 
     add_meteor = False
 
-    for pokemon in data[1123:1125]:
+    for pokemon in data[:152]:
 
         pokemon_json = requests.get(pokemon['url']).json()
         species_json = requests.get(pokemon_json['species']['url']).json()
@@ -39,33 +39,32 @@ def request_moves():
 
             pokemon_json['name'] = 'minior-meteor'
             add_meteor = True
-        
 
         document = {
-            # "id": pokemon_json["id"],
-            # "is_default": pokemon_json["is_default"],
-            # "name": pokemon_json["name"],
-            # "types": getTypes(pokemon_json),
-            # "moves": getMoves(pokemon_json),
-            # "egg_groups": getEggGroups(species_json),
-            # "evolution_step": getEvolutionStep(pokemon_json["id"], evolution_steps),
+            "id": pokemon_json["id"],
+            "is_default": pokemon_json["is_default"],
+            "name": pokemon_json["name"],
+            "types": getTypes(pokemon_json),
+            "moves": getMoves(pokemon_json),
+            "egg_groups": getEggGroups(species_json),
+            "evolution_step": getEvolutionStep(pokemon_json["id"], evolution_steps),
             "categories": getCategories(pokemon_json, species_json, hasZmoves),
-            # "generation": getGeneration(pokemon_json, species_json),
-            # "region": getRegion(pokemon_json, species_json),
-            # "abilities": getAbilities(pokemon_json, species_json['id']),
-            # "other_forms": getOtherForms(species_json, pokemon_json["id"]),
-            # "habitat": getHabitat(species_json),
-            # "shape": species_json["shape"]["name"],
-            # "color": getColor(species_json['color']['name'], pokemon_json["name"], colors)
+            "generation": getGeneration(pokemon_json, species_json),
+            "region": getRegion(pokemon_json, species_json),
+            "abilities": getAbilities(pokemon_json, species_json['id']),
+            "other_forms": getOtherForms(species_json, pokemon_json["id"]),
+            "habitat": getHabitat(species_json),
+            "shape": species_json["shape"]["name"],
+            "color": getColor(species_json['color']['name'], pokemon_json["name"], colors)
         }
 
-        # existing_document = pokemons.find_one({'id': document['id']})
+        existing_document = pokemons.find_one({'id': document['id']})
 
-        # if existing_document:
-        #     print(f"Documento com nome {document["name"]} já existe. Não inserindo novamente.")
-        # else:
-        #     pokemons.insert_one(document)
-        #     print(f"Documento inserido com o nome: {document["name"]}")
+        if existing_document:
+            print(f"Documento com nome {document["name"]} já existe. Não inserindo novamente.")
+        else:
+            pokemons.insert_one(document)
+            print(f"Documento inserido com o nome: {document["name"]}")
 
 def getTypes (pokemon_json):
     types = []
@@ -170,7 +169,7 @@ def getCategories (pokemon_json, species_json, hasZmoves):
     
     if pokemon_json['name'] in hasZmoves:
         categories.append('7')
-    if species_json['forms_switchable']:
+    if species_json['forms_switchable'] or species_json['name'] in FORMS_SWITCHABLE:
         categories.append('9')
     if species_json['has_gender_differences']:
         categories.append('10')
@@ -182,10 +181,10 @@ def getCategories (pokemon_json, species_json, hasZmoves):
         categories.append('13')
     if '-gmax' in pokemon_json['name']:
         categories.append('14')
-    if any(regional_name in pokemon_json['name'] for regional_name in regional_names):
+    if any(regional_name in pokemon_json['name'] for regional_name in REGIONAL_NAMES):
         categories.append('15')
 
-    print(pokemon_json['name'], categories)
+    # print(pokemon_json['name'], categories)
     return categories
 
 def addCategoriesAlternativeForms(categories, forms, name):
@@ -197,7 +196,7 @@ def addCategoriesAlternativeForms(categories, forms, name):
             categories.append('4')
         if name + '-gmax' in form['pokemon']['name'] or 'eternamax' in form['pokemon']['name']:
             categories.append('6')
-        if any(regional_name in form['pokemon']['name'] for regional_name in regional_names):
+        if any(regional_name in form['pokemon']['name'] for regional_name in REGIONAL_NAMES):
             categories.append('8')
     return categories
 

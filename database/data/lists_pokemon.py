@@ -1,14 +1,14 @@
 REGIONS = {
-        '1': "kanto",
-        '2': "johto",
-        '3': "hoenn",
-        '4': "sinnoh",
-        '5': "unova",
-        '6': "kalos",
-        '7': "alola",
-        '8': "galar",
-        '9': "paldea",
-    }
+    '1': "kanto",
+    '2': "johto",
+    '3': "hoenn",
+    '4': "sinnoh",
+    '5': "unova",
+    '6': "kalos",
+    '7': "alola",
+    '8': "galar",
+    '9': "paldea",
+}
 
 GENERATIONS = {
     'primal': '6',
@@ -36,8 +36,7 @@ POKEMON_EXCLUDES = [
     '-dada', '-totem', '-mode', '-build', 'own-tempo', '-ash'
 ]
 
-regional_names = ['-alola', '-galar', '-paldea', '-hisui']
-
+REGIONAL_NAMES = ['-alola', '-galar', '-paldea', '-hisui']
 
 STARTERS = [
     'bulbasaur', 'ivysaur', 'venusaur',
@@ -92,10 +91,14 @@ ULTRABEASTS = [
 ]
 
 PARADOX = [
-
     'great-tusk', 'scream-tail', 'brute-bonnet', 'flutter-mane', 'walking-wake'
     'slither-wing', 'sandy-shocks', 'roaring-moon', 'raging-bolt', 'gouging-fire',
 
     'iron-treads', 'iron-bundle', 'iron-hands', 'iron-jugulis', 'iron-leaves'
     'iron-moth', 'iron-thorns', 'iron-valiant', 'iron-boulder', 'iron-crown',
+]
+
+FORMS_SWITCHABLE = [
+    'zygarde', 'hoopa', 'oricorio', 'wishiwashi', 'silvally', 'minior', 'mimikyu', 'necrozma',
+    'eiscue', 'morpeko', 'zacian', 'zamazenta', 'calyrex', 'palafin', 'ogerpon', 'terapagos'
 ]

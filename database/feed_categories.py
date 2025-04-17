@@ -28,7 +28,8 @@ def fill_categories():
 
             document = {
                 "id": str(index),
-                "name": possibility
+                "name": possibility,
+                "display": True
             }
             index -=-1
 
