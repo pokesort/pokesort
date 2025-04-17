@@ -17,7 +17,9 @@ def fill_categories():
             "hasGenderDifferences",
             "isFirstPartner",
             "isUltraBeast",
-            "isParadox"
+            "isParadox",
+            "isGMax",
+            "isRegionalForm",
         ]
 
         index = 1

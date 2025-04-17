@@ -1,44 +1,7 @@
 import database as db
 import requests, json, os
 import pandas as pd
-
-REGIONS = {
-        '1': "kanto",
-        '2': "johto",
-        '3': "hoenn",
-        '4': "sinnoh",
-        '5': "unova",
-        '6': "kalos",
-        '7': "alola",
-        '8': "galar",
-        '9': "paldea",
-    }
-
-GENERATIONS = {
-    'primal': '6',
-    'mega': '6',
-    'alola': '7',
-    'gmax': '8',
-    'galar': '8',
-    'hisui': '8',
-    'origin': '8',
-    'paldea': '9'
-}
-
-ABILITIES = {
-    744 : 20,
-    658 : 210,
-    718 : 211
-}
-
-HISUIAN = [
-    899, 900, 901, 902, 903, 904, 905
-]
-
-POKEMON_EXCLUDES = [
-    'power-construct', 'battle-bond', 'gulping', 'gorging', '-rock-star', '-pop-star', '-phd', '-belle', '-libre', '-cosplay', '-cap', '-starter',
-    '-dada', '-totem', '-mode', '-build', 'own-tempo'
-]
+from data.lists_pokemon import *
 
 def request_moves():
     url = "https://pokeapi.co/api/v2/pokemon?limit=3000"
@@ -60,36 +23,40 @@ def request_moves():
         return
     
     colors = pd.read_csv('data/colors.csv')
+    hasZmoves = pd.read_csv('data/z_moves.csv')['Pokémon'].drop_duplicates().tolist()
 
     add_meteor = False
 
-    for pokemon in data:
+    for pokemon in data[1123:1125]:
 
         pokemon_json = requests.get(pokemon['url']).json()
         species_json = requests.get(pokemon_json['species']['url']).json()
         
-        if 'meteor' in pokemon_json["name"] and not add_meteor:
+        if any(pk_excludes in pokemon_json['name'] for pk_excludes in POKEMON_EXCLUDES): continue
+
+        if '-meteor' in pokemon_json["name"]:
+            if add_meteor == True: continue
+
             pokemon_json['name'] = 'minior-meteor'
             add_meteor = True
         
-        if any(pk_excludes in pokemon_json['name'] for pk_excludes in POKEMON_EXCLUDES): continue
 
         document = {
-            "id": pokemon_json["id"],
-            "is_default": pokemon_json["is_default"],
-            "name": pokemon_json["name"],
-            "types": getTypes(pokemon_json),
-            "moves": getMoves(pokemon_json),
-            "egg_groups": getEggGroups(species_json),
-            "evolution_step": getEvolutionStep(pokemon_json["id"], evolution_steps),
-            "categories": getCategories(pokemon_json, species_json),
-            "generation": getGeneration(pokemon_json, species_json),
-            "region": getRegion(pokemon_json, species_json),
-            "abilities": getAbilities(pokemon_json, species_json['id']),
-            "other_forms": getOtherForms(species_json, pokemon_json["id"]),
-            "habitat": getHabitat(species_json),
-            "shape": species_json["shape"]["name"],
-            "color": getColor(species_json['color']['name'], pokemon_json["name"], colors)
+            # "id": pokemon_json["id"],
+            # "is_default": pokemon_json["is_default"],
+            # "name": pokemon_json["name"],
+            # "types": getTypes(pokemon_json),
+            # "moves": getMoves(pokemon_json),
+            # "egg_groups": getEggGroups(species_json),
+            # "evolution_step": getEvolutionStep(pokemon_json["id"], evolution_steps),
+            "categories": getCategories(pokemon_json, species_json, hasZmoves),
+            # "generation": getGeneration(pokemon_json, species_json),
+            # "region": getRegion(pokemon_json, species_json),
+            # "abilities": getAbilities(pokemon_json, species_json['id']),
+            # "other_forms": getOtherForms(species_json, pokemon_json["id"]),
+            # "habitat": getHabitat(species_json),
+            # "shape": species_json["shape"]["name"],
+            # "color": getColor(species_json['color']['name'], pokemon_json["name"], colors)
         }
 
         # existing_document = pokemons.find_one({'id': document['id']})
@@ -186,27 +153,52 @@ def getRegion (pokemon_json, species_json):
 
     return region
 
-def getCategories (pokemon_json, species_json):
+def getCategories (pokemon_json, species_json, hasZmoves):
     categories = []
 
-    # "isBaby",
-    # "isMythical",
-    # "isLegendary",
-    # "MegaEvolves",
-    # "isMegaEvolution",
-    # "hasGigantamax",
-    # "hasExclusiveZMove",
-    # "isRegionalForm",
-    # "SwitchableForm",
-    # "hasGenderDifferences",
-    # "isFirstPartner",
-    # "isUltraBeast",
-    # "isParadox"
-
+    if species_json['is_baby']:
+        categories.append('1')
+    if species_json['is_mythical']:
+        categories.append('2')
+    if species_json['is_legendary']:
+        categories.append('3')
     
+    categories = addCategoriesAlternativeForms(categories, species_json['varieties'], pokemon_json['name']) #id 4, 6, 8
+    
+    if '-mega' in pokemon_json['name']:
+        categories.append('5')
+    
+    if pokemon_json['name'] in hasZmoves:
+        categories.append('7')
+    if species_json['forms_switchable']:
+        categories.append('9')
+    if species_json['has_gender_differences']:
+        categories.append('10')
+    if pokemon_json['name'] in STARTERS:
+        categories.append('11')
+    if pokemon_json['name'] in ULTRABEASTS:
+        categories.append('12')
+    if pokemon_json['name'] in PARADOX:
+        categories.append('13')
+    if '-gmax' in pokemon_json['name']:
+        categories.append('14')
+    if any(regional_name in pokemon_json['name'] for regional_name in regional_names):
+        categories.append('15')
 
-    # Obter categorias a partir das informações da API
+    print(pokemon_json['name'], categories)
+    return categories
 
+def addCategoriesAlternativeForms(categories, forms, name):
+
+    for form in forms:
+        if name == form['pokemon']['name'] or any(pk_excludes in form['pokemon']['name'] for pk_excludes in POKEMON_EXCLUDES): continue 
+
+        if name + '-mega' in form['pokemon']['name']:
+            categories.append('4')
+        if name + '-gmax' in form['pokemon']['name'] or 'eternamax' in form['pokemon']['name']:
+            categories.append('6')
+        if any(regional_name in form['pokemon']['name'] for regional_name in regional_names):
+            categories.append('8')
     return categories
 
 def init():
