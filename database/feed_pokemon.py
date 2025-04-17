@@ -14,8 +14,30 @@ REGIONS = {
         '9': "paldea",
     }
 
+GENERATIONS = {
+    'primal': '6',
+    'mega': '6',
+    'alola': '7',
+    'gmax': '8',
+    'galar': '8',
+    'hisui': '8',
+    'origin': '8',
+    'paldea': '9'
+}
+
+ABILITIES = {
+    744 : 20,
+    658 : 210,
+    718 : 211
+}
+
 HISUIAN = [
     899, 900, 901, 902, 903, 904, 905
+]
+
+POKEMON_EXCLUDES = [
+    'power-construct', 'battle-bond', 'gulping', 'gorging', '-rock-star', '-pop-star', '-phd', '-belle', '-libre', '-cosplay', '-cap', '-starter',
+    '-dada', '-totem', '-mode', '-build', 'own-tempo'
 ]
 
 def request_moves():
@@ -39,27 +61,35 @@ def request_moves():
     
     colors = pd.read_csv('data/colors.csv')
 
-    for pokemon in data:
-        pokemon_json = requests.get(pokemon['url']).json()
+    add_meteor = False
 
-        # species_json = requests.get(pokemon_json['species']['url']).json()
+    for pokemon in data:
+
+        pokemon_json = requests.get(pokemon['url']).json()
+        species_json = requests.get(pokemon_json['species']['url']).json()
+        
+        if 'meteor' in pokemon_json["name"] and not add_meteor:
+            pokemon_json['name'] = 'minior-meteor'
+            add_meteor = True
+        
+        if any(pk_excludes in pokemon_json['name'] for pk_excludes in POKEMON_EXCLUDES): continue
 
         document = {
-            # "id": pokemon_json["id"],
-            # "is_default": pokemon_json["is_default"],
-            # "name": pokemon_json["name"],
-            # "types": getTypes(pokemon_json),
-            # "moves": getMoves(pokemon_json),
-            # "egg_groups": getEggGroups(species_json),
-            # "evolution_step": getEvolutionStep(pokemon_json["id"], evolution_steps),
-            # "categories": getCategories(pokemon_json, species_json),
-            # "generation": getGeneration(pokemon_json, species_json),
-            # "region": getRegion(pokemon_json, species_json),
-            # "abilities": getAbilities(pokemon_json),
-            # "other_forms": getOtherForms(species_json, pokemon_json["id"]),
-            # "habitat": getHabitat(species_json),
-            # "shape": species_json["shape"]["name"],
-            "color": getColor(pokemon_json["name"], colors)
+            "id": pokemon_json["id"],
+            "is_default": pokemon_json["is_default"],
+            "name": pokemon_json["name"],
+            "types": getTypes(pokemon_json),
+            "moves": getMoves(pokemon_json),
+            "egg_groups": getEggGroups(species_json),
+            "evolution_step": getEvolutionStep(pokemon_json["id"], evolution_steps),
+            "categories": getCategories(pokemon_json, species_json),
+            "generation": getGeneration(pokemon_json, species_json),
+            "region": getRegion(pokemon_json, species_json),
+            "abilities": getAbilities(pokemon_json, species_json['id']),
+            "other_forms": getOtherForms(species_json, pokemon_json["id"]),
+            "habitat": getHabitat(species_json),
+            "shape": species_json["shape"]["name"],
+            "color": getColor(species_json['color']['name'], pokemon_json["name"], colors)
         }
 
         # existing_document = pokemons.find_one({'id': document['id']})
@@ -86,11 +116,14 @@ def getMoves (pokemon_json):
 
     return moves
 
-def getAbilities (pokemon_json):
+def getAbilities (pokemon_json, species_id):
     abilities = []
 
     for ability in pokemon_json["abilities"]:
         abilities.append(ability["ability"]["url"].split('/')[-2])
+    
+    if species_id in ABILITIES.keys():
+        abilities.append(ABILITIES[species_id])
 
     return abilities
 
@@ -100,7 +133,7 @@ def getOtherForms (species_json, id):
     for form in species_json["varieties"]:
         new_form = form["pokemon"]["url"].split('/')[-2]
 
-        if new_form != str(id):
+        if new_form != str(id) and any(pk_excludes not in form['pokemon']['name'] for pk_excludes in POKEMON_EXCLUDES):
             forms.append(new_form)
 
     return forms
@@ -123,19 +156,20 @@ def getEvolutionStep (id, evolution_steps):
     
     return document["id"]
 
-def getColor (name, colors):
-    color =  colors.loc[colors['Pokemon'] == name, 'Color']
+def getColor (color_api, name, colors):
+
+    color = colors.loc[colors['Pokemon'] == name, 'Color']
     if color.empty:
-        print(f'Nome diferente do csv: {name}')
-        return 'color'
+        return color_api
     else:
-        # print(f'Nome encontrado do csv: {name}')
         return color.values[0]
 
 def getGeneration (pokemon_json, species_json):
     generation = species_json["generation"]["url"].split('/')[-2]
-
-    # Checar se está correto
+    
+    affix = pokemon_json["name"].split('-')[-1]
+    if (affix in GENERATIONS.keys() and 'giratina' not in pokemon_json['name']):
+        generation = GENERATIONS[affix]
 
     return generation
 
@@ -154,6 +188,22 @@ def getRegion (pokemon_json, species_json):
 
 def getCategories (pokemon_json, species_json):
     categories = []
+
+    # "isBaby",
+    # "isMythical",
+    # "isLegendary",
+    # "MegaEvolves",
+    # "isMegaEvolution",
+    # "hasGigantamax",
+    # "hasExclusiveZMove",
+    # "isRegionalForm",
+    # "SwitchableForm",
+    # "hasGenderDifferences",
+    # "isFirstPartner",
+    # "isUltraBeast",
+    # "isParadox"
+
+    
 
     # Obter categorias a partir das informações da API
 
