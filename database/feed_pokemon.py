@@ -27,7 +27,7 @@ def request_moves():
 
     add_meteor = False
 
-    for pokemon in data[:152]:
+    for pokemon in data:
 
         pokemon_json = requests.get(pokemon['url']).json()
         species_json = requests.get(pokemon_json['species']['url']).json()
