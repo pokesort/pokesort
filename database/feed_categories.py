@@ -12,7 +12,7 @@ def fill_categories():
             "isMegaEvolution",
             "hasGigantamax",
             "hasExclusiveZMove",
-            "isRegionalForm",
+            "hasRegionalForm",
             "SwitchableForm",
             "hasGenderDifferences",
             "isFirstPartner",
