@@ -12,6 +12,8 @@ MILOTIC_SPECIES = 350
 PROBOPASS_SPECIES = 476
 MIMEJR_CHAIN = 57
 
+FORCE_COPY = ['-zen', 'wormadam']
+
 def fetch_data ():
     # Se os arquivos csv não existirem, buscá-los do github
     files = {
@@ -68,8 +70,8 @@ def start_cleanup (pokemon_csv, evolution_csv, species_csv):
                 evolution_csv = add_clause(evolution_csv, pokemon)
             else:
                 evolution_csv = copy_clause(evolution_csv, pokemon)
-        elif pokemon["id"] >= 10000 and ('-zen' in pokemon['identifier'] or (evolution_csv["evolved_species_id"] == pokemon["species_id"]).sum() == 1):
-                evolution_csv = copy_clause(evolution_csv, pokemon)
+        elif pokemon["id"] >= 10000 and (any(affix in pokemon['identifier'] for affix in FORCE_COPY) or (evolution_csv["evolved_species_id"] == pokemon["species_id"]).sum() == 1):
+            evolution_csv = copy_clause(evolution_csv, pokemon)
         else:
             evolution_csv = update_clause(evolution_csv, pokemon)
 
