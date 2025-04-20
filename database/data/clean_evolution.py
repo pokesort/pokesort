@@ -12,7 +12,10 @@ MILOTIC_SPECIES = 350
 PROBOPASS_SPECIES = 476
 MIMEJR_CHAIN = 57
 
-FORCE_COPY = ['-zen', 'wormadam']
+EXCLUDES = [
+    '-mega', '-gmax', '-primal', '-totem', '-dada', 'pikachu', 'eevee',
+    'rockruff', 'eternatus', 'koraidon', 'miraidon'
+]
 
 def fetch_data ():
     # Se os arquivos csv não existirem, buscá-los do github
@@ -70,7 +73,7 @@ def start_cleanup (pokemon_csv, evolution_csv, species_csv):
                 evolution_csv = add_clause(evolution_csv, pokemon)
             else:
                 evolution_csv = copy_clause(evolution_csv, pokemon)
-        elif pokemon["id"] >= 10000 and (any(affix in pokemon['identifier'] for affix in FORCE_COPY) or (evolution_csv["evolved_species_id"] == pokemon["species_id"]).sum() == 1):
+        elif pokemon["id"] >= 10000 and (evolution_csv["evolved_species_id"] == pokemon["species_id"]).sum() == 1:
             evolution_csv = copy_clause(evolution_csv, pokemon)
         else:
             evolution_csv = update_clause(evolution_csv, pokemon)
@@ -91,7 +94,7 @@ def start_cleanup (pokemon_csv, evolution_csv, species_csv):
 
 def skip_clause (pokemon):
     # Exclui formas mega, gmax e outras formas
-    keywords = ['-mega', '-gmax', '-primal', '-totem', '-dada', 'pikachu', 'eevee', 'rockruff', 'eternatus', 'koraidon', 'miraidon']
+    keywords = EXCLUDES
     return any(keyword in pokemon["identifier"] for keyword in keywords)
 
 def add_clause (evolution_csv, pokemon):
@@ -124,11 +127,14 @@ def update_clause (evolution_csv, pokemon):
     if rows.empty: return evolution_csv
     print(f"Atualizando linha para {pokemon["identifier"]}...")
 
-    update_index = rows.index[0]
+    update_index = -1
     for i in rows.index:
         if pd.isna(evolution_csv.at[i, "identifier"]):
             update_index = i
             break
+
+    if update_index == -1:
+        return copy_clause(evolution_csv, pokemon)
 
     evolution_csv.at[update_index, "identifier"] = pokemon["identifier"]
     evolution_csv.at[update_index, "pokemon_id"] = pokemon["id"]
