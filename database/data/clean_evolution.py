@@ -10,6 +10,7 @@ import os, requests
 
 MILOTIC_SPECIES = 350
 PROBOPASS_SPECIES = 476
+MELMETAL_SPECIES = 809
 MIMEJR_CHAIN = 57
 
 EXCLUDES = [
@@ -66,7 +67,7 @@ def start_cleanup (pokemon_csv, evolution_csv, species_csv):
         species = species_csv.loc[species_csv["id"] == pokemon["species_id"]].iloc[0]
         is_split = pd.notna(species["evolves_from_species_id"]) and (species_csv["evolves_from_species_id"] == species["evolves_from_species_id"]).sum() > 1
         pokemon["is_split"] = 1 if is_split else 0
-        pokemon["evolution_chain_id"] = species["evolution_chain_id"]
+        pokemon["evolution_chain_id"] = species["evolution_chain_id"] if species['id'] != MELMETAL_SPECIES else 428
 
         if pd.isna(species["evolves_from_species_id"]):
             if not (evolution_csv["evolved_species_id"] == pokemon["species_id"]).any():
@@ -97,17 +98,19 @@ def skip_clause (pokemon):
     keywords = EXCLUDES
     return any(keyword in pokemon["identifier"] for keyword in keywords)
 
-def add_clause (evolution_csv, pokemon):
+def add_clause (evolution_csv, pokemon, null_name=False):
     # Adiciona um evolution step novo
     print(f"Criando nova linha para {pokemon["identifier"]}...")
     new_row = {
         "pokemon_id": pokemon["id"],
         "evolved_species_id": pokemon["species_id"],
-        "identifier": pokemon["identifier"],
+        "identifier": pokemon["identifier"] if not null_name else None,
         "evolution_chain_id": pokemon["evolution_chain_id"],
         "is_split": pokemon["is_split"],
         "step_id": 0
     }
+    if (null_name):
+        new_row['evolution_trigger_id'] = 10
     return pd.concat([evolution_csv, pd.DataFrame([new_row])], ignore_index=True)
 
 def copy_clause (evolution_csv, pokemon):
@@ -122,6 +125,10 @@ def copy_clause (evolution_csv, pokemon):
     return pd.concat([evolution_csv, pd.DataFrame([new_row])], ignore_index=True)
 
 def update_clause (evolution_csv, pokemon):
+    # Tratar melmetal
+    if (pokemon['id'] == MELMETAL_SPECIES):
+        evolution_csv = add_clause(evolution_csv, pokemon, True)
+    
     # Encontra uma linha apropriada para inserir as informações deste pokemon
     rows = evolution_csv.loc[evolution_csv["evolved_species_id"] == pokemon["species_id"]]
     if rows.empty: return evolution_csv
