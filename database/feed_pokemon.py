@@ -55,6 +55,7 @@ def request_moves():
             "id": pokemon_json["id"],
             "is_default": pokemon_json["is_default"],
             "name": pokemon_json["name"],
+            "species_name": species_json['name'],
             "types": getTypes(pokemon_json),
             "moves": getMoves(pokemon_json),
             "egg_groups": getEggGroups(species_json),

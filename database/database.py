@@ -5,10 +5,11 @@ import os
 def connect(collection_name):
     print('Connecting to MongoDB...')
     uri = os.getenv('MONGODB_URI')
+    db_name = os.getenv('DB_NAME')
 
     client = MongoClient(uri, server_api=ServerApi('1'))
     try:
-        database = client['pokesort']
+        database = client[db_name]
         collection = database[collection_name]
 
         print("Retrieved collection '{collection_name}' successfully")
