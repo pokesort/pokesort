@@ -3,6 +3,11 @@ import requests, json, os
 import pandas as pd
 from data.lists_pokemon import *
 
+EXCLUDES = [
+    '-mega', '-gmax', '-primal', '-totem', '-dada', 'pikachu', 'eevee',
+    'rockruff', 'eternatus', 'koraidon', 'miraidon'
+]
+
 def request_moves():
     url = "https://pokeapi.co/api/v2/pokemon?limit=3000"
     response = requests.get(url)
@@ -27,7 +32,7 @@ def request_moves():
 
     add_meteor = False
 
-    for pokemon in data:
+    for pokemon in data[1025:]:
 
         pokemon_json = requests.get(pokemon['url']).json()
 
@@ -53,7 +58,7 @@ def request_moves():
             "types": getTypes(pokemon_json),
             "moves": getMoves(pokemon_json),
             "egg_groups": getEggGroups(species_json),
-            "evolution_step": getEvolutionStep(pokemon_json["id"], evolution_steps),
+            "evolution_step": getEvolutionStep(pokemon_json["id"], evolution_steps, pokemon_json['name']),
             "categories": getCategories(pokemon_json, species_json, hasZmoves),
             "generation": getGeneration(pokemon_json, species_json),
             "region": getRegion(pokemon_json, species_json),
@@ -118,9 +123,11 @@ def getHabitat (species_json):
 
     return habitat["name"] if habitat != None else ""
 
-def getEvolutionStep (id, evolution_steps):
-    document = evolution_steps.find_one({'pokemon': id})
+def getEvolutionStep (id, evolution_steps, name):
+
+    if id >= 10000 and any(affix in name for affix in EXCLUDES): return None
     
+    document = evolution_steps.find_one({'pokemon': id})
     return document["id"]
 
 def getColor (color_api, name, colors):
