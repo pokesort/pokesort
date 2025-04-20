@@ -13,9 +13,8 @@ if __name__ == "__main__":
 
     # typesDB.init()
     # movesDB.init()
-    # abilitiesDbB.init()
-    # categoriesDB.init()
-    # abilityDB.init()
-    # evolutionMethodDB.init()
-    # evolutionChainDB.init()
+    abilityDB.init()
+    categoriesDB.init()
+    evolutionMethodDB.init()
+    evolutionChainDB.init()
     pokemon.init()

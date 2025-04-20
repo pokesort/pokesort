@@ -58,8 +58,8 @@ def generate_chains():
     pokemon_csv = pd.read_csv("data/pokemon_evolution.csv")
 
     steps = db.connect("evolution_steps")
-    chains = db.connect("evolution_chains")
-    steps_dict = {}
+    # chains = db.connect("evolution_chains")
+    # steps_dict = {}
 
     for _, pokemon in pokemon_csv.iterrows():
 
