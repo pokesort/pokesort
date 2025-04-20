@@ -30,6 +30,12 @@ def request_moves():
     for pokemon in data:
 
         pokemon_json = requests.get(pokemon['url']).json()
+
+        existing_document = pokemons.find_one({'id': pokemon_json['id']})
+        if existing_document: 
+            print(f"Documento com nome {pokemon_json["name"]} já existe. Não inserindo novamente.")
+            continue
+
         species_json = requests.get(pokemon_json['species']['url']).json()
         
         if any(pk_excludes in pokemon_json['name'] for pk_excludes in POKEMON_EXCLUDES): continue
@@ -58,13 +64,8 @@ def request_moves():
             "color": getColor(species_json['color']['name'], pokemon_json["name"], colors)
         }
 
-        existing_document = pokemons.find_one({'id': document['id']})
-
-        if existing_document:
-            print(f"Documento com nome {document["name"]} já existe. Não inserindo novamente.")
-        else:
-            pokemons.insert_one(document)
-            print(f"Documento inserido com o nome: {document["name"]}")
+        pokemons.insert_one(document)
+        print(f"Documento inserido com o nome: {document["name"]}")
 
 def getTypes (pokemon_json):
     types = []
