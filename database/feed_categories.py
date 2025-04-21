@@ -20,6 +20,7 @@ def fill_categories():
             "isParadox",
             "isGMax",
             "isRegionalForm",
+            "isVivillon"
         ]
 
         index = 1
@@ -29,7 +30,7 @@ def fill_categories():
             document = {
                 "id": str(index),
                 "name": possibility,
-                "display": True
+                "display": True if possibility != 'isVivillon' else False
             }
             index -=-1
 
