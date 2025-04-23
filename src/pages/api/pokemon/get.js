@@ -43,7 +43,8 @@ export default async function handler(req, res) {
 async function handlerEvolutionStep(step, filter) {
   if (step === "no_line") {
     // filter.evolution_step = { $in: [null, undefined] };
-    filter.evolution_step = await handlerNoLine()
+    filter.id = await handlerNoLine()
+    
   } else if (step === "is_split") {
     filter.evolution_step = await handlerIsSplit();
   } else {
@@ -52,7 +53,7 @@ async function handlerEvolutionStep(step, filter) {
 }
 
 async function handlerNoLine() {
-  const pokemons = await data.db.collection('pokemon').aggregate([
+  const basePokemons = await data.db.collection('pokemon').aggregate([
     {
       $lookup: {
         from: "evolution_steps",
@@ -90,8 +91,10 @@ async function handlerNoLine() {
         _id: "$chain_id",
         pokemons: {
           $push: {
+            id: "$id",
             evolution_step: "$evolution_step",
             name: "$name",
+            species_name: "$species_name",
             step: "$step"
           }
         },
@@ -102,26 +105,35 @@ async function handlerNoLine() {
     {
       $match: {
         $or: [
-          { count: 1 }, // Só um Pokémon nessa linha
-          { distinctSteps: { $size: 1 }, "distinctSteps.0": 0 } // Todos os passos são 0 (ex: 77-paldea-0, ninguém evolui)
+          { count: 1 },
+          { distinctSteps: { $size: 1 }, "distinctSteps.0": 0 }
         ]
       }
     },
-    {
-      $unwind: "$pokemons"
-    },
+    { $unwind: "$pokemons" },
     {
       $project: {
-        evolution_step: "$pokemons.evolution_step",
-        _id: 0
+        _id: 0,
+        id: "$pokemons.id",
+        name: "$pokemons.name",
+        species_name: "$pokemons.species_name"
       }
     }
   ]).toArray();
 
-  const validSteps = pokemons.map(p => p.evolution_step);
-  return { $in: validSteps };
-}
+  const baseIds = basePokemons.map(p => p.id);
+  
+  const speciesNames = basePokemons.map(p => p.species_name);
 
+  const extraForms = await data.db.collection("pokemon").find({
+    name: { $regex: /-(mega|gmax)$/ },
+    species_name: { $in: speciesNames }
+  }).project({ id: 1, _id: 0 }).toArray();
+
+  const extraIds = extraForms.map(f => f.id);
+
+  return { $in: [...baseIds, ...extraIds] };
+}
 
 // async function handlerEvolutionMethod(method) {
 
