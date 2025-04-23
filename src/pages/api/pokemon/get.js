@@ -9,17 +9,17 @@ export default async function handler(req, res) {
     const booleanFields = ["is_default"];
 
     const step = req.query.step;
-    const method = req.query.method
+    const methods = req.query.methods
 
     if (step !== undefined) {
       await handlerEvolutionStep(step, filter);
       delete req.query.step;
     }
 
-    // if (method !== undefined) {
-    //   filter.evolution_step = await handlerEvolutionMethod(method, filter);
-    //   delete req.query.method;
-    // }
+    if (methods !== undefined) {
+      filter.id = await handlerEvolutionMethod(parseInt(methods), filter);
+      delete req.query.methods;
+    }
 
     for (const [key, value] of Object.entries(req.query)) {
       if (arrayFields.includes(key)) {
@@ -135,34 +135,34 @@ async function handlerNoLine() {
   return { $in: [...baseIds, ...extraIds] };
 }
 
-// async function handlerEvolutionMethod(method) {
+async function handlerEvolutionMethod(methods) {
+  const pokemonsWithMethod = await data.db.collection('pokemon').aggregate([
+    {
+      $lookup: {
+        from: "evolution_steps",
+        localField: "id",
+        foreignField: "pokemon",
+        as: "evo_data"
+      }
+    },
+    { $unwind: "$evo_data" },
+    {
+      $match: {
+        "evo_data.methods": methods
+      }
+    },
+    {
+      $project: {
+        id: 1,
+        _id: 0
+      }
+    }
+  ]).toArray();
 
-//   const pokemonsWithMethod = await data.db.collection('pokemon').aggregate([
-//     {
-//       $lookup: {
-//         from: "evolution_steps",
-//         localField: "evolution_step",
-//         foreignField: "id",
-//         as: "evo_data"
-//       }
-//     },
-//     { $unwind: "$evo_data" },
-//     {
-//       $match: {
-//         "evo_data.methods": method
-//       }
-//     },
-//     {
-//       $project: {
-//         evolution_step: 1,
-//         _id: 0
-//       }
-//     }
-//   ]).toArray();
-
-//   const validMethods = pokemonsWithMethod.map(p => p.id);
-//   return { $in: validMethods };
-// }
+  const ids = pokemonsWithMethod.map(p => p.id);
+  
+  return { $in: ids };
+}
 
 async function handlerIsSplit() {
   const splitPokemons = await data.db.collection('pokemon').aggregate([
