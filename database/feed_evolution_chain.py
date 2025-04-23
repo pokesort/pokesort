@@ -33,10 +33,10 @@ def fill_methods(pokemon):
     if pokemon['evolution_trigger_id'] == 3.0:
         methods.append(4)
     if pokemon['evolution_trigger_id'] > 3.0:
-        methods.append(3)
+        methods.append(6)
     if not pd.isna(pokemon['regional']):
         methods.append(3)
-    if pokemon['evolution_trigger_id'] != 3 and not pd.isna(pokemon['trigger_item_id']):
+    if pokemon['evolution_trigger_id'] != 3.0 and not pd.isna(pokemon['trigger_item_id']):
         methods.append(7)
     if not pd.isna(pokemon['gender_id']):
         methods.append(5)
@@ -49,7 +49,7 @@ def fill_methods(pokemon):
     if pokemon['time_of_day'] == 'night':
         methods.append(11)
     if 3 not in methods and check_unique(pokemon):
-        methods.append(3)
+        methods.append(6)
 
     return list(set(methods))
 
