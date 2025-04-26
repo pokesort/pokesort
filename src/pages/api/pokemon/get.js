@@ -10,6 +10,8 @@ export default async function handler(req, res) {
 
     const step = req.query.step;
     const methods = req.query.methods
+    const others = req.query.others
+
 
     if (step !== undefined) {
       await handlerEvolutionStep(step, filter);
@@ -17,8 +19,13 @@ export default async function handler(req, res) {
     }
 
     if (methods !== undefined) {
-      filter.id = await handlerEvolutionMethod(parseInt(methods), filter);
+      filter.id = await handlerEvolutionMethod(parseInt(methods));
       delete req.query.methods;
+    }
+
+    if (others != undefined) {
+      await handlerOtherForms(parseInt(others), filter);
+      delete req.query.others;
     }
 
     for (const [key, value] of Object.entries(req.query)) {
@@ -44,7 +51,7 @@ async function handlerEvolutionStep(step, filter) {
   if (step === "no_line") {
     // filter.evolution_step = { $in: [null, undefined] };
     filter.id = await handlerNoLine()
-    
+
   } else if (step === "is_split") {
     filter.evolution_step = await handlerIsSplit();
   } else {
@@ -122,7 +129,7 @@ async function handlerNoLine() {
   ]).toArray();
 
   const baseIds = basePokemons.map(p => p.id);
-  
+
   const speciesNames = basePokemons.map(p => p.species_name);
 
   const extraForms = await data.db.collection("pokemon").find({
@@ -160,7 +167,7 @@ async function handlerEvolutionMethod(methods) {
   ]).toArray();
 
   const ids = pokemonsWithMethod.map(p => p.id);
-  
+
   return { $in: ids };
 }
 
@@ -191,4 +198,9 @@ async function handlerIsSplit() {
 
   const validSteps = splitPokemons.map(p => p.evolution_step);
   return { $in: validSteps };
+}
+
+async function handlerOtherForms(others, filter) {
+  filter.other_forms = { $exists: true, $ne: [] }; // array não vazio
+  filter.is_default = others == 1 ? true : false;
 }
