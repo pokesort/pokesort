@@ -1,9 +1,10 @@
+@use "sass:map";
 @use "./globals" as *;
 
 @function color($key) {
-    @return map-get($colors, $key);
+    @return map.get($colors, $key);
 }
 
 @function text($key) {
-    @return map-get($font-sizes, $key);
+    @return map.get($font-sizes, $key);
 }
