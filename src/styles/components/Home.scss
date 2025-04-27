@@ -2,15 +2,23 @@
 
 body {  
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 
   width: 100vw;
-  height: 100vh;
 
   background-color: color(background1);
+  color: color(text1);
 
-  p {
-    color: color(text1);
+  img {
+    width: 150px;
+  }
+
+  ul {
+    display: flex;
+    max-width: 100vw;
+    flex-direction: row;
+    flex-wrap: wrap;
   }
 }

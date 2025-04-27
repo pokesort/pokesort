@@ -36,7 +36,7 @@ def fill_methods(pokemon):
         methods.append(6)
     if not pd.isna(pokemon['regional']):
         methods.append(3)
-    if pokemon['evolution_trigger_id'] != 3.0 and not pd.isna(pokemon['trigger_item_id']):
+    if not pd.isna(pokemon['held_item_id']):
         methods.append(7)
     if not pd.isna(pokemon['gender_id']):
         methods.append(5)
@@ -73,6 +73,7 @@ def generate_chains():
             'id': id,
             'chain_id': pokemon['evolution_chain_id'],
             'step' : pokemon['step_id'],
+            'has_split': pokemon['has_split'],
             'is_split': pokemon['is_split'],
             'pokemon': pokemon['pokemon_id'],
             'methods': methods

@@ -18,6 +18,10 @@ EXCLUDES = [
     'rockruff', 'eternatus', 'koraidon', 'miraidon'
 ]
 
+NO_SPLIT = [
+    980, 863, 53, 195, 903, 461, 563, 867
+]
+
 def fetch_data ():
     # Se os arquivos csv não existirem, buscá-los do github
     files = {
@@ -43,6 +47,7 @@ def prepare_dataframe (evolution_csv):
     # Prepara as novas colunas e as ordena
     evolution_csv["identifier"] = None
     evolution_csv["evolution_chain_id"] = None
+    evolution_csv["has_split"] = 0
     evolution_csv["is_split"] = None
     evolution_csv["pokemon_id"] = None
     evolution_csv["step_id"] = 0
@@ -53,7 +58,8 @@ def prepare_dataframe (evolution_csv):
     column_order.insert(column_order.index("identifier") + 1, "pokemon_id")
     column_order.insert(column_order.index("pokemon_id") + 1, "step_id")
     column_order.insert(column_order.index("evolved_species_id") + 1, "evolution_chain_id")
-    column_order.insert(column_order.index("evolution_chain_id") + 1, "is_split")
+    column_order.insert(column_order.index("evolution_chain_id") + 1, "has_split")
+    column_order.insert(column_order.index("has_split") + 1, "is_split")
     column_order.insert(column_order.index("evolution_trigger_id") + 1, "regional")
     column_order = list(dict.fromkeys(column_order))
     return evolution_csv[column_order]
@@ -66,7 +72,12 @@ def start_cleanup (pokemon_csv, evolution_csv, species_csv):
 
         species = species_csv.loc[species_csv["id"] == pokemon["species_id"]].iloc[0]
         is_split = pd.notna(species["evolves_from_species_id"]) and (species_csv["evolves_from_species_id"] == species["evolves_from_species_id"]).sum() > 1
-        pokemon["is_split"] = 1 if is_split else 0
+        if is_split and species['id'] not in NO_SPLIT:
+            pokemon["is_split"] = 1
+            evolution_csv = handle_has_split(evolution_csv, species["evolves_from_species_id"])
+        else:
+            pokemon["is_split"] = 0
+            
         pokemon["evolution_chain_id"] = species["evolution_chain_id"] if species['id'] != MELMETAL_SPECIES else 428
 
         if pd.isna(species["evolves_from_species_id"]):
@@ -107,6 +118,7 @@ def add_clause (evolution_csv, pokemon, null_name=False):
         "identifier": pokemon["identifier"] if not null_name else None,
         "evolution_chain_id": pokemon["evolution_chain_id"],
         "is_split": pokemon["is_split"],
+        "has_split": 0,
         "step_id": 0
     }
     if (null_name):
@@ -122,6 +134,7 @@ def copy_clause (evolution_csv, pokemon):
     new_row["pokemon_id"] = pokemon["id"]
     new_row["evolution_chain_id"] = pokemon["evolution_chain_id"]
     new_row["is_split"] = pokemon["is_split"]
+    new_row["has_split"] = 0
     return pd.concat([evolution_csv, pd.DataFrame([new_row])], ignore_index=True)
 
 def update_clause (evolution_csv, pokemon):
@@ -147,6 +160,8 @@ def update_clause (evolution_csv, pokemon):
     evolution_csv.at[update_index, "pokemon_id"] = pokemon["id"]
     evolution_csv.at[update_index, "evolution_chain_id"] = pokemon["evolution_chain_id"]
     evolution_csv.at[update_index, "is_split"] = pokemon["is_split"]
+    evolution_csv.at[update_index, "has_split"] = 0
+
     return evolution_csv
 
 def leftover_clause (evolution_csv, species_csv):
@@ -167,6 +182,7 @@ def leftover_clause (evolution_csv, species_csv):
                 output_csv.at[i, "pokemon_id"] = pokemon["pokemon_id"]
                 output_csv.at[i, "evolution_chain_id"] = pokemon["evolution_chain_id"]
                 output_csv.at[i, "is_split"] = pokemon["is_split"]
+                output_csv.at[i, "has_split"] = 0
 
                 if (specie == PROBOPASS_SPECIES):
                     output_csv.at[i, "evolution_trigger_id"] = 3
@@ -248,6 +264,13 @@ def handle_steps (evolution_csv, species_csv, id, step=0):
     for next_id in next_mons:
         evolution_csv = handle_steps(evolution_csv, species_csv, next_id, step+1)
 
+    return evolution_csv
+
+def handle_has_split (evolution_csv, species_id):
+    # Torna o pokémon com a devida species_id 
+
+    evolution_csv.loc[evolution_csv["evolved_species_id"] == species_id, "has_split"] = 1
+    
     return evolution_csv
 
 if __name__ == "__main__":

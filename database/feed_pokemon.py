@@ -55,6 +55,7 @@ def request_moves():
             "id": pokemon_json["id"],
             "is_default": pokemon_json["is_default"],
             "name": pokemon_json["name"],
+            "dex_number": species_json["id"],
             "species_name": species_json['name'],
             "types": getTypes(pokemon_json),
             "moves": getMoves(pokemon_json),
@@ -106,7 +107,7 @@ def getOtherForms (species_json, id):
     for form in species_json["varieties"]:
         new_form = form["pokemon"]["url"].split('/')[-2]
 
-        if new_form != str(id) and any(pk_excludes not in form['pokemon']['name'] for pk_excludes in POKEMON_EXCLUDES):
+        if new_form != str(id) and all(pk_excludes not in form['pokemon']['name'] for pk_excludes in POKEMON_EXCLUDES):
             forms.append(new_form)
 
     return forms
