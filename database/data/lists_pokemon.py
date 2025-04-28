@@ -33,7 +33,13 @@ HISUIAN = [
 
 POKEMON_EXCLUDES = [
     'power-construct', 'battle-bond', 'gulping', 'gorging', '-rock-star', '-pop-star', '-phd', '-belle', '-libre', '-cosplay', '-cap', '-starter',
-    '-dada', '-totem', '-mode', '-build', 'own-tempo', '-ash', '-eternal'
+    '-dada', '-totem', '-mode', '-build', 'own-tempo', '-ash', '-eternal',
+    '-small', '-large', '-super'
+]
+
+EVOLUTION_EXCLUDES = [
+    '-mega', '-gmax', '-primal', '-totem', '-dada', 'pikachu', 'eevee',
+    'rockruff', 'eternatus', 'koraidon', 'miraidon'
 ]
 
 REGIONAL_NAMES = ['-alola', '-galar', '-paldea', '-hisui']
@@ -102,3 +108,8 @@ FORMS_SWITCHABLE = [
     'zygarde', 'hoopa', 'oricorio', 'wishiwashi', 'silvally', 'minior', 'mimikyu', 'necrozma',
     'eiscue', 'morpeko', 'zacian', 'zamazenta', 'calyrex', 'palafin', 'ogerpon', 'terapagos'
 ]
+
+# Pokémons com o id da esquerda recebem o id da direita
+ID_EQUIVALENCE = {
+    10181: 10118
+}

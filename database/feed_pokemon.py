@@ -3,11 +3,6 @@ import requests, json, os
 import pandas as pd
 from data.lists_pokemon import *
 
-EXCLUDES = [
-    '-mega', '-gmax', '-primal', '-totem', '-dada', 'pikachu', 'eevee',
-    'rockruff', 'eternatus', 'koraidon', 'miraidon'
-]
-
 def request_moves():
     url = "https://pokeapi.co/api/v2/pokemon?limit=3000"
     response = requests.get(url)
@@ -50,6 +45,9 @@ def request_moves():
 
             pokemon_json['name'] = 'minior-meteor'
             add_meteor = True
+
+        if pokemon_json['id'] in ID_EQUIVALENCE.keys():
+            pokemon_json['id'] = ID_EQUIVALENCE[pokemon_json['id']]
 
         document = {
             "id": pokemon_json["id"],
@@ -127,7 +125,7 @@ def getHabitat (species_json):
 
 def getEvolutionStep (id, evolution_steps, name):
 
-    if id >= 10000 and any(affix in name for affix in EXCLUDES): return None
+    if id >= 10000 and any(affix in name for affix in EVOLUTION_EXCLUDES): return None
     
     document = evolution_steps.find_one({'pokemon': id})
     return document["id"]
