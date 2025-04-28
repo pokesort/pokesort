@@ -40,7 +40,7 @@ export default async function handler(req, res) {
 
     const pokemons = await data.db.collection('pokemon').find(filter).toArray();
 
-    res.status(200).json({ success: true, pokemons });
+    res.status(200).json({ success: true, pokemons: pokemons.map((col) => ({name : col.name, id: col.id, species_name: col.species_name})) });
   } catch (error) {
     console.error("Connection failed:", error);
     res.status(500).json({ success: false, error: error.message });
