@@ -11,7 +11,7 @@ export default function Home() {
   const queries = window.location.href.split('?')[1];
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/pokemon/get${queries ? '?'+queries : ''}`, {
+    fetch(`http://localhost:3000//api/pokemon/get${queries ? '?'+queries : ''}`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -25,8 +25,6 @@ export default function Home() {
 
   return (
     <>
-      <p>{t('test')}</p>
-
       <ul>
 
         {pokemons && pokemons.map((p: any, index: number) => (

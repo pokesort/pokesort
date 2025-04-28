@@ -54,6 +54,8 @@ async function handlerEvolutionStep(step, filter) {
 
   } else if (step === "is_split") {
     filter.evolution_step = await handlerIsSplit();
+  } else if (step === "has_split"){
+    filter.evolution_step = await handlerHasSplit();
   } else {
     filter.evolution_step = { $regex: `-${step}$` };
   }
@@ -186,6 +188,35 @@ async function handlerIsSplit() {
     {
       $match: {
         "evo_data.is_split": 1 // aqui está o filtro
+      }
+    },
+    {
+      $project: {
+        evolution_step: 1,
+        _id: 0
+      }
+    }
+  ]).toArray();
+
+  const validSteps = splitPokemons.map(p => p.evolution_step);
+  return { $in: validSteps };
+}
+
+async function handlerHasSplit() {
+  const splitPokemons = await data.db.collection('pokemon').aggregate([
+    {
+      $lookup: {
+        from: "evolution_steps",              // coleção relacionada
+        localField: "evolution_step",         // campo em 'pokemon'
+        foreignField: "id",                   // campo em 'evolution_steps'
+        as: "evo_data"
+      }
+    },
+    { $unwind: "$evo_data" },
+
+    {
+      $match: {
+        "evo_data.has_split": 1 // aqui está o filtro
       }
     },
     {
