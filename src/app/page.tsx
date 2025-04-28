@@ -18,7 +18,7 @@ export default function Home() {
         },
       }).then((res) => res.json())
       .then((result) => {
-          setPokemons(result.pokemons.sort((a: any, b: any) => a.name.localeCompare(b.name)));
+          setPokemons(result.pokemons.sort((a: any, b: any) => a.dex_number < b.dex_number));
       })
   }, [])
   
@@ -31,8 +31,9 @@ export default function Home() {
 
         {pokemons && pokemons.map((p: any, index: number) => (
           <li key={index}>
-            <img src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${p.id}.png`}/>
-            {p.id}
+            <img src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${p.id}.png`}/>
+            <p>{p.id}</p>
+            <p>{p.name}</p>
           </li>
         ))}
 
