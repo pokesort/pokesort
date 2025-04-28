@@ -33,7 +33,7 @@ HISUIAN = [
 
 POKEMON_EXCLUDES = [
     'power-construct', 'battle-bond', 'gulping', 'gorging', '-rock-star', '-pop-star', '-phd', '-belle', '-libre', '-cosplay', '-cap', '-starter',
-    '-dada', '-totem', '-mode', '-build', 'own-tempo', '-ash'
+    '-dada', '-totem', '-mode', '-build', 'own-tempo', '-ash', '-eternal'
 ]
 
 REGIONAL_NAMES = ['-alola', '-galar', '-paldea', '-hisui']
