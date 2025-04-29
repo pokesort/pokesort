@@ -13,7 +13,7 @@ export default function Home() {
     const qs = window.location.href.split('?')[1];
     setQueries(qs || '');
 
-    fetch(`http://localhost:3000//api/pokemon/get${qs ? '?'+qs : ''}`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/pokemon/get${qs ? '?'+qs : ''}`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
