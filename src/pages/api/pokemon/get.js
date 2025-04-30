@@ -9,8 +9,18 @@ export default async function handler(req, res) {
     const booleanFields = ["is_default"];
 
     const step = req.query.step;
-    const methods = req.query.methods
-    const others = req.query.others
+    const methods = req.query.methods;
+    const others = req.query.others;
+    const weak = req.query.weak;
+    const strong = req.query.strong;
+    const immune = req.query.immune;
+
+    const relations_query = {
+      "weak": {$gte: 2},
+      "strong" : {$gt: 0, $lt:1},
+      "immune": 0,
+    }
+
 
 
     if (step !== undefined) {
@@ -26,6 +36,21 @@ export default async function handler(req, res) {
     if (others != undefined) {
       await handlerOtherForms(parseInt(others), filter);
       delete req.query.others;
+    }
+
+    if (weak != undefined) {
+      await handlerRelationTo(weak, filter, relations_query["weak"]);
+      delete req.query.weak;
+    }
+
+    if (strong != undefined) {
+      await handlerRelationTo(strong, filter, relations_query["strong"]);
+      delete req.query.strong;
+    }
+
+    if (immune != undefined) {
+      await handlerRelationTo(immune, filter, relations_query["immune"]);
+      delete req.query.immune;
     }
 
     for (const [key, value] of Object.entries(req.query)) {
@@ -234,4 +259,61 @@ async function handlerHasSplit() {
 async function handlerOtherForms(others, filter) {
   filter.other_forms = { $exists: true, $ne: [] }; // array não vazio
   filter.is_default = others == 1 ? true : false;
+}
+
+async function handlerRelationTo(typeId, filter, expression) {
+  const pipeline = [
+    {
+      $lookup: {
+        from: "types",
+        localField: "types",
+        foreignField: "id",
+        as: "type_data"
+      }
+    },
+    {
+      $project: {
+        id: 1,
+        name: 1,
+        species_name: 1,
+        types: 1,
+        multipliers: {
+          $map: {
+            input: "$type_data",
+            as: "type",
+            in: {
+              $ifNull: [`$$type.matchups.${typeId}`, 1] // fallback para 1 se não existir
+            }
+          }
+        }
+      }
+    },
+    {
+      $addFields: {
+        total_multiplier: {
+          $reduce: {
+            input: "$multipliers",
+            initialValue: 1,
+            in: { $multiply: ["$$value", "$$this"] }
+          }
+        }
+      }
+    },
+    {
+      $match: {
+        total_multiplier: expression
+      }
+    },
+    {
+      $project: {
+        _id: 0,
+        id: 1
+      }
+    }
+  ];
+
+  const results = await data.db.collection("pokemon").aggregate(pipeline).toArray();
+
+  const ids = results.map(p => p.id);
+  filter.id = { $in: ids };
 }
