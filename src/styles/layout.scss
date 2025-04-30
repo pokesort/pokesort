@@ -10,6 +10,16 @@ body {
     overflow-x: hidden;
 }
 
+body {
+    background-color: #12121B;
+    background-image: url('../assets/images/bg_texture.png');
+    background-repeat: repeat;
+    background-attachment: scroll;
+    background-position: center;
+
+    min-height: 100vh;
+}
+
 * {
     box-sizing: border-box;
     padding: 0;

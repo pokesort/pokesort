@@ -1,6 +1,6 @@
 @use "../abstract" as *;
 
-body {  
+section.page {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -9,6 +9,9 @@ body {
   width: 100vw;
   height: 100vh;
 
-  background-color: color(background1);
   color: color(text1);
+  
+  div.gradient {
+    background: linear-gradient(180deg, color(transparent) 9.7%, color(background1) 45.82%, color(background1) 63.88%, color(transparent) 100%);
+  }
 }

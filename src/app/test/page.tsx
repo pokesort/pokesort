@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import "@/src/styles/components/Test.scss";
 import { useEffect, useState } from 'react';
+import Gradient from '@/src/components/Gradient';
 
 export default function Home() {
   const t = useTranslations();
@@ -26,6 +27,7 @@ export default function Home() {
 
   return (
     <>
+      <Gradient/>      
       <ul>
 
         {pokemons && pokemons.map((p: any, index: number) => (
