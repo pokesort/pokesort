@@ -9,6 +9,7 @@ export default async function handler(req, res) {
     const booleanFields = ["is_default"];
 
     const step = req.query.step;
+
     const methods = req.query.methods;
     const others = req.query.others;
     const weak = req.query.weak;
@@ -16,43 +17,63 @@ export default async function handler(req, res) {
     const immune = req.query.immune;
 
     const relations_query = {
-      "weak": {$gte: 2},
-      "strong" : {$gt: 0, $lt:1},
-      "immune": 0,
+      "weak": { $gte: 2 },
+      "strong": { $gt: 0, $lt: 1 },
+      "immune": { $eq: 0 },
     }
-
-
+    let pokemonIds = [];
+    
 
     if (step !== undefined) {
-      await handlerEvolutionStep(step, filter);
+      const steps = Array.isArray(step) ? step : [step];
+    
+      for (const element of steps) {
+        const result = await handlerEvolutionStep(element, filter);
+        pokemonIds = pokemonIds.concat(result);
+      }
+
       delete req.query.step;
     }
-
+    
     if (methods !== undefined) {
-      filter.id = await handlerEvolutionMethod(parseInt(methods));
+      const methodsIds = await handlerEvolutionMethod(parseInt(methods));
+      pokemonIds = pokemonIds.length > 0 ? methodsIds.filter(value => pokemonIds.includes(value)) : methodsIds;
+
       delete req.query.methods;
     }
-
+    
     if (others != undefined) {
       await handlerOtherForms(parseInt(others), filter);
       delete req.query.others;
     }
-
+    
     if (weak != undefined) {
-      await handlerRelationTo(weak, filter, relations_query["weak"]);
+      const weakIds = await handlerRelationTo(weak, relations_query["weak"]);
+      
+      pokemonIds = pokemonIds.length > 0 ? weakIds.filter(value => pokemonIds.includes(value)) : weakIds;
+
       delete req.query.weak;
     }
-
+    
     if (strong != undefined) {
-      await handlerRelationTo(strong, filter, relations_query["strong"]);
+      const strongIds = await handlerRelationTo(strong, relations_query["strong"]);
+      pokemonIds = pokemonIds.length > 0 ? strongIds.filter(value => pokemonIds.includes(value)) : strongIds;
+
       delete req.query.strong;
     }
-
+    
     if (immune != undefined) {
-      await handlerRelationTo(immune, filter, relations_query["immune"]);
+      const immuneIds = await handlerRelationTo(immune, relations_query["immune"]);
+      
+      pokemonIds = pokemonIds.length > 0 ? immuneIds.filter(value => pokemonIds.includes(value)) : immuneIds;
       delete req.query.immune;
     }
 
+    if (pokemonIds.length>0){
+      pokemonIds = pokemonIds.filter((item, index) => pokemonIds.indexOf(item) === index);
+      filter.id = {$in: pokemonIds};
+    }
+    
     for (const [key, value] of Object.entries(req.query)) {
       if (arrayFields.includes(key)) {
         filter[key] = { $all: Array.isArray(value) ? value : [value] };
@@ -63,7 +84,7 @@ export default async function handler(req, res) {
       }
     }
 
-    let pokemons = await data.db.collection('pokemon').find(filter, {projection: { name: 1, id: 1, species_name: 1, dex_number: 1, _id: 0 }}).toArray();
+    let pokemons = await data.db.collection('pokemon').find(filter, { projection: { name: 1, id: 1, species_name: 1, dex_number: 1, _id: 0 } }).toArray();
 
     res.status(200).json({ success: true, pokemons });
   } catch (error) {
@@ -74,15 +95,17 @@ export default async function handler(req, res) {
 
 async function handlerEvolutionStep(step, filter) {
   if (step === "no_line") {
-    // filter.evolution_step = { $in: [null, undefined] };
-    filter.id = await handlerNoLine()
+    return await handlerNoLine()
 
   } else if (step === "is_split") {
-    filter.evolution_step = await handlerIsSplit();
-  } else if (step === "has_split"){
-    filter.evolution_step = await handlerHasSplit();
+    return await handlerIsSplit();
+    
+  } else if (step === "has_split") {
+    return await handlerHasSplit();
+
   } else {
     filter.evolution_step = { $regex: `-${step}$` };
+    return [];
   }
 }
 
@@ -166,7 +189,7 @@ async function handlerNoLine() {
 
   const extraIds = extraForms.map(f => f.id);
 
-  return { $in: [...baseIds, ...extraIds] };
+  return [...baseIds, ...extraIds];
 }
 
 async function handlerEvolutionMethod(methods) {
@@ -195,7 +218,7 @@ async function handlerEvolutionMethod(methods) {
 
   const ids = pokemonsWithMethod.map(p => p.id);
 
-  return { $in: ids };
+  return ids;
 }
 
 async function handlerIsSplit() {
@@ -217,14 +240,15 @@ async function handlerIsSplit() {
     },
     {
       $project: {
-        evolution_step: 1,
+        id: 1,
         _id: 0
       }
     }
   ]).toArray();
 
-  const validSteps = splitPokemons.map(p => p.evolution_step);
-  return { $in: validSteps };
+  const validSteps = splitPokemons.map(p => p.id);
+  
+  return validSteps;
 }
 
 async function handlerHasSplit() {
@@ -246,14 +270,14 @@ async function handlerHasSplit() {
     },
     {
       $project: {
-        evolution_step: 1,
+        id: 1,
         _id: 0
       }
     }
   ]).toArray();
 
-  const validSteps = splitPokemons.map(p => p.evolution_step);
-  return { $in: validSteps };
+  const validSteps = splitPokemons.map(p => p.id);
+  return validSteps;
 }
 
 async function handlerOtherForms(others, filter) {
@@ -261,7 +285,8 @@ async function handlerOtherForms(others, filter) {
   filter.is_default = others == 1 ? true : false;
 }
 
-async function handlerRelationTo(typeId, filter, expression) {
+async function handlerRelationTo(typeId, expression) {
+  
   const pipeline = [
     {
       $lookup: {
@@ -315,5 +340,6 @@ async function handlerRelationTo(typeId, filter, expression) {
   const results = await data.db.collection("pokemon").aggregate(pipeline).toArray();
 
   const ids = results.map(p => p.id);
-  filter.id = { $in: ids };
+  
+  return ids;
 }

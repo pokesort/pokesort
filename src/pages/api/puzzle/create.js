@@ -1,5 +1,5 @@
 import { connect } from "@/lib/mongodb";
-import { Puzzle } from "../../../models/puzzle";
+import { Puzzle } from "../../../models/Puzzle";
 
 export default async function handler(req, res) {
     if (req.method !== "POST") {
