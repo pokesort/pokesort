@@ -1,3 +1,8 @@
 {
-    "test": "Mensagem em português"
+    "test": "Mensagem em português",
+    "header": {
+        "daily": "Hoje",
+        "archive": "Arquivo",
+        "dex": "Dex"
+    }
 }

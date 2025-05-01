@@ -1,3 +1,5 @@
+@use "sass:map";
+
 // HEX COLORS
 $colors: (
   background1: #12121B,
@@ -20,6 +22,10 @@ $colors: (
   hint: #EEF0FF
 );
 
+@function color($key) {
+  @return map.get($colors, $key);
+}
+
 // TYPOGRAPHY
 $text-sizes: (
   xsmall: 0.625rem,
@@ -28,3 +34,7 @@ $text-sizes: (
   large: 1.25rem,
   xlarge: 1.5rem
 );
+
+@function text($key) {
+  @return map.get($text-sizes, $key);
+}

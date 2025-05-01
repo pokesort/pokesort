@@ -9,8 +9,8 @@ export default function Daily() {
     const t = useTranslations();
 
     return (
-        <section className="page">
-            <Gradient/>
-        </section>
+        <>
+            aBBA
+        </>
     )
 }

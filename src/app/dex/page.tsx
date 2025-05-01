@@ -1,7 +1,7 @@
 "use client"
 
 import { useTranslations } from 'next-intl';
-import "@/src/styles/components/Test.scss";
+import "@/src/styles/components/Dex.scss";
 import { useEffect, useState } from 'react';
 import Gradient from '@/src/components/Gradient';
 

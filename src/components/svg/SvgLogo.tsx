@@ -1,0 +1,22 @@
+export default function SvgLogo () {
+    return (
+        <svg width="53" height="52" viewBox="0 0 53 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M13.5 5C13.5 3.89543 12.6046 3 11.5 3H5.5C4.39543 3 3.5 3.89543 3.5 5V11C3.5 12.1046 4.39543 13 5.5 13H11.5C12.6046 13 13.5 12.1046 13.5 11V5Z" fill="#272C47"/>
+        <rect width="10" height="10" rx="2" transform="matrix(-1 0 0 1 25.5 3)" fill="#FC3C3F"/>
+        <rect width="10" height="10" rx="2" transform="matrix(-1 0 0 1 37.5 3)" fill="#FC3C3F"/>
+        <path d="M49.5 5C49.5 3.89543 48.6046 3 47.5 3H41.5C40.3954 3 39.5 3.89543 39.5 5V11C39.5 12.1046 40.3954 13 41.5 13H47.5C48.6046 13 49.5 12.1046 49.5 11V5Z" fill="#272C47"/>
+        <rect width="10" height="10" rx="2" transform="matrix(-1 0 0 1 13.5 15)" fill="#FC3C3F"/>
+        <rect width="10" height="10" rx="2" transform="matrix(-1 0 0 1 25.5 15)" fill="#272C47"/>
+        <rect width="10" height="10" rx="2" transform="matrix(-1 0 0 1 37.5 15)" fill="#272C47"/>
+        <rect width="10" height="10" rx="2" transform="matrix(-1 0 0 1 49.5 15)" fill="#FC3C3F"/>
+        <rect width="10" height="10" rx="2" transform="matrix(-1 0 0 1 13.5 27)" fill="#EEF0FF"/>
+        <rect width="10" height="10" rx="2" transform="matrix(-1 0 0 1 25.5 27)" fill="#272C47"/>
+        <rect width="10" height="10" rx="2" transform="matrix(-1 0 0 1 37.5 27)" fill="#272C47"/>
+        <rect width="10" height="10" rx="2" transform="matrix(-1 0 0 1 49.5 27)" fill="#EEF0FF"/>
+        <rect width="10" height="10" rx="2" transform="matrix(-1 0 0 1 13.5 39)" fill="#272C47"/>
+        <rect width="10" height="10" rx="2" transform="matrix(-1 0 0 1 25.5 39)" fill="#EEF0FF"/>
+        <rect width="10" height="10" rx="2" transform="matrix(-1 0 0 1 37.5 39)" fill="#EEF0FF"/>
+        <rect width="10" height="10" rx="2" transform="matrix(-1 0 0 1 49.5 39)" fill="#272C47"/>
+        </svg>
+    )
+}

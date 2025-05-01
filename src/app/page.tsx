@@ -1,16 +1,11 @@
-"use client"
-
 import { useTranslations } from 'next-intl';
 import "@/src/styles/components/Home.scss";
-import { useEffect, useState } from 'react';
-import Gradient from '../components/Gradient';
 
 export default function Home() {
   const t = useTranslations();  
 
   return (
-    <section className="page">
-      <Gradient/>
+    <section className="page">     
 
       <p>
         {t('test')}
