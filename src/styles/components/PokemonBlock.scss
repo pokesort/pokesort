@@ -1,0 +1,57 @@
+@use "../abstract" as *;
+
+label.pokemon-block {
+    --fraction: 4;
+    --gap: .5rem;
+
+    container-type: inline-size;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+
+    border-radius: 10px;
+    padding: 0.5rem;
+
+    width: calc((100% / var(--fraction, 4)) - (var(--gap) * calc(var(--fraction, 4) - 1)));
+    aspect-ratio: 1;
+
+    background-color: color(section1);
+
+    &:has(input:checked) {
+        outline: 2px solid color(selection1);
+    }
+
+    img {
+        position: absolute;
+        top: 5%;
+
+        width: 75%;
+        z-index: 5;
+    }
+
+    h3, h4 {
+        text-transform: capitalize;
+        text-align: center;
+        z-index: 10;
+    }
+
+    h3 {
+        font-size: text(xsmall);
+
+        // @container (min-width: 80px) {
+        //     font-size: text(small);
+        // }
+    }
+
+    h4 {
+        font-size: text(xsmall);
+        color: color(text2)
+    }
+
+    input {
+        display: none;
+    }
+}

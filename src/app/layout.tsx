@@ -6,7 +6,6 @@ import { headers } from "next/headers";
 import "@/src/styles/layout.scss";
 import { Montserrat } from 'next/font/google'
 import HeaderClient from "../components/HeaderClient";
-import Gradient from "../components/Gradient";
 
 const montserrat = Montserrat({
   subsets: ['latin'],
@@ -30,7 +29,6 @@ export default async function RootLayout({children,}: Readonly<{children: React.
   const locale = await getLocale();
   const headersList = await headers();
   const pathname = headersList.get('x-next-url') || '/';
-  console.log(pathname);
   
   return (
     <html lang={locale}>
@@ -38,9 +36,8 @@ export default async function RootLayout({children,}: Readonly<{children: React.
       <NextIntlClientProvider>
         <body>
           <HeaderClient/>
-          <Gradient/>
-          <section id="page">          
-              {children}          
+          <section id="page">
+              {children}
           </section>
         </body>
       </NextIntlClientProvider>

@@ -1,7 +1,12 @@
 import "@/src/styles/components/Gradient.scss";
 
-export default function Gradient () {
+interface GradientProps {
+    pathname: string | null;
+}
+
+export default function Gradient ({ pathname }: GradientProps) {
+
     return (
-        <div className="gradient"></div>
+        <div id="gradient" className={pathname === `/` ? 'headless' : ''}></div>
     )
 }

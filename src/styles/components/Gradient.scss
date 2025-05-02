@@ -1,6 +1,6 @@
 @use "../abstract" as *;
 
-div.gradient {
+div#gradient {
     width: 100vw;
     height: 100vh;
 
@@ -8,5 +8,11 @@ div.gradient {
     top: 0;
     z-index: -1;
 
-    background: linear-gradient(180deg, color(background1) 10%, rgba(25, 25, 27, 0) 100%);
+    &:not(.headless) {
+        background: linear-gradient(180deg, color(background1) 10%, rgba(25, 25, 27, 0) 100%);
+    }
+
+    &.headless {
+        background: linear-gradient(180deg, color(transparent) 9.7%, color(background1) 45.82%, color(background1) 63.88%, color(transparent) 100%);
+    }
 }

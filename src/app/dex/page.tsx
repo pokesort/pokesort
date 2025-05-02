@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl';
 import "@/src/styles/components/Dex.scss";
 import { useEffect, useState } from 'react';
-import Gradient from '@/src/components/Gradient';
+import PokemonBlock from '@/src/components/PokemonBlock';
 
 export default function Home() {
   const t = useTranslations();
@@ -21,21 +21,16 @@ export default function Home() {
         },
       }).then((res) => res.json())
       .then((result) => {
-          setPokemons(result.pokemons.sort((a: any, b: any) => a.dex_number - b.dex_number));
+          setPokemons(result.pokemons);
       })
   }, [])
 
   return (
     <>
-      <Gradient/>      
       <ul>
 
         {pokemons && pokemons.map((p: any, index: number) => (
-          <li key={index}>
-            <img src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${p.id}.png`}/>
-            <p>{p.id}</p>
-            <p>{p.name}</p>
-          </li>
+          <PokemonBlock key={p.id} pokemon={p} multiselect={false} />
         ))}
 
       </ul>
