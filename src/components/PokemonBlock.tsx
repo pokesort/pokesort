@@ -50,7 +50,7 @@ export default function PokemonBlock ({ pokemon, multiselect }: PokemonProps) {
     }
 
     return (
-        <label ref={ref} key={pokemon.id} className="pokemon-block">
+        <label ref={ref} key={pokemon.id} className="pokemon-block disable-select">
             <input type={multiselect ? 'checkbox' : 'radio'} name="pokemon[]" />
             <img src={loadedImage || fallback.src} />
             <h3>{p_name}</h3>

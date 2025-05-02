@@ -6,6 +6,8 @@ header {
     align-items: stretch;
 
     width: 100%;
+    max-width: 100vw;
+
     padding: 0 20%;
     background-color: color(background1);
     color: color(text1);
@@ -43,6 +45,14 @@ header {
                 border-bottom: 2px solid color(selection1);
                 color: color(text1);
             }
+        }
+    }
+
+    @media (max-width: 768px) {
+        padding: 0 0.5rem;
+
+        nav {
+            display: none;
         }
     }
 }

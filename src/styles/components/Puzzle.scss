@@ -1,10 +1,15 @@
 @use "../abstract" as *;
 
-section.page {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+section.puzzle {
+    --fraction: 4;
+    --gap: .5rem;
 
-    width: 100%;
+    display: flex;  
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--gap);
+
+    width: 550px;
+    max-width: 100vw;
 }

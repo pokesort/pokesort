@@ -1,6 +1,6 @@
 @use "../abstract" as *;
 
-section#page {  
+section#page {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -11,12 +11,19 @@ section#page {
   color: color(text1);
 
   ul {
-    display: flex;
-    width: 500px;
-    max-width: 100vw;
+    --fraction: 4;
+    --gap: .5rem;
+
+    display: flex;  
     flex-direction: row;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    justify-content: center;
+    gap: var(--gap);
+
+    width: 50vw;
+    @media(max-width: 768px) {
+      width: 100%;
+    }
 
     li {
       display: flex;
