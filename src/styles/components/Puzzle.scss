@@ -12,4 +12,8 @@ section.puzzle {
 
     width: 550px;
     max-width: 100vw;
+
+    &.pause {
+        pointer-events: none;
+    }
 }

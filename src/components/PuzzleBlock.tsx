@@ -6,12 +6,14 @@ import { useState, useEffect } from 'react';
 import '@/src/styles/components/PokemonBlock.scss';
 import fallback from '@/src/assets/images/pk_fallback.svg';
 
-interface PokemonProps {
-    pokemon: any,
-    multiselect: boolean,
+interface BlockProps {
+    pokemon: any;
+    multiselect: boolean;
+    isSelected: boolean;
+    onSelect: () => void;
 }
 
-export default function PokemonBlock ({ pokemon, multiselect }: PokemonProps) {
+export default function PuzzleBlock ({ pokemon, multiselect, isSelected, onSelect }: BlockProps) {
     const [loadedImage, setLoadedImage] = useState<string | null>(null);
     
     const default_url = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`;
@@ -50,8 +52,14 @@ export default function PokemonBlock ({ pokemon, multiselect }: PokemonProps) {
     }
 
     return (
-        <label ref={ref} key={pokemon.id} className="pokemon-block disable-select">
-            <input type={multiselect ? 'checkbox' : 'radio'} name="pokemon[]" />
+        <label ref={ref} key={pokemon.id} className="pokemon-block">
+            <input
+                type={multiselect ? 'checkbox' : 'radio'}
+                name="pokemon"
+                checked={isSelected}
+                onChange={onSelect}
+                hidden
+            />
             <img src={loadedImage || fallback.src} />
             <h3>{p_name}</h3>
             {p_surname != '' && (

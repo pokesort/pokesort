@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl';
 import "@/src/styles/components/Dex.scss";
 import { useEffect, useState } from 'react';
-import PokemonBlock from '@/src/components/PokemonBlock';
+import PokemonBlock from '@/src/components/PuzzleBlock';
 
 export default function Home() {
   const t = useTranslations();

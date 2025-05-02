@@ -1,12 +1,15 @@
 @use "../abstract" as *;
 
-label.pokemon-block {  
+label.pokemon-block {
+    --selection: #{color(selection1)};
+    
     container-type: inline-size;
     display: flex;
     flex-direction: column;
     justify-content: end;
     align-items: center;
     position: relative;
+    overflow: hidden;
     cursor: pointer;
 
     border-radius: 10px;
@@ -61,8 +64,30 @@ label.pokemon-block {
     }
 
 
+    &.incorrect {
+        --selection: #{color(selection2)};
+    }
+
+    &.correct {
+        --selection: #{color(selection2)};
+    }
+
     &:has(input:checked) {
-        border: 2px solid var(--selection, color(selection1));
+        border: 2px solid var(--selection);
+
+        &::after {
+            display: block;
+            content: '';
+            background-color: var(--selection);
+            width: 25px;
+            aspect-ratio: 1;
+
+            position: absolute;
+            right: 0;
+            top: 0;
+
+            transform: translate(50%, -50%) rotate(45deg);
+        }
     }
 
     &:hover {
