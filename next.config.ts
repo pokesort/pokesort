@@ -1,10 +1,15 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from 'next-intl/plugin';
+const path = require('path');
 
 const nextConfig: NextConfig = {
   /* config options here */
   eslint: {
     ignoreDuringBuilds: true,
+  },
+  webpack: (config) => {
+    config.resolve.alias['@'] = path.resolve(__dirname);
+    return config;
   },
 };
 
