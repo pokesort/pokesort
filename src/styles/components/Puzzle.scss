@@ -1,19 +1,77 @@
 @use "../abstract" as *;
 
 section.puzzle {
-    --fraction: 4;
-    --gap: .5rem;
+    --cols: 4;
 
     display: flex;  
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
-    gap: var(--gap);
+    gap: var(--spacing);
 
-    width: 550px;
-    max-width: 100vw;
+    width: min(100%, 550px);
 
     &.pause {
         pointer-events: none;
+    }
+}
+
+section.puzzle-info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    width: min(100%, 550px);
+}
+
+.guesses-container {
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    flex-wrap: wrap;
+
+    max-width: 50%;
+    gap: var(--spacing);
+    z-index: 2;
+
+    li {
+        display: block;
+        width: 10px;
+        aspect-ratio: 1;
+        border-radius: 2px;
+
+        animation: guess-in 0.15s ease 1;
+
+        &.guess-0 {
+            background-color: color(selection2);
+        }
+        &.guess-1 {
+            background-color: color(selection3);
+        }
+        &.guess-2 {
+            background-color: color(selection1);
+        }
+
+        @keyframes guess-in {
+            0% {
+                width: 0px;
+                height: 0px;
+            }
+
+            30% {
+                width: calc(var(--width, 8px) / 2);
+                height: calc(var(--width, 8px) / 2);
+            }
+
+            80% {
+                width: calc(var(--width, 8px) + 3px);
+                height: calc(var(--width, 8px) + 3px);
+            }
+        
+            100% {
+                width: var(--width, 8px);
+                height: var(--width, 8px);
+            }
+        }
     }
 }

@@ -1,68 +1,102 @@
 @use "../abstract" as *;
 
-label.pokemon-block {
+label.block-container {
     --selection: #{color(selection1)};
     
     container-type: inline-size;
-    display: flex;
-    flex-direction: column;
-    justify-content: end;
-    align-items: center;
-    position: relative;
-    overflow: hidden;
     cursor: pointer;
 
-    border-radius: 10px;
-    padding: 0.5rem;
-    background-color: color(section1);
     aspect-ratio: 1;
     flex: 0 0 calc(
-        (100% - (var(--gap) * (var(--fraction, 4) - 1))) / var(--fraction, 4)
+        (100% - (var(--spacing) * (var(--cols, 4) - 1))) / var(--cols, 4)
     );
 
-    transform-origin: center;
-    transition:
-        transform 0.15s ease,
-        box-shadow 0.25s ease;
-    
-    img {
-        position: absolute;
-        top: 0;
-        
-        width: 80%;
-        z-index: 1;
-    }
-    
-    h3, h4 {
-        text-transform: capitalize;
-        text-align: center;
-        font-weight: unset;
-        z-index: 5;
-    }
-    
-    h3 {
-        font-size: text(xsmall);
-        
-        @container (min-width: 60px) {
-            font-size: text(small);
-        }
-        @container (min-width: 100px) {
-            font-size: text(base);
-        }
-    }
-    
-    h4 {
-        color: color(text2);
-        font-size: text(xsmall);
-        @container (min-width: 120px) {
-            font-size: text(small);
-        }
-    }
-    
-    input {
-        display: none;
-    }
+    div.pokemon-block {
+        width: 100%;
+        height: 100%;
 
+        display: flex;
+        flex-direction: column;
+        justify-content: end;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+    
+        border-radius: 10px;
+        padding: var(--spacing);
+        background-color: color(section1);        
+    
+        transform-origin: center;
+        transition:
+            transform 0.15s ease,
+            box-shadow 0.15s ease;
+        
+        img {
+            position: absolute;
+            top: 0;
+            
+            width: 80%;
+            z-index: 1;
+        }
+        
+        h3, h4 {
+            text-transform: capitalize;
+            text-align: center;
+            font-weight: unset;
+            z-index: 5;
+            text-shadow: -2px -2px 0 color(section1), 2px -2px 0 color(section1), -2px 2px 0 color(section1), 2px 2px 0 color(section1);
+        }
+        
+        h3 {
+            font-size: text(xsmall);
+            
+            @container (min-width: 60px) {
+                font-size: text(small);
+            }
+            @container (min-width: 100px) {
+                font-size: text(base);
+            }
+        }
+        
+        h4 {
+            color: color(text2);
+            font-size: text(xsmall);
+            @container (min-width: 120px) {
+                font-size: text(small);
+            }
+        }
+        
+        input {
+            display: none;
+        }        
+    
+        &:has(input:checked) {
+            border: 2px solid var(--selection);
+    
+            &::after {
+                display: block;
+                content: '';
+                background-color: var(--selection);
+                width: 20%;
+                aspect-ratio: 1;
+    
+                position: absolute;
+                right: 0;
+                top: 0;
+    
+                transform: translate(50%, -50%) rotate(45deg);
+            }
+        }
+    
+        &:hover {
+            box-shadow: 0px 0 70px color(darker);
+            z-index: 1;
+        }
+    
+        &:active {
+            transform: scale(90%);
+        }
+    }
 
     &.incorrect {
         --selection: #{color(selection2)};
@@ -70,32 +104,5 @@ label.pokemon-block {
 
     &.correct {
         --selection: #{color(selection2)};
-    }
-
-    &:has(input:checked) {
-        border: 2px solid var(--selection);
-
-        &::after {
-            display: block;
-            content: '';
-            background-color: var(--selection);
-            width: 25px;
-            aspect-ratio: 1;
-
-            position: absolute;
-            right: 0;
-            top: 0;
-
-            transform: translate(50%, -50%) rotate(45deg);
-        }
-    }
-
-    &:hover {
-        box-shadow: 0px 0 70px color(darker);
-        z-index: 1;
-    }
-
-    &:active {
-        transform: scale(90%);
     }
 }

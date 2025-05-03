@@ -15,51 +15,71 @@ export default function Daily() {
     const [pokemons, setPokemons] = useState<any>([]);
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
     const [pause, setPause] = useState<boolean>(false);
+    const [guesses, setGuesses] = useState<number[]>([]);
 
-    function handleSelect(id: number) {
+    function handleSelect (id: number) {
         setSelectedIds(prev =>
             prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
         );
     }
-  
-    useEffect(() => {  
-      fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/pokemon/get?step=has_split`, {
-          method: "GET",
-          headers: {
-              "Content-Type": "application/json",
-          },
+
+    function handleGuess (guess: number) {''
+        setGuesses(prev => [...prev, guess]);
+    }
+
+    useEffect(() => {
+        fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/pokemon/get?step=has_split`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
         }).then((res) => res.json())
-        .then((result) => {
-            setPokemons(result.pokemons);
-        })
+            .then((result) => {
+                setPokemons(result.pokemons);
+            })
     }, [])
 
     useEffect(() => {
-      console.log(selectedIds);
-      if (selectedIds.length >= cols) {
-        const selected = document.querySelectorAll('label:has(input:checked)');
-        setPause(true);
-        setTimeout(() => {
-            selected.forEach(s => {
-                s.classList.add('incorrect');
-            })
-        }, 200);
-        setTimeout(() => {
-            selected.forEach(s => {
-                s.classList.remove('incorrect');
-            })
-            setSelectedIds([]);
-            setPause(false);
-        }, 800);
-      }
+        function makeGuess() {
+            const selected = document.querySelectorAll('label:has(input:checked)');
+            setPause(true);
+            setTimeout(() => {
+                selected.forEach(s => {
+                    s.classList.add('incorrect');
+                })
+            }, 200);
+            setTimeout(() => {
+                selected.forEach(s => {
+                    s.classList.remove('incorrect');
+                })
+                setSelectedIds([]);
+                handleGuess(0);
+                setPause(false);
+            }, 900);
+        }
 
+        if (selectedIds.length >= cols) {
+            makeGuess();
+        }
     }, [selectedIds])
+
+    useEffect(() => {
+      console.log(guesses)
+    }, [guesses])
     
 
     return (
         <>
+            <section className="puzzle-info-row">
+                <div/>
+                <ul className="guesses-container">
+                    {guesses.map((guess: number, index: number) => (
+                        <li key={index} className={`guess-${guess}`}></li>
+                    ))}
+                </ul>
+            </section>
             <section className={`puzzle disable-select ${pause ? 'pause' : ''}`}>
-                {pokemons && pokemons.map((p: any, index: number) => (
+                {pokemons.map((p: any, index: number) => (
                     <PokemonBlock
                         key={p.id}
                         pokemon={p}

@@ -11,14 +11,13 @@ section#page {
   color: color(text1);
 
   ul {
-    --fraction: 4;
-    --gap: .5rem;
+    --cols: 6;
 
     display: flex;  
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
-    gap: var(--gap);
+    gap: var(--spacing);
 
     width: 50vw;
     @media(max-width: 768px) {

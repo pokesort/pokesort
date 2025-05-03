@@ -52,19 +52,22 @@ export default function PuzzleBlock ({ pokemon, multiselect, isSelected, onSelec
     }
 
     return (
-        <label ref={ref} key={pokemon.id} className="pokemon-block">
-            <input
-                type={multiselect ? 'checkbox' : 'radio'}
-                name="pokemon"
-                checked={isSelected}
-                onChange={onSelect}
-                hidden
-            />
-            <img src={loadedImage || fallback.src} />
-            <h3>{p_name}</h3>
-            {p_surname != '' && (
-                <h4>{p_surname}</h4>
-            )}
+        <label ref={ref} key={pokemon.id} className="block-container">
+            <div className="pokemon-block disable-select">
+                <input
+                    type={multiselect ? 'checkbox' : 'radio'}
+                    name="pokemon"
+                    value={pokemon.id}
+                    checked={isSelected}
+                    onChange={onSelect}
+                    hidden
+                />
+                <img src={loadedImage || fallback.src} />
+                <h3>{p_name}</h3>
+                {p_surname != '' && (
+                    <h4>{p_surname}</h4>
+                )}
+            </div>
         </label>
     )
 }
