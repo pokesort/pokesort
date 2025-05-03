@@ -1,5 +1,5 @@
 import { connect, data } from '@/lib/mongodb';
-import { getPuzzleModel } from '../../../models/Puzzle';
+import { getPuzzleModel } from '@/src/models/Puzzle';
 import mongoose from 'mongoose';
 
 export default async function handler(req, res) {
