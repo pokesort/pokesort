@@ -30,7 +30,14 @@ export default async function handler(req, res) {
 }
 
 async function show(res, existingPuzzle){
-  return res.status(200).json({success: true, data: existingPuzzle})
+
+  const populatedMons = await Promise.all(
+    existingPuzzle.groups.map(async (group) => {
+      return await data.db.collection('pokemon').find({ id: { $in: group.pokemons }}, { projection: { name: 1, id: 1, species_name: 1, dex_number: 1, _id: 0 } }).toArray();
+    })
+  );
+
+  return res.status(200).json({success: true, data: existingPuzzle, pokemon: populatedMons.flat()})
 }
 
 async function update(req, res, existingPuzzle) {

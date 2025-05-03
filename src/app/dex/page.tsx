@@ -9,6 +9,11 @@ export default function Home() {
   const t = useTranslations();
   const [pokemons, setPokemons] = useState<any>([]);
   const [queries, setQueries] = useState<string>('');
+  const [selected, setSelected] = useState<number>();
+
+  function handleSelect (id: number) {
+    setSelected(id);
+  }
 
   useEffect(() => {
     const qs = window.location.href.split('?')[1];
@@ -30,7 +35,13 @@ export default function Home() {
       <ul>
 
         {pokemons && pokemons.map((p: any, index: number) => (
-          <PokemonBlock key={p.id} pokemon={p} multiselect={false} />
+          <PokemonBlock
+            key={p.id}
+            pokemon={p}
+            multiselect={false}
+            isSelected={selected == p.id}
+            onSelect={() => handleSelect(p.id)}
+          />
         ))}
 
       </ul>

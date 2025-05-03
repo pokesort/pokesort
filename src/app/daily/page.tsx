@@ -12,6 +12,7 @@ export default function Daily() {
     const rows = 4;
     const cols = 4;
 
+    const [puzzle, setPuzzle] = useState<any>([]);
     const [pokemons, setPokemons] = useState<any>([]);
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
     const [pause, setPause] = useState<boolean>(false);
@@ -27,33 +28,62 @@ export default function Daily() {
         setGuesses(prev => [...prev, guess]);
     }
 
+    function compareGroups (selected: number[]) {
+        let equal = false;
+        selected.sort();
+
+        puzzle.groups.forEach((group: any) => {
+            const other = [...group.pokemons];
+            
+            if (!equal)
+                equal = equal || selected.every((val, i) => val == other[i]);
+        })
+
+        return equal;
+    }
+
     useEffect(() => {
-        fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/pokemon/get?step=has_split`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-            },
-        }).then((res) => res.json())
-            .then((result) => {
-                setPokemons(result.pokemons);
-            })
+        function getPuzzle () {
+            fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/puzzle/daily`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }).then((res) => res.json())
+                .then((result) => {
+                    result.data.groups.forEach((group: any) => {
+                        group.pokemons.sort();
+                    })
+                    setPuzzle(result.data)
+                    setPokemons(shuffleMons(result.pokemon));
+                })
+        }
+
+        function shuffleMons (pokemon: any[]) {
+            return pokemon.sort(() => Math.random() - 0.5);
+        }
+
+        getPuzzle();
     }, [])
 
     useEffect(() => {
         function makeGuess() {
             const selected = document.querySelectorAll('label:has(input:checked)');
+            const correct = compareGroups(selectedIds);
+            let className = correct ? 'correct' : 'incorrect';
+
             setPause(true);
             setTimeout(() => {
                 selected.forEach(s => {
-                    s.classList.add('incorrect');
+                    s.classList.add(className);
                 })
             }, 200);
             setTimeout(() => {
                 selected.forEach(s => {
-                    s.classList.remove('incorrect');
+                    s.classList.remove(className);
                 })
                 setSelectedIds([]);
-                handleGuess(0);
+                handleGuess(correct ? 1 : 0);
                 setPause(false);
             }, 900);
         }
@@ -61,12 +91,7 @@ export default function Daily() {
         if (selectedIds.length >= cols) {
             makeGuess();
         }
-    }, [selectedIds])
-
-    useEffect(() => {
-      console.log(guesses)
-    }, [guesses])
-    
+    }, [selectedIds])    
 
     return (
         <>
