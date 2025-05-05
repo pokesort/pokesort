@@ -58,11 +58,6 @@ section.puzzle-info-row {
                 height: 0px;
             }
 
-            30% {
-                width: calc(var(--width, 8px) / 2);
-                height: calc(var(--width, 8px) / 2);
-            }
-
             80% {
                 width: calc(var(--width, 8px) + 3px);
                 height: calc(var(--width, 8px) + 3px);

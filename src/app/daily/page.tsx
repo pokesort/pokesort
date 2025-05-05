@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import "@/src/styles/components/Puzzle.scss";
 import PokemonBlock from '@/src/components/PuzzleBlock';
 
+
 export default function Daily() {
     const t = useTranslations();
 
@@ -27,6 +28,14 @@ export default function Daily() {
     function handleGuess (guess: number) {''
         setGuesses(prev => [...prev, guess]);
     }
+
+    const moveToTop = (selectedIds: number[]) => {
+        setPokemons((prev: any[]) => {
+            const top = prev.filter((pokemon) => selectedIds.includes(pokemon.id));
+            const rest = prev.filter((pokemon) => !selectedIds.includes(pokemon.id));
+            return [...top, ...rest];
+        });
+    };
 
     function compareGroups (selected: number[]) {
         let equal = false;
@@ -63,7 +72,7 @@ export default function Daily() {
             return pokemon.sort(() => Math.random() - 0.5);
         }
 
-        getPuzzle();
+        getPuzzle();        
     }, [])
 
     useEffect(() => {
@@ -79,13 +88,20 @@ export default function Daily() {
                 })
             }, 200);
             setTimeout(() => {
-                selected.forEach(s => {
-                    s.classList.remove(className);
-                })
                 setSelectedIds([]);
                 handleGuess(correct ? 1 : 0);
+                if (correct) {
+                    selected.forEach(s => {
+                        s.querySelector('.pokemon-block')?.classList.add('permaselect');
+                    })
+                    moveToTop(selectedIds)
+                } else {
+                    selected.forEach(s => {
+                        s.classList.remove(className);
+                    })
+                };
                 setPause(false);
-            }, 900);
+            }, 900);            
         }
 
         if (selectedIds.length >= cols) {

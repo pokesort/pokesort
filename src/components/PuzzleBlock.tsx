@@ -52,7 +52,7 @@ export default function PuzzleBlock ({ pokemon, multiselect, isSelected, onSelec
     }
 
     return (
-        <label ref={ref} key={pokemon.id} className="block-container">
+        <label ref={ref} className="block-container">
             <div className="pokemon-block disable-select">
                 <input
                     type={multiselect ? 'checkbox' : 'radio'}
