@@ -1,0 +1,41 @@
+@use "sass:map";
+
+// HEX COLORS
+$colors: (
+  background1: #12121B,
+  background2: #202029,
+  transparent: #12121B00,
+  darker: #020214CC,
+  
+  section1: #1D223B,
+
+  text1: #EEF0FF,
+  text2: #B0B5DB,
+  text3: #7E829E,
+
+  accent1: #FC3C3F,
+  accent2: #62F2B3,
+
+  selection1: #EEF0FF,
+  selection2: #FC3C3F,
+  selection3: #62F2B3,
+
+  hint: #EEF0FF
+);
+
+@function color($key) {
+  @return map.get($colors, $key);
+}
+
+// TYPOGRAPHY
+$text-sizes: (
+  xsmall: 0.625rem,
+  small: 0.75rem,
+  base: 1rem,
+  large: 1.25rem,
+  xlarge: 1.5rem
+);
+
+@function text($key) {
+  @return map.get($text-sizes, $key);
+}

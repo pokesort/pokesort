@@ -1,5 +1,5 @@
 {
-  "name": "matchup",
+  "name": "pokesort",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -11,8 +11,10 @@
   "dependencies": {
     "mongoose": "^8.12.2",
     "next": "15.2.3",
+    "next-intl": "^4.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-intersection-observer": "^9.16.0",
     "sass": "^1.86.0"
   },
   "devDependencies": {

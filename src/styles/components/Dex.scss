@@ -1,0 +1,34 @@
+@use "../abstract" as *;
+
+section#page {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  width: 100vw;
+
+  color: color(text1);
+
+  ul {
+    --cols: 6;
+
+    display: flex;  
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--spacing);
+
+    width: 50vw;
+    @media(max-width: 768px) {
+      width: 100%;
+    }
+
+    li {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+}
