@@ -27,10 +27,8 @@ export default async function handler(req, res) {
     if (step !== undefined) {
       const steps = Array.isArray(step) ? step : [step];
     
-      for (const element of steps) {
-        const result = await handlerEvolutionStep(element, filter);
-        pokemonIds = pokemonIds.concat(result);
-      }
+      const results = await Promise.all(steps.map(step => handlerEvolutionStep(step, filter)));
+      pokemonIds = results.flat();
 
       delete req.query.step;
     }
@@ -197,15 +195,22 @@ async function handlerEvolutionMethod(methods) {
     {
       $lookup: {
         from: "evolution_steps",
-        localField: "id",
-        foreignField: "pokemon",
+        let: { pokemonId: "$id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$pokemon", "$$pokemonId"] },
+              methods: methods
+            }
+          },
+          { $project: { _id: 0, pokemon: 1 } }
+        ],
         as: "evo_data"
       }
     },
-    { $unwind: "$evo_data" },
     {
       $match: {
-        "evo_data.methods": methods
+        "evo_data.0": { $exists: true } // só mantém os que têm correspondência
       }
     },
     {
@@ -216,26 +221,31 @@ async function handlerEvolutionMethod(methods) {
     }
   ]).toArray();
 
-  const ids = pokemonsWithMethod.map(p => p.id);
-
-  return ids;
+  return pokemonsWithMethod.map(p => p.id);
 }
 
 async function handlerIsSplit() {
   const splitPokemons = await data.db.collection('pokemon').aggregate([
     {
       $lookup: {
-        from: "evolution_steps",              // coleção relacionada
-        localField: "evolution_step",         // campo em 'pokemon'
-        foreignField: "id",                   // campo em 'evolution_steps'
+        from: "evolution_steps",
+        let: { evoId: "$evolution_step" },
+        pipeline: [
+          { $match: { $expr: { $eq: ["$id", "$$evoId"] } } },
+          { $project: { id: 1, is_split: 1, _id: 0 } },
+          { $match: { is_split: 1 } }
+        ],
         as: "evo_data"
       }
     },
-    { $unwind: "$evo_data" },
-
+    {
+      $addFields: {
+        evo_data_first: { $arrayElemAt: ["$evo_data", 0] }
+      }
+    },
     {
       $match: {
-        "evo_data.is_split": 1 // aqui está o filtro
+        evo_data_first: { $exists: true }
       }
     },
     {
@@ -247,7 +257,7 @@ async function handlerIsSplit() {
   ]).toArray();
 
   const validSteps = splitPokemons.map(p => p.id);
-  
+
   return validSteps;
 }
 
@@ -255,17 +265,24 @@ async function handlerHasSplit() {
   const splitPokemons = await data.db.collection('pokemon').aggregate([
     {
       $lookup: {
-        from: "evolution_steps",              // coleção relacionada
-        localField: "evolution_step",         // campo em 'pokemon'
-        foreignField: "id",                   // campo em 'evolution_steps'
+        from: "evolution_steps",
+        let: { evoId: "$evolution_step" },
+        pipeline: [
+          { $match: { $expr: { $eq: ["$id", "$$evoId"] } } },
+          { $project: { id: 1, has_split: 1, _id: 0 } },
+          { $match: { has_split: 1 } }
+        ],
         as: "evo_data"
       }
     },
-    { $unwind: "$evo_data" },
-
+    {
+      $addFields: {
+        evo_data_first: { $arrayElemAt: ["$evo_data", 0] }
+      }
+    },
     {
       $match: {
-        "evo_data.has_split": 1 // aqui está o filtro
+        evo_data_first: { $exists: true }
       }
     },
     {
