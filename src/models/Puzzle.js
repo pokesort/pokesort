@@ -51,10 +51,8 @@ const puzzleSchema = new mongoose.Schema({
         type: [groupSchema],
         validate: {
             validator: function (groups) {
-                // Valida número de grupos
                 if (groups.length !== this.rows) return false;
 
-                // Valida quantidade de pokemons por grupo conforme cols
                 return groups.every(group => group.pokemons.length === this.cols);
             },
             message: 'Groups length must match "rows" and each "pokemons" array must match "cols".',
