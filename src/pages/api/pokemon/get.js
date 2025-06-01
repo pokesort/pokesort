@@ -4,7 +4,7 @@ export default async function handler(req, res) {
   try {
     await connect();
 
-    const filter = {};
+    let filter = {};
     const arrayFields = ["types", "abilities", "moves", "egg_groups", "categories", "other_forms"];
     const booleanFields = ["is_default"];
 
@@ -15,6 +15,8 @@ export default async function handler(req, res) {
     const weak = req.query.weak;
     const strong = req.query.strong;
     const immune = req.query.immune;
+    const form = req.query.form;
+    const dual = req.query.dual;
 
     const relations_query = {
       "weak": { $gte: 2 },
@@ -23,14 +25,11 @@ export default async function handler(req, res) {
     }
     let pokemonIds = [];
     
-
     if (step !== undefined) {
       const steps = Array.isArray(step) ? step : [step];
     
-      for (const element of steps) {
-        const result = await handlerEvolutionStep(element, filter);
-        pokemonIds = pokemonIds.concat(result);
-      }
+      const results = await Promise.all(steps.map(step => handlerEvolutionStep(step, filter)));
+      pokemonIds = results.flat();
 
       delete req.query.step;
     }
@@ -49,27 +48,36 @@ export default async function handler(req, res) {
     
     if (weak != undefined) {
       const weakIds = await handlerRelationTo(weak, relations_query["weak"]);
-      
       pokemonIds = pokemonIds.length > 0 ? weakIds.filter(value => pokemonIds.includes(value)) : weakIds;
-
       delete req.query.weak;
     }
     
     if (strong != undefined) {
+
       const strongIds = await handlerRelationTo(strong, relations_query["strong"]);
       pokemonIds = pokemonIds.length > 0 ? strongIds.filter(value => pokemonIds.includes(value)) : strongIds;
-
       delete req.query.strong;
+      
     }
     
     if (immune != undefined) {
+
       const immuneIds = await handlerRelationTo(immune, relations_query["immune"]);
-      
       pokemonIds = pokemonIds.length > 0 ? immuneIds.filter(value => pokemonIds.includes(value)) : immuneIds;
       delete req.query.immune;
+
+    }
+    if (form != undefined){
+
+      const evoIds = await handlerEvolutionChain(form);
+      pokemonIds = pokemonIds.length > 0 ? evoIds.filter(value => pokemonIds.includes(value)) : evoIds;
+      delete req.query.form;
+
     }
 
-    if (pokemonIds.length>0){
+    if (dual != undefined) delete req.query.dual;
+    
+    if (pokemonIds.length > 0){
       pokemonIds = pokemonIds.filter((item, index) => pokemonIds.indexOf(item) === index);
       filter.id = {$in: pokemonIds};
     }
@@ -84,6 +92,13 @@ export default async function handler(req, res) {
       }
     }
 
+    if (dual != undefined){
+      filter = await handlerDualTypes(parseInt(dual), filter);
+    }
+
+    console.log(filter);
+
+
   let pokemons = await data.db.collection('pokemon').find(filter, { projection: { name: 1, id: 1, species_name: 1, dex_number: 1, _id: 0 } }).sort({ dex_number: 1, id: 1}).toArray();
 
     res.status(200).json({ success: true, pokemons });
@@ -94,19 +109,15 @@ export default async function handler(req, res) {
 }
 
 async function handlerEvolutionStep(step, filter) {
-  if (step === "no_line") {
-    return await handlerNoLine()
-
-  } else if (step === "is_split") {
-    return await handlerIsSplit();
+  
+  if (step === "no_line") return await handlerNoLine();
+  
+  else if (step === "is_split") return await handlerIsSplit();
     
-  } else if (step === "has_split") {
-    return await handlerHasSplit();
+  else if (step === "has_split") return await handlerHasSplit();
 
-  } else {
-    filter.evolution_step = { $regex: `-${step}$` };
-    return [];
-  }
+  filter.evolution_step = { $regex: `-${step}$` };
+  return [];
 }
 
 async function handlerNoLine() {
@@ -197,15 +208,22 @@ async function handlerEvolutionMethod(methods) {
     {
       $lookup: {
         from: "evolution_steps",
-        localField: "id",
-        foreignField: "pokemon",
+        let: { pokemonId: "$id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$pokemon", "$$pokemonId"] },
+              methods: methods
+            }
+          },
+          { $project: { _id: 0, pokemon: 1 } }
+        ],
         as: "evo_data"
       }
     },
-    { $unwind: "$evo_data" },
     {
       $match: {
-        "evo_data.methods": methods
+        "evo_data.0": { $exists: true } // só mantém os que têm correspondência
       }
     },
     {
@@ -216,26 +234,31 @@ async function handlerEvolutionMethod(methods) {
     }
   ]).toArray();
 
-  const ids = pokemonsWithMethod.map(p => p.id);
-
-  return ids;
+  return pokemonsWithMethod.map(p => p.id);
 }
 
 async function handlerIsSplit() {
   const splitPokemons = await data.db.collection('pokemon').aggregate([
     {
       $lookup: {
-        from: "evolution_steps",              // coleção relacionada
-        localField: "evolution_step",         // campo em 'pokemon'
-        foreignField: "id",                   // campo em 'evolution_steps'
+        from: "evolution_steps",
+        let: { evoId: "$evolution_step" },
+        pipeline: [
+          { $match: { $expr: { $eq: ["$id", "$$evoId"] } } },
+          { $project: { id: 1, is_split: 1, _id: 0 } },
+          { $match: { is_split: 1 } }
+        ],
         as: "evo_data"
       }
     },
-    { $unwind: "$evo_data" },
-
+    {
+      $addFields: {
+        evo_data_first: { $arrayElemAt: ["$evo_data", 0] }
+      }
+    },
     {
       $match: {
-        "evo_data.is_split": 1 // aqui está o filtro
+        evo_data_first: { $exists: true }
       }
     },
     {
@@ -247,7 +270,7 @@ async function handlerIsSplit() {
   ]).toArray();
 
   const validSteps = splitPokemons.map(p => p.id);
-  
+
   return validSteps;
 }
 
@@ -255,17 +278,24 @@ async function handlerHasSplit() {
   const splitPokemons = await data.db.collection('pokemon').aggregate([
     {
       $lookup: {
-        from: "evolution_steps",              // coleção relacionada
-        localField: "evolution_step",         // campo em 'pokemon'
-        foreignField: "id",                   // campo em 'evolution_steps'
+        from: "evolution_steps",
+        let: { evoId: "$evolution_step" },
+        pipeline: [
+          { $match: { $expr: { $eq: ["$id", "$$evoId"] } } },
+          { $project: { id: 1, has_split: 1, _id: 0 } },
+          { $match: { has_split: 1 } }
+        ],
         as: "evo_data"
       }
     },
-    { $unwind: "$evo_data" },
-
+    {
+      $addFields: {
+        evo_data_first: { $arrayElemAt: ["$evo_data", 0] }
+      }
+    },
     {
       $match: {
-        "evo_data.has_split": 1 // aqui está o filtro
+        evo_data_first: { $exists: true }
       }
     },
     {
@@ -281,7 +311,7 @@ async function handlerHasSplit() {
 }
 
 async function handlerOtherForms(others, filter) {
-  filter.other_forms = { $exists: true, $ne: [] }; // array não vazio
+  filter.other_forms = { $exists: true, $ne: [] };
   filter.is_default = others == 1 ? true : false;
 }
 
@@ -342,4 +372,207 @@ async function handlerRelationTo(typeId, expression) {
   const ids = results.map(p => p.id);
   
   return ids;
+}
+
+async function handlerEvolutionChain(form) {
+  
+  if (form == "first") return await handlerFirstInChain();
+
+  else if(form == "middle") return await handlerMiddleInChain();
+
+  else if(form == "final") return await handlerFinalInChain();
+}
+
+async function handlerFirstInChain() {
+  const pipeline = [
+    {
+      $match: {
+        evolution_step: { $ne: null }
+      }
+    },
+    {
+      $addFields: {
+        parts: { $split: ["$evolution_step", "-"] }
+      }
+    },
+    {
+      $addFields: {
+        step: { $toInt: { $arrayElemAt: ["$parts", -1] } },
+        chain_id: {
+          $cond: {
+            if: { $eq: [{ $size: "$parts" }, 3] },
+            then: {
+              $concat: [
+                { $arrayElemAt: ["$parts", 0] },
+                "-",
+                { $arrayElemAt: ["$parts", 1] }
+              ]
+            },
+            else: { $arrayElemAt: ["$parts", 0] }
+          }
+        }
+      }
+    },
+    {
+      $group: {
+        _id: "$chain_id",
+        steps: { $addToSet: "$step" },
+        pokemons: { $push: "$$ROOT" }
+      }
+    },
+    {
+      $match: {
+        $expr: {
+          $and: [
+            { $in: [0, "$steps"] },
+            { $gt: [{ $size: { $ifNull: ["$steps", []] } }, 1] }
+          ]
+        }
+      }
+    },
+    { $unwind: "$pokemons" },
+    { $match: { "pokemons.step": 0 } },
+    { $project: { _id: 0, id: "$pokemons.id" } }
+  ];
+
+  const result = await data.db.collection("pokemon").aggregate(pipeline).toArray();
+
+  return result.map(p => p.id);
+}
+
+async function handlerMiddleInChain() {
+  const pipeline = [
+    {
+      $match: {
+        evolution_step: { $ne: null }
+      }
+    },
+    {
+      $addFields: {
+        parts: { $split: ["$evolution_step", "-"] }
+      }
+    },
+    {
+      $addFields: {
+        step: { $toInt: { $arrayElemAt: ["$parts", -1] } },
+        chain_id: {
+          $cond: {
+            if: { $eq: [{ $size: "$parts" }, 3] },
+            then: {
+              $concat: [
+                { $arrayElemAt: ["$parts", 0] },
+                "-",
+                { $arrayElemAt: ["$parts", 1] }
+              ]
+            },
+            else: { $arrayElemAt: ["$parts", 0] }
+          }
+        }
+      }
+    },
+    {
+      $group: {
+        _id: "$chain_id",
+        steps: { $addToSet: "$step" },
+        pokemons: { $push: "$$ROOT" }
+      }
+    },
+    {
+      $match: {
+        $expr: {
+          $and: [
+            { $in: [0, "$steps"] },
+            { $in: [1, "$steps"] },
+            { $in: [2, "$steps"] }
+          ]
+        }
+      }
+    },
+    { $unwind: "$pokemons" },
+    { $match: { "pokemons.step": 1 } },
+    { $project: { _id: 0, id: "$pokemons.id" } }
+  ];
+
+  const result = await data.db.collection("pokemon").aggregate(pipeline).toArray();
+  return result.map(p => p.id);
+}
+
+async function handlerFinalInChain() {
+  const pipeline = [
+    {
+      $match: {
+        evolution_step: { $ne: null }
+      }
+    },
+    {
+      $addFields: {
+        parts: { $split: ["$evolution_step", "-"] }
+      }
+    },
+    {
+      $addFields: {
+        step: { $toInt: { $arrayElemAt: ["$parts", -1] } },
+        chain_id: {
+          $cond: {
+            if: { $eq: [{ $size: "$parts" }, 3] },
+            then: {
+              $concat: [
+                { $arrayElemAt: ["$parts", 0] },
+                "-",
+                { $arrayElemAt: ["$parts", 1] }
+              ]
+            },
+            else: { $arrayElemAt: ["$parts", 0] }
+          }
+        }
+      }
+    },
+    {
+      $group: {
+        _id: "$chain_id",
+        maxStep: { $max: "$step" },
+        steps: { $addToSet: "$step" },
+        pokemons: { $push: "$$ROOT" }
+      }
+    },
+    {
+      $match: {
+        $expr: { $gt: [{ $size: "$steps" }, 1] } // filtra cadeias com mais de 1 step
+      }
+    },
+    { $unwind: "$pokemons" },
+    {
+      $match: {
+        $expr: { $eq: ["$pokemons.step", "$maxStep"] }
+      }
+    },
+    {
+      $project: {
+        _id: 0,
+        id: "$pokemons.id"
+      }
+    }
+  ];
+
+  const result = await data.db.collection("pokemon").aggregate(pipeline).toArray();
+  return result.map(p => p.id);
+}
+
+async function handlerDualTypes(dual, filter){
+  
+  if (filter.types === undefined) {
+
+    filter.types = { $size: dual };
+
+  }
+  else {
+    filter = {
+      $and: [
+        filter,
+        { types: { $size: dual } }
+      ]
+    };
+
+    return filter;
+  }
 }
