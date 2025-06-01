@@ -2,6 +2,7 @@
   "name": "pokesort",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
@@ -12,6 +13,7 @@
     "mongoose": "^8.12.2",
     "next": "15.2.3",
     "next-intl": "^4.1.0",
+    "node-cron": "^4.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-intersection-observer": "^9.16.0",
