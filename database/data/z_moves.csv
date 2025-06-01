@@ -1,5 +1,5 @@
 Pokémon,Base Move,Z-Move,Type,Category,Power,Z-Crystal
-pikachu,Volt Tackle,Catastropika,Electric,Physical,210,Pikanium Z
+-midnight,Volt Tackle,Catastropika,Electric,Physical,210,Pikanium Z
 decidueye,Spirit Shackle,Sinister Arrow Raid,Ghost,Physical,180,Decidium Z
 incineroar,Darkest Lariat,Malicious Moonsault,Dark,Physical,180,Incinium Z
 primarina,Sparkling Aria,Oceanic Operetta,Water,Special,195,Primarium Z
@@ -18,6 +18,9 @@ necrozma-dusk,Sunsteel Strike,Searing Sunraze Smash,Steel,Physical,200,Solganium
 necrozma-dawn,Moongeist Beam,Menacing Moonraze Maelstrom,Ghost,Special,200,Lunalium Z
 solgaleo,Sunsteel Strike,Searing Sunraze Smash,Steel,Physical,200,Solganium Z
 lunala,Moongeist Beam,Menacing Moonraze Maelstrom,Ghost,Special,200,Lunalium Z
-mimikyu,Play Rough,Let's Snuggle Forever,Fairy,Physical,190,Mimikium Z
-lycanroc,Stone Edge,Splintered Stormshards,Rock,Physical,190,Lycanium Z
+mimikyu-disguised,Play Rough,Let's Snuggle Forever,Fairy,Physical,190,Mimikium Z
+lycanroc-dusk,Stone Edge,Splintered Stormshards,Rock,Physical,190,Lycanium Z
 kommo-o,Clanging Scales,Clangorous Soulblaze*,Dragon,Special,185,Kommonium Z
+mimikyu-busted,Play Rough,Let's Snuggle Forever,Fairy,Physical,,Mimikium Z
+lycanroc-midday,Stone Edge,Splintered Stormshards,Rock,Physical,,Lycanium Z
+lycanroc-midnight,Stone Edge,Splintered Stormshards,Rock,Physical,,Lycanium Z
