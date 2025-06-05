@@ -10,8 +10,8 @@ let idsUsed = [];
 
 export default async function handler(req, res) {
 
-    const amount = req.body.amount;
-
+    const amount = req.query.amount;
+  
     if (amount > 30) return res.status(403).json({success: false, message: "Quantidade de puzzles pedidos maior que o permitido"});
 
     const randomInRange = (min, max) => {
