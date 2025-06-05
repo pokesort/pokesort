@@ -79,7 +79,10 @@ export default async function handler(req, res) {
     
     if (pokemonIds.length > 0){
       pokemonIds = pokemonIds.filter((item, index) => pokemonIds.indexOf(item) === index);
-      filter.id = {$in: pokemonIds};
+      filter.id =  {$in: pokemonIds};
+    }
+    else {
+      filter.id = {$in: [0]}
     }
     
     for (const [key, value] of Object.entries(req.query)) {
@@ -95,9 +98,6 @@ export default async function handler(req, res) {
     if (dual != undefined){
       filter = await handlerDualTypes(parseInt(dual), filter);
     }
-
-    console.log(filter);
-
 
   let pokemons = await data.db.collection('pokemon').find(filter, { projection: { name: 1, id: 1, species_name: 1, dex_number: 1, _id: 0 } }).sort({ dex_number: 1, id: 1}).toArray();
 
