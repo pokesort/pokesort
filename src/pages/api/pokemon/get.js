@@ -25,6 +25,8 @@ export default async function handler(req, res) {
       "immune": { $eq: 0 },
     }
     let pokemonIds = [];
+
+    // console.log(JSON.stringify(filter, null, 2)); //printar filtro
     
     if (step !== undefined) {
       const steps = Array.isArray(step) ? step : [step];
@@ -83,7 +85,6 @@ export default async function handler(req, res) {
     
     if (pokemonIds.length > 0){
       pokemonIds = pokemonIds.filter((item, index) => pokemonIds.indexOf(item) === index);
-      pokemonIdsUsed = true;
       filter.id =  {$in: pokemonIds};
     }
     else if(pokemonIdsUsed) {
@@ -563,21 +564,23 @@ async function handlerFinalInChain() {
   return result.map(p => p.id);
 }
 
-async function handlerDualTypes(dual, filter){
-  
-  if (filter.types === undefined) {
+async function handlerDualTypes(dual, filter) {
 
-    filter.types = { $size: dual };
+  const newAnd = [];
 
+  if (filter.$and) {
+    newAnd.push(...filter.$and);
+  } else {
+    newAnd.push(filter);
   }
-  else {
-    filter = {
-      $and: [
-        filter,
-        { types: { $size: dual } }
-      ]
-    };
 
-    return filter;
+  if (filter.types !== undefined) {
+    newAnd.push({ types: filter.types });
   }
+
+  newAnd.push({ types: { $size: dual } });
+
+  filter = { $and: newAnd };
+
+  return filter;
 }
