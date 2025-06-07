@@ -1,8 +1,6 @@
 @use "../abstract" as *;
 
 section.puzzle {
-    --cols: 4;
-
     display: flex;  
     flex-direction: row;
     flex-wrap: wrap;
