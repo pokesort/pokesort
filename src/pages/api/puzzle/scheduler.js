@@ -3,26 +3,33 @@ import { getPuzzleModel } from '@/src/models/Puzzle';
 
 export default async function handler(req, res) {
 
-  const Puzzle = getPuzzleModel(data);
+  try {
+    await connect();
   
-  const today = new Date().toISOString().split('T')[0];
-  let existingPuzzle = await getTodayPuzzle(today);
-
-  if(!existingPuzzle) return res.status(404).json({success: false, message: "Nenhum puzzle disponível"});
+    const Puzzle = getPuzzleModel(data);
     
-  return res.status(200).json({success: true})
+    const today = new Date().toISOString().split('T')[0];
+    let existingPuzzle = await getTodayPuzzle(today, Puzzle);
+  
+    if(!existingPuzzle) return res.status(404).json({success: false, message: "Nenhum puzzle disponível"});
+      
+    return res.status(200).json({success: true})
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({success: false, message: "Erro interno de Servidor"})
+  }
 }
 
-async function getTodayPuzzle(today){
+async function getTodayPuzzle(today, Puzzle){
 
-  let todayPuzzle = await data.db.collection('puzzles').findOne({date: today});
+  let todayPuzzle = await Puzzle.findOne({date: today});
 
   if (!todayPuzzle){
 
-    const puzzleNoDate = await data.db.collection('puzzles').findOne({ date: null });
+    const puzzleNoDate = await Puzzle.findOne({ date: null });
     
     if (puzzleNoDate) {
-      await data.db.collection('puzzles').updateOne(
+      await Puzzle.updateOne(
         { _id: puzzleNoDate._id },
         { $set: { date: today } }
       );

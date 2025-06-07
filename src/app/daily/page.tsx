@@ -10,8 +10,8 @@ import PokemonBlock from '@/src/components/PuzzleBlock';
 export default function Daily() {
     const t = useTranslations();
 
-    const rows = 4;
-    const cols = 4;
+    const [rows, setRows] = useState<number>(4);
+    const [cols, setCols] = useState<number>(4);
 
     const [puzzle, setPuzzle] = useState<any>([]);
     const [pokemons, setPokemons] = useState<any>([]);
@@ -60,10 +60,13 @@ export default function Daily() {
                 },
             }).then((res) => res.json())
                 .then((result) => {
+                    console.log(result);
                     result.data.groups.forEach((group: any) => {
                         group.pokemons.sort();
                     })
-                    setPuzzle(result.data)
+                    setRows(result.data.rows);
+                    setCols(result.data.cols);
+                    setPuzzle(result.data);
                     setPokemons(shuffleMons(result.pokemon));
                 })
         }
@@ -119,7 +122,7 @@ export default function Daily() {
                     ))}
                 </ul>
             </section>
-            <section className={`puzzle disable-select ${pause ? 'pause' : ''}`}>
+            <section style={{'--cols': cols} as React.CSSProperties} className={`puzzle disable-select ${pause ? 'pause' : ''}`}>
                 {pokemons.map((p: any, index: number) => (
                     <PokemonBlock
                         key={p.id}
