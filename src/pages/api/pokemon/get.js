@@ -5,6 +5,7 @@ export default async function handler(req, res) {
     await connect();
 
     let filter = {};
+    let pokemonIdsUsed = false;
     const arrayFields = ["types", "abilities", "moves", "egg_groups", "categories", "other_forms"];
     const booleanFields = ["is_default"];
 
@@ -24,20 +25,22 @@ export default async function handler(req, res) {
       "immune": { $eq: 0 },
     }
     let pokemonIds = [];
+
+    // console.log(JSON.stringify(filter, null, 2)); //printar filtro
     
     if (step !== undefined) {
       const steps = Array.isArray(step) ? step : [step];
     
       const results = await Promise.all(steps.map(step => handlerEvolutionStep(step, filter)));
       pokemonIds = results.flat();
-
+      pokemonIdsUsed = true;
       delete req.query.step;
     }
     
     if (methods !== undefined) {
       const methodsIds = await handlerEvolutionMethod(parseInt(methods));
       pokemonIds = pokemonIds.length > 0 ? methodsIds.filter(value => pokemonIds.includes(value)) : methodsIds;
-
+      pokemonIdsUsed = true;
       delete req.query.methods;
     }
     
@@ -49,6 +52,7 @@ export default async function handler(req, res) {
     if (weak != undefined) {
       const weakIds = await handlerRelationTo(weak, relations_query["weak"]);
       pokemonIds = pokemonIds.length > 0 ? weakIds.filter(value => pokemonIds.includes(value)) : weakIds;
+      pokemonIdsUsed = true;
       delete req.query.weak;
     }
     
@@ -56,14 +60,15 @@ export default async function handler(req, res) {
 
       const strongIds = await handlerRelationTo(strong, relations_query["strong"]);
       pokemonIds = pokemonIds.length > 0 ? strongIds.filter(value => pokemonIds.includes(value)) : strongIds;
+      pokemonIdsUsed = true;
       delete req.query.strong;
-      
     }
     
     if (immune != undefined) {
 
       const immuneIds = await handlerRelationTo(immune, relations_query["immune"]);
       pokemonIds = pokemonIds.length > 0 ? immuneIds.filter(value => pokemonIds.includes(value)) : immuneIds;
+      pokemonIdsUsed = true;
       delete req.query.immune;
 
     }
@@ -71,6 +76,7 @@ export default async function handler(req, res) {
 
       const evoIds = await handlerEvolutionChain(form);
       pokemonIds = pokemonIds.length > 0 ? evoIds.filter(value => pokemonIds.includes(value)) : evoIds;
+      pokemonIdsUsed = true;
       delete req.query.form;
 
     }
@@ -79,7 +85,10 @@ export default async function handler(req, res) {
     
     if (pokemonIds.length > 0){
       pokemonIds = pokemonIds.filter((item, index) => pokemonIds.indexOf(item) === index);
-      filter.id = {$in: pokemonIds};
+      filter.id =  {$in: pokemonIds};
+    }
+    else if(pokemonIdsUsed) {
+      filter.id = {$in: [0]}
     }
     
     for (const [key, value] of Object.entries(req.query)) {
@@ -95,9 +104,6 @@ export default async function handler(req, res) {
     if (dual != undefined){
       filter = await handlerDualTypes(parseInt(dual), filter);
     }
-
-    console.log(filter);
-
 
   let pokemons = await data.db.collection('pokemon').find(filter, { projection: { name: 1, id: 1, species_name: 1, dex_number: 1, _id: 0 } }).sort({ dex_number: 1, id: 1}).toArray();
 
@@ -558,21 +564,23 @@ async function handlerFinalInChain() {
   return result.map(p => p.id);
 }
 
-async function handlerDualTypes(dual, filter){
-  
-  if (filter.types === undefined) {
+async function handlerDualTypes(dual, filter) {
 
-    filter.types = { $size: dual };
+  const newAnd = [];
 
+  if (filter.$and) {
+    newAnd.push(...filter.$and);
+  } else {
+    newAnd.push(filter);
   }
-  else {
-    filter = {
-      $and: [
-        filter,
-        { types: { $size: dual } }
-      ]
-    };
 
-    return filter;
+  if (filter.types !== undefined) {
+    newAnd.push({ types: filter.types });
   }
+
+  newAnd.push({ types: { $size: dual } });
+
+  filter = { $and: newAnd };
+
+  return filter;
 }
