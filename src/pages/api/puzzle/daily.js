@@ -6,6 +6,8 @@ export default async function handler(req, res) {
   // Esta rota deve encontrar o puzzle com a data de hoje.
   // Usando um id fixo para testes
 
+  await connect();
+
   const id = '6814d35057d11f3951d361d6';
 
   if (!mongoose.Types.ObjectId.isValid(id)) {

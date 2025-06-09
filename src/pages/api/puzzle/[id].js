@@ -3,6 +3,8 @@ import { getPuzzleModel } from '@/src/models/Puzzle';
 import mongoose from 'mongoose';
 
 export default async function handler(req, res) {
+  await connect();
+  
   const { id } = req.query;
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
