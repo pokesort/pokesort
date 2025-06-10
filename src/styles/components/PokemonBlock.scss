@@ -6,7 +6,7 @@ label.block-container {
     container-type: inline-size;
     cursor: pointer;
 
-    border-radius: 10px;
+    // border-radius: 10px;
     aspect-ratio: 1;
     flex: 0 0 calc(
         (100% - (var(--spacing) * (var(--cols, 4) - 1))) / var(--cols, 4)
@@ -24,9 +24,9 @@ label.block-container {
         overflow: hidden;
     
         z-index: 0;
-        border-radius: 10px;
+        // border-radius: 10px;
         padding: var(--spacing);
-        background-color: color(section1);        
+        background-color: color(section2);        
     
         transform-origin: center;
         transition:
@@ -46,7 +46,8 @@ label.block-container {
             text-align: center;
             font-weight: unset;
             z-index: 5;
-            text-shadow: -2px -2px 0 color(section1), 2px -2px 0 color(section1), -2px 2px 0 color(section1), 2px 2px 0 color(section1);
+            white-space: nowrap;
+            text-shadow: -2px -2px 0 color(section2), 2px -2px 0 color(section2), -2px 2px 0 color(section2), 2px 2px 0 color(section2);
         }
         
         h3 {

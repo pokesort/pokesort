@@ -5,19 +5,18 @@ import { useEffect, useState } from 'react';
 
 import "@/src/styles/components/Puzzle.scss";
 import PokemonBlock from '@/src/components/PuzzleBlock';
+import CalendarIcon from '@/src/components/svg/CalendarIcon';
 
 
 export default function Daily() {
     const t = useTranslations();
 
-    const [rows, setRows] = useState<number>(4);
-    const [cols, setCols] = useState<number>(4);
-
     const [puzzle, setPuzzle] = useState<any>([]);
     const [pokemons, setPokemons] = useState<any>([]);
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
     const [pause, setPause] = useState<boolean>(false);
-    const [guesses, setGuesses] = useState<number[]>([]);
+    const [guesses, setGuesses] = useState<any[]>([]);
+    const [date, setDate] = useState<string>('');
 
     function handleSelect (id: number) {
         setSelectedIds(prev =>
@@ -64,11 +63,23 @@ export default function Daily() {
                     result.data.groups.forEach((group: any) => {
                         group.pokemons.sort();
                     })
-                    setRows(result.data.rows);
-                    setCols(result.data.cols);
                     setPuzzle(result.data);
+                    console.log(result.data.date);
+                    setDate(formatDate(result.data.date))
                     setPokemons(shuffleMons(result.pokemon));
                 })
+        }
+
+        function formatDate (inputDate: string) {
+            inputDate="2025-02-28"
+            const date = new Date(`${inputDate}T00:00:00`)
+
+            const formattedDate = date.toLocaleDateString('pt-BR', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+            });
+            return formattedDate;
         }
 
         function shuffleMons (pokemon: any[]) {
@@ -107,32 +118,35 @@ export default function Daily() {
             }, 900);            
         }
 
-        if (selectedIds.length >= cols) {
+        if (selectedIds.length >= puzzle.cols) {
             makeGuess();
         }
     }, [selectedIds])    
 
     return (
         <>
-            <section className="puzzle-info-row">
-                <div/>
-                <ul className="guesses-container">
-                    {guesses.map((guess: number, index: number) => (
-                        <li key={index} className={`guess-${guess}`}></li>
+            <div className="window-container">
+                <section className="puzzle-info-row">
+                    <CalendarIcon/>
+                    <p>{date}</p>
+                    {/* <ul className="guesses-container">
+                        {guesses.map((guess: number, index: number) => (
+                            <li key={index} className={`guess-${guess}`}></li>
+                        ))}
+                    </ul> */}
+                </section>
+                <section style={{'--cols': puzzle.cols} as React.CSSProperties} className={`puzzle disable-select ${pause ? 'pause' : ''}`}>
+                    {pokemons.map((p: any, index: number) => (
+                        <PokemonBlock
+                            key={p.id}
+                            pokemon={p}
+                            multiselect={true}
+                            isSelected={selectedIds.includes(p.id)}
+                            onSelect={() => handleSelect(p.id)}
+                        />
                     ))}
-                </ul>
-            </section>
-            <section style={{'--cols': cols} as React.CSSProperties} className={`puzzle disable-select ${pause ? 'pause' : ''}`}>
-                {pokemons.map((p: any, index: number) => (
-                    <PokemonBlock
-                        key={p.id}
-                        pokemon={p}
-                        multiselect={true}
-                        isSelected={selectedIds.includes(p.id)}
-                        onSelect={() => handleSelect(p.id)}
-                    />
-                ))}
-            </section>
+                </section>
+            </div>
         </>
     )
 }
