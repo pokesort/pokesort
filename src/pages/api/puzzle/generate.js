@@ -4,7 +4,7 @@ import {
   pickRandom,
   getRandomFieldValue,
   pickRandomMult
-} from '../../../scripts/utils.js';
+} from '@/src/scripts/utils.js';
 
 let idsUsed = [];
 
@@ -43,7 +43,7 @@ export default async function handler(req, res) {
     });
   }
 
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/puzzle/lote`, {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/puzzle/batch`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
