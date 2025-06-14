@@ -2,6 +2,7 @@
 
 import { useInView } from 'react-intersection-observer';
 import React, { useState, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 
 import '@/src/styles/components/PokemonBlock.scss';
 import fallback from '@/src/assets/images/pk_fallback.svg';
@@ -14,6 +15,16 @@ interface BlockProps {
     isIncorrect: boolean;
     onSelect: (id: number) => void;
 }
+
+const itemVariants: Variants = {
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+        type: 'tween'
+    }
+  }
+};
 
 function getSurname(name: string, species_name: string) {
     let p_name = name.replace(species_name, '').split('-');
@@ -59,7 +70,15 @@ export default React.memo(function PuzzleBlock({ pokemon, multiselect, isSelecte
     }, [inView]);
 
     return (
-        <label ref={ref} className="block-container">
+        <motion.label ref={ref} className="block-container"
+            key={pokemon.id}
+            layoutId={`pokemon-block-${pokemon.id}`}
+            variants={itemVariants}
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.5 }}
+            transition={{ duration: 0.5, type: 'spring' }}
+        >
             <div className={blockClasses}>
                 <input
                     type={multiselect ? 'checkbox' : 'radio'}
@@ -75,6 +94,6 @@ export default React.memo(function PuzzleBlock({ pokemon, multiselect, isSelecte
                     <h4>{p_surname}</h4>
                 )}
             </div>
-        </label>
+        </motion.label>
     )
 })

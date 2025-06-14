@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { motion, AnimatePresence, AnimateSharedLayout, Variants } from 'framer-motion';
 
 import type { PuzzleApiResponseUnion } from '@/src/assets/types/PuzzleApiResponse';
 import "@/src/styles/components/Puzzle.scss";
@@ -11,6 +12,16 @@ import CalendarIcon from '@/src/components/svg/CalendarIcon';
 interface PuzzleProps {
     puzzleId: string;
 }
+
+const containerVariants: Variants = {
+  hidden: { opacity: 1 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.02
+    }
+  }
+};
 
 function formatDate(inputDate: string): string {
     const date = new Date(`${inputDate}T00:00:00`);
@@ -23,6 +34,10 @@ function formatDate(inputDate: string): string {
 
 function shuffleMons<T>(pokemonArray: T[]): T[] {    
     return [...pokemonArray].sort(() => Math.random() - 0.5);
+}
+
+const PokemonBlockWrapper = () => {
+
 }
 
 export default React.memo(function Puzzle({puzzleId}: PuzzleProps) {
@@ -39,7 +54,9 @@ export default React.memo(function Puzzle({puzzleId}: PuzzleProps) {
     const [guesses, setGuesses] = useState<any[]>([]);
 
     const [incorrectGuessIds, setIncorrectGuessIds] = useState<Set<number>>(new Set());
+    const [correctGuessIds, setCorrectGuessIds] = useState<Set<number>>(new Set());
     const [solvedGroupIds, setSolvedGroupIds] = useState<Set<number>>(new Set());
+    const [solvedInOrder, setSolvedInOrder] = useState<any[]>([]);
 
     const handleSelect = useCallback((id: number) => {
         if (pause) return;
@@ -71,17 +88,17 @@ export default React.memo(function Puzzle({puzzleId}: PuzzleProps) {
         return false;
     }, [puzzle, solvedGroupIds]);
 
-    function handleGuess (guess: number) {''
+    const handleGuess = useCallback((guess: number) => {
+        console.log("Abba?");
         setGuesses(prev => [...prev, guess]);
-    }
-
-    const moveToTop = useCallback((newlySolvedIds: number[]) => {
-        setPokemons((prevPokemons: any) => {
-            const top = prevPokemons.filter((p: any) => newlySolvedIds.includes(p.id));
-            const rest = prevPokemons.filter((p: any) => !newlySolvedIds.includes(p.id));
-            return [...top, ...rest];
-        });
     }, []);
+
+    const markGroupAsSolved = useCallback((newlySolvedIds: Set<number>) => {
+        const newSolvedGroup = pokemons.filter((p:any) => newlySolvedIds.has(p.id));
+
+        setSolvedInOrder(prevOrder => [...prevOrder, ...newSolvedGroup]);
+        setSolvedGroupIds(prevIds => new Set([...prevIds, ...newlySolvedIds]));
+    }, [pokemons]);
 
     // FETCH INICIAL
     useEffect(() => {
@@ -124,7 +141,7 @@ export default React.memo(function Puzzle({puzzleId}: PuzzleProps) {
     }, [puzzleId])
 
     useEffect(() => {
-        if (!puzzle || selectedIds.size < puzzle.cols) {
+        if (!puzzle?.cols || selectedIds.size < puzzle.cols) {
             return;
         }
 
@@ -133,17 +150,17 @@ export default React.memo(function Puzzle({puzzleId}: PuzzleProps) {
             const isCorrect = compareGroups(selectedIds);
             
             if (isCorrect) {
-                setSolvedGroupIds(selectedIds);
-                setGuesses(prev => [...prev, 1]);
+                setCorrectGuessIds(selectedIds);
+                handleGuess(1);
 
                 setTimeout(() => {
-                    moveToTop(Array.from(selectedIds));
+                    markGroupAsSolved(selectedIds);
                     setSelectedIds(new Set());
                     setPause(false);
                 }, 800);                
             } else {
                 setIncorrectGuessIds(selectedIds);
-                setGuesses(prev => [...prev, 0]);
+                handleGuess(0);
                 
                 setTimeout(() => {
                     setSelectedIds(new Set());
@@ -154,11 +171,14 @@ export default React.memo(function Puzzle({puzzleId}: PuzzleProps) {
         };
 
         makeGuess();
-    }, [selectedIds, puzzle, compareGroups, moveToTop]);
+    }, [selectedIds, puzzle, compareGroups, markGroupAsSolved, handleGuess]);
 
     const date = useMemo(() => {
         return puzzle ? formatDate(puzzle.date) : '';
     }, [puzzle]);
+
+    // const solvedPokemons = useMemo(() => pokemons.filter((p:any) => solvedGroupIds.has(p.id)), [pokemons, solvedGroupIds]);
+    const activePokemons = useMemo(() => pokemons.filter((p:any) => !solvedGroupIds.has(p.id)), [pokemons, solvedGroupIds]);
 
     return (
         <>
@@ -177,25 +197,50 @@ export default React.memo(function Puzzle({puzzleId}: PuzzleProps) {
                 {loading ? (
                     <p>Loading</p>
                 ): (
-                    <section className={`puzzle disable-select ${pause ? 'pause' : ''}`}>
-                        {pokemons.map((p: any, index: number) => {
-                            const isSelected = selectedIds.has(p.id);
-                            const isSolved = solvedGroupIds.has(p.id);
-                            const isIncorrect = incorrectGuessIds.has(p.id);
+                    <motion.section
+                        className={`puzzle disable-select ${pause ? 'pause' : ''}`}
+                        variants={containerVariants}
+                        initial="hidden"
+                        animate="visible"
+                    >
+                        <AnimatePresence>
 
-                            return (
-                                <PokemonBlock
-                                    key={p.id}
-                                    pokemon={p}
-                                    multiselect={true}
-                                    isSelected={isSelected}
-                                    isSolved={isSolved}
-                                    isIncorrect={isIncorrect}
-                                    onSelect={handleSelect}
-                                />
-                            )
-                        })}
-                    </section>
+                            {solvedInOrder.map((p: any, index: number) => {
+                                const isSelected = selectedIds.has(p.id);
+                                const isSolved = solvedGroupIds.has(p.id) || correctGuessIds.has(p.id);
+                                const isIncorrect = incorrectGuessIds.has(p.id);
+
+                                return (
+                                    <PokemonBlock
+                                        key={p.id}
+                                        pokemon={p}
+                                        multiselect={true}
+                                        isSelected={isSelected}
+                                        isSolved={isSolved}
+                                        isIncorrect={isIncorrect}
+                                        onSelect={handleSelect}
+                                    />
+                                )
+                            })}
+                            {activePokemons.map((p: any, index: number) => {
+                                const isSelected = selectedIds.has(p.id);
+                                const isSolved = solvedGroupIds.has(p.id) || correctGuessIds.has(p.id);
+                                const isIncorrect = incorrectGuessIds.has(p.id);
+
+                                return (
+                                    <PokemonBlock
+                                        key={p.id}
+                                        pokemon={p}
+                                        multiselect={true}
+                                        isSelected={isSelected}
+                                        isSolved={isSolved}
+                                        isIncorrect={isIncorrect}
+                                        onSelect={handleSelect}
+                                    />
+                                )
+                            })}
+                        </AnimatePresence>
+                    </motion.section>
                 )}
             </div>      
         </>

@@ -10,6 +10,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "framer-motion": "^12.18.1",
     "mongoose": "^8.12.2",
     "next": "15.2.3",
     "next-intl": "^4.1.0",
