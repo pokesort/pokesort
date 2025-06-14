@@ -125,15 +125,15 @@ export default function Daily() {
 
     return (
         <>
+            <ul className="guesses-container">
+                {guesses.map((guess: number, index: number) => (
+                    <li key={index} className={`guess-${guess}`}></li>
+                ))}
+            </ul>
             <div className="window-container">
                 <section className="puzzle-info-row">
                     <CalendarIcon/>
-                    <p>{date}</p>
-                    {/* <ul className="guesses-container">
-                        {guesses.map((guess: number, index: number) => (
-                            <li key={index} className={`guess-${guess}`}></li>
-                        ))}
-                    </ul> */}
+                    <p>{date}</p>                    
                 </section>
                 <section style={{'--cols': puzzle.cols} as React.CSSProperties} className={`puzzle disable-select ${pause ? 'pause' : ''}`}>
                     {pokemons.map((p: any, index: number) => (
