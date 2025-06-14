@@ -3,6 +3,7 @@
 .window-container {
     display: flex;
     flex-direction: column;
+    min-height: 580px;
     width: min(100%, 560px);
     background-color: color(section1);
 
@@ -11,6 +12,8 @@
     padding-top: 0;
 
     clip-path: polygon(0% 0%, 45% 0%, calc(45% + 37px) 37px, 100% 37px, 100% 100%, 0% 100%);
+
+    transition: height 0.3s ease;
 }
 @media (max-width: 640px) {
     .window-container:has(section.puzzle) {
