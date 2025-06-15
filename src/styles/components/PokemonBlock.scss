@@ -6,11 +6,16 @@ label.block-container {
     container-type: inline-size;
     cursor: pointer;
 
-    border-radius: 10px;
+    // border-radius: 10px;
     aspect-ratio: 1;
     flex: 0 0 calc(
         (100% - (var(--spacing) * (var(--cols, 4) - 1))) / var(--cols, 4)
     );
+
+    &:has(.solved) {
+        cursor: default;
+        pointer-events: none;
+    }
 
     div.pokemon-block {
         width: 100%;
@@ -24,9 +29,8 @@ label.block-container {
         overflow: hidden;
     
         z-index: 0;
-        border-radius: 10px;
         padding: var(--spacing);
-        background-color: color(section1);        
+        background-color: color(section2);
     
         transform-origin: center;
         transition:
@@ -46,7 +50,8 @@ label.block-container {
             text-align: center;
             font-weight: unset;
             z-index: 5;
-            text-shadow: -2px -2px 0 color(section1), 2px -2px 0 color(section1), -2px 2px 0 color(section1), 2px 2px 0 color(section1);
+            white-space: nowrap;
+            text-shadow: -2px -2px 0 color(section2), 2px -2px 0 color(section2), -2px 2px 0 color(section2), 2px 2px 0 color(section2);
         }
         
         h3 {
@@ -70,10 +75,23 @@ label.block-container {
         
         input {
             display: none;
-        }        
+        }     
     
-        &:has(input:checked), &.permaselect {
+        &:has(input:checked) {
             border: 2px solid var(--selection);
+
+            &.correct, &.incorrect {
+                z-index: 1;
+                pointer-events: none;
+                animation: make-guess 0.5s ease 1;
+            }
+
+            &.incorrect {
+                --selection: #{color(selection2)};
+            }
+            &.correct {
+                --selection: #{color(selection3)};
+            }
     
             &::after {
                 display: block;
@@ -89,6 +107,36 @@ label.block-container {
                 transform: translate(50%, -50%) rotate(45deg);
             }
         }
+
+        &.solved {
+            background-color: unset;
+            animation: solved-background 1.0s ease 1;
+            border: 2px solid;
+            border-color: transparent;
+            
+
+            &::after {
+                display: block;
+                content: '';
+                background-color: #{color(selection3)};
+                width: 20%;
+                aspect-ratio: 1;
+                opacity: 0;
+    
+                position: absolute;
+                right: 0;
+                top: 0;
+    
+                transform: translate(50%, -50%) rotate(45deg);
+                animation: solved-text 1.0s ease 1;
+            }
+
+            h3, h4 {
+                opacity: 0;
+                visibility: hidden;
+                animation: solved-text 1.0s ease 1;
+            }
+        }
     
         &:hover {
             box-shadow: 0px 0 70px color(darker);
@@ -98,32 +146,53 @@ label.block-container {
         &:active {
             transform: scale(90%);
         }
-    }
 
-    &.correct, &.incorrect {
-        z-index: 1;
-        animation: make-guess 0.5s ease 1;
-        pointer-events: none;
-    }
-
-    &.incorrect {
-        --selection: #{color(selection2)};
-    }
-    &.correct {
-        --selection: #{color(selection3)};
+        @media (max-width: 768px) {
+            &:hover {
+                box-shadow: unset;
+            }
+        }
     }
 
     @keyframes make-guess {
         0% {
             box-shadow: 0px 0 0px transparent;
         }
-
         30% {
             box-shadow: 0px 0 10px var(--selection);
         }
-
         100% {
             box-shadow: 0px 0 30px transparent;
+        }
+    }
+
+    @keyframes solved-background {
+        0% {
+            background-color: color(section2);
+            border-color: #{color(selection3)};
+        }
+        60% {
+            background-color: color(section2);
+            border-color: #{color(selection3)};
+        }
+        100% {
+            background-color: transparent;
+            border-color: transparent;
+        }
+    }
+
+    @keyframes solved-text {
+        0% {
+            opacity: 1;
+            visibility: visible;
+        }
+        60% {
+            opacity: 1;
+            visibility: visible;
+        }
+        100% {
+            opacity: 0;
+            visibility: hidden;
         }
     }
 }

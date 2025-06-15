@@ -10,6 +10,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.18.1",
     "mongoose": "^8.12.2",
     "next": "15.2.3",
     "next-intl": "^4.1.0",
@@ -26,6 +28,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.2.3",
+    "react-scan": "^0.3.4",
     "typescript": "^5"
   }
 }

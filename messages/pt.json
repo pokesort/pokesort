@@ -4,5 +4,197 @@
         "daily": "Hoje",
         "archive": "Arquivo",
         "dex": "Dex"
+    },
+    
+    "groupnames": {
+        "types": {
+            "long": "Tipo ",
+            "short": "Tipo",
+
+            "1": "Normal",
+            "2": "Lutador",
+            "3": "Voador",
+            "4": "Venenoso",
+            "5": "Terra",
+            "6": "Pedra",
+            "7": "Inseto",
+            "8": "Fantasma",
+            "9": "Aço",
+            "10": "Fogo",
+            "11": "Água",
+            "12": "Grama",
+            "13": "Elétrico",
+            "14": "Psíquico",
+            "15": "Gelo",
+            "16": "Dragão",
+            "17": "Sombrio",
+            "18": "Fada"
+        },
+        "color": {
+            "long": "",
+            "short": "Cor",
+
+            "red": "Vermelho",
+            "blue": "Azul",
+            "green": "Verde",
+            "yellow": "Amarelo",
+            "black": "Preto",
+            "brown": "Marrom",
+            "gray": "Cinza",
+            "pink": "Rosa",
+            "purple": "Roxo",
+            "white": "Branco"
+        },
+        "region": {
+            "long": "Da Região de ",
+            "short": "Região"
+        },
+        "shape": {
+            "long": "Tem Corpo ",
+            "short": "Formato",
+
+            "armor": "com Armadura",
+            "wings": "com Asas",
+            "quadruped": "Quadrupede",
+            "ball": "em Forma de Bola",
+            "squiggle": "Ondulado",
+            "fish": "de Peixe",
+            "arms": "Focado em Braços",
+            "blob": "Disforme",
+            "upright": "Bipede",
+            "legs": "Focado em Pernas",
+            "heads": "com Várias Cabeças",
+            "bug-wings": "com Asas de Inseto",
+            "humanoid": "Humanóide",
+            "tentacles": "com Tentáculos"
+        },
+        "egg-groups": {
+            "long": "No Grupo de Reprodução ",
+            "short": "Grupo de Reprodução",
+
+            "monster": "Monstro",
+            "dragon": "Dragão",
+            "water1": "Água 1",
+            "bug": "Inseto",
+            "flying": "Voador",
+            "ground": "Campo",
+            "fairy": "Fada",
+            "plant": "Planta",
+            "humanshape": "Humanóide",
+            "water3": "Água 3",
+            "mineral": "Mineral",
+            "indeterminate": "Indeterminado",
+            "water2": "Água 2",
+            "ditto": "Ditto",
+            "no-eggs": "Sem Ovos"
+        },
+        "categories": {
+            "long": "",
+            "short": "Categoria",
+
+            "1": "Forma Bebê",
+            "2": "Mítico",
+            "3": "Lendário",
+            "4": "Possui Mega Evolução",
+            "5": "Mega Evolução",
+            "6": "Possui Gigantamax",
+            "7": "Possui Z-Move Exclusivo",
+            "8": "Possui Forma Regional",
+            "9": "Pode Trocar de Forma",
+            "10": "Possui Diferenças de Gênero",
+            "11": "Inicial",
+            "12": "Ultra Beast",
+            "13": "Paradoxo",
+            "14": "Gigantamax",
+            "15": "Forma Regional",
+            "16": "Vivillon"
+        },
+        "others": {
+            "long": "",
+            "short": "Outras Formas",
+
+            "1": "Possui Formas Alternativas",
+            "2": "Forma Alternativa"
+        },
+        "methods": {
+            "long": "Evolui ",
+            "short": "Método Evolutivo",
+
+            "1": "Subindo de Nível",
+            "2": "por Troca",
+            "3": "Apenas em Região Específica",
+            "4": "Usando um Item",
+            "5": "Baseado no Gênero",
+            "6": "de Forma Exclusiva",
+            "7": "Segurando um Item",
+            "8": "ao Aprender um Movimento",
+            "9": "por Felicidade",
+            "10": "Apenas de Dia",
+            "11": "Apenas de Noite"
+        },
+        "generation": {
+            "long": "Geração ",
+            "short": "Geração",
+
+            "1": "I",
+            "2": "II",
+            "3": "III",
+            "4": "IV",
+            "5": "V",
+            "6": "VI",
+            "7": "VII",
+            "8": "VIII",
+            "9": "IX",
+            "10": "X"
+        },
+        "habitat": {
+            "long": "Vive em ",
+            "short": "Habitat",
+
+            "cave": "Cavernas",
+            "forest": "Florestas",
+            "grassland": "Campos",
+            "mountain": "Montanhas",
+            "rare": "Lugares Incomuns",
+            "rough-terrain": "Relevo Irregular",
+            "sea": "Mares",
+            "urban": "Cidades",
+            "waters-edge": "Margens de Água"
+        },
+        "step": {
+            "long": "",
+            "short": "Cadeia Evolutiva",
+
+            "no_line": "Não Possui Cadeia Evolutiva",
+            "has_split": "Possui Evolução Ramificada",
+            "is_split": "É uma Evolução Ramificada"
+        },
+        "weak": {
+            "long": "Fraco ao Tipo ",
+            "short": "Fraqueza"
+        },
+        "strong": {
+            "long": "Resiste ao Tipo ",
+            "short": "Resistência"
+        },
+        "immune": {
+            "long": "Imune ao Tipo ",
+            "short": "Imune"
+        },
+        "form": {
+            "long": "",
+            "short": "Passo de Evolução",
+
+            "first": "Forma Base",
+            "middle": "Forma do Meio",
+            "final": "Forma Final"
+        },
+        "dual": {
+            "long": "Tipagem ",
+            "short": "Tipagem",
+
+            "1": "Única",
+            "2": "Dupla"
+        }
     }
 }

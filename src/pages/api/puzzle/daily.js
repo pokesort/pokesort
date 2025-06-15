@@ -8,12 +8,6 @@ export default async function handler(req, res) {
 
   await connect();
 
-  const id = '6814d35057d11f3951d361d6';
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({ success: false, error: 'Invalid ID format' });
-  }
-
   const Puzzle = getPuzzleModel(data);
   
   const today = new Date().toISOString().split('T')[0];
