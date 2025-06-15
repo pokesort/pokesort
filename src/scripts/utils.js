@@ -58,3 +58,16 @@ export const toTitleCase = (str) => {
       return word.charAt(0).toUpperCase() + word.slice(1);
     }).join(' ');
 }
+
+export function formatDate(inputDate, locale) {
+    const date = new Date(`${inputDate}T00:00:00`);
+    return date.toLocaleDateString(locale, {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric'
+    });
+}
+
+export function shuffleArray(array) {
+    return [...array].sort(() => Math.random() - 0.5);
+}
