@@ -18,6 +18,10 @@
     .window-container {
         width: calc(100% + var(--spacing) * 2.5);
     }
+
+    section.puzzle-info-row {
+        margin: 0.25rem 0;
+    }
 }
 
 section.puzzle {
