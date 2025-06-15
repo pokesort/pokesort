@@ -3,7 +3,6 @@
 .window-container {
     display: flex;
     flex-direction: column;
-    min-height: 580px;
     width: min(100%, 560px);
     background-color: color(section1);
 
@@ -18,7 +17,6 @@
 @media (max-width: 640px) {
     .window-container {
         width: calc(100% + var(--spacing) * 2.5);
-        min-height: 100vw;
     }
 }
 
@@ -44,7 +42,7 @@ section.solved-groups-grid {
     left: 0;
 
     display: grid;
-    grid-template-rows: repeat(4, 1fr);
+    grid-template-rows: repeat(var(--rows), 1fr);
     gap: inherit;
     padding: inherit;
     width: 100%;
@@ -62,8 +60,16 @@ section.solved-groups-grid {
         background-color: color(section2);
         padding: var(--spacing);
         overflow: hidden;
-
+        text-align: center;
         border: 2px solid #{color(selection3)};
+
+        font-size: text(xsmall);
+        @container (min-height: 60px) {
+            font-size: text(small);
+        }
+        @container (min-height: 100px) {
+            font-size: text(base);
+        }
 
         animation: solved-group-appear 1.0s ease 1;
 

@@ -1,13 +1,14 @@
 "use client"
 
 import { useTranslations } from 'next-intl';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { CSSProperties, useCallback, useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence, AnimateSharedLayout, Variants } from 'framer-motion';
 
 import type { PuzzleApiResponseUnion } from '@/src/assets/types/PuzzleApiResponse';
 import "@/src/styles/components/Puzzle.scss";
 import PokemonBlock from '@/src/components/PuzzleBlock';
 import CalendarIcon from '@/src/components/svg/CalendarIcon';
+import GroupName from './GroupName';
 
 interface PuzzleProps {
     puzzleId: string;
@@ -43,9 +44,10 @@ interface SolvedGroupsGridProps {
 function SolvedGroupsGrid ({groups}: SolvedGroupsGridProps) {
     return (
         <section className="solved-groups-grid">
+            
             {groups.map((group: string, index: number)=> (
                 <div key={group} className="solved-group">
-                    <span>{group}</span>
+                    <GroupName query={group}/>
                 </div>
             ))}
         </section>
@@ -141,6 +143,7 @@ export default React.memo(function Puzzle({puzzleId}: PuzzleProps) {
                     puzzleResponse.json(),
                 ]);
 
+                console.log(puzzleData.data);-
                 setPuzzle(puzzleData.data);
                 setPokemons(shuffleMons(puzzleData.pokemon));
             } catch (e) {
@@ -204,7 +207,7 @@ export default React.memo(function Puzzle({puzzleId}: PuzzleProps) {
                     <li key={index} className={`guess-${guess}`}></li>
                 ))}
             </ul>            
-            <div style={{'--cols': puzzle.cols} as React.CSSProperties} className="window-container">
+            <div style={{'--cols': puzzle.cols, '--rows': puzzle.rows} as React.CSSProperties} className="window-container">
                 <section className="puzzle-info-row">
                     {date && !loading && <>
                         <CalendarIcon/>
@@ -212,7 +215,7 @@ export default React.memo(function Puzzle({puzzleId}: PuzzleProps) {
                     </>}
                 </section>
                 {loading ? (
-                    <p>Loading</p>
+                    <p style={{margin: "250px 0", textAlign: "center"} as CSSProperties}>Loading</p>
                 ): (
                     <motion.section
                         className={`puzzle disable-select ${pause ? 'pause' : ''}`}

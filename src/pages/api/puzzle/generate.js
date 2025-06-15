@@ -69,8 +69,8 @@ export async function generateGroup(cols) {
       return `${field}=${value}`;
     });
 
-    const query = queryParts.join('&');
-    const response = await fetch(`http://localhost:3000/api/pokemon/get?${query}`);
+    const query = '?'+queryParts.join('&');
+    const response = await fetch(`http://localhost:3000/api/pokemon/get${query}`);
 
     if (!response.ok) {
       throw new Error(`Erro ao buscar pokémons: ${response.statusText}`);

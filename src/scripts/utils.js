@@ -17,7 +17,6 @@ export const FIELD_OPTIONS = {
   immune: [1, 2, 3, 4, 5, 8, 13, 14, 16], //normal, fighting, flying, poison, ground, fantasma, eletrico, psychic, dragao
   form: ['first', 'middle', 'final'],
   dual: { min: 1, max: 2 },
-
 };
 
 export const randomInRange = (min, max) =>
@@ -48,3 +47,14 @@ export const getRandomFieldValue = (field) => {
     throw new Error(`Invalid field definition for "${field}"`);
   }
 };
+
+export const toTitleCase = (str) => {
+  if (!str || typeof str !== 'string') {
+    return "";
+  }
+  
+  return str.toLowerCase().split(' ')
+    .map(word => {      
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    }).join(' ');
+}
