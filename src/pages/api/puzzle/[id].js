@@ -6,14 +6,17 @@ export default async function handler(req, res) {
   await connect();
   
   const { id } = req.query;
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
+  const Puzzle = getPuzzleModel(data);
+  let existingPuzzle;
+  const date = new Date(`${id}T00:00:00`);
+  
+  if (!isNaN(date) && date <= Date.now()) {
+    existingPuzzle = await Puzzle.findOne({'date': id});
+  } else if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).json({ success: false, error: 'Invalid ID format' });
   }
 
-  const Puzzle = getPuzzleModel(data);
-
-  const existingPuzzle = await Puzzle.findById(id);
+  if (!existingPuzzle) existingPuzzle = await Puzzle.findById(id);
   if (!existingPuzzle) {
     return res.status(404).json({ success: false, error: 'Puzzle not found' });
   }
@@ -27,8 +30,6 @@ export default async function handler(req, res) {
   else if (req.method === 'GET'){
     await show(res, existingPuzzle);
   }
-
-
 }
 
 async function show(res, existingPuzzle){
