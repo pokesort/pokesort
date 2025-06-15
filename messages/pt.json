@@ -46,30 +46,30 @@
             "white": "Branco"
         },
         "region": {
-            "long": "Da região de ",
+            "long": "Da Região de ",
             "short": "Região"
         },
         "shape": {
-            "long": "Tem corpo ",
+            "long": "Tem Corpo ",
             "short": "Formato",
 
-            "armor": "com armadura",
-            "wings": "com asas",
-            "quadruped": "quadrupede",
-            "ball": "em forma de bola",
-            "squiggle": "ondulado",
-            "fish": "de peixe",
-            "arms": "focado em braços",
-            "blob": "disforme",
-            "upright": "bipede",
-            "legs": "focado em pernas",
-            "heads": "com várias cabeças",
-            "bug-wings": "com asas de inseto",
-            "humanoid": "humanóide",
-            "tentacles": "com tentáculos"
+            "armor": "com Armadura",
+            "wings": "com Asas",
+            "quadruped": "Quadrupede",
+            "ball": "em Forma de Bola",
+            "squiggle": "Ondulado",
+            "fish": "de Peixe",
+            "arms": "Focado em Braços",
+            "blob": "Disforme",
+            "upright": "Bipede",
+            "legs": "Focado em Pernas",
+            "heads": "com Várias Cabeças",
+            "bug-wings": "com Asas de Inseto",
+            "humanoid": "Humanóide",
+            "tentacles": "com Tentáculos"
         },
         "egg-groups": {
-            "long": "No grupo de reprodução ",
+            "long": "No Grupo de Reprodução ",
             "short": "Grupo de Reprodução",
 
             "monster": "Monstro",
@@ -92,45 +92,45 @@
             "long": "",
             "short": "Categoria",
 
-            "1": "Bebê",
+            "1": "Forma Bebê",
             "2": "Mítico",
             "3": "Lendário",
             "4": "Possui Mega Evolução",
             "5": "Mega Evolução",
             "6": "Possui Gigantamax",
-            "7": "Possui Z-Move exclusivo",
-            "8": "Possui forma regional",
-            "9": "Pode trocar de forma",
-            "10": "Possui diferenças de gênero",
+            "7": "Possui Z-Move Exclusivo",
+            "8": "Possui Forma Regional",
+            "9": "Pode Trocar de Forma",
+            "10": "Possui Diferenças de Gênero",
             "11": "Inicial",
             "12": "Ultra Beast",
             "13": "Paradoxo",
             "14": "Gigantamax",
-            "15": "Forma regional",
+            "15": "Forma Regional",
             "16": "Vivillon"
         },
         "others": {
-            "long": "Possui outras formas ",
+            "long": "",
             "short": "Outras Formas",
 
-            "1": "e é a original",
-            "2": "e é alternativa"
+            "1": "Possui Formas Alternativas",
+            "2": "Forma Alternativa"
         },
         "methods": {
             "long": "Evolui ",
             "short": "Método Evolutivo",
 
-            "1": "subindo de nível",
-            "2": "por troca",
-            "3": "apenas em região específica",
-            "4": "usando item",
-            "5": "por gênero específico",
-            "6": "de forma exclusiva",
-            "7": "segurando item",
-            "8": "ao aprender um movimento",
-            "9": "por felicidade",
-            "10": "apenas de dia",
-            "11": "apenas de noite"
+            "1": "Subindo de Nível",
+            "2": "por Troca",
+            "3": "Apenas em Região Específica",
+            "4": "Usando um Item",
+            "5": "Baseado no Gênero",
+            "6": "de Forma Exclusiva",
+            "7": "Segurando um Item",
+            "8": "ao Aprender um Movimento",
+            "9": "por Felicidade",
+            "10": "Apenas de Dia",
+            "11": "Apenas de Noite"
         },
         "generation": {
             "long": "Geração ",
@@ -151,23 +151,23 @@
             "long": "Vive em ",
             "short": "Habitat",
 
-            "cave": "cavernas",
-            "forest": "florestas",
-            "grassland": "campos",
-            "mountain": "montanhas",
-            "rare": "lugares incomuns",
-            "rough-terrain": "relevo irregular",
-            "sea": "mares",
-            "urban": "cidades",
-            "waters-edge": "margens de água"
+            "cave": "Cavernas",
+            "forest": "Florestas",
+            "grassland": "Campos",
+            "mountain": "Montanhas",
+            "rare": "Lugares Incomuns",
+            "rough-terrain": "Relevo Irregular",
+            "sea": "Mares",
+            "urban": "Cidades",
+            "waters-edge": "Margens de Água"
         },
         "step": {
             "long": "",
             "short": "Cadeia Evolutiva",
 
-            "no_line": "Não possui cadeia evolutiva",
-            "has_split": "Possui evolução ramificada",
-            "is_split": "É uma evolução ramificada"
+            "no_line": "Não Possui Cadeia Evolutiva",
+            "has_split": "Possui Evolução Ramificada",
+            "is_split": "É uma Evolução Ramificada"
         },
         "weak": {
             "long": "Fraco ao Tipo ",
@@ -185,9 +185,9 @@
             "long": "",
             "short": "Passo de Evolução",
 
-            "first": "Forma base",
-            "middle": "Forma do meio",
-            "final": "Forma final"
+            "first": "Forma Base",
+            "middle": "Forma do Meio",
+            "final": "Forma Final"
         },
         "dual": {
             "long": "Tipagem ",

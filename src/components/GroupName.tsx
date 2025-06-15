@@ -58,7 +58,7 @@ export default function GroupName ({query}: GroupNameProps) {
 
     const groupList = getGroupList(query);
     const naturalGroupNames = getNaturalGroupnames(groupList);
-    let result = naturalGroupNames.join(' | ');
+    let result = naturalGroupNames.join('  ·  ');
 
     return ( <span>{result}</span> )
 }

@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import React, { CSSProperties, useCallback, useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence, AnimateSharedLayout, Variants } from 'framer-motion';
+import { useLocale } from 'next-intl';
 
 import type { PuzzleApiResponseUnion } from '@/src/assets/types/PuzzleApiResponse';
 import "@/src/styles/components/Puzzle.scss";
@@ -24,9 +25,9 @@ const containerVariants: Variants = {
   }
 };
 
-function formatDate(inputDate: string): string {
+function formatDate(inputDate: string, locale: string): string {
     const date = new Date(`${inputDate}T00:00:00`);
-    return date.toLocaleDateString('pt-BR', {
+    return date.toLocaleDateString(locale, {
         day: '2-digit',
         month: 'long',
         year: 'numeric'
@@ -60,6 +61,7 @@ function SolvedGroupsGrid ({groups}: SolvedGroupsGridProps) {
 
 export default React.memo(function Puzzle({puzzleId}: PuzzleProps) {
     const t = useTranslations();
+    const locale = useLocale();
 
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -194,7 +196,7 @@ export default React.memo(function Puzzle({puzzleId}: PuzzleProps) {
     }, [selectedIds, puzzle, compareGroups, markGroupAsSolved, handleGuess]);
 
     const date = useMemo(() => {
-        return puzzle ? formatDate(puzzle.date) : '';
+        return puzzle ? formatDate(puzzle.date, locale) : '';
     }, [puzzle]);
 
     // const solvedPokemons = useMemo(() => pokemons.filter((p:any) => solvedGroupIds.has(p.id)), [pokemons, solvedGroupIds]);

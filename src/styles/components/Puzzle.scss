@@ -60,18 +60,16 @@ section.solved-groups-grid {
         background-color: color(section2);
         padding: var(--spacing);
         overflow: hidden;
-        text-align: center;
         border: 2px solid #{color(selection3)};
 
-        font-size: text(xsmall);
-        @container (min-height: 60px) {
+        animation: solved-group-appear 1.0s ease 1;
+
+        span {
+            margin-bottom: 0.1rem;
+            width: 100%;
+            text-align: center;
             font-size: text(small);
         }
-        @container (min-height: 100px) {
-            font-size: text(base);
-        }
-
-        animation: solved-group-appear 1.0s ease 1;
 
         &::after {
             display: block;
@@ -96,6 +94,7 @@ section.puzzle-info-row {
     height: fit-content;
     gap: var(--spacing);
     padding: var(--spacing);
+    font-size: text(small);
     
     width: min(100%, 550px);
 }
