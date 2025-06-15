@@ -3,6 +3,7 @@
 import { useInView } from 'react-intersection-observer';
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
+import clsx from 'clsx';
 
 import '@/src/styles/components/PokemonBlock.scss';
 import fallback from '@/src/assets/images/pk_fallback.svg';
@@ -11,8 +12,9 @@ interface BlockProps {
     pokemon: any;
     multiselect: boolean;
     isSelected: boolean;
-    isSolved: boolean;
-    isIncorrect: boolean;
+    isSolved?: boolean;
+    isCorrect?: boolean;
+    isIncorrect?: boolean;
     onSelect: (id: number) => void;
 }
 
@@ -39,7 +41,7 @@ function getSurname(name: string, species_name: string) {
     return surname;
 }
 
-export default React.memo(function PuzzleBlock({ pokemon, multiselect, isSelected, isSolved, isIncorrect, onSelect }: BlockProps) {
+export default React.memo(function PuzzleBlock({ pokemon, multiselect, isSelected, isSolved=false, isCorrect=false, isIncorrect=false, onSelect }: BlockProps) {
     const [loadedImage, setLoadedImage] = useState<string | null>(null);
     
     const default_url = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`;
@@ -57,7 +59,15 @@ export default React.memo(function PuzzleBlock({ pokemon, multiselect, isSelecte
     let p_name = pokemon.species_name.replaceAll('-', ' ');
     let p_surname = getSurname(pokemon.name, pokemon.species_name);
 
-    const blockClasses = `pokemon-block ${isSolved ? 'permaselect correct' : ''} ${isIncorrect ? 'incorrect' : ''}`;
+    const blockClasses = clsx(
+        'pokemon-block',
+        {
+            'solved': isSolved,
+            'correct': isCorrect,
+            'incorrect': isIncorrect,
+            'selected': isSelected,
+        }
+    );
 
     useEffect(() => {
         if (inView) {

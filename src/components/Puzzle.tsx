@@ -36,9 +36,25 @@ function shuffleMons<T>(pokemonArray: T[]): T[] {
     return [...pokemonArray].sort(() => Math.random() - 0.5);
 }
 
-const PokemonBlockWrapper = () => {
-
+interface SolvedGroupsGridProps {
+    groups: string[];
 }
+
+function SolvedGroupsGrid ({groups}: SolvedGroupsGridProps) {
+    return (
+        <section className="solved-groups-grid">
+            {groups.map((group: string, index: number)=> (
+                <div key={group} className="solved-group">
+                    <span>{group}</span>
+                </div>
+            ))}
+        </section>
+    )
+}
+
+// function PuzzleGrid (puzzle) {
+
+// }
 
 export default React.memo(function Puzzle({puzzleId}: PuzzleProps) {
     const t = useTranslations();
@@ -57,6 +73,7 @@ export default React.memo(function Puzzle({puzzleId}: PuzzleProps) {
     const [correctGuessIds, setCorrectGuessIds] = useState<Set<number>>(new Set());
     const [solvedGroupIds, setSolvedGroupIds] = useState<Set<number>>(new Set());
     const [solvedInOrder, setSolvedInOrder] = useState<any[]>([]);
+    const [solvedGroupNames, setSolvedGroupNames] = useState<string[]>([]);
 
     const handleSelect = useCallback((id: number) => {
         if (pause) return;
@@ -72,8 +89,8 @@ export default React.memo(function Puzzle({puzzleId}: PuzzleProps) {
         });
     }, [pause]);
 
-    const compareGroups = useCallback((selected: Set<number>): boolean => {
-        if (!puzzle || !puzzle.groups) return false;
+    const compareGroups = useCallback((selected: Set<number>): any[] => {
+        if (!puzzle || !puzzle.groups) return [0, null];
 
         const selectedArr = Array.from(selected).sort();
 
@@ -82,14 +99,13 @@ export default React.memo(function Puzzle({puzzleId}: PuzzleProps) {
 
             const otherArr = [...group.pokemons].sort();
             if (selectedArr.length === otherArr.length && selectedArr.every((val, i) => val === otherArr[i])) {
-                return true;
+                return [100, group.query];
             }
         }
-        return false;
+        return [0, null];
     }, [puzzle, solvedGroupIds]);
 
     const handleGuess = useCallback((guess: number) => {
-        console.log("Abba?");
         setGuesses(prev => [...prev, guess]);
     }, []);
 
@@ -147,17 +163,18 @@ export default React.memo(function Puzzle({puzzleId}: PuzzleProps) {
 
         const makeGuess = () => {
             setPause(true);
-            const isCorrect = compareGroups(selectedIds);
+            const guessResult = compareGroups(selectedIds);
             
-            if (isCorrect) {
+            if (guessResult[0] >= 100) {
                 setCorrectGuessIds(selectedIds);
                 handleGuess(1);
 
                 setTimeout(() => {
                     markGroupAsSolved(selectedIds);
+                    solvedGroupNames.push(guessResult[1]);
                     setSelectedIds(new Set());
                     setPause(false);
-                }, 800);                
+                }, 800);          
             } else {
                 setIncorrectGuessIds(selectedIds);
                 handleGuess(0);
@@ -203,11 +220,12 @@ export default React.memo(function Puzzle({puzzleId}: PuzzleProps) {
                         initial="hidden"
                         animate="visible"
                     >
+                        <SolvedGroupsGrid groups={solvedGroupNames}/>
                         <AnimatePresence>
 
                             {solvedInOrder.map((p: any, index: number) => {
                                 const isSelected = selectedIds.has(p.id);
-                                const isSolved = solvedGroupIds.has(p.id) || correctGuessIds.has(p.id);
+                                const isCorrect = solvedGroupIds.has(p.id) || correctGuessIds.has(p.id);
                                 const isIncorrect = incorrectGuessIds.has(p.id);
 
                                 return (
@@ -216,7 +234,8 @@ export default React.memo(function Puzzle({puzzleId}: PuzzleProps) {
                                         pokemon={p}
                                         multiselect={true}
                                         isSelected={isSelected}
-                                        isSolved={isSolved}
+                                        isSolved={true}
+                                        isCorrect={isCorrect}
                                         isIncorrect={isIncorrect}
                                         onSelect={handleSelect}
                                     />
@@ -224,7 +243,7 @@ export default React.memo(function Puzzle({puzzleId}: PuzzleProps) {
                             })}
                             {activePokemons.map((p: any, index: number) => {
                                 const isSelected = selectedIds.has(p.id);
-                                const isSolved = solvedGroupIds.has(p.id) || correctGuessIds.has(p.id);
+                                const isCorrect = solvedGroupIds.has(p.id) || correctGuessIds.has(p.id);
                                 const isIncorrect = incorrectGuessIds.has(p.id);
 
                                 return (
@@ -233,7 +252,8 @@ export default React.memo(function Puzzle({puzzleId}: PuzzleProps) {
                                         pokemon={p}
                                         multiselect={true}
                                         isSelected={isSelected}
-                                        isSolved={isSolved}
+                                        isSolved={false}
+                                        isCorrect={isCorrect}
                                         isIncorrect={isIncorrect}
                                         onSelect={handleSelect}
                                     />
