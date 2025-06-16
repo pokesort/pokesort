@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import React, { CSSProperties, useCallback, useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { useLocale } from 'next-intl';
-import { formatDate } from '@/src/scripts/utils';
+import { formatDate, shuffleArray } from '@/src/scripts/utils';
 
 import type { PuzzleData } from '@/src/assets/types/PuzzleApiResponse';
 import "@/src/styles/components/Puzzle.scss";
@@ -24,15 +24,16 @@ const containerVariants: Variants = {
 
 interface SolvedGroupsGridProps {
     groups: string[];
+    dictionary: any;
 }
 
-const SolvedGroupsGrid = ({groups}: SolvedGroupsGridProps) => {
+const SolvedGroupsGrid = ({groups, dictionary}: SolvedGroupsGridProps) => {
     return (
         <section className="solved-groups-grid">
             
             {groups.map((group: string, index: number)=> (
                 <div key={group} className="solved-group">
-                    <GroupName query={group}/>
+                    <GroupName query={group} dictionary={dictionary}/>
                 </div>
             ))}
         </section>
@@ -44,10 +45,11 @@ interface PuzzleGridProps {
     pause: boolean,
     setPause: (pause: boolean) => void;
     pokemons: any[];
+    dictionary: any;
     setGuesses: React.Dispatch<React.SetStateAction<any[]>>;
 }
 
-const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, setGuesses}: PuzzleGridProps) => {
+const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, setGuesses}: PuzzleGridProps) => {
     const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
 
     const [incorrectGuessIds, setIncorrectGuessIds] = useState<Set<number>>(new Set());
@@ -140,7 +142,7 @@ const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, setGuesses}: 
             initial="hidden"
             animate="visible"
         >
-            <SolvedGroupsGrid groups={solvedGroupNames}/>
+            <SolvedGroupsGrid groups={solvedGroupNames} dictionary={dictionary}/>
             <AnimatePresence>
 
                 {solvedInOrder.map((p: any, index: number) => {
@@ -187,19 +189,24 @@ const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, setGuesses}: 
 interface PuzzleProps {
     puzzle: PuzzleData | undefined;
     setPuzzle: (puzzle: PuzzleData) => void;
-    pokemons: any[];
+    dictionary: any;
     loading: boolean;
     setLoading: (loading: boolean) => void;
     error: string | null;
     setError: (error: string | null) => void;
 }
 
-export default React.memo(function Puzzle({puzzle, setPuzzle, pokemons, loading, setLoading, error, setError}: PuzzleProps) {
+export default React.memo(function Puzzle({puzzle, setPuzzle, dictionary, loading, setLoading, error, setError}: PuzzleProps) {
     const t = useTranslations();
     const locale = useLocale();
 
     const [pause, setPause] = useState<boolean>(false);
     const [guesses, setGuesses] = useState<any[]>([]);
+    const [pokemons, setPokemons] = useState<any>([]);
+
+    useEffect(() => {
+        if (dictionary) setPokemons(shuffleArray(dictionary.pokemons));
+    }, [dictionary]);    
 
     const date = useMemo(() => {
         return puzzle ? formatDate(puzzle.date, locale) : '';
@@ -227,6 +234,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, pokemons, loading,
                         pause={pause}
                         setPause={setPause}
                         pokemons={pokemons}
+                        dictionary={dictionary}
                         setGuesses={setGuesses}
                     />
                 )}

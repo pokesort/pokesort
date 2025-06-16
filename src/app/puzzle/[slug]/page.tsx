@@ -3,7 +3,6 @@
 import Puzzle from '@/src/components/Puzzle';
 import type { PuzzleData } from '@/src/assets/types/PuzzleApiResponse';
 import { useEffect, useState } from 'react';
-import { shuffleArray } from '@/src/scripts/utils';
 import { notFound, redirect, useParams } from 'next/navigation';
 
 export default function PuzzlePage() {
@@ -17,7 +16,7 @@ export default function PuzzlePage() {
     const [error, setError] = useState<string | null>(null);
 
     const [puzzle, setPuzzle] = useState<PuzzleData>();
-    const [pokemons, setPokemons] = useState<any>([]);    
+    const [dictionary, setDictionary] = useState<any>();
 
     useEffect(() => {
         setLoading(true);
@@ -43,9 +42,12 @@ export default function PuzzlePage() {
                     puzzleResponse.json(),
                 ]);
 
-                console.log(puzzleData.data);
+                if (process.env.NODE_ENV === "development") {
+                    console.log(puzzleData.data);
+                    console.log(puzzleData.dictionary);
+                }
                 setPuzzle(puzzleData.data);
-                setPokemons(shuffleArray(puzzleData.pokemon));
+                setDictionary(puzzleData.dictionary);
             } catch (e) {
                 console.error(e);
                 setError('Não foi possível conectar ao servidor. Tente novamente.');
@@ -64,7 +66,7 @@ export default function PuzzlePage() {
         <Puzzle
             puzzle={puzzle}
             setPuzzle={setPuzzle}
-            pokemons={pokemons}
+            dictionary={dictionary}
             loading={loading}
             setLoading={setLoading}
             error={error}

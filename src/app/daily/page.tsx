@@ -12,7 +12,7 @@ export default function Daily() {
     const [error, setError] = useState<string | null>(null);
 
     const [puzzle, setPuzzle] = useState<PuzzleData>();
-    const [pokemons, setPokemons] = useState<any>([]);    
+    const [dictionary, setDictionary] = useState<any>();
 
     useEffect(() => {
         setLoading(true);
@@ -38,9 +38,12 @@ export default function Daily() {
                     puzzleResponse.json(),
                 ]);
 
-                console.log(puzzleData.data);
+                if (process.env.NODE_ENV === "development") {
+                    console.log(puzzleData.data);
+                    console.log(puzzleData.dictionary);
+                }
                 setPuzzle(puzzleData.data);
-                setPokemons(shuffleArray(puzzleData.pokemon));
+                setDictionary(puzzleData.dictionary);
             } catch (e) {
                 console.error(e);
                 setError('Não foi possível conectar ao servidor. Tente novamente.');
@@ -59,7 +62,7 @@ export default function Daily() {
         <Puzzle
             puzzle={puzzle}
             setPuzzle={setPuzzle}
-            pokemons={pokemons}
+            dictionary={dictionary}
             loading={loading}
             setLoading={setLoading}
             error={error}

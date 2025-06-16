@@ -49,6 +49,14 @@
             "long": "Da Região de ",
             "short": "Região"
         },
+        "moves": {
+            "long": "Pode Aprender ",
+            "short": "Movimento"
+        },
+        "abilities": {
+            "long": "Tem a Habilidade ",
+            "short": "Habilidade"
+        },
         "shape": {
             "long": "Tem Corpo ",
             "short": "Formato",
@@ -61,7 +69,7 @@
             "fish": "de Peixe",
             "arms": "Focado em Braços",
             "blob": "Disforme",
-            "upright": "Bipede",
+            "upright": "Vertical",
             "legs": "Focado em Pernas",
             "heads": "com Várias Cabeças",
             "bug-wings": "com Asas de Inseto",

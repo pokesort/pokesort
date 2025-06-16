@@ -22,6 +22,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/pages/api/test-connection.js", "src/pages/api/groups/create.js", "src/scripts/utils.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/pages/api/test-connection.js", "src/pages/api/groups/create.js", "src/scripts/utils.js", "src/pages/api/moves/get.js"],
   "exclude": ["node_modules"]
 }
