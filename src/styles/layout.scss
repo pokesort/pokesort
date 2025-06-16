@@ -56,7 +56,7 @@ section#page {
     width: 100vw;
     flex-grow: 1;
     gap: var(--spacing);
-    padding: var(--spacing);
+    padding: 0 var(--spacing);
   
     color: color(text1);
 

@@ -32,7 +32,7 @@ export default function Daily() {
                     }),
                 ]);
                 if (!puzzleResponse.ok) {
-                    throw new Error('Ops! Ocorreu um erro inesperado.');
+                    throw new Error('Erro ao obter informações do puzzle.');
                 }
                 const [puzzleData] = await Promise.all([
                     puzzleResponse.json(),
