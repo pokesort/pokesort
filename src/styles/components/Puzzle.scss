@@ -8,19 +8,25 @@
 
     gap: var(--spacing);
     padding: var(--spacing);
-    padding-top: 0;
+    padding-top: 0.25rem;
 
     clip-path: polygon(0% 0%, 45% 0%, calc(45% + 37px) 37px, 100% 37px, 100% 100%, 0% 100%);
 
     transition: height 0.3s ease;
 }
-@media (max-width: 640px) {
+@media (max-width: 768px) {
     .window-container {
-        width: calc(100% + var(--spacing) * 2.5);
+        padding-top: 0.1rem;
     }
 
     section.puzzle-info-row {
         margin: 0.25rem 0;
+    }
+}
+@media (max-width: 640px) {
+    .window-container {
+        width: calc(100% + var(--spacing) * 2.5);
+        padding-top: 0;
     }
 }
 

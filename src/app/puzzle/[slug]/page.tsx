@@ -10,6 +10,9 @@ export default function PuzzlePage() {
     const params = useParams();
     const slug = params?.slug as string;
 
+    if (slug === 'daily')
+        redirect('/daily');
+
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -34,7 +37,7 @@ export default function PuzzlePage() {
                     }),
                 ]);
                 if (!puzzleResponse.ok) {
-                    throw new Error('Ops! Ocorreu um erro inesperado.');
+                    throw new Error('Erro ao obter informações do puzzle.');
                 }
                 const [puzzleData] = await Promise.all([
                     puzzleResponse.json(),
