@@ -152,47 +152,47 @@ label.block-container {
                 box-shadow: unset;
             }
         }
-    }
+    }    
+}
 
-    @keyframes make-guess {
-        0% {
-            box-shadow: 0px 0 0px transparent;
-        }
-        30% {
-            box-shadow: 0px 0 10px var(--selection);
-        }
-        100% {
-            box-shadow: 0px 0 30px transparent;
-        }
+@keyframes make-guess {
+    0% {
+        box-shadow: 0px 0 0px transparent;
     }
-
-    @keyframes solved-background {
-        0% {
-            background-color: color(section2);
-            border-color: #{color(selection3)};
-        }
-        60% {
-            background-color: color(section2);
-            border-color: #{color(selection3)};
-        }
-        100% {
-            background-color: transparent;
-            border-color: transparent;
-        }
+    30% {
+        box-shadow: 0px 0 10px var(--selection);
     }
+    100% {
+        box-shadow: 0px 0 30px transparent;
+    }
+}
 
-    @keyframes solved-text {
-        0% {
-            opacity: 1;
-            visibility: visible;
-        }
-        60% {
-            opacity: 1;
-            visibility: visible;
-        }
-        100% {
-            opacity: 0;
-            visibility: hidden;
-        }
+@keyframes solved-background {
+    0% {
+        background-color: color(section2);
+        border-color: #{color(selection3)};
+    }
+    60% {
+        background-color: color(section2);
+        border-color: #{color(selection3)};
+    }
+    100% {
+        background-color: transparent;
+        border-color: transparent;
+    }
+}
+
+@keyframes solved-text {
+    0% {
+        opacity: 1;
+        visibility: visible;
+    }
+    60% {
+        opacity: 1;
+        visibility: visible;
+    }
+    100% {
+        opacity: 0;
+        visibility: hidden;
     }
 }

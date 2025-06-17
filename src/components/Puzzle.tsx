@@ -17,7 +17,7 @@ const containerVariants: Variants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.02
+      staggerChildren: 0.05
     }
   }
 };
@@ -227,7 +227,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, dictionary, loadin
                     </>}
                 </section>
                 {loading || !puzzle ? (
-                    <p style={{margin: "250px 0", textAlign: "center"} as CSSProperties}>Loading</p>
+                    <p style={{margin: "auto 0", textAlign: "center"} as CSSProperties}>Loading</p>
                 ): (
                     <PuzzleGrid
                         puzzle={puzzle}
