@@ -40,13 +40,20 @@ const SolvedGroupsGrid = ({groups, dictionary}: SolvedGroupsGridProps) => {
     )
 }
 
+type PuzzleGuess = {
+    type: 0 | 1 | 2; // guess | hint | dex
+    accuracy: number;
+    pokemons: number[];
+    group: number | null;
+}
+
 interface PuzzleGridProps {
     puzzle: PuzzleData;
     pause: boolean,
     setPause: (pause: boolean) => void;
     pokemons: any[];
     dictionary: any;
-    setGuesses: React.Dispatch<React.SetStateAction<any[]>>;
+    setGuesses: React.Dispatch<React.SetStateAction<PuzzleGuess[]>>;
 }
 
 const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, setGuesses}: PuzzleGridProps) => {
@@ -72,24 +79,33 @@ const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, s
         });
     }, [pause]);
 
-    const compareGroups = useCallback((selected: Set<number>): any[] => {
-        if (!puzzle || !puzzle.groups) return [0, null];
+    const compareGroups = useCallback((selected: Set<number>): PuzzleGuess | null => {
+        if (!puzzle || !puzzle.groups) return null;
 
         const selectedArr = Array.from(selected).sort();
+        let guess = {
+            type: 0,
+            accuracy: 0,
+            pokemons: selectedArr,
+            group: null
+        } as PuzzleGuess;
 
-        for (const group of puzzle.groups) {
-            if (solvedGroupIds.has(group.pokemons[0])) continue;
+        for (let i = 0; i < puzzle.groups.length; i++) {
+            if (solvedGroupIds.has(puzzle.groups[i].pokemons[0])) continue;
 
-            const otherArr = [...group.pokemons].sort();
-            if (selectedArr.length === otherArr.length && selectedArr.every((val, i) => val === otherArr[i])) {
-                return [100, group.query];
+            const otherArr = [...puzzle.groups[i].pokemons].sort();
+            if (selectedArr.length === otherArr.length && selectedArr.every((val, j) => val === otherArr[j])) {
+                guess.accuracy = 100;
+                guess.group = i;
+                break;
             }
         }
-        return [0, null];
+
+        return guess;
     }, [puzzle, solvedGroupIds]);
 
-    const handleGuess = useCallback((guess: any) => {
-        setGuesses((prev: any[]) => [...prev, guess]);
+    const handleGuess = useCallback((guess: PuzzleGuess) => {
+        setGuesses((prev: PuzzleGuess[]) => [...prev, guess]);
     }, []);
 
     const markGroupAsSolved = useCallback((newlySolvedIds: Set<number>) => {
@@ -99,29 +115,29 @@ const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, s
         setSolvedGroupIds(prevIds => new Set([...prevIds, ...newlySolvedIds]));
     }, [pokemons]);
 
-        useEffect(() => {
+    useEffect(() => {
         if (!puzzle?.cols || selectedIds.size < puzzle.cols) {
             return;
         }
 
         const makeGuess = () => {
             setPause(true);
-            const guessResult = compareGroups(selectedIds);
-            
-            if (guessResult[0] >= 100) {
-                setCorrectGuessIds(selectedIds);
-                handleGuess(1);
+            const guess = compareGroups(selectedIds);
 
+            if (!guess) return;
+            handleGuess(guess);
+            
+            if (guess.accuracy >= 100) {
+                setCorrectGuessIds(selectedIds);
                 setTimeout(() => {
                     markGroupAsSolved(selectedIds);
-                    solvedGroupNames.push(guessResult[1]);
+                    if (guess.group)
+                        solvedGroupNames.push(puzzle.groups[guess.group].query);
                     setSelectedIds(new Set());
                     setPause(false);
-                }, 800);          
+                }, 800);
             } else {
-                setIncorrectGuessIds(selectedIds);
-                handleGuess(0);
-                
+                setIncorrectGuessIds(selectedIds);                
                 setTimeout(() => {
                     setSelectedIds(new Set());
                     setIncorrectGuessIds(new Set());
@@ -201,12 +217,16 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, dictionary, loadin
     const locale = useLocale();
 
     const [pause, setPause] = useState<boolean>(false);
-    const [guesses, setGuesses] = useState<any[]>([]);
+    const [guesses, setGuesses] = useState<PuzzleGuess[]>([]);
     const [pokemons, setPokemons] = useState<any>([]);
 
     useEffect(() => {
         if (dictionary) setPokemons(shuffleArray(dictionary.pokemons));
-    }, [dictionary]);    
+    }, [dictionary]);
+
+    useEffect(() => {
+        console.log(guesses);
+    }, [guesses]);
 
     const date = useMemo(() => {
         return puzzle ? formatDate(puzzle.date, locale) : '';
@@ -215,10 +235,10 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, dictionary, loadin
     return (
         <>
             <ul className="guesses-container">
-                {guesses.map((guess: number, index: number) => (
-                    <li key={index} className={`guess-${guess}`}></li>
+                {guesses.map((guess: PuzzleGuess, index: number) => (
+                    <li key={index} className={`guess-${guess.accuracy >= 100 ? '1' : '0'}`}></li>
                 ))}
-            </ul>            
+            </ul>
             <div style={{'--cols': puzzle ? puzzle.cols : 4, '--rows': puzzle ? puzzle.rows : 4} as React.CSSProperties} className="window-container">
                 <section className="puzzle-info-row">
                     {date && !loading && <>

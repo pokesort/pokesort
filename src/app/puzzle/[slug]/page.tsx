@@ -63,7 +63,7 @@ export default function PuzzlePage() {
         <Puzzle
             puzzle={puzzle}
             setPuzzle={setPuzzle}
-            dictionary={dictionary
+            dictionary={dictionary}
             loading={loading}
             setLoading={setLoading}
             error={error}
