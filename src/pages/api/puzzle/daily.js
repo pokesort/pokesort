@@ -24,6 +24,10 @@ export default async function handler(req, res) {
 async function getTodayPuzzle(today){
 
   let todayPuzzle = await data.db.collection('puzzles').findOne({date: today});
+  while (!todayPuzzle) {
+    today -= 86400000;
+    todayPuzzle = await data.db.collection('puzzles').findOne({date: today});
+  }
 
   // if (!todayPuzzle){
 

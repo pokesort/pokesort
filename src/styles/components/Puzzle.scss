@@ -3,16 +3,19 @@
 .window-container {
     display: flex;
     flex-direction: column;
-    width: min(100%, 560px);
+    width: min(100%, calc(140px * var(--cols, 4)));
     background-color: color(section1);
 
     gap: var(--spacing);
     padding: var(--spacing);
     padding-top: 0.25rem;
+    min-height: min(80vw, 590px);
 
     clip-path: polygon(0% 0%, 45% 0%, calc(45% + 37px) 37px, 100% 37px, 100% 100%, 0% 100%);
 
-    transition: height 0.3s ease;
+    transition:
+        height 0.3s ease
+        width 0.3s ease;
 }
 @media (max-width: 768px) {
     .window-container {
@@ -78,7 +81,11 @@ section.solved-groups-grid {
             margin-bottom: 0.1rem;
             width: 100%;
             text-align: center;
-            font-size: text(small);
+            font-size: text(regular);
+            z-index: 100;
+            @media (max-width: 640px) {
+                font-size: text(small);
+            }
         }
 
         &::after {

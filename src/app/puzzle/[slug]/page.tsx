@@ -51,11 +51,8 @@ export default function PuzzlePage() {
             } catch (e) {
                 console.error(e);
                 setError('Não foi possível conectar ao servidor. Tente novamente.');
-            } finally {
-                setLoading(true);                
-                setTimeout(() => {                    
-                    setLoading(false);
-                }, 300);
+            } finally {                
+                setLoading(false);
             }
         };
 
