@@ -5,6 +5,7 @@ import { toTitleCase } from '@/src/scripts/utils';
 
 interface GroupNameProps {
     query: string;
+    dictionary: any;
 }
 
 interface Group {
@@ -27,9 +28,10 @@ function getGroupList (queries: string) {
     return groupList;
 }
 
-function getNaturalGroupnames (groups: Group[]) {
+function getNaturalGroupnames (groups: Group[], dictionary: any) {
     const t = useTranslations();
-    const direct = ['moves', 'abilities', 'region'];
+    const direct = ['region'];
+    const from_dict = ['abilities', 'moves'];
     const types = ['types', 'weak', 'strong', 'immune'];
 
     let groupNames: string[] = [];
@@ -39,6 +41,8 @@ function getNaturalGroupnames (groups: Group[]) {
         output += t(`groupnames.${group.key}.long`)
         if (direct.includes(group.key)) {            
             output += toTitleCase(group.value.replaceAll('-', ' '));
+        } else if(from_dict.includes(group.key)) {
+            output += toTitleCase(dictionary[group.key][group.value].replaceAll('-', ' '));
         } else if(types.includes(group.key)) {
             output += t(`groupnames.types.${group.value}`)
         } else {
@@ -50,14 +54,14 @@ function getNaturalGroupnames (groups: Group[]) {
     return groupNames;
 }
 
-export default function GroupName ({query}: GroupNameProps) {
+export default function GroupName ({query, dictionary}: GroupNameProps) {
     const t = useTranslations();
     
     if (query[0] !== '?')
         return ( <span>{t(`groupname.custom.${query}`)}</span> )
 
     const groupList = getGroupList(query);
-    const naturalGroupNames = getNaturalGroupnames(groupList);
+    const naturalGroupNames = getNaturalGroupnames(groupList, dictionary);
     let result = naturalGroupNames.join('  ·  ');
 
     return ( <span>{result}</span> )

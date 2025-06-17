@@ -49,6 +49,14 @@
             "long": "From ",
             "short": "Region"
         },
+        "moves": {
+            "long": "Pode Aprender ",
+            "short": "Movimento"
+        },
+        "abilities": {
+            "long": "Tem a Habilidade ",
+            "short": "Habilidade"
+        },
         "shape": {
             "long": "",
             "short": "Shape",
