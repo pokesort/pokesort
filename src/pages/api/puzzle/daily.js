@@ -24,9 +24,12 @@ export default async function handler(req, res) {
 async function getTodayPuzzle(today){
 
   let todayPuzzle = await data.db.collection('puzzles').findOne({date: today});
-  while (!todayPuzzle) {
-    today -= 86400000;
-    todayPuzzle = await data.db.collection('puzzles').findOne({date: today});
+  if (!todayPuzzle) { // Caso não encontre o puzzle de hoje, volte dia por dia até achar um
+    let date = Date.now();
+    while (!todayPuzzle) {
+      date = new Date(date - 86400000);
+      todayPuzzle = await data.db.collection('puzzles').findOne({date: date.toISOString().split('T')[0]});
+    }
   }
 
   // if (!todayPuzzle){
