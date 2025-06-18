@@ -131,7 +131,7 @@ const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, s
                 setCorrectGuessIds(selectedIds);
                 setTimeout(() => {
                     markGroupAsSolved(selectedIds);
-                    if (guess.group)
+                    if (guess.group != null)
                         solvedGroupNames.push(puzzle.groups[guess.group].query);
                     setSelectedIds(new Set());
                     setPause(false);
@@ -220,9 +220,11 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, dictionary, loadin
     const [guesses, setGuesses] = useState<PuzzleGuess[]>([]);
     const [pokemons, setPokemons] = useState<any>([]);
 
-    useEffect(() => {
-        if (dictionary) setPokemons(shuffleArray(dictionary.pokemons));
-    }, [dictionary]);
+    if (process.env.NODE_ENV === "development") {
+        useEffect(() => {
+            if (dictionary) setPokemons(shuffleArray(dictionary.pokemons));
+        }, [dictionary]);
+    }
 
     useEffect(() => {
         console.log(guesses);
