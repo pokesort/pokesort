@@ -153,7 +153,7 @@ const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, s
 
     return (
         <motion.section
-            className={`puzzle disable-select ${pause ? 'pause' : ''}`}
+            className={`puzzle disable-select cols-${puzzle.cols} ${pause ? 'pause' : ''}`}
             variants={containerVariants}
             initial="hidden"
             animate="visible"
