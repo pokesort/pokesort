@@ -12,7 +12,7 @@ export default function Header ({ pathname }: HeaderProps) {
     const t = useTranslations("header");
 
     const pages = [
-        'daily', 'archive', 'dex'
+        'daily', 'archive', 'infinite', 'dex'
     ]
 
     return (

@@ -5,17 +5,24 @@ import {
   getRandomFieldValue,
   pickRandomMult
 } from '@/src/scripts/utils.js';
+import { populate } from './_utils';
 
 let idsUsed = [];
 
 export default async function handler(req, res) {
 
-  const amount = req.query.amount;
+  let amount = req.query.amount;
+  if (!amount) amount = 1;
+
   const password = req.query.password;
+  const infinite = req.query.infinite == 'true';
+
+  if (infinite && req.method !== 'POST') return res.status(403).json({ success: false, message: "Método não suportado" });
+  const { generation } = req.body;
 
   if (amount > 30) return res.status(403).json({ success: false, message: "Quantidade de puzzles pedidos maior que o permitido" });
 
-  if (password != process.env.AUTHORIZATION_BATCH) return res.status(403).json({success: false, message: "Usuário não permitido"});
+  if (!infinite && (password != process.env.AUTHORIZATION_BATCH)) return res.status(403).json({success: false, message: "Usuário não permitido"});
 
   const randomInRange = (min, max) => {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -30,7 +37,7 @@ export default async function handler(req, res) {
 
     const groups = [];
     for (let j = 0; j < rows; j++) {
-      const group = await generateGroup(cols);
+      const group = await generateGroup(cols, generation, infinite);
       groups.push(group);
     }
 
@@ -41,6 +48,11 @@ export default async function handler(req, res) {
       cols,
       groups
     });
+  }
+  
+  if (infinite) {
+    const dictionary = await populate(res, puzzles[0]);
+    return res.status(200).json({ success: true, data: puzzles[0], dictionary: dictionary });
   }
 
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/puzzle/batch`, {
@@ -53,15 +65,17 @@ export default async function handler(req, res) {
 
   const result = await response.json();
   return res.status(response.status).json(result);
-
-  // return res.status(200).json({ success: true, puzzles });
 }
 
-export async function generateGroup(cols) {
+export async function generateGroup(cols, generation, infinite) {
 
   while (true) {
     const allFields = Object.keys(FIELD_OPTIONS);
-    const numFields = randomInRange(2, 3);
+
+    let numFields = 0;
+    if (!infinite) numFields = randomInRange(1, 2, 3);
+    else numFields = randomInRange(1, 2);
+
     const selectedFields = pickRandom(allFields, numFields);
 
     const queryParts = selectedFields.map((field) => {
