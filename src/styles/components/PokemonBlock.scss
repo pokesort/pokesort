@@ -101,7 +101,7 @@ label.block-container {
     
                 position: absolute;
                 right: 0;
-                top: 0;
+                top: -1;
     
                 clip-path: polygon(0% 0%, 100% 100%, 100% 0%);
             }
@@ -136,7 +136,7 @@ label.block-container {
     
                 position: absolute;
                 right: 0;
-                top: 0;
+                top: -1;
     
                 clip-path: polygon(0% 0%, 100% 100%, 100% 0%);
                 animation: solved-text 1.0s ease 1;

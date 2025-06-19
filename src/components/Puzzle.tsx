@@ -220,14 +220,14 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, dictionary, loadin
     const [guesses, setGuesses] = useState<PuzzleGuess[]>([]);
     const [pokemons, setPokemons] = useState<any>([]);
 
-    if (process.env.NODE_ENV === "development") {
-        useEffect(() => {
-            if (dictionary) setPokemons(shuffleArray(dictionary.pokemons));
-        }, [dictionary]);
-    }
+    useEffect(() => {
+        if (dictionary) setPokemons(shuffleArray(dictionary.pokemons));
+    }, [dictionary]);    
 
     useEffect(() => {
-        console.log(guesses);
+        if (process.env.NODE_ENV === "development") {        
+            console.log(guesses);
+        }
     }, [guesses]);
 
     useEffect(() => {
