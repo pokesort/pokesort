@@ -96,7 +96,7 @@ section.solved-groups-grid {
 
             position: absolute;
             right: 0;
-            top: -1;
+            top: -1px;
 
             clip-path: polygon(0% 0%, 100% 100%, 100% 0%);
             animation: solved-text 1.0s ease 1;
