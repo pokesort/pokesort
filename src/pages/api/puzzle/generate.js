@@ -74,10 +74,9 @@ export async function generateGroup(cols, generation, excludeFields) {
     if (excludeFields != undefined) {
       allFields = allFields.filter(f => !excludeFields.includes(f));
     }
-    console.log(`>>>> ${allFields}`);
 
     let numFields = 0;
-    numFields = randomInRange(1, 2, 3);
+    numFields = randomInRange(1, 3);
 
     const selectedFields = pickRandom(allFields, numFields);
 
