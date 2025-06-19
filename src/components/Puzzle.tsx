@@ -230,6 +230,10 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, dictionary, loadin
         }
     }, [guesses]);
 
+    useEffect(() => {
+        setGuesses([]);
+    }, [puzzle])
+
     const date = useMemo(() => {
         return puzzle ? formatDate(puzzle.date, locale) : '';
     }, [puzzle]);

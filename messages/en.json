@@ -3,7 +3,8 @@
     "header": {
         "daily": "Daily",
         "archive": "Archive",
-        "dex": "Dex"
+        "dex": "Dex",
+        "infinite": "Infinite"
     },
     
     "groupnames": {
