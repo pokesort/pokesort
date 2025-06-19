@@ -72,7 +72,6 @@ section.solved-groups-grid {
         align-items: center;
         background-color: color(section2);
         padding: var(--spacing);
-        overflow: hidden;
         border: 2px solid #{color(selection3)};
 
         animation: solved-group-appear 1.0s ease 1;
@@ -91,15 +90,16 @@ section.solved-groups-grid {
         &::after {
             display: block;
             content: '';
-            background-color: #{color(selection3)};
-            width: 5%;
+            background-color: color(selection3);
+            height: 15%;
             aspect-ratio: 1;
 
             position: absolute;
             right: 0;
-            top: 0;
+            top: -1;
 
-            transform: translate(50%, -50%) rotate(45deg);
+            clip-path: polygon(0% 0%, 100% 100%, 100% 0%);
+            animation: solved-text 1.0s ease 1;
         }
     }
 }

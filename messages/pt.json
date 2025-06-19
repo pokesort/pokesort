@@ -178,15 +178,15 @@
             "is_split": "É uma Evolução Ramificada"
         },
         "weak": {
-            "long": "Fraco ao Tipo ",
+            "long": "Fraco a ",
             "short": "Fraqueza"
         },
         "strong": {
-            "long": "Resiste ao Tipo ",
+            "long": "Resiste a  ",
             "short": "Resistência"
         },
         "immune": {
-            "long": "Imune ao Tipo ",
+            "long": "Imune a ",
             "short": "Imune"
         },
         "form": {
