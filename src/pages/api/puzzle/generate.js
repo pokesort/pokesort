@@ -18,7 +18,7 @@ export default async function handler(req, res) {
   const infinite = req.query.infinite == 'true';
 
   if (infinite && req.method !== 'POST') return res.status(403).json({ success: false, message: "Método não suportado" });
-  const { generation } = req.body;
+  const { generation, excludeFields } = req.body;
 
   if (amount > 30) return res.status(403).json({ success: false, message: "Quantidade de puzzles pedidos maior que o permitido" });
 
@@ -37,7 +37,7 @@ export default async function handler(req, res) {
 
     const groups = [];
     for (let j = 0; j < rows; j++) {
-      const group = await generateGroup(cols, generation, infinite);
+      const group = await generateGroup(cols, generation, excludeFields);
       groups.push(group);
     }
 
@@ -67,14 +67,17 @@ export default async function handler(req, res) {
   return res.status(response.status).json(result);
 }
 
-export async function generateGroup(cols, generation, infinite) {
+export async function generateGroup(cols, generation, excludeFields) {
 
   while (true) {
-    const allFields = Object.keys(FIELD_OPTIONS);
+    let allFields = Object.keys(FIELD_OPTIONS);
+    if (excludeFields != undefined) {
+      allFields = allFields.filter(f => !excludeFields.includes(f));
+    }
+    console.log(`>>>> ${allFields}`);
 
     let numFields = 0;
-    if (!infinite) numFields = randomInRange(1, 2, 3);
-    else numFields = randomInRange(1, 2);
+    numFields = randomInRange(1, 2, 3);
 
     const selectedFields = pickRandom(allFields, numFields);
 
@@ -84,7 +87,8 @@ export async function generateGroup(cols, generation, infinite) {
     });
 
     const query = '?'+queryParts.join('&');
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/pokemon/get${query}`);
+    const route = `/api/pokemon/get${query}${generation ? `&max_generation=${generation}` : ''}`
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}${route}`);
 
     if (!response.ok) {
       throw new Error(`Erro ao buscar pokémons: ${response.statusText}`);

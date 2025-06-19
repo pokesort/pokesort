@@ -28,9 +28,9 @@ export default function Header ({ pathname }: HeaderProps) {
                         key={index}
                         href={`/${page}`}
                         className={pathname === `/${page}` ? 'selected' : ''}>
-                            {t(page)}
+                            {t(page)}{page == 'infinite' ? ' ᵇᵉᵗᵃ' : ''}
                     </Link>
-                ))}                
+                ))}
             </nav>
         </header>
     )
