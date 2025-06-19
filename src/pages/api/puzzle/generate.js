@@ -61,7 +61,7 @@ export async function generateGroup(cols) {
 
   while (true) {
     const allFields = Object.keys(FIELD_OPTIONS);
-    const numFields = randomInRange(2, 3);
+    const numFields = randomInRange(1, 3);
     const selectedFields = pickRandom(allFields, numFields);
 
     const queryParts = selectedFields.map((field) => {
