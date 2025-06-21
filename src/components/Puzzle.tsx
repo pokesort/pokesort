@@ -90,7 +90,7 @@ const VictoryModal = React.memo(({type, guesses, date, victoryOpen, setVictoryOp
                 <>
                 <div className="modal-content-div">
                     <p>Próximo puzzle diário em:</p>
-                    <h1><Countdown targetDate={getNextRefresh()} /></h1>
+                    <h1><Countdown targetDate={getNextRefresh()} active={victoryOpen} /></h1>
                 </div>
                 <button className="modal-content-div" onClick={ () => redirect('/daily') }>
                     <p>Voltar ao Início</p>

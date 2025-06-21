@@ -130,3 +130,12 @@ section.modal {
         min-height: 0px;
     }
 }
+
+@media (max-width: 640px) {
+    section.modal {
+        width: 100dvw;
+        max-width: unset;
+        min-width: unset;
+        clip-path: polygon(0% 27px, 27px 0%, 100% 0%, 100% 100%, 0% 100%);
+    }
+}
