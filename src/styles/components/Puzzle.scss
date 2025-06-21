@@ -20,6 +20,8 @@
 @media (max-width: 768px) {
     .window-container {
         padding-top: 0.1rem;
+        clip-path: polygon(0% 0%, calc(100% - 37px) 0%, 100% 37px, 100% 37px, 100% 100%, 0% 100%);
+
     }
 
     section.puzzle-info-row {

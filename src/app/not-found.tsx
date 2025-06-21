@@ -1,14 +1,10 @@
 "use client"
 
-import { useTranslations } from 'next-intl';
-import Link from 'next/link';
+import ErrorSection from "../components/ErrorSection";
 
 export default function NotFound() {
-    const t = useTranslations("header");
 
     return (
-        <section className="not-found">
-            <h1>404 – Page Not Found</h1>
-        </section>
+        <ErrorSection code='404' message='not-found' />
     );
 }
