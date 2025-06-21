@@ -82,7 +82,7 @@ section.solved-groups-grid {
             margin-bottom: 0.1rem;
             width: 100%;
             text-align: center;
-            font-size: text(regular);
+            font-size: text(base);
             z-index: 100;
             @media (max-width: 640px) {
                 font-size: text(small);
@@ -120,12 +120,12 @@ section.puzzle-info-row {
 
 .guesses-container {
     display: flex;
-    justify-content: end;
+    justify-content: center;
     align-items: center;
     flex-wrap: wrap;
+    margin: 0.25rem 0;
 
-    min-height: 30px;
-    max-width: 50%;
+    max-width: 100%;
     gap: var(--spacing);
     z-index: 2;
 
@@ -133,7 +133,6 @@ section.puzzle-info-row {
         display: block;
         width: 10px;
         aspect-ratio: 1;
-        border-radius: 2px;
 
         animation: guess-in 0.15s ease 1;
 

@@ -1,0 +1,132 @@
+@use "../abstract" as *;
+
+div.modal-background {
+    position: fixed;
+    top: 0;
+    z-index: 20;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    opacity: 0;
+    pointer-events: none;
+    
+    width: 100vw;
+    height: 100dvh;
+    background-color: #12121Baa;
+
+    transition: opacity 0.3s ease;
+
+    &:has(.modal.open) {
+        opacity: 1;
+        pointer-events: all;
+    }
+}
+
+section.modal {
+    display: block;
+    max-width: min(100%, 560px);
+    min-width: 500px;
+    padding: var(--spacing);
+
+    background-color: color(section1);
+    clip-path: polygon(0% 27px, calc(45% - 27px) 27px, 45% 0%, 100% 0%, 100% 100%, 0% 100%);
+
+    div.modal-header {
+        display: flex;
+        justify-content: end;
+        align-items: start;
+
+        width: 100%;
+        min-height: 16px;
+        gap: var(--spacing);
+        margin-bottom: var(--spacing);
+
+        button {
+            height: 100%;
+        }
+
+        svg {
+            height: 16px;
+            width: 16px;
+        }
+    }
+    div.modal-content {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing);
+
+        min-height: 100px;
+        max-height: 80vh;
+        overflow-y: auto;
+
+        h1 {
+            font-size: text(large);
+        }
+        .modal-content-div {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: inherit;
+
+            min-height: 40px;
+            width: 100%;
+            padding: 0.5rem;
+            background-color: color(section2);
+            text-align: center;
+        }
+        button {
+            font-weight: 700;
+            transition:
+                transform 0.15s ease,
+                box-shadow 0.15s ease;
+
+            &:hover {
+                box-shadow: 0px 0 70px color(darker);
+                z-index: 60;
+            }
+            &:active {
+                transform: scale(0.85);
+            }
+        }
+    }
+
+    &.open {
+        animation: modal-fade-in 0.5s ease 1;
+
+        div.modal-content {
+            animation: modal-content-fade-in 1s ease-out 1;
+        }
+    }
+}
+
+@keyframes modal-fade-in {
+    0% {
+        transform: scale(1.5);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes modal-content-fade-in {
+    0% {
+        overflow: hidden;
+        max-height: 40px;
+        min-height: 0px;
+    }
+    20% {
+        overflow: hidden;
+        max-height: 40px;
+        min-height: 0px;
+    }
+    100% {
+        overflow: hidden;
+        max-height: 80vh;
+        min-height: 0px;
+    }
+}

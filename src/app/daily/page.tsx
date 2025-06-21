@@ -59,6 +59,7 @@ export default function Daily() {
         <Puzzle
             puzzle={puzzle}
             setPuzzle={setPuzzle}
+            type="daily"
             dictionary={dictionary}
             loading={loading}
             setLoading={setLoading}

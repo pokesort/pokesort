@@ -14,6 +14,9 @@ section.error {
         }
 
         div {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
             margin-left: 4rem;
         }
     }
@@ -26,7 +29,7 @@ section.error {
         margin: 0 auto;
         margin-top: 1rem;
         color: color(text1);
-        font-size: text(regular);       
+        font-size: text(base);       
         background-color: color(section1);     
 
         clip-path: polygon(0% 10px, 10px 0%, 100% 0%, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0% 100%)
