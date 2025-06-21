@@ -84,7 +84,7 @@ const VictoryModal = React.memo(({type, guesses, date, victoryOpen, setVictoryOp
                         <li key={index} className={`guess-${guess.accuracy >= 100 ? '1' : '0'}`}></li>
                     ))}
                 </div>
-                <p>Resolvido em {guesses.length} tentativas</p>
+                <p>Resolvido em <b>{guesses.length}</b> tentativas</p>
             </div>
             {type == 'daily' ? (
                 <>
@@ -294,16 +294,21 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
     const [guesses, setGuesses] = useState<PuzzleGuess[]>([]);
     const [pokemons, setPokemons] = useState<any>([]);
     const [victoryOpen, setVictoryOpen] = useState<boolean>(false);
+    const [mountVictoryModal, setMountVictoryModal] = useState<boolean>(false);
 
     useEffect(() => {
         if (dictionary) setPokemons(shuffleArray(dictionary.pokemons));
-    }, [dictionary]);    
+    }, [dictionary]);
 
     useEffect(() => {
         if (process.env.NODE_ENV === "development") {        
             console.log(guesses);
         }
     }, [guesses]);
+
+    useEffect(() => {
+        setMountVictoryModal(true);
+    }, [victoryOpen]);
 
     useEffect(() => {
         setGuesses([]);
@@ -315,7 +320,9 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
 
     return (
         <>
+            {mountVictoryModal &&
             <VictoryModal type={type} guesses={guesses} date={puzzle?.date} victoryOpen={victoryOpen} setVictoryOpen={setVictoryOpen} />
+            }
             <ul className="guesses-container">
                 {guesses.map((guess: PuzzleGuess, index: number) => (
                     <li key={index} className={`guess-${guess.accuracy >= 100 ? '1' : '0'}`}></li>
