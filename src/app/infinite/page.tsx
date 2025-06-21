@@ -5,13 +5,14 @@ import Puzzle from '@/src/components/Puzzle';
 import type { PuzzleData } from '@/src/assets/types/PuzzleApiResponse';
 import { useCallback, useEffect, useState } from 'react';
 import { FIELD_OPTIONS } from '@/src/scripts/utils';
+import Modal from '@/src/components/Modal';
 
 export default function InfinitePage() {
     const t = useTranslations();
 
-    const [loading, setLoading] = useState<boolean>(true);
+    const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
-    const [regenerate, setRegenerate] = useState<boolean>(false);
+    const [generated, setGenerated] = useState<boolean>(false);
 
     const [puzzle, setPuzzle] = useState<PuzzleData>();
     const [dictionary, setDictionary] = useState<any>();
@@ -19,6 +20,9 @@ export default function InfinitePage() {
     const [excludeFields, setExcludeFields] = useState<string[]>([]);
 
     useEffect(() => {
+        if (!generated)
+            return;
+
         setLoading(true);
         setError(null);
 
@@ -58,7 +62,7 @@ export default function InfinitePage() {
         };
 
         fetchPageData();
-    }, [regenerate])
+    }, [generated])
 
     const handleCheckbox = useCallback((option: string) => {
         setExcludeFields((prev: string[]) => {
@@ -72,35 +76,40 @@ export default function InfinitePage() {
 
     return (
         <>
-            <div style={{display: 'flex', maxWidth: '500px', flexWrap: 'wrap', gap: '0.5rem'}}>
-                <label style={{display: 'flex', flexDirection: 'column', width: '100%'}}>
-                    Limite de geração:
-                    <select value={generationLimit} onChange={(e) => setGenerationLimit(Number(e.target.value))}>
-                        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((generation) => (
-                            <option value={generation} key={generation}>Geração {t(`groupnames.generation.${generation}`)}</option>
-                        ))}
-                    </select>
-                </label>
-                <label>
-                    Excluir categorias:
-                </label>
-                {Object.keys(FIELD_OPTIONS).map((option, index) => (
-                    <label key={index}>
-                        <input type="checkbox" onChange={(e) => handleCheckbox(option)} checked={excludeFields.includes(option)}/>
-                        {option}
+            <Modal title="Gerar Puzzle" id="generate-modal" canClose={false} isOpen={!generated}>
+                <div style={{display: 'flex', maxWidth: '500px', flexWrap: 'wrap', gap: '0.5rem'}}>
+                    <label style={{display: 'flex', flexDirection: 'column', width: '100%'}}>
+                        Limite de geração:
+                        <select value={generationLimit} onChange={(e) => setGenerationLimit(Number(e.target.value))}>
+                            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((generation) => (
+                                <option value={generation} key={generation}>Geração {t(`groupnames.generation.${generation}`)}</option>
+                            ))}
+                        </select>
                     </label>
-                ))}
-            </div>
-            <button onClick={() => {if(!loading) setRegenerate(!regenerate)}}>Gerar Novamente</button>
-            <Puzzle
+                    <label>
+                        Excluir categorias:
+                    </label>
+                    {Object.keys(FIELD_OPTIONS).map((option, index) => (
+                        <label key={index}>
+                            <input type="checkbox" onChange={(e) => handleCheckbox(option)} checked={excludeFields.includes(option)}/>
+                            {option}
+                        </label>
+                    ))}
+                </div>
+                <button className="modal-content-div" onClick={() => {if(!loading) setGenerated(true)}}>
+                    Gerar
+                </button>
+            </Modal>            
+            {generated && <Puzzle
                 puzzle={puzzle}
                 setPuzzle={setPuzzle}
+                type="infinite"
                 dictionary={dictionary}
                 loading={loading}
                 setLoading={setLoading}
                 error={error}
                 setError={setError}
-            />
+            />}
         </>
     )
 }

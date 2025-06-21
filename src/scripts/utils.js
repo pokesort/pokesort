@@ -19,6 +19,15 @@ export const FIELD_OPTIONS = {
   dual: { min: 1, max: 2 },
 };
 
+export const getNextRefresh = () => {
+  const now = new Date();
+  const tomorrow = new Date(now);
+  tomorrow.setDate(now.getDate() + 1);
+  tomorrow.setHours(0, 0, 0, 0);
+
+  return tomorrow;
+}
+
 export const randomInRange = (min, max) =>
   Math.floor(Math.random() * (max - min + 1)) + min;
 
@@ -59,13 +68,20 @@ export const toTitleCase = (str) => {
     }).join(' ');
 }
 
-export function formatDate(inputDate, locale) {
+export function formatDate(inputDate, locale, full=true) {
     const date = new Date(`${inputDate}T00:00:00`);
-    return date.toLocaleDateString(locale, {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric'
-    });
+    if (full) {
+      return date.toLocaleDateString(locale, {
+          day: '2-digit',
+          month: 'long',
+          year: 'numeric'
+      });
+    } else {
+      return date.toLocaleDateString(locale, {
+          day: '2-digit',
+          month: 'long'
+      });
+    }
 }
 
 export function shuffleArray(array) {

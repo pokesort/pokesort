@@ -48,7 +48,7 @@ header {
             text-align: center;
             padding: 0.5rem 1.25rem;
             color: color(text2);
-            font-size: text(regular);            
+            font-size: text(base);            
 
             clip-path: polygon(0% 10px, 10px 0%, 100% 0%, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0% 100%);
             transition: background-color 0.15s ease, transform 0.3s ease;
@@ -112,7 +112,6 @@ header {
             flex-direction: column;
             width: 100%;
             opacity: 1;
-            visibility: visible;
             pointer-events: all;
 
             background-color: color(background1);
@@ -127,7 +126,6 @@ header {
 
             &:not(.open) {
                 opacity: 0;
-                visibility: hidden;
                 pointer-events: none;
             }
         }
