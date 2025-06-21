@@ -9,6 +9,7 @@ interface TimeLeft {
 
 interface CountdownProps {
   targetDate: Date;
+  active: boolean;
 }
 
 const calculateTimeLeft = (targetDate: Date): TimeLeft => {
@@ -34,7 +35,7 @@ const calculateTimeLeft = (targetDate: Date): TimeLeft => {
   return timeLeft;
 };
 
-export default function Countdown ({ targetDate }: CountdownProps) {
+export default function Countdown ({ targetDate, active }: CountdownProps) {
   const [timeLeft, setTimeLeft] = useState<TimeLeft>(() =>
     calculateTimeLeft(targetDate)
   );
@@ -46,7 +47,7 @@ export default function Countdown ({ targetDate }: CountdownProps) {
         return;
     }
 
-    if (timeLeft.isExpired) {
+    if (timeLeft.isExpired || !active) {
       return;
     }
 
@@ -60,7 +61,7 @@ export default function Countdown ({ targetDate }: CountdownProps) {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [targetDate, timeLeft.isExpired]); // Re-run effect if targetDate changes or expiration state changes
+  }, [active, targetDate, timeLeft.isExpired]); // Re-run effect if targetDate changes or expiration state changes
 
   if (timeLeft.isExpired) {
     return <>00:00:00</>;
