@@ -1,4 +1,4 @@
-# Sonhario - API
+# Pokesort
 ![Pokesort Logo](src/assets/images/logo.png)
 Um puzzle diário de associação de Pokémon construído em Next.
 
