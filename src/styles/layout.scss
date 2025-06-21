@@ -83,11 +83,21 @@ section#page {
     user-select: none;
 }
 
+::selection {
+  background: color(text3);
+  color: color(text1);
+  text-shadow: none;
+}
+::-moz-selection {
+  background: color(text3);
+  color: color(text1);
+  text-shadow: none;
+}
+
 body.firefox * {
   scrollbar-width: thin;
   scrollbar-color: color(section2) transparent;
 }
-
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;

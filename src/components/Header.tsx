@@ -6,6 +6,12 @@ import SvgLogo from './svg/SvgLogo';
 import HamburgerIcon from './svg/HamburgerIcon';
 import { useEffect, useState } from 'react';
 
+type Page = {
+    route: string;
+    label: string;
+    beta: boolean;
+}
+
 interface HeaderProps {
     pathname: string | null;
 }
@@ -16,8 +22,11 @@ export default function Header ({ pathname }: HeaderProps) {
     const [menuOpen, setMenuOpen] = useState<boolean>(false);
 
     const pages = [
-        'daily', 'archive', 'infinite', 'dex'
-    ]
+        {route: '/daily', label: t('daily'), beta: false},
+        {route: '/infinite', label: t('infinite'), beta: true},
+        {route: '/archive', label: t('archive'), beta: false},
+        {route: '/dex', label: t('dex'), beta: false},
+    ] as Page[];
 
     useEffect(() => {
         const handleScroll = () => setMenuOpen(false);
@@ -41,12 +50,12 @@ export default function Header ({ pathname }: HeaderProps) {
                 <HamburgerIcon/>
             </button>
             <nav className={menuOpen ? 'open' : ''}>
-                {pages && pages.map((page: string, index: number) => (
+                {pages && pages.map((page: Page, index: number) => (
                     <Link
                         key={index}
-                        href={`/${page}`}
-                        className={pathname === `/${page}` ? 'selected' : ''}>
-                            {t(page)}{page == 'infinite' ? ' ᵇᵉᵗᵃ' : ''}
+                        href={page.route}
+                        className={pathname === page.route ? 'selected' : ''}>
+                            {page.label}{page.beta ? ' ᵇᵉᵗᵃ' : ''}
                     </Link>
                 ))}
             </nav>

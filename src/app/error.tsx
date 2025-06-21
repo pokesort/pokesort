@@ -1,14 +1,10 @@
 "use client"
 
-import { useTranslations } from 'next-intl';
-import Link from 'next/link';
+import ErrorSection from "../components/ErrorSection";
 
 export default function ErrorPage() {
-    const t = useTranslations("header");
 
     return (
-        <section className="error-page">
-          <h1>500 – Internal Server Error</h1>
-        </section>
-      );
+        <ErrorSection code='500' message='internal' />
+    );
 }
