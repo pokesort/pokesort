@@ -76,7 +76,7 @@ export default function InfinitePage() {
 
     return (
         <>
-            <Modal title="Gerar Puzzle" id="generate-modal" canClose={false} isOpen={!generated}>
+            <Modal title="Gerar Puzzle" background={false} id="generate-modal" canClose={false} isOpen={!generated}>
                 <div style={{display: 'flex', maxWidth: '500px', flexWrap: 'wrap', gap: '0.5rem'}}>
                     <label style={{display: 'flex', flexDirection: 'column', width: '100%'}}>
                         Limite de geração:

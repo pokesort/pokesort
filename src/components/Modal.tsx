@@ -5,13 +5,14 @@ import CloseIcon from './svg/CloseIcon';
 interface ModalProps {
     id: string;
     title?: string;
+    background?: boolean,
     isOpen: boolean;
     setIsOpen?: React.Dispatch<React.SetStateAction<boolean>>;
     canClose?: boolean;
     children?: React.ReactNode; 
 }
 
-export default function Modal({ id, title=undefined, isOpen, setIsOpen, canClose=true, children }: ModalProps) {
+export default function Modal({ id, title=undefined, background=true, isOpen, setIsOpen, canClose=true, children }: ModalProps) {
     const closeModal = () => {
         if (canClose && setIsOpen)
             setIsOpen(false);
@@ -22,7 +23,7 @@ export default function Modal({ id, title=undefined, isOpen, setIsOpen, canClose
     }
     
     return (
-        <div className="modal-background" onClick={closeModal}>
+        <div className={`modal-background ${background ? 'filter': ''}`} onClick={closeModal}>
             <section id={id} className={`modal ${isOpen ? 'open' : ''}`} onClick={handleModalClick}>
                 <div className="modal-header">
                     {canClose &&
