@@ -15,6 +15,7 @@ import Modal from './Modal';
 import TickIcon from './svg/TickIcon';
 import Countdown from './Countdown';
 import { redirect } from 'next/navigation';
+import Loading from './Loading';
 
 const containerVariants: Variants = {
   hidden: { opacity: 1 },
@@ -336,7 +337,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
                     </>}
                 </section>
                 {loading || !puzzle ? (
-                    <p style={{margin: "auto 0", textAlign: "center"} as CSSProperties}>Loading</p>
+                    <Loading expand={true} />
                 ): (
                     <PuzzleGrid
                         puzzle={puzzle}
