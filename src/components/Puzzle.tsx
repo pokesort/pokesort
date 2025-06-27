@@ -4,13 +4,18 @@ import { useTranslations } from 'next-intl';
 import React, { CSSProperties, useCallback, useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { useLocale } from 'next-intl';
-import { formatDate, shuffleArray } from '@/src/scripts/utils';
+import { formatDate, shuffleArray, getNextRefresh } from '@/src/scripts/utils';
 
 import type { PuzzleData } from '@/src/assets/types/PuzzleApiResponse';
 import "@/src/styles/components/Puzzle.scss";
 import PokemonBlock from '@/src/components/PuzzleBlock';
 import CalendarIcon from '@/src/components/svg/CalendarIcon';
 import GroupName from './GroupName';
+import Modal from './Modal';
+import TickIcon from './svg/TickIcon';
+import Countdown from './Countdown';
+import { redirect } from 'next/navigation';
+import Loading from './Loading';
 
 const containerVariants: Variants = {
   hidden: { opacity: 1 },
@@ -40,12 +45,95 @@ const SolvedGroupsGrid = ({groups, dictionary}: SolvedGroupsGridProps) => {
     )
 }
 
+interface VictoryModalProps {
+    type: 'daily' | 'infinite',
+    guesses: PuzzleGuess[],
+    date: string | undefined,
+    victoryOpen: boolean,
+    setVictoryOpen: React.Dispatch<React.SetStateAction<boolean>>
+}
+
+const VictoryModal = React.memo(({type, guesses, date, victoryOpen, setVictoryOpen}: VictoryModalProps) => {
+    const t = useTranslations();
+    const locale = useLocale();
+    const count = 1;
+    date = formatDate(date, locale, false);
+    
+    return (
+        <Modal id="victory-modal" title="Gotcha!" isOpen={victoryOpen} setIsOpen={setVictoryOpen}>
+            <>
+            {type == 'daily' &&
+                <div style={{display: 'flex', gap: 'inherit'}}>
+                    {date &&
+                        <div className="modal-content-div">
+                            <p style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+                                <CalendarIcon/>{date}
+                            </p>
+                        </div>
+                    }
+                    <div className="modal-content-div">
+                        <p style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+                            <TickIcon/>
+                            Seu {count}º puzzle
+                        </p>
+                    </div>
+                </div>
+            }
+            <div className="modal-content-div">
+                <div className="guesses-container">
+                    {guesses.map((guess: PuzzleGuess, index: number) => (
+                        <li key={index} className={`guess-${guess.accuracy >= 100 ? '1' : '0'}`}></li>
+                    ))}
+                </div>
+                <p>Resolvido em <b>{guesses.length}</b> tentativas</p>
+            </div>
+            {type == 'daily' ? (
+                <>
+                <div className="modal-content-div">
+                    <p>Próximo puzzle diário em:</p>
+                    <h1><Countdown targetDate={getNextRefresh()} active={victoryOpen} /></h1>
+                </div>
+                <button className="modal-content-div" onClick={ () => redirect('/daily') }>
+                    <p>Voltar ao Início</p>
+                </button>
+                </>
+            ) : (
+                <button className="modal-content-div" onClick={ () => window.location.reload() }>
+                    <p>Gerar Novo Puzzle</p>
+                </button>
+            )}
+            </>
+        </Modal>
+    )
+})
+
 type PuzzleGuess = {
     type: 0 | 1 | 2; // guess | hint | dex
     accuracy: number;
     pokemons: number[];
     group: number | null;
 }
+
+interface GuessLogsInterface {
+    guesses: PuzzleGuess[];
+}
+
+const GuessLogs = React.memo(({guesses}: GuessLogsInterface) => {
+    return (
+        <section className="puzzle-guess-logs">
+            {guesses.map((guess: PuzzleGuess, index: number) => (
+                <div key={index} style={{'--accuracy': guess.accuracy} as CSSProperties}
+                    className={`puzzle-guess type-${guess.type} ${guess.accuracy == 100 ? 'correct' : ''}`}>
+                    {/* {guess.accuracy} */}
+                    <div className="accuracy-circle"/>
+                    {guess.pokemons.map((pokemon: number) => (
+                        <img key={pokemon} src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon}.png`}/>
+                    ) )}
+                </div>
+            ))}
+        </section>
+    )
+});
 
 interface PuzzleGridProps {
     puzzle: PuzzleData;
@@ -54,16 +142,29 @@ interface PuzzleGridProps {
     pokemons: any[];
     dictionary: any;
     setGuesses: React.Dispatch<React.SetStateAction<PuzzleGuess[]>>;
+    victoryOpen: boolean,
+    setVictoryOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, setGuesses}: PuzzleGridProps) => {
+const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, setGuesses, victoryOpen, setVictoryOpen}: PuzzleGridProps) => {
     const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
 
+    const [groupSets, setGroupSets] = useState<Set<number>[]>([]);
     const [incorrectGuessIds, setIncorrectGuessIds] = useState<Set<number>>(new Set());
     const [correctGuessIds, setCorrectGuessIds] = useState<Set<number>>(new Set());
     const [solvedGroupIds, setSolvedGroupIds] = useState<Set<number>>(new Set());
     const [solvedInOrder, setSolvedInOrder] = useState<any[]>([]);
     const [solvedGroupNames, setSolvedGroupNames] = useState<string[]>([]);
+
+    useEffect(() => {
+        let groupArray: Set<number>[] = [];
+
+        for (let i = 0; i < puzzle.groups.length; i++) {
+            groupArray[i] = new Set(puzzle.groups[i].pokemons);
+        }
+
+        setGroupSets(groupArray);
+    }, [puzzle]);
 
     const handleSelect = useCallback((id: number) => {
         if (pause) return;
@@ -82,27 +183,38 @@ const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, s
     const compareGroups = useCallback((selected: Set<number>): PuzzleGuess | null => {
         if (!puzzle || !puzzle.groups) return null;
 
-        const selectedArr = Array.from(selected).sort();
+        let accuracy = 0;
         let guess = {
             type: 0,
             accuracy: 0,
-            pokemons: selectedArr,
+            pokemons: Array.from(selected),
             group: null
         } as PuzzleGuess;
 
         for (let i = 0; i < puzzle.groups.length; i++) {
             if (solvedGroupIds.has(puzzle.groups[i].pokemons[0])) continue;
 
-            const otherArr = [...puzzle.groups[i].pokemons].sort();
-            if (selectedArr.length === otherArr.length && selectedArr.every((val, j) => val === otherArr[j])) {
-                guess.accuracy = 100;
-                guess.group = i;
-                break;
+            for(const [index, group] of groupSets.entries()) {      
+                let innerAccuracy = 0;
+                
+                if (selected.size !== group.size) continue;
+                for (let element of selected) {
+                    if (group.has(element)) innerAccuracy += 1;
+                }
+
+                if (innerAccuracy > accuracy) accuracy = innerAccuracy;
+
+                if (innerAccuracy == group.size) {
+                    guess.group = index;
+                    break;
+                }
             }
         }
 
+        guess.accuracy = Math.round((accuracy * 100) / selected.size);
         return guess;
-    }, [puzzle, solvedGroupIds]);
+
+    }, [puzzle, solvedGroupIds, groupSets]);
 
     const handleGuess = useCallback((guess: PuzzleGuess) => {
         setGuesses((prev: PuzzleGuess[]) => [...prev, guess]);
@@ -134,6 +246,11 @@ const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, s
                     if (guess.group != null)
                         solvedGroupNames.push(puzzle.groups[guess.group].query);
                     setSelectedIds(new Set());
+                    if (solvedGroupNames.length == puzzle.rows) {
+                        setTimeout(() => {
+                            setVictoryOpen(true);
+                        }, 1600);
+                    }
                     setPause(false);
                 }, 800);
             } else {
@@ -147,7 +264,7 @@ const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, s
         };
 
         makeGuess();
-    }, [selectedIds, puzzle, compareGroups, markGroupAsSolved, handleGuess]);
+    }, [selectedIds, puzzle, compareGroups, markGroupAsSolved, handleGuess]);   
 
     const activePokemons = useMemo(() => pokemons.filter((p:any) => !solvedGroupIds.has(p.id)), [pokemons, solvedGroupIds]);
 
@@ -205,6 +322,7 @@ const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, s
 interface PuzzleProps {
     puzzle: PuzzleData | undefined;
     setPuzzle: (puzzle: PuzzleData) => void;
+    type: 'daily' | 'infinite';
     dictionary: any;
     loading: boolean;
     setLoading: (loading: boolean) => void;
@@ -212,23 +330,29 @@ interface PuzzleProps {
     setError: (error: string | null) => void;
 }
 
-export default React.memo(function Puzzle({puzzle, setPuzzle, dictionary, loading, setLoading, error, setError}: PuzzleProps) {
+export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, loading, setLoading, error, setError}: PuzzleProps) {
     const t = useTranslations();
     const locale = useLocale();
 
     const [pause, setPause] = useState<boolean>(false);
     const [guesses, setGuesses] = useState<PuzzleGuess[]>([]);
     const [pokemons, setPokemons] = useState<any>([]);
+    const [victoryOpen, setVictoryOpen] = useState<boolean>(false);
+    const [mountVictoryModal, setMountVictoryModal] = useState<boolean>(false);
 
     useEffect(() => {
         if (dictionary) setPokemons(shuffleArray(dictionary.pokemons));
-    }, [dictionary]);    
+    }, [dictionary]);
 
     useEffect(() => {
         if (process.env.NODE_ENV === "development") {        
             console.log(guesses);
         }
     }, [guesses]);
+
+    useEffect(() => {
+        setMountVictoryModal(true);
+    }, [victoryOpen]);
 
     useEffect(() => {
         setGuesses([]);
@@ -240,6 +364,9 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, dictionary, loadin
 
     return (
         <>
+            {mountVictoryModal &&
+                <VictoryModal type={type} guesses={guesses} date={puzzle?.date} victoryOpen={victoryOpen} setVictoryOpen={setVictoryOpen} />
+            }
             <ul className="guesses-container">
                 {guesses.map((guess: PuzzleGuess, index: number) => (
                     <li key={index} className={`guess-${guess.accuracy >= 100 ? '1' : '0'}`}></li>
@@ -253,7 +380,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, dictionary, loadin
                     </>}
                 </section>
                 {loading || !puzzle ? (
-                    <p style={{margin: "auto 0", textAlign: "center"} as CSSProperties}>Loading</p>
+                    <Loading expand={true} />
                 ): (
                     <PuzzleGrid
                         puzzle={puzzle}
@@ -262,9 +389,12 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, dictionary, loadin
                         pokemons={pokemons}
                         dictionary={dictionary}
                         setGuesses={setGuesses}
+                        victoryOpen={victoryOpen}
+                        setVictoryOpen={setVictoryOpen}
                     />
                 )}
-            </div>      
+            </div>
+            <GuessLogs guesses={guesses} />
         </>
     )
 })

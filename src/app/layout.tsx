@@ -32,7 +32,15 @@ export default async function RootLayout({children,}: Readonly<{children: React.
   
   return (
     <html lang={locale}>
-      <head></head>
+      <head>
+        <link
+            rel="preload"
+            href="/AnimatedLoading.json"
+            as="fetch"
+            type="application/json"
+            crossOrigin="anonymous"
+          />
+      </head>
       <NextIntlClientProvider>
         <body>
           <HeaderClient/>

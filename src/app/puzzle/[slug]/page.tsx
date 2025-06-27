@@ -63,6 +63,7 @@ export default function PuzzlePage() {
         <Puzzle
             puzzle={puzzle}
             setPuzzle={setPuzzle}
+            type="daily"
             dictionary={dictionary}
             loading={loading}
             setLoading={setLoading}

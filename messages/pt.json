@@ -1,10 +1,17 @@
 {
     "test": "Mensagem em português",
     "header": {
-        "daily": "Hoje",
+        "daily": "Diário",
+        "infinite": "Infinito",
         "archive": "Arquivo",
-        "dex": "Dex",
-        "infinite": "Infinito"
+        "dex": "Dex"
+    },
+    "error": {
+        "oops": "Ops...",
+        "error": "Erro",
+        "not-found": "Não conseguimos encontrar o que você pediu.",
+        "internal": "Algo de estranho aconteceu.",
+        "go-back": "Voltar"
     },
     
     "groupnames": {

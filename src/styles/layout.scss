@@ -21,7 +21,7 @@ body {
 
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    min-height: 100dvh;
     max-width: 100vw;
     font-size: text(base);
 }
@@ -35,6 +35,20 @@ body {
 a {
     color: inherit;
     text-decoration: none;
+}
+
+b {
+  font-weight: 700;
+}
+
+button {
+    background: none;
+	color: inherit;
+	border: none;
+	padding: 0;
+	font: inherit;
+	cursor: pointer;
+	outline: inherit;
 }
 
 h1 {
@@ -71,4 +85,32 @@ section#page {
     -moz-user-select: none;
     -o-user-select: none;
     user-select: none;
+}
+
+::selection {
+  background: color(text3);
+  color: color(text1);
+  text-shadow: none;
+}
+::-moz-selection {
+  background: color(text3);
+  color: color(text1);
+  text-shadow: none;
+}
+
+body.firefox * {
+  scrollbar-width: thin;
+  scrollbar-color: color(section2) transparent;
+}
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: color(section2);
+  border-radius: 4px;
+  transition: background-color 0.3s;
 }

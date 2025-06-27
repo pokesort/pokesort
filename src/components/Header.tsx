@@ -3,6 +3,14 @@ import Link from 'next/link';
 
 import '@/src/styles/components/Header.scss';
 import SvgLogo from './svg/SvgLogo';
+import HamburgerIcon from './svg/HamburgerIcon';
+import { useEffect, useState } from 'react';
+
+type Page = {
+    route: string;
+    label: string;
+    beta: boolean;
+}
 
 interface HeaderProps {
     pathname: string | null;
@@ -11,9 +19,25 @@ interface HeaderProps {
 export default function Header ({ pathname }: HeaderProps) {
     const t = useTranslations("header");
 
+    const [menuOpen, setMenuOpen] = useState<boolean>(false);
+
     const pages = [
-        'daily', 'archive', 'infinite', 'dex'
-    ]
+        {route: '/daily', label: t('daily'), beta: false},
+        {route: '/infinite', label: t('infinite'), beta: true},
+        {route: '/archive', label: t('archive'), beta: false},
+        {route: '/dex', label: t('dex'), beta: false},
+    ] as Page[];
+
+    useEffect(() => {
+        const handleScroll = () => setMenuOpen(false);
+
+        document.addEventListener('scroll', handleScroll);
+        
+        return () => {
+            document.removeEventListener('scroll', handleScroll);
+        }
+    }, [])
+    
 
     return (
         <header>
@@ -22,13 +46,16 @@ export default function Header ({ pathname }: HeaderProps) {
                 <h1>POKESORT</h1>
             </Link>
             
-            <nav>
-                {pages && pages.map((page: string, index: number) => (
+            <button id="menu-icon" onClick={() => setMenuOpen(prev => !prev)}>
+                <HamburgerIcon/>
+            </button>
+            <nav className={menuOpen ? 'open' : ''}>
+                {pages && pages.map((page: Page, index: number) => (
                     <Link
                         key={index}
-                        href={`/${page}`}
-                        className={pathname === `/${page}` ? 'selected' : ''}>
-                            {t(page)}{page == 'infinite' ? ' ᵇᵉᵗᵃ' : ''}
+                        href={page.route}
+                        className={pathname === page.route ? 'selected' : ''}>
+                            {page.label}{page.beta ? ' ᵇᵉᵗᵃ' : ''}
                     </Link>
                 ))}
             </nav>

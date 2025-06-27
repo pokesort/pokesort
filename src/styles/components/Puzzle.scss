@@ -9,7 +9,6 @@
     gap: var(--spacing);
     padding: var(--spacing);
     padding-top: 0.25rem;
-    min-height: min(80vw, 590px);
 
     clip-path: polygon(0% 0%, 45% 0%, calc(45% + 37px) 37px, 100% 37px, 100% 100%, 0% 100%);
 
@@ -20,6 +19,8 @@
 @media (max-width: 768px) {
     .window-container {
         padding-top: 0.1rem;
+        clip-path: polygon(0% 0%, calc(100% - 37px) 0%, 100% 37px, 100% 37px, 100% 100%, 0% 100%);
+
     }
 
     section.puzzle-info-row {
@@ -80,7 +81,7 @@ section.solved-groups-grid {
             margin-bottom: 0.1rem;
             width: 100%;
             text-align: center;
-            font-size: text(regular);
+            font-size: text(base);
             z-index: 100;
             @media (max-width: 640px) {
                 font-size: text(small);
@@ -96,7 +97,7 @@ section.solved-groups-grid {
 
             position: absolute;
             right: 0;
-            top: -1;
+            top: -1px;
 
             clip-path: polygon(0% 0%, 100% 100%, 100% 0%);
             animation: solved-text 1.0s ease 1;
@@ -116,14 +117,62 @@ section.puzzle-info-row {
     width: min(100%, 550px);
 }
 
+.puzzle-guess-logs {
+    display: flex;
+    flex-direction: column;
+    
+    gap: var(--spacing);
+    padding: var(--spacing);
+    background-color: color(section1);
+    max-width: min(500px, 100vw);
+
+    max-height: 260px;
+    overflow-y: auto;
+
+    div.puzzle-guess {
+        display: flex;
+        align-items: center;
+
+        border: 2px solid color(selection2);
+        background-color: color(section2);
+        width: 100%;
+        padding: var(--spacing);
+
+        .accuracy-circle {
+            --percent: calc(1% * var(--accuracy));
+
+            width: 24px;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            border: 2px solid color(selection2);
+
+            background-image: conic-gradient(color(selection2) var(--percent), transparent var(--percent), transparent calc(100% - var(--percent)), transparent calc(100% - var(--percent)));
+            // background-image: conic-gradient(color(selection2) calc(100% - var(--percent)), transparent calc(100% - var(--percent)), transparent var(--percent), transparent var(--percent));
+        }
+
+        img {
+            width: 48px;
+        }
+
+        &.correct {
+            border: 2px solid color(selection3);
+            .accuracy-circle {
+                background-image: unset;
+                background-color: color(selection3);
+                border: 2px solid color(selection3);
+            }
+        }
+    }
+}
+
 .guesses-container {
     display: flex;
-    justify-content: end;
+    justify-content: center;
     align-items: center;
     flex-wrap: wrap;
+    margin: 0.25rem 0;
 
-    min-height: 30px;
-    max-width: 50%;
+    max-width: 100%;
     gap: var(--spacing);
     z-index: 2;
 
@@ -131,7 +180,6 @@ section.puzzle-info-row {
         display: block;
         width: 10px;
         aspect-ratio: 1;
-        border-radius: 2px;
 
         animation: guess-in 0.15s ease 1;
 

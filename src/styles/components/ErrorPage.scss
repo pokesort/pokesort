@@ -1,0 +1,38 @@
+@use "../abstract" as *;
+
+section.error {
+    
+    .flex {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        
+        img {
+            width: 200px;
+            height: 200px;
+            margin: -16% -15% -10% -15%;
+        }
+
+        div {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            margin-left: 4rem;
+        }
+    }
+
+    button {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        padding: 0.5rem 1.25rem;
+        margin: 0 auto;
+        margin-top: 1rem;
+        color: color(text1);
+        font-size: text(base);       
+        background-color: color(section1);     
+
+        clip-path: polygon(0% 10px, 10px 0%, 100% 0%, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0% 100%)
+    }
+
+}

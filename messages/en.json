@@ -6,6 +6,13 @@
         "dex": "Dex",
         "infinite": "Infinite"
     },
+    "error": {
+        "oops": "Uh-oh...",
+        "error": "Error",
+        "not-found": "We couldn't find what you asked.",
+        "internal": "Something unexpected happened.",
+        "go-back": "Go back"
+    },
     
     "groupnames": {
         "types": {
