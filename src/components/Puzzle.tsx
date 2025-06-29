@@ -6,15 +6,15 @@ import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { useLocale } from 'next-intl';
 import { formatDate, shuffleArray, getNextRefresh } from '@/src/scripts/utils';
 import { useInView } from 'react-intersection-observer';
+import { redirect } from 'next/navigation';
 
 import type { PuzzleData } from '@/src/assets/types/PuzzleApiResponse';
 import "@/src/styles/components/Puzzle.scss";
 import PokemonBlock from '@/src/components/PuzzleBlock';
-import GroupName from './GroupName';
-import Modal from './Modal';
-import Countdown from './Countdown';
-import { redirect } from 'next/navigation';
-import Loading from './Loading';
+import GroupName from '@/src/components/GroupName';
+import Modal from '@/src/components/Modal';
+import Countdown from '@/src/components/Countdown';
+import Loading from '@/src/components/Loading';
 
 import CalendarIcon from '@/src/components/svg/CalendarIcon';
 import TickIcon from '@/src/components/svg/TickIcon';
