@@ -3,27 +3,29 @@
 .window-container {
     display: flex;
     flex-direction: column;
-    width: min(100%, calc(140px * var(--cols, 4)));
+    width: min(100%, 400px);
     background-color: color(section1);
 
     gap: var(--spacing);
     padding: var(--spacing);
     padding-top: 0.25rem;
-
     clip-path: polygon(0% 0%, 45% 0%, calc(45% + 37px) 37px, 100% 37px, 100% 100%, 0% 100%);
 
     transition:
         height 0.3s ease
         width 0.3s ease;
+
+    &:has(section.puzzle), &:has(section.loading) {
+        width: min(100%, calc(140px * var(--cols, 4)));
+    }
 }
 @media (max-width: 768px) {
     .window-container {
         padding-top: 0.1rem;
         clip-path: polygon(0% 0%, calc(100% - 37px) 0%, 100% 37px, 100% 37px, 100% 100%, 0% 100%);
-
     }
 
-    section.puzzle-info-row {
+    section.window-info-row {
         margin: 0.25rem 0;
     }
 }
@@ -75,6 +77,40 @@ ul.puzzle-tabs-container {
 
     @media(max-width: 768px) {
         
+    }
+}
+
+nav.puzzle-tab-nav {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    width: min(calc(100% + (var(--spacing) * 2)), calc(140px * var(--cols, 4)));
+    padding: var(--spacing);
+    gap: var(--spacing);
+
+    background-color: color(section1);
+
+    @media(min-width: 1280px) {
+        display: none;
+    }
+
+    button {
+        background-color: color(section1);
+        color: color(text2);
+        font-size: text(small);
+        text-align: center;
+        padding: 0.25rem 0.5rem;
+
+        transition: background-color 0.3s ease;
+
+        span {
+            color: color(text2);
+            padding: 0.2rem 0.4rem;
+        }
+
+        &.active {
+            background-color: color(section2);
+            color: color(text1);
+        }
     }
 }
 
@@ -149,7 +185,7 @@ section.solved-groups-grid {
     }
 }
 
-section.puzzle-info-row {
+section.window-info-row {
     display: flex;
     justify-content: start;
     align-items: center;
@@ -158,29 +194,39 @@ section.puzzle-info-row {
     padding: var(--spacing);
     font-size: text(small);
     
-    width: min(100%, 550px);
+    width: min(100%, 550px);   
+
+    span {
+        color: color(text2);
+        padding: 0.2rem 0.4rem;
+        padding-left: 0.5rem;
+    }
 }
 
 .puzzle-guess-logs {
     display: flex;
     flex-direction: column;
+    justify-content: start;
     
     gap: var(--spacing);
-    padding: var(--spacing);
-    background-color: color(section1);
-    max-width: min(500px, 100vw);
-
-    max-height: 260px;
+    width: 100%;
+    height: 300px;
     overflow-y: auto;
 
     div.puzzle-guess {
         display: flex;
+        justify-content: space-around;
         align-items: center;
 
         border: 2px solid color(selection2);
         background-color: color(section2);
         width: 100%;
         padding: var(--spacing);
+        transform-origin: bottom;
+
+        &:first-child {
+            margin-top: auto;
+        }
 
         .accuracy-circle {
             --percent: calc(1% * var(--accuracy));
@@ -207,6 +253,10 @@ section.puzzle-info-row {
             }
         }
     }
+
+    @media(max-width: 1280px) {
+        height: 400px;
+    }
 }
 
 .guesses-container {
@@ -225,8 +275,6 @@ section.puzzle-info-row {
         width: 10px;
         aspect-ratio: 1;
 
-        animation: guess-in 0.15s ease 1;
-
         &.guess-0 {
             background-color: color(selection2);
         }
@@ -235,23 +283,6 @@ section.puzzle-info-row {
         }
         &.guess-2 {
             background-color: color(selection1);
-        }
-
-        @keyframes guess-in {
-            0% {
-                width: 0px;
-                height: 0px;
-            }
-
-            80% {
-                width: calc(var(--width, 8px) + 3px);
-                height: calc(var(--width, 8px) + 3px);
-            }
-        
-            100% {
-                width: var(--width, 8px);
-                height: var(--width, 8px);
-            }
         }
     }
 }

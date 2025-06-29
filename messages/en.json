@@ -13,7 +13,13 @@
         "internal": "Something unexpected happened.",
         "go-back": "Go back"
     },
-    
+
+    "puzzle": {
+        "infinite": "Infinite Mode",
+        "logs": "Logs",
+        "puzzle": "Puzzle",
+        "dex": "Dex"
+    },
     "groupnames": {
         "types": {
             "long": "",
