@@ -146,16 +146,19 @@ interface GuessLogsInterface {
 }
 
 const GuessLogs = React.memo(({guesses}: GuessLogsInterface) => {
+const t = useTranslations('puzzle');
+
     return (
         <section className="puzzle-guess-logs">
             {guesses.map((guess: PuzzleGuess, index: number) => (
                 <div key={index} style={{'--accuracy': guess.accuracy} as CSSProperties}
                     className={`puzzle-guess type-${guess.type} ${guess.accuracy == 100 ? 'correct' : ''}`}>
-                    {/* {guess.accuracy} */}
-                    <div className="accuracy-circle"/>
-                    {guess.pokemons.map((pokemon: number) => (
-                        <img key={pokemon} src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon}.png`}/>
-                    ) )}
+                    <div className="accuracy-circle" title={`${guess.accuracy}% ${t('correct')}`}/>
+                    <div className="guess-group">
+                        {guess.pokemons.map((pokemon: number) => (
+                            <img key={pokemon} src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon}.png`}/>
+                        ) )}
+                    </div>
                 </div>
             ))}
         </section>
@@ -369,7 +372,9 @@ interface PuzzleProps {
 export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, loading, setLoading, error, setError}: PuzzleProps) {
     const t = useTranslations('puzzle');
     const locale = useLocale();
+    const mainTabRef = useRef<HTMLDivElement>(null);
 
+    const [refresh, setRefresh] = useState<boolean>(false);
     const [pause, setPause] = useState<boolean>(false);
     const [guesses, setGuesses] = useState<PuzzleGuess[]>([]);
     const [pokemons, setPokemons] = useState<any>([]);
@@ -394,7 +399,22 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
     useEffect(() => {
         setGuesses([]);
         scrollToTab(1, 'instant');
+        setTimeout(() => {
+            setRefresh(prev => !prev);
+        }, 0);
     }, [puzzle])
+
+    useEffect(() => {
+        const handleResize = () => {
+            setRefresh(prev => !prev);
+        };
+
+        window.addEventListener("resize", handleResize);
+
+        return () => {
+            window.removeEventListener("resize", handleResize);
+        };
+    }, []);
 
     const scrollToTab = (target: number, behavior: ('smooth' | 'instant') = 'smooth') => {
         if (target !== visibleTab) {
@@ -402,6 +422,10 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
             if (tab) tab.scrollIntoView({ behavior: behavior, block: 'center' });
         }
     }
+
+    const tabsHeight = useMemo(() => {
+       return mainTabRef.current?.offsetHeight;
+    }, [puzzle, visibleTab, refresh]);
 
     const date = useMemo(() => {
         if (type == 'infinite') {
@@ -416,8 +440,8 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
             {mountVictoryModal &&
                 <VictoryModal type={type} guesses={guesses} date={puzzle?.date} victoryOpen={victoryOpen} setVictoryOpen={setVictoryOpen} />
             }
-            <ul className="puzzle-tabs-container" style={{'--cols': puzzle ? puzzle.cols : 4, '--rows': puzzle ? puzzle.rows : 4} as React.CSSProperties}>
-                {puzzle &&
+            <ul className="puzzle-tabs-container" style={{'--height': `${tabsHeight}px`, '--cols': puzzle ? puzzle.cols : 4, '--rows': puzzle ? puzzle.rows : 4} as React.CSSProperties}>
+                {puzzle ?
                 <PuzzleTab setVisibleTab={setVisibleTab} tab={0}>
                     <div className="window-container cut-left">
                         <section className="window-info-row">
@@ -426,9 +450,9 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
                         </section>
                         <GuessLogs guesses={guesses} />
                     </div>
-                </PuzzleTab>}
+                </PuzzleTab> : <div></div>}
                 <PuzzleTab setVisibleTab={setVisibleTab} tab={1}>
-                    <div className="window-container cut-left">
+                    <div className="window-container cut-left" ref={mainTabRef}>
                         <section className="window-info-row">
                             {!loading && <>
                                 <GridIcon/>
