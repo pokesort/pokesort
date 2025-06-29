@@ -13,7 +13,19 @@
         "internal": "Algo de estranho aconteceu.",
         "go-back": "Voltar"
     },
-    
+
+    "puzzle": {
+        "infinite": "Modo Infinito",
+        "logs": "Logs",
+        "puzzle": "Puzzle",
+        "dex": "Dex",
+        "correct": "correto",
+
+        "help": {
+            "logs": "A acurácia de cada uma de suas tentativas será exibida aqui.",
+            "dex": "Pressione um bloco ou clique com o botão direito para pesquisar na Dex."
+        }
+    },
     "groupnames": {
         "types": {
             "long": "Tipo ",

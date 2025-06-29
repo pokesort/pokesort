@@ -6,23 +6,18 @@ import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { useLocale } from 'next-intl';
 import { formatDate, shuffleArray, getNextRefresh } from '@/src/scripts/utils';
 import { useInView } from 'react-intersection-observer';
-import { redirect } from 'next/navigation';
 
 import type { PuzzleData } from '@/src/assets/types/PuzzleApiResponse';
 import "@/src/styles/components/Puzzle.scss";
 import PokemonBlock from '@/src/components/PuzzleBlock';
-import GroupName from '@/src/components/GroupName';
-import Modal from '@/src/components/Modal';
-import Countdown from '@/src/components/Countdown';
-import Loading from '@/src/components/Loading';
-
 import CalendarIcon from '@/src/components/svg/CalendarIcon';
-import TickIcon from '@/src/components/svg/TickIcon';
-import GridIcon from '@/src/components/svg/GridIcon';
-import LogsIcon from '@/src/components/svg/LogsIcon';
-import DexIcon from '@/src/components/svg/DexIcon';
-import helpLogsImage from '@/src/assets/images/help_logs.png';
-import helpDexImage from '@/src/assets/images/help_dex.png';
+import GroupName from './GroupName';
+import Modal from './Modal';
+import TickIcon from './svg/TickIcon';
+import Countdown from './Countdown';
+import { redirect } from 'next/navigation';
+import Loading from './Loading';
+import GridIcon from './svg/GridIcon';
 
 const containerVariants: Variants = {
   hidden: { opacity: 1 },
@@ -148,28 +143,18 @@ interface GuessLogsInterface {
 }
 
 const GuessLogs = React.memo(({guesses}: GuessLogsInterface) => {
-const t = useTranslations('puzzle');
-
     return (
         <section className="puzzle-guess-logs">
-            {guesses.length > 0 ?
-                guesses.map((guess: PuzzleGuess, index: number) => (
-                    <div key={index} style={{'--accuracy': guess.accuracy} as CSSProperties}
-                        className={`puzzle-guess type-${guess.type} ${guess.accuracy == 100 ? 'correct' : ''}`}>
-                        <div className="accuracy-circle" title={`${guess.accuracy}% ${t('correct')}`}/>
-                        <div className="guess-group">
-                            {guess.pokemons.map((pokemon: number) => (
-                                <img key={pokemon} src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon}.png`}/>
-                            ) )}
-                        </div>
-                    </div>
-                ))
-                :
-                <div className="tab-help">
-                    <img src={helpLogsImage.src}/>
-                    <p>{t('help.logs')}</p>
+            {guesses.map((guess: PuzzleGuess, index: number) => (
+                <div key={index} style={{'--accuracy': guess.accuracy} as CSSProperties}
+                    className={`puzzle-guess type-${guess.type} ${guess.accuracy == 100 ? 'correct' : ''}`}>
+                    {/* {guess.accuracy} */}
+                    <div className="accuracy-circle"/>
+                    {guess.pokemons.map((pokemon: number) => (
+                        <img key={pokemon} src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon}.png`}/>
+                    ) )}
                 </div>
-            }
+            ))}
         </section>
     )
 });
@@ -276,7 +261,6 @@ const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, s
             const guess = compareGroups(selectedIds);
 
             if (!guess) return;
-            const logs = document.querySelector('.puzzle-guess-logs');
             handleGuess(guess);
             
             if (guess.accuracy >= 100) {
@@ -291,10 +275,6 @@ const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, s
                             setVictoryOpen(true);
                         }, 1600);
                     }
-                    logs?.scrollBy({
-                        top: logs.scrollHeight,
-                        behavior: "smooth",
-                    });
                     setPause(false);
                 }, 800);
             } else {
@@ -302,10 +282,6 @@ const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, s
                 setTimeout(() => {
                     setSelectedIds(new Set());
                     setIncorrectGuessIds(new Set());
-                    logs?.scrollBy({
-                        top: logs.scrollHeight,
-                        behavior: "smooth",
-                    });
                     setPause(false);
                 }, 800);
             }
@@ -381,9 +357,7 @@ interface PuzzleProps {
 export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, loading, setLoading, error, setError}: PuzzleProps) {
     const t = useTranslations('puzzle');
     const locale = useLocale();
-    const mainTabRef = useRef<HTMLDivElement>(null);
 
-    const [refresh, setRefresh] = useState<boolean>(false);
     const [pause, setPause] = useState<boolean>(false);
     const [guesses, setGuesses] = useState<PuzzleGuess[]>([]);
     const [pokemons, setPokemons] = useState<any>([]);
@@ -408,23 +382,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
     useEffect(() => {
         setGuesses([]);
         scrollToTab(1, 'instant');
-        setTimeout(() => {
-            setRefresh(prev => !prev);
-        }, 0);
     }, [puzzle])
-
-    useEffect(() => {
-        const handleResize = () => {
-            scrollToTab(1, 'instant');
-            setRefresh(prev => !prev);
-        };
-
-        window.addEventListener("resize", handleResize);
-
-        return () => {
-            window.removeEventListener("resize", handleResize);
-        };
-    }, []);
 
     const scrollToTab = (target: number, behavior: ('smooth' | 'instant') = 'smooth') => {
         if (target !== visibleTab) {
@@ -432,10 +390,6 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
             if (tab) tab.scrollIntoView({ behavior: behavior, block: 'center' });
         }
     }
-
-    const tabsHeight = useMemo(() => {
-       return mainTabRef.current?.offsetHeight;
-    }, [puzzle, visibleTab, refresh]);
 
     const date = useMemo(() => {
         if (type == 'infinite') {
@@ -450,23 +404,23 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
             {mountVictoryModal &&
                 <VictoryModal type={type} guesses={guesses} date={puzzle?.date} victoryOpen={victoryOpen} setVictoryOpen={setVictoryOpen} />
             }
-            <ul className="puzzle-tabs-container" style={{'--height': `${tabsHeight}px`, '--cols': puzzle ? puzzle.cols : 4, '--rows': puzzle ? puzzle.rows : 4} as React.CSSProperties}>
-                {puzzle ?
+            <ul className="puzzle-tabs-container" style={{'--cols': puzzle ? puzzle.cols : 4, '--rows': puzzle ? puzzle.rows : 4} as React.CSSProperties}>
+                {puzzle &&
                 <PuzzleTab setVisibleTab={setVisibleTab} tab={0}>
-                    <div className="window-container cut-left">
+                    <div className="window-container">
                         <section className="window-info-row">
-                            <LogsIcon/>
-                            <p>{t('logs')}<span>{guesses.length}</span></p>
+                            <GridIcon/>
+                            <p>Logs<span>{guesses.length}</span></p>
                         </section>
                         <GuessLogs guesses={guesses} />
                     </div>
-                </PuzzleTab> : <div></div>}
+                </PuzzleTab>}
                 <PuzzleTab setVisibleTab={setVisibleTab} tab={1}>
-                    <div className="window-container cut-left" ref={mainTabRef}>
+                    <div className="window-container">
                         <section className="window-info-row">
                             {!loading && <>
                                 <GridIcon/>
-                                <p>{t('puzzle')}{date ? <span>{date}</span> : <></>}</p>
+                                <p>Puzzle{date ? <span>{date}</span> : <></>}</p>
                             </>}
                         </section>
                         {loading || !puzzle ? (
@@ -486,28 +440,19 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
                     </div>
                 </PuzzleTab>
                 {puzzle && <PuzzleTab setVisibleTab={setVisibleTab} tab={2}>
-                    <div className="window-container cut-right">
-                        <section className="window-info-row">
-                            <DexIcon/>
-                            <p>{t('dex')}</p>
-                        </section>
-                        <div className="tab-help">
-                            <img src={helpDexImage.src}/>
-                            <p>{t('help.dex')}</p>
-                        </div>
-                    </div>
+                    Testando...
                 </PuzzleTab>}
             </ul>
             {puzzle &&
             <nav className="puzzle-tab-nav">
                 <button onClick={() => scrollToTab(0)} className={visibleTab == 0 ? 'active' : ''}>
-                    {t('logs')}<span>{guesses.length}</span>
+                    Logs<span>{guesses.length}</span>
                 </button>
                 <button onClick={() => scrollToTab(1)} className={visibleTab == 1 ? 'active' : ''}>
-                    {t('puzzle')}
+                    Puzzle
                 </button>
                 <button onClick={() => scrollToTab(2)} className={visibleTab == 2 ? 'active' : ''}>
-                    {t('dex')}
+                    Dex
                 </button>
             </nav>}
         </>
