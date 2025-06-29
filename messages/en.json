@@ -19,7 +19,12 @@
         "logs": "Logs",
         "puzzle": "Puzzle",
         "dex": "Dex",
-        "correct": "correto"
+        "correct": "correto",
+
+        "help": {
+            "logs": "Each of your attempts and its accuracy will be shown here.",
+            "dex": "Press and hold a block or right-click it to search on the Dex."
+        }
     },
     "groupnames": {
         "types": {
