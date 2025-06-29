@@ -1,18 +1,19 @@
 import { connect, data } from "@/lib/mongodb";
+import { pipe } from "framer-motion";
+import { pipeline } from "stream";
 
 export default async function handler(req, res) {
   try {
     await connect();
 
-    const { dex } = req.query;
+    const { id } = req.query;
 
-    const pokemon = await getDexData(dex);
+    const pokemon = await getDexData(id);
 
-    // const pokemon = await data.db.collection("pokemon").findOne({$or:[{"id": Number(dex)}, {"name": dex}]});
+    if (!pokemon) {
+      res.status(404).json({ success: false, error: "Pokemon não encontrado" });
+    }
 
-    // if (!pokemon){
-    //     res.status(404).json({success: false, error: "Pokemon não encontrado"})
-    // }
     res.status(200).json({ success: true, pokemon: pokemon });
   } catch (error) {
     console.error("Connection failed:", error);
@@ -29,41 +30,184 @@ export default async function handler(req, res) {
             $or: [{ id: Number(id_dex) }, { name: id_dex }],
           },
         },
-
         {
           $lookup: {
-            from: "types",
-            localField: "types",
+            from: "evolution_steps",
+            localField: "evolution_step",
             foreignField: "id",
-            as: "typesData",
+            as: "evo_data",
+            pipeline: [
+              {
+                $project: {
+                  _id: 0,
+                  id: 1,
+                },
+              },
+            ],
+          },
+        },
+        { $unwind: "$evo_data" },
+        {
+          $addFields: {
+            split_parts: { $split: ["$evo_data.id", "-"] },
           },
         },
         {
           $addFields: {
-            types: { $map: { input: "$typesData", as: "t", in: "$$t.name" } },
+            chain_id: {
+              $cond: {
+                if: { $eq: [{ $size: "$split_parts" }, 3] },
+                then: {
+                  $concat: [
+                    { $arrayElemAt: ["$split_parts", 0] },
+                    "-",
+                    { $arrayElemAt: ["$split_parts", 1] },
+                  ],
+                },
+                else: { $arrayElemAt: ["$split_parts", 0] },
+              },
+            },
           },
         },
-
+        {
+          $lookup: {
+            from: "pokemon",
+            let: { chainId: "$chain_id" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $regexMatch: {
+                      input: "$evolution_step",
+                      regex: { $concat: ["^", "$$chainId", "-"] },
+                    },
+                  },
+                },
+              },
+            ],
+            as: "chainData",
+          },
+        },
+        {
+          $addFields: {
+            chain: {
+              $map: {
+                input: "$chainData",
+                as: "cd",
+                in: {
+                  name: "$$cd.name",
+                  id: "$$cd.id",
+                  species_name: "$$cd.species_name",
+                  dex_number: "$$cd.dex_number",
+                  evolution_step: "$$cd.evolution_step",
+                },
+              },
+            },
+          },
+        },
+        {
+          $lookup: {
+            from: "evolution_steps",
+            localField: "chain.evolution_step",
+            foreignField: "id",
+            as: "chain_evo_data",
+            pipeline: [
+              {
+                $project: {
+                  _id: 0,
+                  id: 1,
+                  methods: 1,
+                  pokemon: 1
+                },
+              },
+            ],
+          },
+        },
+        {
+          $addFields: {
+            chain: {
+              $map: {
+                input: "$chain",
+                as: "c",
+                in: {
+                  $mergeObjects: [
+                    "$$c",
+                    {
+                      methods: {
+                        $let: {
+                          vars: {
+                            matched: {
+                              $filter: {
+                                input: "$chain_evo_data",
+                                as: "ced",
+                                cond: {
+                                  $and: [
+                                    { $eq: ["$$ced.id", "$$c.evolution_step"] },
+                                    { $eq: ["$$ced.pokemon", "$$c.id"] },
+                                  ],
+                                },
+                              },
+                            },
+                          },
+                          in: {
+                            $ifNull: [
+                              { $arrayElemAt: ["$$matched.methods", 0] },
+                              [],
+                            ],
+                          },
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+        },
         {
           $lookup: {
             from: "moves",
             localField: "moves",
             foreignField: "id",
             as: "movesData",
+            pipeline: [
+              {
+                $project: {
+                  _id: 0,
+                  id: 1,
+                  name: 1,
+                  type_id: 1,
+                },
+              },
+            ],
           },
         },
         {
           $addFields: {
-            moves: { $map: { input: "$movesData", as: "m", in: {name: "$$m.name", type: "$$m.type_id"} } },
+            moves: {
+              $map: {
+                input: "$movesData",
+                as: "m",
+                in: { name: "$$m.name", type: "$$m.type_id" },
+              },
+            },
           },
         },
-
         {
           $lookup: {
             from: "abilities",
             localField: "abilities",
             foreignField: "id",
             as: "abilitiesData",
+            pipeline: [
+              {
+                $project: {
+                  _id: 0,
+                  id: 1,
+                  name: 1,
+                },
+              },
+            ],
           },
         },
         {
@@ -73,23 +217,6 @@ export default async function handler(req, res) {
             },
           },
         },
-
-        {
-          $lookup: {
-            from: "categories",
-            localField: "categories",
-            foreignField: "id",
-            as: "categoriesData",
-          },
-        },
-        {
-          $addFields: {
-            categories: {
-              $map: { input: "$categoriesData", as: "c", in: "$$c.name" },
-            },
-          },
-        },
-
         {
           $addFields: {
             otherFormsInt: {
@@ -107,6 +234,17 @@ export default async function handler(req, res) {
             localField: "otherFormsInt",
             foreignField: "id",
             as: "formsData",
+            pipeline: [
+              {
+                $project: {
+                  _id: 0,
+                  id: 1,
+                  name: 1,
+                  species_name: 1,
+                  dex_number: 1
+                },
+              },
+            ],
           },
         },
         {
@@ -115,30 +253,29 @@ export default async function handler(req, res) {
               $map: {
                 input: "$formsData",
                 as: "f",
-                in: { name: "$$f.name", id: "$$f.id" },
+                in: { name: "$$f.name", id: "$$f.id", species_name: "$$f.species_name", dex_number: "$$f.dex_number"},
               },
             },
           },
         },
-
         {
           $project: {
             _id: 0,
-            id: 0,
-            dex_number: 0,
-            species_name: 0,
-            typesData: 0,
             movesData: 0,
             abilitiesData: 0,
-            eggGroupsData: 0,
-            categoriesData: 0,
             formsData: 0,
             otherFormsInt: 0,
+            chain_id: 0,
+            chainData: 0,
+            chain_evo_data: 0,
+            split_parts: 0,
+            evo_data: 0,
+            evolution_step: 0,
           },
         },
       ])
       .toArray();
 
-    return pokemon;
+    return pokemon[0];
   }
 }
