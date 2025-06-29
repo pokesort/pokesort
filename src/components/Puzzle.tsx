@@ -17,10 +17,12 @@ import { redirect } from 'next/navigation';
 import Loading from './Loading';
 
 import CalendarIcon from '@/src/components/svg/CalendarIcon';
-import TickIcon from './svg/TickIcon';
-import GridIcon from './svg/GridIcon';
-import LogsIcon from './svg/LogsIcon';
-import DexIcon from './svg/DexIcon';
+import TickIcon from '@/src/components/svg/TickIcon';
+import GridIcon from '@/src/components/svg/GridIcon';
+import LogsIcon from '@/src/components/svg/LogsIcon';
+import DexIcon from '@/src/components/svg/DexIcon';
+import helpLogsImage from '@/src/assets/images/help_logs.png';
+import helpDexImage from '@/src/assets/images/help_dex.png';
 
 const containerVariants: Variants = {
   hidden: { opacity: 1 },
@@ -150,17 +152,24 @@ const t = useTranslations('puzzle');
 
     return (
         <section className="puzzle-guess-logs">
-            {guesses.map((guess: PuzzleGuess, index: number) => (
-                <div key={index} style={{'--accuracy': guess.accuracy} as CSSProperties}
-                    className={`puzzle-guess type-${guess.type} ${guess.accuracy == 100 ? 'correct' : ''}`}>
-                    <div className="accuracy-circle" title={`${guess.accuracy}% ${t('correct')}`}/>
-                    <div className="guess-group">
-                        {guess.pokemons.map((pokemon: number) => (
-                            <img key={pokemon} src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon}.png`}/>
-                        ) )}
+            {guesses.length > 0 ?
+                guesses.map((guess: PuzzleGuess, index: number) => (
+                    <div key={index} style={{'--accuracy': guess.accuracy} as CSSProperties}
+                        className={`puzzle-guess type-${guess.type} ${guess.accuracy == 100 ? 'correct' : ''}`}>
+                        <div className="accuracy-circle" title={`${guess.accuracy}% ${t('correct')}`}/>
+                        <div className="guess-group">
+                            {guess.pokemons.map((pokemon: number) => (
+                                <img key={pokemon} src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon}.png`}/>
+                            ) )}
+                        </div>
                     </div>
+                ))
+                :
+                <div className="tab-help">
+                    <img src={helpLogsImage.src}/>
+                    <p>{t('help.logs')}</p>
                 </div>
-            ))}
+            }
         </section>
     )
 });
@@ -406,6 +415,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
 
     useEffect(() => {
         const handleResize = () => {
+            scrollToTab(1, 'instant');
             setRefresh(prev => !prev);
         };
 
@@ -481,7 +491,10 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
                             <DexIcon/>
                             <p>{t('dex')}</p>
                         </section>
-                        Em construção
+                        <div className="tab-help">
+                            <img src={helpDexImage.src}/>
+                            <p>{t('help.dex')}</p>
+                        </div>
                     </div>
                 </PuzzleTab>}
             </ul>

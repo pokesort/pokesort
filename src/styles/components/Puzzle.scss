@@ -19,7 +19,7 @@
         height: 100%;
     }
     &:has(section.puzzle), &:has(section.loading) {
-        width: min(100%, calc(140px * var(--cols, 4)));
+        width: min(100%, calc(120px * var(--cols, 4)));
     }
 }
 @media (max-width: 1480px) {
@@ -47,6 +47,28 @@
     .window-container {
         width: 100%;
         padding-top: 0;
+    }
+}
+
+div.tab-help {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    width: 100%;
+    height: 100%;
+    gap: 0.5rem;
+
+    img {
+        width: 50%;
+    }
+
+    p {
+        text-align: center;
+        font-size: text(regular);
+        color: color(text2);
+        width: 80%;
     }
 }
 
