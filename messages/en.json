@@ -18,7 +18,8 @@
         "infinite": "Infinite Mode",
         "logs": "Logs",
         "puzzle": "Puzzle",
-        "dex": "Dex"
+        "dex": "Dex",
+        "correct": "correto"
     },
     "groupnames": {
         "types": {

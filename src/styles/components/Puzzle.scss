@@ -15,14 +15,28 @@
         height 0.3s ease
         width 0.3s ease;
 
+    &:not(:has(section.puzzle)) {
+        height: 100%;
+    }
     &:has(section.puzzle), &:has(section.loading) {
         width: min(100%, calc(140px * var(--cols, 4)));
+    }
+}
+@media (max-width: 1480px) {
+    .window-container:not(:has(section.puzzle)) {
+        min-height: 350px;
+        height: fit-content;
+        max-height: var(--height, 100%);
     }
 }
 @media (max-width: 768px) {
     .window-container {
         padding-top: 0.1rem;
         clip-path: polygon(0% 0%, calc(100% - 37px) 0%, 100% 37px, 100% 37px, 100% 100%, 0% 100%);
+    
+        &:not(:has(section.puzzle)) {
+            height: var(--height, 100%);
+        }
     }
 
     section.window-info-row {
@@ -37,16 +51,18 @@
 }
 
 ul.puzzle-tabs-container {
-    display: flex;
-    justify-content: start;
-    align-items: center;
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    align-items: stretch;
     overflow-x: hidden;
 
     width: 100%;
-    height: 100%;
+    height: var(--height, 100%);
+    flex-shrink: 0;
 
     -ms-overflow-style: none;
     scrollbar-width: none;
+    // transition: height 0.1s ease;
 
     &::-webkit-scrollbar {
         display: none;
@@ -60,13 +76,15 @@ ul.puzzle-tabs-container {
 
         gap: var(--spacing);
         width: 100%;
-        height: 100%;
+        max-height: var(--height, 100%);
     }
 
-    @media(max-width: 1280px) {
+    @media(max-width: 1480px) {
+        grid-template-columns: repeat(3, 100%);
         width: calc(100% + var(--spacing) * 2.5);
         overflow-x: scroll;
         scroll-snap-type: x mandatory;
+        scroll-snap-stop: normal;
         gap: var(--spacing);
 
         li.puzzle-tab {
@@ -81,6 +99,9 @@ ul.puzzle-tabs-container {
 }
 
 nav.puzzle-tab-nav {
+    position: sticky;
+    bottom: 0;
+
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     width: min(calc(100% + (var(--spacing) * 2)), calc(140px * var(--cols, 4)));
@@ -89,7 +110,7 @@ nav.puzzle-tab-nav {
 
     background-color: color(section1);
 
-    @media(min-width: 1280px) {
+    @media(min-width: 1480px) {
         display: none;
     }
 
@@ -210,7 +231,7 @@ section.window-info-row {
     
     gap: var(--spacing);
     width: 100%;
-    height: 300px;
+    height: 100%;
     overflow-y: auto;
 
     div.puzzle-guess {
@@ -222,15 +243,27 @@ section.window-info-row {
         background-color: color(section2);
         width: 100%;
         padding: var(--spacing);
-        transform-origin: bottom;
+        
+        transition: padding-top 0.3s ease;
 
         &:first-child {
             margin-top: auto;
+        }
+        &:last-child {
+            margin-bottom: 0.1rem;
+        }
+
+        .guess-group {
+            display: inherit;
+            gap: var(--spacing);
+            justify-content: space-between;
+            min-width: 65%;
         }
 
         .accuracy-circle {
             --percent: calc(1% * var(--accuracy));
 
+            position: relative;
             width: 24px;
             aspect-ratio: 1;
             border-radius: 50%;
@@ -250,12 +283,16 @@ section.window-info-row {
                 background-image: unset;
                 background-color: color(selection3);
                 border: 2px solid color(selection3);
+
+                &::after {
+                    content: '✔';
+                    display: block;
+                    position: absolute;
+                    left: 4px;
+                    color: color(section2);
+                }
             }
         }
-    }
-
-    @media(max-width: 1280px) {
-        height: 400px;
     }
 }
 
