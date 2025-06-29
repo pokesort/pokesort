@@ -59,6 +59,13 @@ img {
     pointer-events: none;
 }
 
+ul, li {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  list-style-type: none;
+}
+
 section#page {
     --spacing: .5rem;
 

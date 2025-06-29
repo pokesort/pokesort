@@ -367,34 +367,38 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
             {mountVictoryModal &&
                 <VictoryModal type={type} guesses={guesses} date={puzzle?.date} victoryOpen={victoryOpen} setVictoryOpen={setVictoryOpen} />
             }
-            <ul className="guesses-container">
-                {guesses.map((guess: PuzzleGuess, index: number) => (
-                    <li key={index} className={`guess-${guess.accuracy >= 100 ? '1' : '0'}`}></li>
-                ))}
-            </ul>
-            <div style={{'--cols': puzzle ? puzzle.cols : 4, '--rows': puzzle ? puzzle.rows : 4} as React.CSSProperties} className="window-container">
-                <section className="puzzle-info-row">
-                    {date && !loading && <>
-                        <CalendarIcon/>
-                        <p>{date}</p>
-                    </>}
-                </section>
-                {loading || !puzzle ? (
-                    <Loading expand={true} />
-                ): (
-                    <PuzzleGrid
-                        puzzle={puzzle}
-                        pause={pause}
-                        setPause={setPause}
-                        pokemons={pokemons}
-                        dictionary={dictionary}
-                        setGuesses={setGuesses}
-                        victoryOpen={victoryOpen}
-                        setVictoryOpen={setVictoryOpen}
-                    />
-                )}
-            </div>
-            <GuessLogs guesses={guesses} />
+            <ul className="puzzle-tabs-container">
+                <li className="puzzle-tab">
+                    <GuessLogs guesses={guesses} />
+                </li>
+                <li className="puzzle-tab">
+                    <div className="window-container" style={{'--cols': puzzle ? puzzle.cols : 4, '--rows': puzzle ? puzzle.rows : 4} as React.CSSProperties}>
+                        <section className="puzzle-info-row">
+                            {date && !loading && <>
+                                <CalendarIcon/>
+                                <p>{date}</p>
+                            </>}
+                        </section>
+                        {loading || !puzzle ? (
+                            <Loading expand={true} />
+                        ): (
+                            <PuzzleGrid
+                                puzzle={puzzle}
+                                pause={pause}
+                                setPause={setPause}
+                                pokemons={pokemons}
+                                dictionary={dictionary}
+                                setGuesses={setGuesses}
+                                victoryOpen={victoryOpen}
+                                setVictoryOpen={setVictoryOpen}
+                            />
+                        )}
+                    </div>
+                </li>
+                <li className="puzzle-tab">
+                    Testando...
+                </li>
+            </ul>            
         </>
     )
 })
