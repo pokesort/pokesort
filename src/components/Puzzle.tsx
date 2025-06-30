@@ -17,6 +17,7 @@ import Countdown from '@/src/components/Countdown';
 import Loading from '@/src/components/Loading';
 
 import CalendarIcon from '@/src/components/svg/CalendarIcon';
+import ShareIcon from '@/src/components/svg/ShareIcon';
 import TickIcon from '@/src/components/svg/TickIcon';
 import GridIcon from '@/src/components/svg/GridIcon';
 import LogsIcon from '@/src/components/svg/LogsIcon';
@@ -61,10 +62,41 @@ interface VictoryModalProps {
 }
 
 const VictoryModal = React.memo(({type, guesses, date, victoryOpen, setVictoryOpen}: VictoryModalProps) => {
-    const t = useTranslations();
+    const t = useTranslations('puzzle');
     const locale = useLocale();
     const count = 1;
     date = formatDate(date, locale, false);
+
+    const getGuessEmojis = (): string => {
+        let output: string = '';
+        guesses.forEach(guess => {
+            if (guess.accuracy >= 100) { // correct
+                output += "🟩"
+            } else if (guess.type == 0) { // incorrect
+                output += "🟥"
+            } else { // hint
+                output += "🟨"
+            }
+        })
+        return output;
+    }
+
+    const shareButton = () => {
+        const shareData: ShareData = {
+            title: `Meu resultado do Pokesort:`,
+            text: getGuessEmojis(),
+            url: window.location.href,
+        };
+        try {            
+            if (navigator.canShare(shareData)) {
+                navigator.share(shareData);
+            } else {
+                navigator.clipboard.writeText(shareData.text || window.location.href);
+            }
+        } catch (error) {
+            console.error("Não foi possível compartilhar. O problema talvez seja pela falta de uma conexão segura (HTTPS)");
+        }
+    }
     
     return (
         <Modal id="victory-modal" title="Gotcha!" isOpen={victoryOpen} setIsOpen={setVictoryOpen}>
@@ -92,7 +124,12 @@ const VictoryModal = React.memo(({type, guesses, date, victoryOpen, setVictoryOp
                         <li key={index} className={`guess-${guess.accuracy >= 100 ? '1' : '0'}`}></li>
                     ))}
                 </div>
-                <p>Resolvido em <b>{guesses.length}</b> tentativas</p>
+                <div className="guesses-container">
+                    <p>Resolvido em <b>{guesses.length}</b> tentativas</p>
+                    <button onClick={shareButton} title="Compartilhar">
+                        <ShareIcon/>
+                    </button>
+                </div>
             </div>
             {type == 'daily' ? (
                 <>
