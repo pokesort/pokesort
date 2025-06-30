@@ -18,7 +18,7 @@
     &:not(:has(section.puzzle)) {
         height: 100%;
     }
-    &:has(section.puzzle), &:has(section.loading) {
+    &.puzzle-window {
         width: min(100%, calc(120px * var(--cols, 4)));
     }
 }

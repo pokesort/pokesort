@@ -23,7 +23,8 @@ import GridIcon from '@/src/components/svg/GridIcon';
 import LogsIcon from '@/src/components/svg/LogsIcon';
 import DexIcon from '@/src/components/svg/DexIcon';
 import helpLogsImage from '@/src/assets/images/help_logs.png';
-import helpDexImage from '@/src/assets/images/help_dex.png';
+import DexView from './DexView';
+import PokeSprite from './PokeSprite';
 
 const containerVariants: Variants = {
   hidden: { opacity: 1 },
@@ -196,7 +197,7 @@ const t = useTranslations('puzzle');
                         <div className="accuracy-circle" title={`${guess.accuracy}% ${t('correct')}`}/>
                         <div className="guess-group">
                             {guess.pokemons.map((pokemon: number) => (
-                                <img key={pokemon} src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon}.png`}/>
+                                <PokeSprite key={pokemon} url={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon}.png`}/>
                             ) )}
                         </div>
                     </div>
@@ -220,9 +221,11 @@ interface PuzzleGridProps {
     setGuesses: React.Dispatch<React.SetStateAction<PuzzleGuess[]>>;
     victoryOpen: boolean,
     setVictoryOpen: React.Dispatch<React.SetStateAction<boolean>>
+    setCurrentDexView: React.Dispatch<React.SetStateAction<number | undefined>>;
+    scrollToTab: (target: number, behavior?: "instant" | "smooth") => void;
 }
 
-const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, setGuesses, victoryOpen, setVictoryOpen}: PuzzleGridProps) => {
+const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, setGuesses, victoryOpen, setVictoryOpen, setCurrentDexView, scrollToTab}: PuzzleGridProps) => {
     const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
 
     const [groupSets, setGroupSets] = useState<Set<number>[]>([]);
@@ -254,6 +257,11 @@ const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, s
             }
             return newSet;
         });
+    }, [pause]);
+
+    const handlePress = useCallback((id: number) => {
+        scrollToTab(2);
+        setCurrentDexView(id);
     }, [pause]);
 
     const compareGroups = useCallback((selected: Set<number>): PuzzleGuess | null => {
@@ -378,6 +386,7 @@ const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, s
                             isCorrect={isCorrect}
                             isIncorrect={isIncorrect}
                             onSelect={handleSelect}
+                            onPress={handlePress}
                         />
                     )
                 })}
@@ -396,6 +405,7 @@ const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, s
                             isCorrect={isCorrect}
                             isIncorrect={isIncorrect}
                             onSelect={handleSelect}
+                            onPress={handlePress}
                         />
                     )
                 })}
@@ -427,16 +437,11 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
     const [victoryOpen, setVictoryOpen] = useState<boolean>(false);
     const [mountVictoryModal, setMountVictoryModal] = useState<boolean>(false);
     const [visibleTab, setVisibleTab] = useState<number>(1);
+    const [currentDexView, setCurrentDexView] = useState<number>();
 
     useEffect(() => {
         if (dictionary) setPokemons(shuffleArray(dictionary.pokemons));
     }, [dictionary]);
-
-    useEffect(() => {
-        if (process.env.NODE_ENV === "development") {
-            console.log(guesses);
-        }
-    }, [guesses]);
 
     useEffect(() => {
         setMountVictoryModal(true);
@@ -499,7 +504,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
                     </div>
                 </PuzzleTab> : <div></div>}
                 <PuzzleTab setVisibleTab={setVisibleTab} tab={1}>
-                    <div className="window-container cut-left" ref={mainTabRef}>
+                    <div className="window-container puzzle-window cut-left" ref={mainTabRef}>
                         <section className="window-info-row">
                             {!loading && <>
                                 <GridIcon/>
@@ -518,6 +523,8 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
                                 setGuesses={setGuesses}
                                 victoryOpen={victoryOpen}
                                 setVictoryOpen={setVictoryOpen}
+                                setCurrentDexView={setCurrentDexView}
+                                scrollToTab={scrollToTab}
                             />
                         )}
                     </div>
@@ -528,10 +535,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
                             <DexIcon/>
                             <p>{t('dex')}</p>
                         </section>
-                        <div className="tab-help">
-                            <img src={helpDexImage.src}/>
-                            <p>{t('help.dex')}</p>
-                        </div>
+                        <DexView pokemonId={currentDexView} />
                     </div>
                 </PuzzleTab>}
             </ul>
