@@ -1,0 +1,69 @@
+@use "../abstract" as *;
+
+.type-icon {
+    height: 18px;
+    margin: -4px 0;
+    aspect-ratio: 1;
+
+    img {
+        height: 100%;
+    }
+
+    &.types-1 {
+        background-color: #9099A1;
+    }
+    &.types-2 {
+        background-color: #CE4069;
+    }
+    &.types-3 {
+        background-color: #849cce;
+    }
+    &.types-4 {
+        background-color: #9a5db6;
+    }
+    &.types-5 {
+        background-color: #dc906a;
+    }
+    &.types-6 {
+        background-color: #a39262;
+    }
+    &.types-7 {
+        background-color: #90C12C;
+    }
+    &.types-8 {
+        background-color: #5269AC;
+    }
+    &.types-9 {
+        background-color: #5A8EA1;
+    }
+    &.types-10 {
+        background-color: #ec6645;
+    }
+    &.types-11 {
+        background-color: #4D90D5;
+    }
+    &.types-12 {
+        background-color: #59af51;
+    }
+    &.types-13 {
+        background-color: #dbb818;
+    }
+    &.types-14 {
+        background-color: #df5d71;
+    }
+    &.types-15 {
+        background-color: #59b4a7;
+    }
+    &.types-16 {
+        background-color: #0A6DC4;
+    }
+    &.types-17 {
+        background-color: #5A5366;
+    }
+    &.types-18 {
+        background-color: #d37dce;
+    }
+    &.types-19 {
+        background-color: #A19097;
+    }
+}

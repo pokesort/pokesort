@@ -301,7 +301,9 @@ const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, s
     }, [puzzle, solvedGroupIds, groupSets]);
 
     const handleGuess = useCallback((guess: PuzzleGuess) => {
-        setGuesses((prev: PuzzleGuess[]) => [...prev, guess]);
+        setTimeout(() => {
+            setGuesses((prev: PuzzleGuess[]) => [...prev, guess]);
+        }, 1000);
     }, []);
 
     const markGroupAsSolved = useCallback((newlySolvedIds: Set<number>) => {

@@ -20,10 +20,14 @@
         "puzzle": "Puzzle",
         "dex": "Dex",
         "correct": "correto",
-
         "help": {
             "logs": "Each of your attempts and its accuracy will be shown here.",
             "dex": "Press and hold a block or right-click it to search on the Dex."
+        },
+        "dex-tabs": {
+            "traits": "Traits",
+            "moves": "Moves",
+            "related": "Related"
         }
     },
     "groupnames": {
