@@ -12,6 +12,10 @@ section.dex-view {
     font-size: text(small);
     overflow-y: scroll;
 
+    * {
+        animation: dex-fade-in 0.15s ease 0s 1;
+    }
+
     div.h-group {
         display: flex;
         flex-direction: row;
@@ -79,5 +83,16 @@ section.dex-view {
         gap: inherit;
         align-items: center;
         margin-right: 0.5rem;
+    }
+}
+
+@keyframes dex-fade-in {
+    0% {
+        opacity: 0;
+        transform: scaleY(0.75);
+    }
+    100% {
+        opacity: 1;
+        transform: scaleY(1);
     }
 }

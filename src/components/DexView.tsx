@@ -59,7 +59,28 @@ const DexData = React.memo(({pokemon}: DexDataProps) => {
                 <button className={`tab ${currentTab == 2 ? 'active' : ''}`} onClick={() => setCurrentTab(2)}>
                     {t(`puzzle.dex-tabs.related`)}
                 </button>
-            </div>       
+            </div>
+            {currentTab == 0 &&
+                <div className="h-group">
+                    <div className="block">
+                        Tab 1
+                    </div>
+                </div>
+            }
+            {currentTab == 1 &&
+                <div className="h-group">
+                    <div className="block">
+                        Tab 2
+                    </div>
+                </div>
+            }
+            {currentTab == 2 &&
+                <div className="h-group">
+                    <div className="block">
+                        Tab 3
+                    </div>
+                </div>
+            }
         </section>
     )
 })
