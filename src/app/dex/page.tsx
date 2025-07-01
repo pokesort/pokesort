@@ -41,6 +41,7 @@ export default function Home() {
             multiselect={false}
             isSelected={selected == p.id}
             onSelect={() => handleSelect(p.id)}
+            onPress={() => handleSelect(p.id)}
           />
         ))}
 

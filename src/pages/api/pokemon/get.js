@@ -398,7 +398,8 @@ async function handlerFirstInChain() {
   const pipeline = [
     {
       $match: {
-        evolution_step: { $ne: null }
+        evolution_step: { $ne: null },
+        step_override: { $nin: ["middle", "final"] }
       }
     },
     {
@@ -443,7 +444,16 @@ async function handlerFirstInChain() {
     },
     { $unwind: "$pokemons" },
     { $match: { "pokemons.step": 0 } },
-    { $project: { _id: 0, id: "$pokemons.id" } }
+    { $project: { _id: 0, id: "$pokemons.id" } },
+    {
+      $unionWith: {
+        coll: "pokemon",
+        pipeline: [
+          { $match: { step_override: "first" } },
+          { $project: { _id: 0, id: 1 } }
+        ]
+      }
+    }
   ];
 
   const result = await data.db.collection("pokemon").aggregate(pipeline).toArray();
@@ -455,7 +465,8 @@ async function handlerMiddleInChain() {
   const pipeline = [
     {
       $match: {
-        evolution_step: { $ne: null }
+        evolution_step: { $ne: null },
+        step_override: { $nin: ["first", "final"] }
       }
     },
     {
@@ -501,7 +512,16 @@ async function handlerMiddleInChain() {
     },
     { $unwind: "$pokemons" },
     { $match: { "pokemons.step": 1 } },
-    { $project: { _id: 0, id: "$pokemons.id" } }
+    { $project: { _id: 0, id: "$pokemons.id" } },
+    {
+      $unionWith: {
+        coll: "pokemon",
+        pipeline: [
+          { $match: { step_override: "middle" } },
+          { $project: { _id: 0, id: 1 } }
+        ]
+      }
+    }
   ];
 
   const result = await data.db.collection("pokemon").aggregate(pipeline).toArray();
@@ -512,7 +532,8 @@ async function handlerFinalInChain() {
   const pipeline = [
     {
       $match: {
-        evolution_step: { $ne: null }
+        evolution_step: { $ne: null },
+        step_override: { $nin: ["first", "middle"] }
       }
     },
     {
@@ -561,6 +582,15 @@ async function handlerFinalInChain() {
       $project: {
         _id: 0,
         id: "$pokemons.id"
+      }
+    },
+    {
+      $unionWith: {
+        coll: "pokemon",
+        pipeline: [
+          { $match: { step_override: "final" } },
+          { $project: { _id: 0, id: 1 } }
+        ]
       }
     }
   ];

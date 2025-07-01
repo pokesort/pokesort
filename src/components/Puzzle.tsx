@@ -1,21 +1,30 @@
 "use client"
 
 import { useTranslations } from 'next-intl';
-import React, { CSSProperties, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { useLocale } from 'next-intl';
 import { formatDate, shuffleArray, getNextRefresh } from '@/src/scripts/utils';
+import { useInView } from 'react-intersection-observer';
+import { redirect } from 'next/navigation';
 
 import type { PuzzleData } from '@/src/assets/types/PuzzleApiResponse';
 import "@/src/styles/components/Puzzle.scss";
 import PokemonBlock from '@/src/components/PuzzleBlock';
+import GroupName from '@/src/components/GroupName';
+import Modal from '@/src/components/Modal';
+import Countdown from '@/src/components/Countdown';
+import Loading from '@/src/components/Loading';
+
 import CalendarIcon from '@/src/components/svg/CalendarIcon';
-import GroupName from './GroupName';
-import Modal from './Modal';
-import TickIcon from './svg/TickIcon';
-import Countdown from './Countdown';
-import { redirect } from 'next/navigation';
-import Loading from './Loading';
+import ShareIcon from '@/src/components/svg/ShareIcon';
+import TickIcon from '@/src/components/svg/TickIcon';
+import GridIcon from '@/src/components/svg/GridIcon';
+import LogsIcon from '@/src/components/svg/LogsIcon';
+import DexIcon from '@/src/components/svg/DexIcon';
+import helpLogsImage from '@/src/assets/images/help_logs.png';
+import DexView from './DexView';
+import PokeSprite from './PokeSprite';
 
 const containerVariants: Variants = {
   hidden: { opacity: 1 },
@@ -54,10 +63,41 @@ interface VictoryModalProps {
 }
 
 const VictoryModal = React.memo(({type, guesses, date, victoryOpen, setVictoryOpen}: VictoryModalProps) => {
-    const t = useTranslations();
+    const t = useTranslations('puzzle');
     const locale = useLocale();
     const count = 1;
     date = formatDate(date, locale, false);
+
+    const getGuessEmojis = (): string => {
+        let output: string = '';
+        guesses.forEach(guess => {
+            if (guess.accuracy >= 100) { // correct
+                output += "🟩"
+            } else if (guess.type == 0) { // incorrect
+                output += "🟥"
+            } else { // hint
+                output += "🟨"
+            }
+        })
+        return output;
+    }
+
+    const shareButton = () => {
+        const shareData: ShareData = {
+            title: `Meu resultado do Pokesort:`,
+            text: getGuessEmojis(),
+            url: window.location.href,
+        };
+        try {            
+            if (navigator.canShare(shareData)) {
+                navigator.share(shareData);
+            } else {
+                navigator.clipboard.writeText(shareData.text || window.location.href);
+            }
+        } catch (error) {
+            console.error("Não foi possível compartilhar. O problema talvez seja pela falta de uma conexão segura (HTTPS)");
+        }
+    }
     
     return (
         <Modal id="victory-modal" title="Gotcha!" isOpen={victoryOpen} setIsOpen={setVictoryOpen}>
@@ -85,7 +125,12 @@ const VictoryModal = React.memo(({type, guesses, date, victoryOpen, setVictoryOp
                         <li key={index} className={`guess-${guess.accuracy >= 100 ? '1' : '0'}`}></li>
                     ))}
                 </div>
-                <p>Resolvido em <b>{guesses.length}</b> tentativas</p>
+                <div className="guesses-container">
+                    <p>Resolvido em <b>{guesses.length}</b> tentativas</p>
+                    <button onClick={shareButton} title="Compartilhar">
+                        <ShareIcon/>
+                    </button>
+                </div>
             </div>
             {type == 'daily' ? (
                 <>
@@ -107,6 +152,28 @@ const VictoryModal = React.memo(({type, guesses, date, victoryOpen, setVictoryOp
     )
 })
 
+interface PuzzleTabProps {
+    setVisibleTab: React.Dispatch<React.SetStateAction<number>>;
+    tab: number;
+    children?: React.ReactNode;
+}
+
+const PuzzleTab = React.memo(({setVisibleTab, children, tab}: PuzzleTabProps) => {
+    const { ref: viewRef, inView } = useInView({ threshold: 0.1 });
+
+    useEffect(() => {
+        if (inView) {
+            setVisibleTab(tab);
+        }
+    }, [inView, tab]);
+    
+    return (
+        <li ref={viewRef} className="puzzle-tab" data-tab={tab}>
+            {children}
+        </li>
+    )
+})
+
 type PuzzleGuess = {
     type: 0 | 1 | 2; // guess | hint | dex
     accuracy: number;
@@ -119,18 +186,28 @@ interface GuessLogsInterface {
 }
 
 const GuessLogs = React.memo(({guesses}: GuessLogsInterface) => {
+const t = useTranslations('puzzle');
+
     return (
         <section className="puzzle-guess-logs">
-            {guesses.map((guess: PuzzleGuess, index: number) => (
-                <div key={index} style={{'--accuracy': guess.accuracy} as CSSProperties}
-                    className={`puzzle-guess type-${guess.type} ${guess.accuracy == 100 ? 'correct' : ''}`}>
-                    {/* {guess.accuracy} */}
-                    <div className="accuracy-circle"/>
-                    {guess.pokemons.map((pokemon: number) => (
-                        <img key={pokemon} src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon}.png`}/>
-                    ) )}
+            {guesses.length > 0 ?
+                guesses.map((guess: PuzzleGuess, index: number) => (
+                    <div key={index} style={{'--accuracy': guess.accuracy} as CSSProperties}
+                        className={`puzzle-guess type-${guess.type} ${guess.accuracy == 100 ? 'correct' : ''}`}>
+                        <div className="accuracy-circle" title={`${guess.accuracy}% ${t('correct')}`}/>
+                        <div className="guess-group">
+                            {guess.pokemons.map((pokemon: number) => (
+                                <PokeSprite key={pokemon} url={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon}.png`}/>
+                            ) )}
+                        </div>
+                    </div>
+                ))
+                :
+                <div className="tab-help">
+                    <img src={helpLogsImage.src}/>
+                    <p>{t('help.logs')}</p>
                 </div>
-            ))}
+            }
         </section>
     )
 });
@@ -144,9 +221,11 @@ interface PuzzleGridProps {
     setGuesses: React.Dispatch<React.SetStateAction<PuzzleGuess[]>>;
     victoryOpen: boolean,
     setVictoryOpen: React.Dispatch<React.SetStateAction<boolean>>
+    setCurrentDexView: React.Dispatch<React.SetStateAction<number | undefined>>;
+    scrollToTab: (target: number, behavior?: "instant" | "smooth") => void;
 }
 
-const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, setGuesses, victoryOpen, setVictoryOpen}: PuzzleGridProps) => {
+const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, setGuesses, victoryOpen, setVictoryOpen, setCurrentDexView, scrollToTab}: PuzzleGridProps) => {
     const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
 
     const [groupSets, setGroupSets] = useState<Set<number>[]>([]);
@@ -178,6 +257,11 @@ const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, s
             }
             return newSet;
         });
+    }, [pause]);
+
+    const handlePress = useCallback((id: number) => {
+        scrollToTab(2);
+        setCurrentDexView(id);
     }, [pause]);
 
     const compareGroups = useCallback((selected: Set<number>): PuzzleGuess | null => {
@@ -217,7 +301,9 @@ const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, s
     }, [puzzle, solvedGroupIds, groupSets]);
 
     const handleGuess = useCallback((guess: PuzzleGuess) => {
-        setGuesses((prev: PuzzleGuess[]) => [...prev, guess]);
+        setTimeout(() => {
+            setGuesses((prev: PuzzleGuess[]) => [...prev, guess]);
+        }, 1000);
     }, []);
 
     const markGroupAsSolved = useCallback((newlySolvedIds: Set<number>) => {
@@ -237,6 +323,7 @@ const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, s
             const guess = compareGroups(selectedIds);
 
             if (!guess) return;
+            const logs = document.querySelector('.puzzle-guess-logs');
             handleGuess(guess);
             
             if (guess.accuracy >= 100) {
@@ -251,6 +338,10 @@ const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, s
                             setVictoryOpen(true);
                         }, 1600);
                     }
+                    logs?.scrollBy({
+                        top: logs.scrollHeight,
+                        behavior: "smooth",
+                    });
                     setPause(false);
                 }, 800);
             } else {
@@ -258,6 +349,10 @@ const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, s
                 setTimeout(() => {
                     setSelectedIds(new Set());
                     setIncorrectGuessIds(new Set());
+                    logs?.scrollBy({
+                        top: logs.scrollHeight,
+                        behavior: "smooth",
+                    });
                     setPause(false);
                 }, 800);
             }
@@ -293,6 +388,7 @@ const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, s
                             isCorrect={isCorrect}
                             isIncorrect={isIncorrect}
                             onSelect={handleSelect}
+                            onPress={handlePress}
                         />
                     )
                 })}
@@ -311,6 +407,7 @@ const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, s
                             isCorrect={isCorrect}
                             isIncorrect={isIncorrect}
                             onSelect={handleSelect}
+                            onPress={handlePress}
                         />
                     )
                 })}
@@ -331,24 +428,22 @@ interface PuzzleProps {
 }
 
 export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, loading, setLoading, error, setError}: PuzzleProps) {
-    const t = useTranslations();
+    const t = useTranslations('puzzle');
     const locale = useLocale();
+    const mainTabRef = useRef<HTMLDivElement>(null);
 
+    const [refresh, setRefresh] = useState<boolean>(false);
     const [pause, setPause] = useState<boolean>(false);
     const [guesses, setGuesses] = useState<PuzzleGuess[]>([]);
     const [pokemons, setPokemons] = useState<any>([]);
     const [victoryOpen, setVictoryOpen] = useState<boolean>(false);
     const [mountVictoryModal, setMountVictoryModal] = useState<boolean>(false);
+    const [visibleTab, setVisibleTab] = useState<number>(1);
+    const [currentDexView, setCurrentDexView] = useState<number>();
 
     useEffect(() => {
         if (dictionary) setPokemons(shuffleArray(dictionary.pokemons));
     }, [dictionary]);
-
-    useEffect(() => {
-        if (process.env.NODE_ENV === "development") {        
-            console.log(guesses);
-        }
-    }, [guesses]);
 
     useEffect(() => {
         setMountVictoryModal(true);
@@ -356,10 +451,42 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
 
     useEffect(() => {
         setGuesses([]);
+        scrollToTab(1, 'instant');
+        setTimeout(() => {
+            setRefresh(prev => !prev);
+        }, 0);
     }, [puzzle])
 
+    useEffect(() => {
+        const handleResize = () => {
+            scrollToTab(1, 'instant');
+            setRefresh(prev => !prev);
+        };
+
+        window.addEventListener("resize", handleResize);
+
+        return () => {
+            window.removeEventListener("resize", handleResize);
+        };
+    }, []);
+
+    const scrollToTab = (target: number, behavior: ('smooth' | 'instant') = 'smooth') => {
+        if (target !== visibleTab) {
+            const tab = document.querySelector(`.puzzle-tab[data-tab="${target}"]`) as HTMLElement;
+            if (tab) tab.scrollIntoView({ behavior: behavior, block: 'center' });
+        }
+    }
+
+    const tabsHeight = useMemo(() => {
+       return mainTabRef.current?.offsetHeight;
+    }, [puzzle, visibleTab, refresh]);
+
     const date = useMemo(() => {
-        return puzzle ? formatDate(puzzle.date, locale) : '';
+        if (type == 'infinite') {
+            return t('infinite')
+        } else {
+            return puzzle?.date ? formatDate(puzzle.date, locale) : '';
+        }
     }, [puzzle]);
 
     return (
@@ -367,34 +494,65 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
             {mountVictoryModal &&
                 <VictoryModal type={type} guesses={guesses} date={puzzle?.date} victoryOpen={victoryOpen} setVictoryOpen={setVictoryOpen} />
             }
-            <ul className="guesses-container">
-                {guesses.map((guess: PuzzleGuess, index: number) => (
-                    <li key={index} className={`guess-${guess.accuracy >= 100 ? '1' : '0'}`}></li>
-                ))}
+            <ul className="puzzle-tabs-container" style={{'--height': `${tabsHeight}px`, '--cols': puzzle ? puzzle.cols : 4, '--rows': puzzle ? puzzle.rows : 4} as React.CSSProperties}>
+                {puzzle ?
+                <PuzzleTab setVisibleTab={setVisibleTab} tab={0}>
+                    <div className="window-container cut-left">
+                        <section className="window-info-row">
+                            <LogsIcon/>
+                            <p>{t('logs')}<span>{guesses.length}</span></p>
+                        </section>
+                        <GuessLogs guesses={guesses} />
+                    </div>
+                </PuzzleTab> : <div></div>}
+                <PuzzleTab setVisibleTab={setVisibleTab} tab={1}>
+                    <div className="window-container puzzle-window cut-left" ref={mainTabRef}>
+                        <section className="window-info-row">
+                            {!loading && <>
+                                <GridIcon/>
+                                <p>{t('puzzle')}{date ? <span>{date}</span> : <></>}</p>
+                            </>}
+                        </section>
+                        {loading || !puzzle ? (
+                            <Loading expand={true} />
+                        ): (
+                            <PuzzleGrid
+                                puzzle={puzzle}
+                                pause={pause}
+                                setPause={setPause}
+                                pokemons={pokemons}
+                                dictionary={dictionary}
+                                setGuesses={setGuesses}
+                                victoryOpen={victoryOpen}
+                                setVictoryOpen={setVictoryOpen}
+                                setCurrentDexView={setCurrentDexView}
+                                scrollToTab={scrollToTab}
+                            />
+                        )}
+                    </div>
+                </PuzzleTab>
+                {puzzle && <PuzzleTab setVisibleTab={setVisibleTab} tab={2}>
+                    <div className="window-container cut-right">
+                        <section className="window-info-row">
+                            <DexIcon/>
+                            <p>{t('dex')}</p>
+                        </section>
+                        <DexView pokemonId={currentDexView} />
+                    </div>
+                </PuzzleTab>}
             </ul>
-            <div style={{'--cols': puzzle ? puzzle.cols : 4, '--rows': puzzle ? puzzle.rows : 4} as React.CSSProperties} className="window-container">
-                <section className="puzzle-info-row">
-                    {date && !loading && <>
-                        <CalendarIcon/>
-                        <p>{date}</p>
-                    </>}
-                </section>
-                {loading || !puzzle ? (
-                    <Loading expand={true} />
-                ): (
-                    <PuzzleGrid
-                        puzzle={puzzle}
-                        pause={pause}
-                        setPause={setPause}
-                        pokemons={pokemons}
-                        dictionary={dictionary}
-                        setGuesses={setGuesses}
-                        victoryOpen={victoryOpen}
-                        setVictoryOpen={setVictoryOpen}
-                    />
-                )}
-            </div>
-            <GuessLogs guesses={guesses} />
+            {puzzle &&
+            <nav className="puzzle-tab-nav">
+                <button onClick={() => scrollToTab(0)} className={visibleTab == 0 ? 'active' : ''}>
+                    {t('logs')}<span>{guesses.length}</span>
+                </button>
+                <button onClick={() => scrollToTab(1)} className={visibleTab == 1 ? 'active' : ''}>
+                    {t('puzzle')}
+                </button>
+                <button onClick={() => scrollToTab(2)} className={visibleTab == 2 ? 'active' : ''}>
+                    {t('dex')}
+                </button>
+            </nav>}
         </>
     )
 })
