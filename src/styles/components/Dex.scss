@@ -1,34 +1,24 @@
 @use "../abstract" as *;
+ 
+ul#dex-page {
+  --cols: 6;
 
-section#page {
-  display: flex;
-  flex-direction: column;
+  display: flex;  
+  flex-direction: row;
+  flex-wrap: wrap;
   justify-content: center;
-  align-items: center;
+  gap: var(--spacing);
 
-  width: 100vw;
+  width: 50vw;
+  @media(max-width: 768px) {
+    --cols: 4;
+    width: 100%;
+  }
 
-  color: color(text1);
-
-  ul {
-    --cols: 6;
-
-    display: flex;  
-    flex-direction: row;
-    flex-wrap: wrap;
+  li {
+    display: flex;
+    flex-direction: column;
     justify-content: center;
-    gap: var(--spacing);
-
-    width: 50vw;
-    @media(max-width: 768px) {
-      width: 100%;
-    }
-
-    li {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
+    align-items: center;
   }
 }
