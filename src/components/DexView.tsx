@@ -40,7 +40,7 @@ const DexData = React.memo(({pokemon}: DexDataProps) => {
                     </div>
                     <div className="v-group">
                         <div className="block">
-                            <span>#{String(pokemon.dex_number).padStart(3, '0')}</span>{toTitleCase(pokemon.name)}
+                            <span>#{String(pokemon.dex_number).padStart(4, '0')}</span>{toTitleCase(pokemon.name)}
                         </div>
                         <div className="h-group">
                             <div className="block">
@@ -103,6 +103,33 @@ const DexData = React.memo(({pokemon}: DexDataProps) => {
                     <div className="block">
                         <span>{t(`groupnames.habitat.short`)}:</span>
                         <p>{pokemon.habitat != "" ? t(`groupnames.habitat.${pokemon.habitat}`) : "N/A"}</p>
+                    </div>
+                    <div className="block">
+                        <span>{t(`puzzle.dex-tabs.received-damage`)}:</span>
+                    </div>
+                    <div className="type-chart">
+                        <div className="grid">
+                            {Object.keys(pokemon.type_matchups).map((type: string, index: number) => (
+                                <>
+                                    <IconType folder="types" item={type} expand={true} key={index} />
+                                    <p key={index} data-matchup={pokemon.type_matchups[type]}>
+                                        {pokemon.type_matchups[type]}x
+                                    </p>
+                                </>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="block">
+                        <span>{t(`groupnames.categories.plural`)}:</span>
+                    </div>
+                    <div className="categories">
+                        {pokemon.categories.length > 0 ?
+                            pokemon.categories.map((category: string, index: number) => (
+                                <p key={index}>{t(`groupnames.categories.${category}`)}</p>
+                            ))
+                        :
+                            <p>N/A</p>
+                        }
                     </div>
                 </div>
             }

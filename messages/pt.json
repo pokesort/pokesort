@@ -27,7 +27,8 @@
         "dex-tabs": {
             "traits": "Características",
             "moves": "Movimentos",
-            "related": "Relacionados"
+            "related": "Relacionados",
+            "received-damage": "Dano Recebido por Tipo"
         }
     },
     "groupnames": {
@@ -123,6 +124,7 @@
         "categories": {
             "long": "",
             "short": "Categoria",
+            "plural": "Categorias",
 
             "1": "Forma Bebê",
             "2": "Mítico",

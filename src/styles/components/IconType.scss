@@ -5,6 +5,11 @@
     margin: -4px 0;
     aspect-ratio: 1;
 
+    &.expand {
+        height: 100%;
+        margin: unset;
+    }
+
     img {
         height: 100%;
     }
