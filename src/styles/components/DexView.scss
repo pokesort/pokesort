@@ -48,6 +48,10 @@ section.dex-view {
         width: 100%;
         height: fit-content;
 
+        &.dark {
+            background-color: color(section1);
+        }
+
         span {
             color: color(text2);
         }

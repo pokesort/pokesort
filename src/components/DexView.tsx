@@ -11,6 +11,48 @@ import { toTitleCase } from '../scripts/utils';
 import PokeSprite from './PokeSprite';
 import IconType from './IconType';
 
+const processVarieties = (pokemon: any) => {
+    // Process chain
+    if (pokemon.chain) {
+        const chain_id = pokemon.chain[0].chain_id;
+        pokemon.chain = pokemon.chain.filter((s: any) => s.chain_id == chain_id).sort((a: any, b: any) => a.step - b.step);
+        const length = pokemon.chain.length;
+
+        pokemon.chain = pokemon.chain.map((mon: any) => {
+            if (mon.sprite_url == null) mon.sprite_url = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${mon.id}.png`;
+            if (mon.step_override != null) return mon;
+
+            if (length <= 1) {
+                mon.step_override = 'no_line';
+                return mon;
+            }
+
+            if (mon.step == 0) {
+                mon.step_override = 'first';
+            } else if (mon.step == 1 && pokemon.chain.filter((s: any) => s.step == 2).length > 0) {
+                mon.step_override = 'middle';
+            } else {
+                mon.step_override = 'final';
+            }
+
+            return mon;
+        })
+    } else {
+        pokemon.chain = [{
+            id: pokemon.id,
+            name: pokemon.name,
+            step_override: 'no_line',
+            methods: [],
+            sprite_url: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`
+        }]
+    }
+
+    // Process other forms
+
+
+    return pokemon;
+}
+
 interface DexDataProps {
     pokemon: any;
 }
@@ -35,7 +77,7 @@ const DexData = React.memo(({pokemon}: DexDataProps) => {
         <section className="dex-view">
             <div className="v-group sticky">
                 <div className="h-group">
-                    <div className="sprite-block"> {/* <- this one */}
+                    <div className="sprite-block">
                         <PokeSprite url={default_url} />
                     </div>
                     <div className="v-group">
@@ -143,8 +185,47 @@ const DexData = React.memo(({pokemon}: DexDataProps) => {
             }
             {currentTab == 2 &&
                 <div className="v-group">
-                    <div className="block">
-                        Em construção...
+                    <div className="block dark">
+                        <span>{t(`puzzle.dex-tabs.evolution-chain`)}</span>
+                    </div>
+
+                    {pokemon.chain.map((step: any, index: number) => (
+                        <div className="h-group" key={index}>
+                            <div className="sprite-block">
+                                <PokeSprite url={step.sprite_url} />
+                            </div>
+                            <div className="v-group">
+                                <div className="h-group">
+                                    <div className="block">
+                                        {toTitleCase(step.name)}
+                                    </div>
+                                    <div className="block">
+                                        {step.step_override == 'no_line' ?
+                                            <p>{t(`groupnames.step.${step.step_override}`)}</p>
+                                        :
+                                            <p>{t(`groupnames.form.${step.step_override}`)}</p>
+                                        }
+                                    </div>
+                                </div>
+                                <div className="block">
+                                    <span>{t(`groupnames.short_methods.short`)}</span>
+                                    {step.methods.length > 0 ?
+                                        step.methods.map((method: string, index: number) => (
+                                            <>
+                                                <p key={`p-${index}`}>{t(`groupnames.short_methods.${method}`)}</p>
+                                                {index != step.methods.length-1 ? <span key={index}>+</span> : <></>}
+                                            </>
+                                        ))
+                                    :
+                                        <p>N/A</p>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    ))}                    
+
+                    <div className="block dark">
+                        <span>{t(`puzzle.dex-tabs.varieties`)}</span>
                     </div>
                 </div>
             }
@@ -190,7 +271,8 @@ export default function DexView ({ pokemonId }: DexViewProps) {
                 if (process.env.NODE_ENV === "development") {
                     console.log(dexData.pokemon);
                 }
-                setPokemon(dexData.pokemon);
+
+                setPokemon(processVarieties(dexData.pokemon));
             } catch (e) {
                 console.error(e);
                 setError('Não foi possível conectar ao servidor. Tente novamente.');

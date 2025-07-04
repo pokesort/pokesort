@@ -28,7 +28,9 @@
             "traits": "Características",
             "moves": "Movimentos",
             "related": "Relacionados",
-            "received-damage": "Dano Recebido por Tipo"
+            "received-damage": "Dano Recebido por Tipo",
+            "evolution-chain": "Cadeia Evolutiva:",
+            "varieties": "Variações:"
         }
     },
     "groupnames": {
@@ -165,6 +167,22 @@
             "9": "por Felicidade",
             "10": "Apenas de Dia",
             "11": "Apenas de Noite"
+        },
+        "short_methods": {
+            "long": "Evolui ",
+            "short": "Métodos",
+
+            "1": "Nível",
+            "2": "Troca",
+            "3": "Região Específica",
+            "4": "Usar Item",
+            "5": "Gênero",
+            "6": "Exclusivo",
+            "7": "Segurar Item",
+            "8": "Saber Movimento",
+            "9": "Felicidade",
+            "10": "Dia",
+            "11": "Noite"
         },
         "generation": {
             "long": "Geração ",
