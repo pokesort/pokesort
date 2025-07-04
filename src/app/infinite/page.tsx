@@ -41,6 +41,12 @@ export default function InfinitePage() {
                     }),
                 ]);
                 if (!puzzleResponse.ok) {
+                    const errorData = await puzzleResponse.json();
+
+                    if (errorData.code === 'MAX_ATTEMPTS') {
+                        alert("Gerador falhou após várias tentativas. Tente novamente.");
+                    }
+                    
                     throw new Error('Erro ao obter informações do puzzle.');
                 }
                 const [puzzleData] = await Promise.all([

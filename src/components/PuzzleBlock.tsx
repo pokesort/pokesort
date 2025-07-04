@@ -6,7 +6,7 @@ import { motion, AnimatePresence, Variants } from 'framer-motion';
 import clsx from 'clsx';
 
 import '@/src/styles/components/PokemonBlock.scss';
-import fallback from '@/src/assets/images/pk_fallback.svg';
+import PokeSprite from './PokeSprite';
 
 interface BlockProps {
     pokemon: any;
@@ -16,6 +16,7 @@ interface BlockProps {
     isCorrect?: boolean;
     isIncorrect?: boolean;
     onSelect: (id: number) => void;
+    onPress: (id: number) => void;
 }
 
 const itemVariants: Variants = {
@@ -41,20 +42,18 @@ function getSurname(name: string, species_name: string) {
     return surname;
 }
 
-export default React.memo(function PuzzleBlock({ pokemon, multiselect, isSelected, isSolved=false, isCorrect=false, isIncorrect=false, onSelect }: BlockProps) {
-    const [loadedImage, setLoadedImage] = useState<string | null>(null);
-    
+export default React.memo(function PuzzleBlock({ pokemon, multiselect, isSelected, isSolved=false, isCorrect=false, isIncorrect=false, onSelect, onPress }: BlockProps) {
     const default_url = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`;
     const shiny_url = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${pokemon.id}.png`;
-
-    const { ref, inView } = useInView({
-        threshold: 0.1,
-        triggerOnce: true,
-    });
 
     const handleThisBlockSelect = useCallback(() => {
         onSelect(pokemon.id);
     }, [onSelect, pokemon.id]);
+
+    const handleRightClick = useCallback((e: React.MouseEvent) => {
+        e.preventDefault();
+        onPress(pokemon.id);
+    }, [onPress, pokemon.id]);
 
     let p_name = pokemon.species_name.replaceAll('-', ' ');
     let p_surname = getSurname(pokemon.name, pokemon.species_name);
@@ -67,20 +66,10 @@ export default React.memo(function PuzzleBlock({ pokemon, multiselect, isSelecte
             'incorrect': isIncorrect,
             'selected': isSelected,
         }
-    );
-
-    useEffect(() => {
-        if (inView) {
-            const img = new Image();
-            img.src = default_url;
-            img.onload = () => {
-                setLoadedImage(default_url);
-            };
-        }
-    }, [inView]);
+    );    
 
     return (
-        <motion.label ref={ref} className="block-container"
+        <motion.label className="block-container"
             key={pokemon.id}
             layoutId={`pokemon-block-${pokemon.id}`}
             variants={itemVariants}
@@ -88,6 +77,7 @@ export default React.memo(function PuzzleBlock({ pokemon, multiselect, isSelecte
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.5 }}
             transition={{ duration: 0.5, type: 'spring' }}
+            onContextMenu={handleRightClick}
         >
             <div className={blockClasses}>
                 <input
@@ -95,10 +85,10 @@ export default React.memo(function PuzzleBlock({ pokemon, multiselect, isSelecte
                     name="pokemon"
                     value={pokemon.id}
                     checked={isSelected}
-                    onChange={handleThisBlockSelect} 
+                    onChange={handleThisBlockSelect}                    
                     hidden
                 />
-                <img src={loadedImage || fallback.src} />
+                <PokeSprite url={default_url} />
                 <h3>{p_name}</h3>
                 {p_surname != '' && (
                     <h4>{p_surname}</h4>
