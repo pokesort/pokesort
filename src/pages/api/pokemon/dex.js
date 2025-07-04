@@ -281,6 +281,31 @@ export default async function handler(req, res) {
     return poke?.evolution_step != null;
   }
 
+  async function getTypeMachups(result_object) {
+    let matchups = {};
+    let typeIds = result_object.types;
+
+    let types = await Promise.all(
+      typeIds.map(type =>
+        data.db.collection("types").findOne({ id: type })
+      )
+    );
+
+    types.forEach(typeDoc => {
+      let currentMatchups = typeDoc.matchups;
+      for (let key in currentMatchups) {
+        if (matchups[key] === undefined) {
+          matchups[key] = currentMatchups[key];
+        } else {
+          matchups[key] *= currentMatchups[key];
+        }
+      }
+    });
+
+    result_object.type_matchups = matchups;
+    return result_object;
+  }
+
   // Função principal
   async function getDexData(id_dex) {
 
@@ -301,7 +326,9 @@ export default async function handler(req, res) {
       .aggregate(pipeline)
       .toArray();
 
-    return result[0];
+    const object = await getTypeMachups(result[0]);
+
+    return object;
   }
 
 }

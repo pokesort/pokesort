@@ -5,8 +5,17 @@
     margin: -4px 0;
     aspect-ratio: 1;
 
+    &.expand {
+        height: 100%;
+        margin: unset;
+    }
+
     img {
         height: 100%;
+    }
+
+    &[class*="shape"] {
+        background-color: unset;
     }
 
     &.types-1 {
@@ -37,7 +46,7 @@
         background-color: #5A8EA1;
     }
     &.types-10 {
-        background-color: #ec6645;
+        background-color: #ec6145;
     }
     &.types-11 {
         background-color: #4D90D5;
@@ -65,5 +74,46 @@
     }
     &.types-19 {
         background-color: #A19097;
+    }
+
+    &.color-red {
+        background-color: #ec6145;
+        border-radius: 100%;
+    }
+    &.color-blue {
+        background-color: #4D90D5;
+        border-radius: 100%;
+    }
+    &.color-green {
+        background-color: #59af51;
+        border-radius: 100%;
+    }
+    &.color-yellow {
+        background-color: #dbb818;
+        border-radius: 100%;
+    }
+    &.color-black {
+        background-color: #5A5366;
+        border-radius: 100%;
+    }
+    &.color-brown {
+        background-color: #dc906a;
+        border-radius: 100%;
+    }
+    &.color-gray {
+        background-color: #887f83;
+        border-radius: 100%;
+    }
+    &.color-pink {
+        background-color: #d37dce;
+        border-radius: 100%;
+    }
+    &.color-purple {
+        background-color: #9a5db6;
+        border-radius: 100%;
+    }
+    &.color-white {
+        background-color: #cae1e1;
+        border-radius: 100%;
     }
 }

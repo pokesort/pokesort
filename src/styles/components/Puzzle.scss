@@ -77,10 +77,11 @@ ul.puzzle-tabs-container {
     grid-template-columns: 1fr 2fr 1fr;
     align-items: stretch;
     overflow-x: hidden;
+    overflow-y: hidden;
 
     width: 100%;
     height: var(--height, 100%);
-    flex-shrink: 0;
+    // flex-shrink: 0;
 
     -ms-overflow-style: none;
     scrollbar-width: none;

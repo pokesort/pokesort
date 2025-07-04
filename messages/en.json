@@ -27,7 +27,8 @@
         "dex-tabs": {
             "traits": "Traits",
             "moves": "Moves",
-            "related": "Related"
+            "related": "Related",
+            "received-damage": "Damage Received by Type"
         }
     },
     "groupnames": {
@@ -122,7 +123,8 @@
         },
         "categories": {
             "long": "",
-            "short": "Categoria",
+            "short": "Category",
+            "plural": "Categories",
 
             "1": "Bebê",
             "2": "Mítico",

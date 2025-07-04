@@ -2,18 +2,17 @@
 
 import { useTranslations } from 'next-intl';
 import "@/src/styles/components/Dex.scss";
-import { useEffect, useState } from 'react';
-import PokemonBlock from '@/src/components/PuzzleBlock';
+import React, { useCallback, useEffect, useState } from 'react';
+import ListBlock from '@/src/components/ListBlock';
+import Modal from '@/src/components/Modal';
+import DexView from '@/src/components/DexView';
 
-export default function Home() {
+export default React.memo(function Home() {
   const t = useTranslations();
   const [pokemons, setPokemons] = useState<any>([]);
   const [queries, setQueries] = useState<string>('');
   const [selected, setSelected] = useState<number>();
-
-  function handleSelect (id: number) {
-    setSelected(id);
-  }
+  const [dexModalOpen, setDexModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const qs = window.location.href.split('?')[1];
@@ -30,16 +29,23 @@ export default function Home() {
       })
   }, [])
 
+  const handleSelect = useCallback((id: number) => {
+    setSelected(id);
+    setDexModalOpen(true);
+  }, [])
+
   return (
     <>
-      <ul>
-
+      <Modal id="dex-modal" background={true} isOpen={dexModalOpen} setIsOpen={setDexModalOpen} canClose={true}>
+        <DexView pokemonId={selected} />
+      </Modal>
+      <ul id="dex-page">
         {pokemons && pokemons.map((p: any, index: number) => (
-          <PokemonBlock
+          <ListBlock
             key={p.id}
             pokemon={p}
             multiselect={false}
-            isSelected={selected == p.id}
+            isSelected={false}
             onSelect={() => handleSelect(p.id)}
             onPress={() => handleSelect(p.id)}
           />
@@ -48,4 +54,4 @@ export default function Home() {
       </ul>
     </>
   );
-}
+})
