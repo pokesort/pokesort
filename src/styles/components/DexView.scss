@@ -6,11 +6,12 @@ section.dex-view {
     flex-direction: column;
 
     width: 100%;
-    height: 100%;
-    min-height: 450px;
+    height: calc(var(--height) - 28px);
+    // min-height: 450px;
     gap: var(--spacing);
     font-size: text(small);
     overflow-y: scroll;
+    overflow-x: hidden;
 
     * {
         animation: dex-fade-in 0.15s ease 0s 1;
@@ -95,31 +96,30 @@ section.dex-view {
 
     div.type-chart {
         background-color: color(section2);
+        max-width: 384px;
         overflow-x: scroll;
         -ms-overflow-style: none;
         scrollbar-width: none;
         margin-top: calc(-1 * var(--spacing));
 
-        div.grid {
-            display: grid;
-            grid-template-columns: repeat(18, 24px);
-            grid-template-rows: repeat(2, 24px);
-            grid-auto-flow: column;
-            padding: 3px;
-            gap: 3px;
+        display: grid;
+        grid-template-columns: repeat(18, 24px);
+        grid-template-rows: repeat(2, 24px);
+        grid-auto-flow: column;
+        padding: 3px;
+        gap: 3px;
+        align-items: center;
+
+        p {
+            display: flex;
+            justify-content: center;
             align-items: center;
+            font-size: text(xsmall);
+            height: 100%;
+            background-color: color(section1);
 
-            p {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                font-size: text(xsmall);
-                height: 100%;
-                background-color: color(section1);
-
-                &[data-matchup="1"] {
-                    color: color(text2);
-                }
+            &[data-matchup="1"] {
+                color: color(text2);
             }
         }
     }
@@ -135,6 +135,14 @@ section.dex-view {
         p {
             background-color: color(section1);
             padding: 0.25rem 0.45rem;
+        }
+    }
+}
+
+@media(max-width: 768px) {
+    section.dex-view {
+        div.type-chart {
+            max-width: 100%;
         }
     }
 }

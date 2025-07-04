@@ -78,7 +78,7 @@ const DexData = React.memo(({pokemon}: DexDataProps) => {
                         <span>{t(`groupnames.abilities.short`)}:</span>
                         {pokemon.abilities.map((ability: string, index: number) => (
                             <>
-                                <p key="index">{toTitleCase(ability)}</p>
+                                <p key={`p-${index}`}>{toTitleCase(ability)}</p>
                                 {index != pokemon.abilities.length-1 ? <span key={index}>|</span> : <></>}
                             </>
                         ))}
@@ -95,7 +95,7 @@ const DexData = React.memo(({pokemon}: DexDataProps) => {
                         <span>{t(`groupnames.egg-groups.short`)}:</span>
                         {pokemon.egg_groups.map((group: string, index: number) => (
                             <>
-                                <p key="index">{t(`groupnames.egg-groups.${group}`)}</p>
+                                <p key={`p-${index}`}>{t(`groupnames.egg-groups.${group}`)}</p>
                                 {index != pokemon.egg_groups.length-1 ? <span key={index}>|</span> : <></>}
                             </>
                         ))}
@@ -108,16 +108,14 @@ const DexData = React.memo(({pokemon}: DexDataProps) => {
                         <span>{t(`puzzle.dex-tabs.received-damage`)}:</span>
                     </div>
                     <div className="type-chart">
-                        <div className="grid">
-                            {Object.keys(pokemon.type_matchups).map((type: string, index: number) => (
-                                <>
-                                    <IconType folder="types" item={type} expand={true} key={index} />
-                                    <p key={index} data-matchup={pokemon.type_matchups[type]}>
-                                        {pokemon.type_matchups[type]}x
-                                    </p>
-                                </>
-                            ))}
-                        </div>
+                        {Object.keys(pokemon.type_matchups).map((type: string, index: number) => (
+                            <>
+                                <IconType folder="types" item={type} expand={true} key={`icon-${index}`} />
+                                <p key={index} data-matchup={pokemon.type_matchups[type]}>
+                                    {pokemon.type_matchups[type]}x
+                                </p>
+                            </>
+                        ))}
                     </div>
                     <div className="block">
                         <span>{t(`groupnames.categories.plural`)}:</span>
@@ -135,10 +133,10 @@ const DexData = React.memo(({pokemon}: DexDataProps) => {
             }
             {currentTab == 1 &&
                 <div className="v-group">
-                    {pokemon.moves.map((move: any, index: any) => (
+                    {pokemon.moves.map(( move: any, index: any) => (
                         <div key={index} className="block">
-                            <IconType folder="types" item={move.type} />
-                            <p>{toTitleCase(move.name)}</p>
+                            <IconType key={`icon-${index}`} folder="types" item={move.type} />
+                            <p key={index}>{toTitleCase(move.name)}</p>
                         </div>
                     ))}
                 </div>
@@ -146,7 +144,7 @@ const DexData = React.memo(({pokemon}: DexDataProps) => {
             {currentTab == 2 &&
                 <div className="v-group">
                     <div className="block">
-                        Tab 3
+                        Em construção...
                     </div>
                 </div>
             }
