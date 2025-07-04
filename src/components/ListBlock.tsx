@@ -12,22 +12,9 @@ interface BlockProps {
     pokemon: any;
     multiselect: boolean;
     isSelected: boolean;
-    isSolved?: boolean;
-    isCorrect?: boolean;
-    isIncorrect?: boolean;
     onSelect: (id: number) => void;
     onPress: (id: number) => void;
 }
-
-const itemVariants: Variants = {
-  visible: {
-    opacity: 1,
-    scale: 1,
-    transition: {
-        type: 'tween'
-    }
-  }
-};
 
 function getSurname(name: string, species_name: string) {
     let p_name = name.replace(species_name, '').split('-');
@@ -42,7 +29,7 @@ function getSurname(name: string, species_name: string) {
     return surname;
 }
 
-export default React.memo(function PuzzleBlock({ pokemon, multiselect, isSelected, isSolved=false, isCorrect=false, isIncorrect=false, onSelect, onPress }: BlockProps) {
+export default React.memo(function PuzzleBlock({ pokemon, multiselect, isSelected, onSelect, onPress }: BlockProps) {
     const default_url = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`;
     const shiny_url = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${pokemon.id}.png`;
 
@@ -61,22 +48,13 @@ export default React.memo(function PuzzleBlock({ pokemon, multiselect, isSelecte
     const blockClasses = clsx(
         'pokemon-block',
         {
-            'solved': isSolved,
-            'correct': isCorrect,
-            'incorrect': isIncorrect,
             'selected': isSelected,
         }
     );    
 
     return (
-        <motion.label className="block-container"
+        <label className="block-container"
             key={pokemon.id}
-            layoutId={`pokemon-block-${pokemon.id}`}
-            variants={itemVariants}
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.5 }}
-            transition={{ duration: 0.5, type: 'spring' }}
             onContextMenu={handleRightClick}
         >
             <div className={blockClasses}>
@@ -94,6 +72,6 @@ export default React.memo(function PuzzleBlock({ pokemon, multiselect, isSelecte
                     <h4>{p_surname}</h4>
                 )}
             </div>
-        </motion.label>
+        </label>
     )
 })

@@ -17,12 +17,14 @@ import Countdown from '@/src/components/Countdown';
 import Loading from '@/src/components/Loading';
 
 import CalendarIcon from '@/src/components/svg/CalendarIcon';
+import ShareIcon from '@/src/components/svg/ShareIcon';
 import TickIcon from '@/src/components/svg/TickIcon';
 import GridIcon from '@/src/components/svg/GridIcon';
 import LogsIcon from '@/src/components/svg/LogsIcon';
 import DexIcon from '@/src/components/svg/DexIcon';
 import helpLogsImage from '@/src/assets/images/help_logs.png';
-import helpDexImage from '@/src/assets/images/help_dex.png';
+import DexView from './DexView';
+import PokeSprite from './PokeSprite';
 
 const containerVariants: Variants = {
   hidden: { opacity: 1 },
@@ -61,10 +63,41 @@ interface VictoryModalProps {
 }
 
 const VictoryModal = React.memo(({type, guesses, date, victoryOpen, setVictoryOpen}: VictoryModalProps) => {
-    const t = useTranslations();
+    const t = useTranslations('puzzle');
     const locale = useLocale();
     const count = 1;
     date = formatDate(date, locale, false);
+
+    const getGuessEmojis = (): string => {
+        let output: string = '';
+        guesses.forEach(guess => {
+            if (guess.accuracy >= 100) { // correct
+                output += "🟩"
+            } else if (guess.type == 0) { // incorrect
+                output += "🟥"
+            } else { // hint
+                output += "🟨"
+            }
+        })
+        return output;
+    }
+
+    const shareButton = () => {
+        const shareData: ShareData = {
+            title: `Meu resultado do Pokesort:`,
+            text: getGuessEmojis(),
+            url: window.location.href,
+        };
+        try {            
+            if (navigator.canShare(shareData)) {
+                navigator.share(shareData);
+            } else {
+                navigator.clipboard.writeText(shareData.text || window.location.href);
+            }
+        } catch (error) {
+            console.error("Não foi possível compartilhar. O problema talvez seja pela falta de uma conexão segura (HTTPS)");
+        }
+    }
     
     return (
         <Modal id="victory-modal" title="Gotcha!" isOpen={victoryOpen} setIsOpen={setVictoryOpen}>
@@ -92,7 +125,12 @@ const VictoryModal = React.memo(({type, guesses, date, victoryOpen, setVictoryOp
                         <li key={index} className={`guess-${guess.accuracy >= 100 ? '1' : '0'}`}></li>
                     ))}
                 </div>
-                <p>Resolvido em <b>{guesses.length}</b> tentativas</p>
+                <div className="guesses-container">
+                    <p>Resolvido em <b>{guesses.length}</b> tentativas</p>
+                    <button onClick={shareButton} title="Compartilhar">
+                        <ShareIcon/>
+                    </button>
+                </div>
             </div>
             {type == 'daily' ? (
                 <>
@@ -159,7 +197,7 @@ const t = useTranslations('puzzle');
                         <div className="accuracy-circle" title={`${guess.accuracy}% ${t('correct')}`}/>
                         <div className="guess-group">
                             {guess.pokemons.map((pokemon: number) => (
-                                <img key={pokemon} src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon}.png`}/>
+                                <PokeSprite key={pokemon} url={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon}.png`}/>
                             ) )}
                         </div>
                     </div>
@@ -183,9 +221,11 @@ interface PuzzleGridProps {
     setGuesses: React.Dispatch<React.SetStateAction<PuzzleGuess[]>>;
     victoryOpen: boolean,
     setVictoryOpen: React.Dispatch<React.SetStateAction<boolean>>
+    setCurrentDexView: React.Dispatch<React.SetStateAction<number | undefined>>;
+    scrollToTab: (target: number, behavior?: "instant" | "smooth") => void;
 }
 
-const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, setGuesses, victoryOpen, setVictoryOpen}: PuzzleGridProps) => {
+const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, setGuesses, victoryOpen, setVictoryOpen, setCurrentDexView, scrollToTab}: PuzzleGridProps) => {
     const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
 
     const [groupSets, setGroupSets] = useState<Set<number>[]>([]);
@@ -217,6 +257,11 @@ const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, s
             }
             return newSet;
         });
+    }, [pause]);
+
+    const handlePress = useCallback((id: number) => {
+        scrollToTab(2);
+        setCurrentDexView(id);
     }, [pause]);
 
     const compareGroups = useCallback((selected: Set<number>): PuzzleGuess | null => {
@@ -256,7 +301,9 @@ const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, s
     }, [puzzle, solvedGroupIds, groupSets]);
 
     const handleGuess = useCallback((guess: PuzzleGuess) => {
-        setGuesses((prev: PuzzleGuess[]) => [...prev, guess]);
+        setTimeout(() => {
+            setGuesses((prev: PuzzleGuess[]) => [...prev, guess]);
+        }, 1000);
     }, []);
 
     const markGroupAsSolved = useCallback((newlySolvedIds: Set<number>) => {
@@ -341,6 +388,7 @@ const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, s
                             isCorrect={isCorrect}
                             isIncorrect={isIncorrect}
                             onSelect={handleSelect}
+                            onPress={handlePress}
                         />
                     )
                 })}
@@ -359,6 +407,7 @@ const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, s
                             isCorrect={isCorrect}
                             isIncorrect={isIncorrect}
                             onSelect={handleSelect}
+                            onPress={handlePress}
                         />
                     )
                 })}
@@ -390,6 +439,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
     const [victoryOpen, setVictoryOpen] = useState<boolean>(false);
     const [mountVictoryModal, setMountVictoryModal] = useState<boolean>(false);
     const [visibleTab, setVisibleTab] = useState<number>(1);
+    const [currentDexView, setCurrentDexView] = useState<number>();
 
     useEffect(() => {
         if (dictionary) setPokemons(shuffleArray(dictionary.pokemons));
@@ -462,7 +512,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
                     </div>
                 </PuzzleTab> : <div></div>}
                 <PuzzleTab setVisibleTab={setVisibleTab} tab={1}>
-                    <div className="window-container cut-left" ref={mainTabRef}>
+                    <div className="window-container puzzle-window cut-left" ref={mainTabRef}>
                         <section className="window-info-row">
                             {!loading && <>
                                 <GridIcon/>
@@ -481,6 +531,8 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
                                 setGuesses={setGuesses}
                                 victoryOpen={victoryOpen}
                                 setVictoryOpen={setVictoryOpen}
+                                setCurrentDexView={setCurrentDexView}
+                                scrollToTab={scrollToTab}
                             />
                         )}
                     </div>
@@ -491,10 +543,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
                             <DexIcon/>
                             <p>{t('dex')}</p>
                         </section>
-                        <div className="tab-help">
-                            <img src={helpDexImage.src}/>
-                            <p>{t('help.dex')}</p>
-                        </div>
+                        <DexView pokemonId={currentDexView} />
                     </div>
                 </PuzzleTab>}
             </ul>

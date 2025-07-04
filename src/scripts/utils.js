@@ -61,6 +61,8 @@ export const toTitleCase = (str) => {
   if (!str || typeof str !== 'string') {
     return "";
   }
+
+  str = str.replaceAll('-', ' ');
   
   return str.toLowerCase().split(' ')
     .map(word => {      
