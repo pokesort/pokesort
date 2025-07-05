@@ -24,7 +24,7 @@ const processVarieties = (pokemon: any) => {
             if (mon.id == pokemon.id && mon.has_split) pokemon.has_split = 1;
             if (mon.step_override != null) return mon;
 
-            if (length <= 1) {
+            if (length <= 1 || pokemon.chain.filter((s: any) => s.step == 0).length == length) {
                 mon.step_override = 'no_line';
                 return mon;
             }
