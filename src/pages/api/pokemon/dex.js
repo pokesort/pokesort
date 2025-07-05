@@ -101,6 +101,7 @@ export default async function handler(req, res) {
                 species_name: "$$cd.species_name",
                 dex_number: "$$cd.dex_number",
                 evolution_step: "$$cd.evolution_step",
+                step_override: { $ifNull: ["$$cd.step_override", null] },
               },
             },
           },
@@ -112,7 +113,7 @@ export default async function handler(req, res) {
           localField: "chain.evolution_step",
           foreignField: "id",
           as: "chain_evo_data",
-          pipeline: [{ $project: { _id: 0, id: 1, methods: 1, pokemon: 1 } }],
+          // pipeline: [{ $project: { _id: 0, id: 1, methods: 1, pokemon: 1 } }],
         },
       },
       {
@@ -125,25 +126,27 @@ export default async function handler(req, res) {
                 $mergeObjects: [
                   "$$c",
                   {
-                    methods: {
-                      $let: {
-                        vars: {
-                          matched: {
-                            $filter: {
-                              input: "$chain_evo_data",
-                              as: "ced",
-                              cond: {
-                                $and: [
-                                  { $eq: ["$$ced.id", "$$c.evolution_step"] },
-                                  { $eq: ["$$ced.pokemon", "$$c.id"] },
-                                ],
-                              },
+                    $let: {
+                      vars: {
+                        matched: {
+                          $filter: {
+                            input: "$chain_evo_data",
+                            as: "ced",
+                            cond: {
+                              $and: [
+                                { $eq: ["$$ced.id", "$$c.evolution_step"] },
+                                { $eq: ["$$ced.pokemon", "$$c.id"] },
+                              ],
                             },
                           },
                         },
-                        in: {
-                          $ifNull: [{ $arrayElemAt: ["$$matched.methods", 0] }, []],
-                        },
+                      },
+                      in: {
+                        chain_id: { $ifNull: [{ $arrayElemAt: ["$$matched.chain_id", 0] }, null] },
+                        methods: { $ifNull: [{ $arrayElemAt: ["$$matched.methods", 0] }, []] },
+                        is_split: { $ifNull: [{ $arrayElemAt: ["$$matched.is_split", 0] }, 0] },
+                        has_split: { $ifNull: [{ $arrayElemAt: ["$$matched.has_split", 0] }, 0] },
+                        step: { $ifNull: [{ $arrayElemAt: ["$$matched.step", 0] }, null] },
                       },
                     },
                   },
@@ -152,7 +155,7 @@ export default async function handler(req, res) {
             },
           },
         },
-      },
+      }
     ];
   }
 

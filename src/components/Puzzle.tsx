@@ -446,12 +446,6 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
     }, [dictionary]);
 
     useEffect(() => {
-        if (process.env.NODE_ENV === "development") {
-            console.log(guesses);
-        }
-    }, [guesses]);
-
-    useEffect(() => {
         setMountVictoryModal(true);
     }, [victoryOpen]);
 

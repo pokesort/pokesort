@@ -19,6 +19,8 @@ export const FIELD_OPTIONS = {
   dual: { min: 1, max: 2 },
 };
 
+export const REGIONALS = ['-alola', '-galar', '-hisui', '-paldea'];
+
 export const getNextRefresh = () => {
   const now = new Date();
   const tomorrow = new Date(now);
@@ -84,6 +86,10 @@ export function formatDate(inputDate, locale, full=true) {
           month: 'long'
       });
     }
+}
+
+export function includesAnySubstring(mainString, substrings) {
+  return substrings.some(sub => mainString.includes(sub));
 }
 
 export function shuffleArray(array) {
