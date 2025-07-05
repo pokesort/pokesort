@@ -30,7 +30,17 @@
             "related": "Relacionados",
             "received-damage": "Dano Recebido por Tipo",
             "evolution-chain": "Cadeia Evolutiva:",
-            "varieties": "Variações:"
+            "varieties": "Variações:",
+            "class": "Classificação:",
+            "move_to": "Mover para ",
+
+            "form_class": {
+                "original": "Forma Original",
+                "mega": "Mega Evolução",
+                "gmax": "Gigantamax",
+                "regional": "Forma Regional",
+                "alternate": "Forma Alternativa"
+            }
         }
     },
     "groupnames": {
@@ -239,7 +249,8 @@
 
             "first": "Forma Base",
             "middle": "Forma do Meio",
-            "final": "Forma Final"
+            "final": "Forma Final",
+            "no_line": "Sem Evoluções"
         },
         "dual": {
             "long": "Tipagem ",

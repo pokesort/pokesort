@@ -100,11 +100,12 @@ section.dex-view {
 
     div.type-chart {
         background-color: color(section2);
-        max-width: 384px;
+        max-width: 360px;
         overflow-x: scroll;
         -ms-overflow-style: none;
         scrollbar-width: none;
         margin-top: calc(-1 * var(--spacing));
+        align-self: center;
 
         display: grid;
         grid-template-columns: repeat(18, 24px);
