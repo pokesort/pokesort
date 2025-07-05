@@ -157,10 +157,10 @@ const DexData = React.memo(({pokemon, setSearchId}: DexDataProps) => {
                     <div className="block">
                         <span>{t(`groupnames.abilities.short`)}:</span>
                         {pokemon.abilities.map((ability: string, index: number) => (
-                            <>
-                                <p key={`p-${index}`}>{toTitleCase(ability)}</p>
-                                {index != pokemon.abilities.length-1 ? <span key={index}>|</span> : <></>}
-                            </>
+                            <div className="map-container" key={index}>
+                                <p>{toTitleCase(ability)}</p>
+                                {index != pokemon.abilities.length-1 ? <span>|</span> : <></>}
+                            </div>
                         ))}
                     </div>
                     <div className="h-group">
@@ -174,10 +174,10 @@ const DexData = React.memo(({pokemon, setSearchId}: DexDataProps) => {
                     <div className="block">
                         <span>{t(`groupnames.egg-groups.short`)}:</span>
                         {pokemon.egg_groups.map((group: string, index: number) => (
-                            <>
-                                <p key={`p-${index}`}>{t(`groupnames.egg-groups.${group}`)}</p>
-                                {index != pokemon.egg_groups.length-1 ? <span key={index}>|</span> : <></>}
-                            </>
+                            <div className="map-container" key={index}>
+                                <p>{t(`groupnames.egg-groups.${group}`)}</p>
+                                {index != pokemon.egg_groups.length-1 ? <span>|</span> : <></>}
+                            </div>
                         ))}
                     </div>
                     <div className="block">
@@ -189,12 +189,12 @@ const DexData = React.memo(({pokemon, setSearchId}: DexDataProps) => {
                     </div>
                     <div className="type-chart">
                         {Object.keys(pokemon.type_matchups).map((type: string, index: number) => (
-                            <>
-                                <IconType folder="types" item={type} expand={true} key={`icon-${index}`} />
-                                <p key={index} data-matchup={pokemon.type_matchups[type]}>
-                                    {pokemon.type_matchups[type]}x
-                                </p>
-                            </>
+                            <IconType key={`icon-${index}`} folder="types" item={type} expand={true} />
+                        ))}
+                        {Object.keys(pokemon.type_matchups).map((type: string, index: number) => (
+                            <p key={`p-${index}`} data-matchup={pokemon.type_matchups[type]}>
+                                {pokemon.type_matchups[type]}x
+                            </p>
                         ))}
                     </div>
                     <div className="block">
@@ -250,10 +250,10 @@ const DexData = React.memo(({pokemon, setSearchId}: DexDataProps) => {
                                     <span>{t(`groupnames.short_methods.short`)}:</span>
                                     {step.methods.length > 0 ?
                                         step.methods.map((method: string, index: number) => (
-                                            <>
-                                                <p key={`p-${index}`}>{t(`groupnames.short_methods.${method}`)}</p>
-                                                {index != step.methods.length-1 ? <span key={index}>+</span> : <></>}
-                                            </>
+                                            <div className="map-container" key={index}>
+                                                <p>{t(`groupnames.short_methods.${method}`)}</p>
+                                                {index != step.methods.length-1 ? <span>+</span> : <></>}
+                                            </div>
                                         ))
                                     :
                                         <p>N/A</p>
@@ -349,7 +349,7 @@ export default function DexView ({ pokemonId }: DexViewProps) {
             !loading ?
                 <DexData pokemon={pokemon} setSearchId={setSearchId} />
                 :
-                <Loading expand={false} />
+                <Loading expand={true} />
             :
             <div className="tab-help">
                 <img src={helpDexImage.src}/>

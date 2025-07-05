@@ -22,3 +22,33 @@ ul#dex-page {
     align-items: center;
   }
 }
+
+.modal#dex-modal {
+    --height: 500px;
+
+    width: min(100%, 400px);
+    max-width: unset;
+    min-width: unset;
+    height: var(--height);
+
+    div.modal-content button {
+        font-weight: unset;
+        transition: unset;
+
+        &:hover {
+            box-shadow: unset;
+            z-index: unset;
+        }
+        &:active {
+            transform: unset;
+        }
+    }
+
+    section.dex-view {
+        height: calc(var(--height) - 40px);
+
+        div.type-chart {
+            max-width: 100%;
+        }
+    }
+}
