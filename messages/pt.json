@@ -28,7 +28,19 @@
             "traits": "Características",
             "moves": "Movimentos",
             "related": "Relacionados",
-            "received-damage": "Dano Recebido por Tipo"
+            "received-damage": "Dano Recebido por Tipo",
+            "evolution-chain": "Cadeia Evolutiva:",
+            "varieties": "Variações:",
+            "class": "Classificação:",
+            "move_to": "Mover para ",
+
+            "form_class": {
+                "original": "Forma Original",
+                "mega": "Mega Evolução",
+                "gmax": "Gigantamax",
+                "regional": "Forma Regional",
+                "alternate": "Forma Alternativa"
+            }
         }
     },
     "groupnames": {
@@ -166,6 +178,22 @@
             "10": "Apenas de Dia",
             "11": "Apenas de Noite"
         },
+        "short_methods": {
+            "long": "Evolui ",
+            "short": "Métodos",
+
+            "1": "Nível",
+            "2": "Troca",
+            "3": "Regional",
+            "4": "Usar Item",
+            "5": "Gênero",
+            "6": "Exclusivo",
+            "7": "Segurar Item",
+            "8": "Saber Move",
+            "9": "Felicidade",
+            "10": "Dia",
+            "11": "Noite"
+        },
         "generation": {
             "long": "Geração ",
             "short": "Geração",
@@ -221,7 +249,8 @@
 
             "first": "Forma Base",
             "middle": "Forma do Meio",
-            "final": "Forma Final"
+            "final": "Forma Final",
+            "no_line": "Sem Evoluções"
         },
         "dual": {
             "long": "Tipagem ",
