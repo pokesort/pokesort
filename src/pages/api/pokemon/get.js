@@ -8,6 +8,7 @@ export default async function handler(req, res) {
     let pokemonIdsUsed = false;
     const arrayFields = ["types", "abilities", "moves", "egg_groups", "categories", "other_forms"];
     const booleanFields = ["is_default"];
+    const intFields = ['generation'];
 
     const step = req.query.step;
 
@@ -98,6 +99,8 @@ export default async function handler(req, res) {
         filter[key] = { $all: Array.isArray(value) ? value : [value] };
       } else if (booleanFields.includes(key)) {
         filter[key] = value === "true";
+      } else if (intFields.includes(key)) {
+        filter[key] = Number(value);
       } else {
         filter[key] = value;
       }
