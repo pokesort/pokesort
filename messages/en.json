@@ -41,6 +41,15 @@
                 "regional": "Regional Form",
                 "alternate": "Alternate Form"
             }
+        },
+        "victory": {
+            "streak": "Streak",
+            "streak-desc": "Play Pokesort daily to increase your streak",
+            "attempts-1": "Solved in ",
+            "attempts-2": " attempts",
+            "next-daily": "Next daily puzzle in",
+            "back": "Back to Home",
+            "generate": "Refresh Puzzle"
         }
     },
     "groupnames": {
