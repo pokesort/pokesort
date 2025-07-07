@@ -41,6 +41,15 @@
                 "regional": "Forma Regional",
                 "alternate": "Forma Alternativa"
             }
+        },
+        "victory": {
+            "streak": "Sequência",
+            "streak-desc": "Jogue o Pokesort diariamente para aumentar sua sequência",
+            "attempts-1": "Resolvido em ",
+            "attempts-2": " tentativas",
+            "next-daily": "Próximo puzzle diário em",
+            "back": "Voltar ao Início",
+            "generate": "Gerar Novo Puzzle"
         }
     },
     "groupnames": {

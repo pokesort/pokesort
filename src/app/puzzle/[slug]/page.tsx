@@ -52,7 +52,7 @@ export default function PuzzlePage() {
                 console.error(e);
                 setError('Não foi possível conectar ao servidor. Tente novamente.');
             } finally {                
-                setLoading(false);
+                // setLoading(false);
             }
         };
 

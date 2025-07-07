@@ -48,7 +48,7 @@ export default function Daily() {
                 console.error(e);
                 setError('Não foi possível conectar ao servidor. Tente novamente.');
             } finally {                 
-                setLoading(false);
+                // setLoading(false);
             }
         };
 

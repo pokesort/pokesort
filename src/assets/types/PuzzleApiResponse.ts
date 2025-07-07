@@ -27,6 +27,7 @@ export interface PuzzleData {
   _id: string;
   author: string;
   from: string;
+  daily: boolean;
   date: string;
   rows: number;
   cols: number;

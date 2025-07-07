@@ -29,6 +29,7 @@ export default async function handler(req, res) {
     await remove(res, existingPuzzle);
   }
   else if (req.method === 'GET'){
+    existingPuzzle.daily = false;
     const dictionary = await populate(res, existingPuzzle);
     return res.status(200).json({success: true, data: existingPuzzle, dictionary: dictionary})
   }
