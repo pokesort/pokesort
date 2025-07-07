@@ -88,6 +88,16 @@ export function formatDate(inputDate, locale, full=true) {
     }
 }
 
+export function isYesterday(inputStr, todayStr) {
+  const [inputYear, inputMonth, inputDay] = inputStr.split('-').map(Number);
+  const [todayYear, todayMonth, todayDay] = todayStr.split('-').map(Number);
+
+  const input = new Date(inputYear, inputMonth - 1, inputDay);
+  const yesterday = new Date(todayYear, todayMonth - 1, todayDay - 1);
+
+  return input.getTime() === yesterday.getTime();
+}
+
 export function includesAnySubstring(mainString, substrings) {
   return substrings.some(sub => mainString.includes(sub));
 }
