@@ -219,13 +219,14 @@ interface PuzzleGridProps {
     pokemons: any[];
     dictionary: any;
     setGuesses: React.Dispatch<React.SetStateAction<PuzzleGuess[]>>;
+    forcedGuesses?: PuzzleGuess[];
     victoryOpen: boolean,
     setVictoryOpen: React.Dispatch<React.SetStateAction<boolean>>
     setCurrentDexView: React.Dispatch<React.SetStateAction<number | undefined>>;
     scrollToTab: (target: number, behavior?: "instant" | "smooth") => void;
 }
 
-const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, setGuesses, victoryOpen, setVictoryOpen, setCurrentDexView, scrollToTab}: PuzzleGridProps) => {
+const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, setGuesses, forcedGuesses=[], victoryOpen, setVictoryOpen, setCurrentDexView, scrollToTab}: PuzzleGridProps) => {
     const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
 
     const [groupSets, setGroupSets] = useState<Set<number>[]>([]);
@@ -244,6 +245,16 @@ const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, s
 
         setGroupSets(groupArray);
     }, [puzzle]);
+
+    useEffect(() => {
+        if (forcedGuesses.length > 0 && solvedGroupNames.length == 0) {
+            forcedGuesses.forEach((guess: PuzzleGuess) => {
+                setCorrectGuessIds(new Set(guess.pokemons));
+                markGroupAsSolved(new Set(guess.pokemons));
+                if (guess.group != null) solvedGroupNames.push(puzzle.groups[guess.group].query);
+            })
+        }
+    }, [forcedGuesses]);
 
     const handleSelect = useCallback((id: number) => {
         if (pause) return;
@@ -431,10 +442,42 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
     const t = useTranslations('puzzle');
     const locale = useLocale();
     const mainTabRef = useRef<HTMLDivElement>(null);
+    
+    const [guesses, setGuesses] = useState<PuzzleGuess[]>([]);
+    const [forcedGuesses, setForcedGuesses] = useState<PuzzleGuess[]>([]);
 
+    const saveState = (id: string) => {
+        if (id == '') return;
+        let status = 0;
+        if (guesses.filter((g: PuzzleGuess) => g.accuracy >= 100).length == puzzle?.rows)
+            status = 1;
+        const state = {status, guesses};
+
+        localStorage.setItem(`s_${id}`, JSON.stringify(state));
+    }
+
+    const loadState = (id: string) => {
+        const data = localStorage.getItem(`s_${id}`);
+        if (!data) {
+            setGuesses([]);
+            return false;
+        }
+
+        const state = JSON.parse(data);
+        if (process.env.NODE_ENV === "development") {
+            console.log(`Estado carregado para puzzle ${id}`);
+        }
+        setGuesses(state.guesses);
+        setForcedGuesses(state.guesses.filter((g: PuzzleGuess) => g.accuracy >= 100));
+        if (state.status > 0) {
+            setTimeout(() => {
+                setVictoryOpen(true);
+            }, 1000);
+        }
+    }
+    
     const [refresh, setRefresh] = useState<boolean>(false);
     const [pause, setPause] = useState<boolean>(false);
-    const [guesses, setGuesses] = useState<PuzzleGuess[]>([]);
     const [pokemons, setPokemons] = useState<any>([]);
     const [victoryOpen, setVictoryOpen] = useState<boolean>(false);
     const [mountVictoryModal, setMountVictoryModal] = useState<boolean>(false);
@@ -450,9 +493,14 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
     }, [victoryOpen]);
 
     useEffect(() => {
-        setGuesses([]);
+        if (puzzle && guesses.length > 0) saveState(puzzle._id || '');
+    }, [guesses])
+
+    useEffect(() => {
+        if (puzzle && type != 'infinite') loadState(puzzle._id || '');
         scrollToTab(1, 'instant');
         setTimeout(() => {
+            setLoading(false);
             setRefresh(prev => !prev);
         }, 0);
     }, [puzzle])
@@ -523,6 +571,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
                                 pokemons={pokemons}
                                 dictionary={dictionary}
                                 setGuesses={setGuesses}
+                                forcedGuesses={forcedGuesses}
                                 victoryOpen={victoryOpen}
                                 setVictoryOpen={setVictoryOpen}
                                 setCurrentDexView={setCurrentDexView}
