@@ -14,7 +14,7 @@ export const FIELD_OPTIONS = {
   step: ['no_line', 'has_split', 'is_split'],
   weak: { min: 1, max: 18 },
   strong: { min: 1, max: 18 },
-  immune: [1, 2, 3, 4, 5, 8, 13, 14, 16], //normal, fighting, flying, poison, ground, fantasma, eletrico, psychic, dragao
+  // immune: [1, 2, 4, 5, 8, 13, 14, 16], //normal, fighting, poison, ground, fantasma, eletrico, psychic, dragao
   form: ['first', 'middle', 'final'],
   dual: { min: 1, max: 2 },
 };

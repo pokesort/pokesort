@@ -41,7 +41,7 @@ export default async function handler(req, res) {
     
     if (methods !== undefined) {
       const methodsIds = await handlerEvolutionMethod(parseInt(methods));
-      pokemonIds = pokemonIds.length > 0 ? methodsIds.filter(value => pokemonIds.includes(value)) : methodsIds;
+      pokemonIds = pokemonIds.length > 0 || pokemonIdsUsed ? methodsIds.filter(value => pokemonIds.includes(value)) : methodsIds;
       pokemonIdsUsed = true;
       delete req.query.methods;
     }
@@ -53,7 +53,7 @@ export default async function handler(req, res) {
     
     if (weak != undefined) {
       const weakIds = await handlerRelationTo(weak, relations_query["weak"]);
-      pokemonIds = pokemonIds.length > 0 ? weakIds.filter(value => pokemonIds.includes(value)) : weakIds;
+      pokemonIds = pokemonIds.length > 0 || pokemonIdsUsed ? weakIds.filter(value => pokemonIds.includes(value)) : weakIds;
       pokemonIdsUsed = true;
       delete req.query.weak;
     }
@@ -61,7 +61,7 @@ export default async function handler(req, res) {
     if (strong != undefined) {
 
       const strongIds = await handlerRelationTo(strong, relations_query["strong"]);
-      pokemonIds = pokemonIds.length > 0 ? strongIds.filter(value => pokemonIds.includes(value)) : strongIds;
+      pokemonIds = pokemonIds.length > 0 || pokemonIdsUsed ? strongIds.filter(value => pokemonIds.includes(value)) : strongIds;
       pokemonIdsUsed = true;
       delete req.query.strong;
     }
@@ -69,7 +69,7 @@ export default async function handler(req, res) {
     if (immune != undefined) {
 
       const immuneIds = await handlerRelationTo(immune, relations_query["immune"]);
-      pokemonIds = pokemonIds.length > 0 ? immuneIds.filter(value => pokemonIds.includes(value)) : immuneIds;
+      pokemonIds = pokemonIds.length > 0 || pokemonIdsUsed ? immuneIds.filter(value => pokemonIds.includes(value)) : immuneIds;
       pokemonIdsUsed = true;
       delete req.query.immune;
 
@@ -77,10 +77,9 @@ export default async function handler(req, res) {
     if (form != undefined){
 
       const evoIds = await handlerEvolutionChain(form);
-      pokemonIds = pokemonIds.length > 0 ? evoIds.filter(value => pokemonIds.includes(value)) : evoIds;
+      pokemonIds = pokemonIds.length > 0 || pokemonIdsUsed ? evoIds.filter(value => pokemonIds.includes(value)) : evoIds;
       pokemonIdsUsed = true;
       delete req.query.form;
-
     }
 
     if (dual != undefined) delete req.query.dual;
