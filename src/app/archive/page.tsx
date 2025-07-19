@@ -64,6 +64,7 @@ function Calendar({puzzles, loading}: CalendarProps) {
                 const isCurrentMonth = isSameMonth(day, monthStart);
                 const dayString = format(day, "yyyy-MM-dd");
                 const userData: any = dates.includes(dayString) ? localStorage.getItem(`s_${puzzles[dayString]}`) : null
+                console.log(userData);
 
                 const blockClasses = clsx(
                     'calendar-cell',
@@ -71,7 +72,7 @@ function Calendar({puzzles, loading}: CalendarProps) {
                         'hidden': !isCurrentMonth,
                         'disabled': !dates.includes(dayString) || foundToday,
                         'attempted': userData != null,
-                        'complete': userData && userData.status == 1
+                        'complete': userData && JSON.parse(userData).status == 1
                     }
                 );
                 if (!foundToday && isSameDay(day, today)) foundToday = true;
