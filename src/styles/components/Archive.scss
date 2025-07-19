@@ -15,10 +15,6 @@
         }
     }
 }
-.window-container:not(:has(section.puzzle)) {
-    height: auto;
-    min-height: unset;
-}
 
 button.disabled {
     color: color(text3);
