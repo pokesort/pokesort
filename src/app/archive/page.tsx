@@ -5,6 +5,7 @@ import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, addM
 import Link from 'next/link';
 import clsx from 'clsx';
 
+import "@/src/styles/components/Puzzle.scss";
 import "@/src/styles/components/Archive.scss";
 import { useLocale } from 'next-intl';
 import Loading from '@/src/components/Loading';
