@@ -66,7 +66,7 @@ export default React.memo(function PuzzleBlock({ pokemon, multiselect, isSelecte
             'incorrect': isIncorrect,
             'selected': isSelected,
         }
-    );    
+    );
 
     return (
         <motion.label className="block-container"
