@@ -63,7 +63,7 @@ button.disabled {
         pointer-events: none;
     }
     &.attempted {
-        --selection: #{color(selection1)};
+        --selection: #{color(selection4)};
     }
     &.complete {
         --selection: #{color(selection3)};
