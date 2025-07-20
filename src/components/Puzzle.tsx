@@ -73,15 +73,15 @@ const SolvedGroupsGrid = ({groups, dictionary}: SolvedGroupsGridProps) => {
 interface VictoryModalProps {
     type: 'daily' | 'infinite',
     guesses: PuzzleGuess[],
-    date: string | undefined,
+    dateOg: string | undefined,
     victoryOpen: boolean,
     setVictoryOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const VictoryModal = React.memo(({type, guesses, date, victoryOpen, setVictoryOpen}: VictoryModalProps) => {
+const VictoryModal = React.memo(({type, guesses, dateOg, victoryOpen, setVictoryOpen}: VictoryModalProps) => {
     const t = useTranslations('puzzle');
     const locale = useLocale();
-    date = formatDate(date, locale, false);
+    const date = formatDate(dateOg, locale, false);
 
     const [streak, setStreak] = useState<number>(1);
 
@@ -107,7 +107,8 @@ const VictoryModal = React.memo(({type, guesses, date, victoryOpen, setVictoryOp
     const shareButton = () => {
         const url = window.location.href;
         const emojis = getGuessEmojis();
-        const text = `Pokesort | ${type == 'daily' ? formatDate(date, locale) : t('puzzle.infinite')}`
+        const text = `Pokesort · ${type == 'daily' ? formatDate(dateOg, locale, false) : t('puzzle.infinite')}`
+        
         const shareData: ShareData = {
             text: `${text}\n${emojis}\n${url}`,
         };
@@ -564,7 +565,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
     return (
         <>
             {mountVictoryModal &&
-                <VictoryModal type={type} guesses={guesses} date={puzzle?.date} victoryOpen={victoryOpen} setVictoryOpen={setVictoryOpen} />
+                <VictoryModal type={type} guesses={guesses} dateOg={puzzle?.date} victoryOpen={victoryOpen} setVictoryOpen={setVictoryOpen} />
             }
             <ul className="puzzle-tabs-container" style={{'--height': `${tabsHeight}px`, '--cols': puzzle ? puzzle.cols : 4, '--rows': puzzle ? puzzle.rows : 4} as React.CSSProperties}>
                 {puzzle ?
