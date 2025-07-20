@@ -105,10 +105,11 @@ const VictoryModal = React.memo(({type, guesses, date, victoryOpen, setVictoryOp
     }
 
     const shareButton = () => {
+        const url = window.location.href;
+        const emojis = getGuessEmojis();
+        const text = `Pokesort | ${type == 'daily' ? formatDate(date, locale) : t('puzzle.infinite')}`
         const shareData: ShareData = {
-            title: `Meu resultado do Pokesort:`,
-            text: getGuessEmojis(),
-            url: window.location.href,
+            text: `${text}\n${emojis}\n${url}`,
         };
         try {            
             if (navigator.canShare(shareData)) {
