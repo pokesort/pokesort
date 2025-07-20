@@ -48,6 +48,9 @@
         width: 100%;
         padding-top: 0;
     }
+    .window-container:not(:has(section.puzzle)) {
+        min-height: unset;
+    }
 }
 
 div.tab-help {
