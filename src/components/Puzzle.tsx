@@ -162,7 +162,7 @@ const VictoryModal = React.memo(({type, guesses, dateOg, victoryOpen, setVictory
                     <p>{t(`victory.next-daily`)}:</p>
                     <h1><Countdown targetDate={getNextRefresh()} active={victoryOpen} /></h1>
                 </div>
-                <button className="modal-content-div" onClick={ () => redirect('/daily') }>
+                <button className="modal-content-div" onClick={ () => redirect('/') }>
                     <p>{t(`victory.back`)}</p>
                 </button>
                 </>
