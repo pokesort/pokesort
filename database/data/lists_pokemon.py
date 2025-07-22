@@ -104,6 +104,12 @@ PARADOX = [
     'iron-moth', 'iron-thorns', 'iron-valiant', 'iron-boulder', 'iron-crown',
 ]
 
+FOSSIL = [
+    'aerodactyl', 'amaura', 'aurorus', 'anorith', 'archen', 'archeops', 'arctovish', 'arctovolt',
+    'armaldo', 'bastiodon', 'carracosta', 'cradily', 'cranidos', 'dracovish', 'dracovolt', 'kabuto',
+    'kabutops', 'lileep', 'omanyte', 'omastar', 'rampardos', 'shieldon', 'tirtouga', 'tyrantrum', 'tyrunt'
+]
+
 FORMS_SWITCHABLE = [
     'zygarde', 'hoopa', 'oricorio', 'wishiwashi', 'silvally', 'minior', 'mimikyu', 'necrozma',
     'eiscue', 'morpeko', 'zacian', 'zamazenta', 'calyrex', 'palafin', 'ogerpon', 'terapagos'

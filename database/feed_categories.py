@@ -20,7 +20,8 @@ def fill_categories():
             "isParadox",
             "isGMax",
             "isRegionalForm",
-            "isVivillon"
+            "isVivillon",
+            "isFossil"
         ]
 
         index = 1
