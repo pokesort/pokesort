@@ -16,5 +16,5 @@ if __name__ == "__main__":
     # abilityDB.init()
     # categoriesDB.init()
     # evolutionMethodDB.init()
-    evolutionChainDB.init()
-    # pokemon.init()
+    # evolutionChainDB.init()
+    pokemon.init()

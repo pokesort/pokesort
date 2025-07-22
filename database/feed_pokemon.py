@@ -4,7 +4,7 @@ import pandas as pd
 from data.lists_pokemon import *
 
 def request_moves():
-    url = "https://pokeapi.co/api/v2/pokemon?limit=3000"
+    url = "https://pokeapi.co/api/v2/pokemon?limit=1"
     response = requests.get(url)
 
     if response.status_code != 200:
@@ -12,7 +12,7 @@ def request_moves():
         return
     data = response.json()['results']
 
-    pokemons = db.connect("pokemon")
+    pokemons = db.connect("pokemon_test")
     if pokemons == None:
         print("Erro de fetch")
         return
@@ -32,9 +32,9 @@ def request_moves():
         pokemon_json = requests.get(pokemon['url']).json()
 
         existing_document = pokemons.find_one({'id': pokemon_json['id']})
-        if existing_document: 
-            print(f"Documento com nome {pokemon_json["name"]} já existe. Não inserindo novamente.")
-            continue
+        # if existing_document: 
+        #     print(f"Documento com nome {pokemon_json["name"]} já existe. Não inserindo novamente.")
+        #     continue
 
         species_json = requests.get(pokemon_json['species']['url']).json()
         
@@ -66,7 +66,11 @@ def request_moves():
             "other_forms": getOtherForms(species_json, pokemon_json["id"]),
             "habitat": getHabitat(species_json),
             "shape": species_json["shape"]["name"],
-            "color": getColor(species_json['color']['name'], pokemon_json["name"], colors)
+            "color": getColor(species_json['color']['name'], pokemon_json["name"], colors),
+
+            "sprite_default": pokemon_json["sprites"]["front_default"],
+            "sprite_shiny": pokemon_json["sprites"]["front_shiny"],
+            "cry": pokemon_json["cries"]["latest"],
         }
 
         pokemons.insert_one(document)
@@ -83,7 +87,21 @@ def getTypes (pokemon_json):
 def getMoves (pokemon_json):
     moves = []
 
+    def isLevelUpMove (details):
+        out = []
+
+        for detail in details:
+            if (detail["level_learned_at"] > 0):
+                print()
+                out.append(detail)
+
+        return out
+
     for move in pokemon_json["moves"]:
+        level_up_list = isLevelUpMove(move["version_group_details"])
+
+        if (len(level_up_list) <= 0):
+            continue
         moves.append(move["move"]["url"].split('/')[-2])
 
     return moves
@@ -145,7 +163,7 @@ def getGeneration (pokemon_json, species_json):
     if (affix in GENERATIONS.keys() and 'giratina' not in pokemon_json['name']):
         generation = GENERATIONS[affix]
 
-    return generation
+    return int(generation)
 
 def getRegion (pokemon_json, species_json):
     generation = species_json["generation"]["url"].split('/')[-2]
