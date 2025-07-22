@@ -105,3 +105,18 @@ export function includesAnySubstring(mainString, substrings) {
 export function shuffleArray(array) {
     return [...array].sort(() => Math.random() - 0.5);
 }
+
+export function generateTips(ids, queries) {
+  const pokemons = pickRandomMult(ids, Math.floor(ids.length / 2));
+  
+  queries = queries.slice(1);
+  queries = queries.split('&');
+  
+  const text = pickRandom(queries)[0];
+  const values = pokemons;
+
+  return {
+    text,
+    values
+  };
+}

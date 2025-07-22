@@ -3,7 +3,8 @@ import {
   randomInRange,
   pickRandom,
   getRandomFieldValue,
-  pickRandomMult
+  pickRandomMult,
+  generateTips
 } from '@/src/scripts/utils.js';
 
 import { populate } from './_utils';
@@ -120,13 +121,16 @@ export async function generateGroup(cols, generation, excludeFields, infinite) {
       if (hasOverlap) continue;
       idsUsed.push(...selected);
 
+      const tips = generateTips(selected, query);
+      
       return {
         query,
-        pokemons: selected
+        pokemons: selected,
+        tips
       };
     }
 
-    console.log("###### Tentativa " + attempt + " Falhou ######");
+    // console.log("###### Tentativa " + attempt + " Falhou ######");
 
     attempt -= -1;
   }
