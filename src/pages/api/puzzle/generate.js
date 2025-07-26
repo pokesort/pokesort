@@ -37,7 +37,7 @@ export default async function handler(req, res) {
   const puzzles = [];
 
   for (let i = 0; i < amount; i++) {
-    const rows = randomInRange(4, 4);
+    const rows = randomInRange(4, 5);
     const cols = randomInRange(4, 6);
     idsUsed = [];
 
@@ -99,7 +99,7 @@ export async function generateGroup(cols, generation, allFields, infinite) {
     
     let hasbreak = false;
     let numFields = 0;
-    numFields = randomInRange(1, 1);
+    numFields = randomInRange(1, 3);
 
     const selectedFields = pickRandom(allFields, numFields);
 
