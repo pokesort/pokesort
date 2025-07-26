@@ -1,22 +1,24 @@
 export const FIELD_OPTIONS = {
-  types: { min: 1, max: 18 }, 
-  color: ['red', 'blue', 'green', 'yellow', 'black', 'brown', 'gray', 'pink', 'purple', 'white'],
-  region: ['kanto', 'johto', 'hoenn', 'sinnoh', 'unova', 'kalos', 'alola', 'galar', 'hisui', 'paldea'],
-  shape: ['armor', 'wings', 'quadruped', 'ball', 'squiggle', 'fish', 'arms', 'blob', 'upright', 'legs', 'heads', 'bug-wings', 'humanoid', 'tentacles'],
-  egg_groups: ['monster', 'dragon', 'field', 'water1', 'bug', 'flying', 'ground', 'fairy', 'plant', 'humanshape', 'water3', 'mineral', 'indeterminate', 'water2', 'ditto', 'dragon', 'no-eggs'],
-  categories: { min: 1, max: 16 },
-  others: { min: 1, max: 2 },
-  methods: { min: 1, max: 11 },
-  moves: { min: 1, max: 919 },
-  generation: { min: 1, max: 9 },
-  abilities: { min: 1, max: 307 },
-  habitat: ['cave', 'forest', 'grassland', 'mountain', 'rare', 'rough-terrain', 'sea', 'urban', 'waters-edge'],
-  step: ['no_line', 'has_split', 'is_split'],
-  weak: { min: 1, max: 18 },
-  strong: { min: 1, max: 18 },
+  // types: { min: 1, max: 18 }, 
+  // color: ['red', 'blue', 'green', 'yellow', 'black', 'brown', 'gray', 'pink', 'purple', 'white'],
+  // region: ['kanto', 'johto', 'hoenn', 'sinnoh', 'unova', 'kalos', 'alola', 'galar', 'hisui', 'paldea'],
+  // shape: ['armor', 'wings', 'quadruped', 'ball', 'squiggle', 'fish', 'arms', 'blob', 'upright', 'legs', 'heads', 'bug-wings', 'humanoid', 'tentacles'],
+  // egg_groups: ['monster', 'dragon', 'field', 'water1', 'bug', 'flying', 'ground', 'fairy', 'plant', 'humanshape', 'water3', 'mineral', 'indeterminate', 'water2', 'ditto', 'dragon', 'no-eggs'],
+  // categories: { min: 1, max: 16 },
+  // others: { min: 1, max: 2 },
+  // methods: { min: 1, max: 11 },
+  // moves: { min: 1, max: 919 },
+  // generation: { min: 1, max: 9 },
+  // abilities: { min: 1, max: 307 },
+  // habitat: ['cave', 'forest', 'grassland', 'mountain', 'rare', 'rough-terrain', 'sea', 'urban', 'waters-edge'],
+  habitat: ['cave', 'forest', 'grassland'],
+  step: ['no_line'],
+  // step: ['no_line', 'has_split', 'is_split'],
+  // weak: { min: 1, max: 18 },
+  // strong: { min: 1, max: 18 },
   // immune: [1, 2, 4, 5, 8, 13, 14, 16], //normal, fighting, poison, ground, fantasma, eletrico, psychic, dragao
-  form: ['first', 'middle', 'final'],
-  dual: { min: 1, max: 2 },
+  // form: ['first', 'middle', 'final'],
+  // dual: { min: 1, max: 2 },
 };
 
 export const REGIONALS = ['-alola', '-galar', '-hisui', '-paldea'];
@@ -43,13 +45,23 @@ export const pickRandom = (array, count = 1) => {
   return result;
 };
 
+export const removeFieldValue = (obj, key, valueToRemove) => {
+
+  const target = obj[key];
+  obj[key] = target.filter(v => v !== valueToRemove);
+
+  if (obj[key].length === 0) {
+    delete obj[key];
+  }
+}
+
 export function pickRandomMult(array, count = 1) {
   const shuffled = array.sort(() => 0.5 - Math.random());
   return shuffled.slice(0, count);
 }
 
-export const getRandomFieldValue = (field) => {
-  const definition = FIELD_OPTIONS[field];
+export const getRandomFieldValue = (field, fields) => {
+  const definition = fields[field];
   if (Array.isArray(definition)) {
     return pickRandom(definition, 1)[0];
   } else if (typeof definition === 'object' && 'min' in definition && 'max' in definition) {
