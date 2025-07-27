@@ -4,7 +4,8 @@ import pandas as pd
 from feed_pokemon import *
 from data.lists_pokemon import *
 
-FORM_EXCLUDES = ['minior', 'scatterbug', 'spewpa', 'mothim', 'sinistea', 'polteageist', 'poltchageist', 'sinistea']
+FORM_EXCLUDES = ['minior', 'scatterbug', 'spewpa', 'mothim', 'sinistea', 'polteageist',
+                 'poltchageist', 'sinistcha', 'pichu', 'xerneas', '-unknown']
 
 def request_mons():
     url = "https://pokeapi.co/api/v2/pokemon-form?limit=3000&offset=1025"

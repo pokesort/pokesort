@@ -43,8 +43,8 @@ function getSurname(name: string, species_name: string) {
 }
 
 export default React.memo(function PuzzleBlock({ pokemon, multiselect, isSelected, isSolved=false, isCorrect=false, isIncorrect=false, onSelect, onPress }: BlockProps) {
-    const default_url = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`;
-    const shiny_url = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${pokemon.id}.png`;
+    const default_url = pokemon.sprite_default;
+    const shiny_url = pokemon.sprite_shiny;
 
     const handleThisBlockSelect = useCallback(() => {
         onSelect(pokemon.id);

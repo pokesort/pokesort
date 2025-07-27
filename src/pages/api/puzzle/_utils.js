@@ -7,7 +7,7 @@ export const populate = async (res, existingPuzzle) => {
 
   await Promise.all(
     existingPuzzle.groups.map(async (group) => {
-      dictionary['pokemons'].push(await data.db.collection('pokemon').find({ id: { $in: group.pokemons }}, { projection: { name: 1, id: 1, species_name: 1, dex_number: 1, _id: 0 } }).toArray());
+      dictionary['pokemons'].push(await data.db.collection('pokemon').find({ id: { $in: group.pokemons }}, { projection: { name: 1, id: 1, species_name: 1, dex_number: 1, sprite_default: 1, sprite_shiny: 1, cry: 1, _id: 0 } }).toArray());
       
       const queryParams = group.query.slice(1).split('&');
       for (const q of queryParams) {

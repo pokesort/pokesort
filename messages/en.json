@@ -37,7 +37,7 @@
         "dex-tabs": {
             "traits": "Traits",
             "moves": "Moves",            
-            "moves-level": "Moves learned by level-up",
+            "moves-level": "Learned by Level-Up",
             "related": "Related",
             "received-damage": "Damage Received by Type",
             "evolution-chain": "Evolution Chain:",

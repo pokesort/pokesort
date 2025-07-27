@@ -8,6 +8,7 @@ REGIONS = {
     '7': "alola",
     '8': "galar",
     '9': "paldea",
+    '0': 'hisui'
 }
 
 GENERATIONS = {
