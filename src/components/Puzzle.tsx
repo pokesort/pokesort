@@ -162,7 +162,7 @@ const VictoryModal = React.memo(({type, guesses, dateOg, victoryOpen, setVictory
                     <p>{t(`victory.next-daily`)}:</p>
                     <h1><Countdown targetDate={getNextRefresh()} active={victoryOpen} /></h1>
                 </div>
-                <button className="modal-content-div" onClick={ () => redirect('/daily') }>
+                <button className="modal-content-div" onClick={ () => redirect('/') }>
                     <p>{t(`victory.back`)}</p>
                 </button>
                 </>
@@ -207,10 +207,13 @@ type PuzzleGuess = {
 
 interface GuessLogsInterface {
     guesses: PuzzleGuess[];
+    spritesMap:  React.RefObject<Record<number, string>>;
 }
 
-const GuessLogs = React.memo(({guesses}: GuessLogsInterface) => {
+const GuessLogs = React.memo(({guesses, spritesMap}: GuessLogsInterface) => {
 const t = useTranslations('puzzle');
+
+console.log(spritesMap);
 
     return (
         <section className="puzzle-guess-logs">
@@ -221,7 +224,7 @@ const t = useTranslations('puzzle');
                         <div className="accuracy-circle" title={`${guess.accuracy}% ${t('correct')}`}/>
                         <div className="guess-group">
                             {guess.pokemons.map((pokemon: number) => (
-                                <PokeSprite key={pokemon} url={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon}.png`}/>
+                                <PokeSprite key={pokemon} url={spritesMap.current[pokemon]}/>
                             ) )}
                         </div>
                     </div>
@@ -467,6 +470,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
     const t = useTranslations('puzzle');
     const locale = useLocale();
     const mainTabRef = useRef<HTMLDivElement>(null);
+    const spritesMap = useRef<Record<number, string>>({});
     
     const [guesses, setGuesses] = useState<PuzzleGuess[]>([]);
     const [forcedGuesses, setForcedGuesses] = useState<PuzzleGuess[]>([]);
@@ -510,7 +514,12 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
     const [currentDexView, setCurrentDexView] = useState<number>();
 
     useEffect(() => {
-        if (dictionary) setPokemons(shuffleArray(dictionary.pokemons));
+        if (dictionary) {
+            setPokemons(shuffleArray(dictionary.pokemons));
+            dictionary.pokemons.forEach((p: any) => {
+                spritesMap.current[p.id] = p.sprite_default;
+            })
+        }
     }, [dictionary]);
 
     useEffect(() => {
@@ -575,7 +584,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
                             <LogsIcon/>
                             <p>{t('logs')}<span>{guesses.length}</span></p>
                         </section>
-                        <GuessLogs guesses={guesses} />
+                        <GuessLogs guesses={guesses} spritesMap={spritesMap} />
                     </div>
                 </PuzzleTab> : <div></div>}
                 <PuzzleTab setVisibleTab={setVisibleTab} tab={1}>

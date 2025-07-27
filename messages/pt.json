@@ -1,5 +1,14 @@
 {
-    "test": "Mensagem em português",
+    "home": {
+        "subtitle": "Um puzzle de associação diário de Pokémon",
+
+        "daily": "Resolva nosso puzzle de hoje",
+        "infinite": "Gere um puzzle personalizado",
+        "archive": "Explore jogos de dias anteriores",
+        "dex": "Prepare-se conhecendo nossos dados",
+
+        "disclaimer": "O Pokesort não é afiliado à Nintendo e não possui nem reivindica quaisquer direitos sobre as marcas registradas da Nintendo ou da franquia Pokémon. Todas as referências feitas a essas marcas são utilizadas apenas para fins de comentário e informação."
+    },
     "header": {
         "daily": "Diário",
         "infinite": "Infinito",
@@ -11,6 +20,7 @@
         "error": "Erro",
         "not-found": "Não conseguimos encontrar o que você pediu.",
         "internal": "Algo de estranho aconteceu.",
+        "maintenance": "O Pokesort está em manutenção. Por favor volte mais tarde!",
         "go-back": "Voltar"
     },
 
@@ -27,6 +37,7 @@
         "dex-tabs": {
             "traits": "Características",
             "moves": "Movimentos",
+            "moves-level": "Aprendidos por Nível",
             "related": "Relacionados",
             "received-damage": "Dano Recebido por Tipo",
             "evolution-chain": "Cadeia Evolutiva:",

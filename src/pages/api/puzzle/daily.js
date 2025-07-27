@@ -1,6 +1,7 @@
 import { connect, data } from '@/lib/mongodb';
 import { getPuzzleModel } from '@/src/models/Puzzle';
 import { populate } from './_utils';
+import {generateTips} from '../../../scripts/utils';
 
 export default async function handler(req, res) {
   await connect();
@@ -17,6 +18,11 @@ export default async function handler(req, res) {
   if (req.method === 'GET'){
     existingPuzzle.daily = true;
     const dictionary = await populate(res, existingPuzzle);
+    for (const group of existingPuzzle.groups) {
+      group.tips = generateTips(group.pokemons, group.query);
+    }
+    console.log(existingPuzzle.groups[0].tips);
+    
     return res.status(200).json({success: true, data: existingPuzzle, dictionary: dictionary})
   }
 

@@ -112,7 +112,7 @@ export default async function handler(req, res) {
       filter = await handleMaxGeneration(parseInt(max_generation), filter);
     }
 
-  let pokemons = await data.db.collection('pokemon').find(filter, { projection: { name: 1, id: 1, species_name: 1, dex_number: 1, _id: 0 } }).sort({ dex_number: 1, id: 1}).toArray();
+  let pokemons = await data.db.collection('pokemon').find(filter, { projection: { name: 1, id: 1, species_name: 1, dex_number: 1, sprite_default: 1, sprite_shiny: 1, cry: 1, _id: 0 } }).sort({ dex_number: 1, id: 1}).toArray();
 
     res.status(200).json({ success: true, pokemons });
   } catch (error) {

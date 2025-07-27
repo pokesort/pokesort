@@ -101,7 +101,9 @@ export default async function handler(req, res) {
                 species_name: "$$cd.species_name",
                 dex_number: "$$cd.dex_number",
                 evolution_step: "$$cd.evolution_step",
-                step_override: { $ifNull: ["$$cd.step_override", null] },
+                step_override: { $ifNull: ["$$cd.step_override", null] },                
+                sprite_default: "$$cd.sprite_default",
+                sprite_shiny: "$$cd.sprite_shiny"
               },
             },
           },
@@ -232,6 +234,8 @@ export default async function handler(req, res) {
                 name: 1,
                 species_name: 1,
                 dex_number: 1,
+                sprite_default: 1,
+                sprite_shinyt: 1
               },
             },
           ],
@@ -248,6 +252,8 @@ export default async function handler(req, res) {
                 id: "$$f.id",
                 species_name: "$$f.species_name",
                 dex_number: "$$f.dex_number",
+                sprite_default: "$$f.sprite_default",
+                sprite_shiny: "$$f.sprite_shiny"
               },
             },
           },
@@ -270,7 +276,7 @@ export default async function handler(req, res) {
           chain_evo_data: 0,
           split_parts: 0,
           evo_data: 0,
-          evolution_step: 0,
+          evolution_step: 0
         },
       },
     ];

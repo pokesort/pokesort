@@ -1,5 +1,14 @@
 {
-    "test": "Message in english",
+    "home": {
+        "subtitle": "A daily Pokémon association puzzle",
+
+        "daily": "Solve today's puzzle",
+        "infinite": "Generate a custom puzzle",
+        "archive": "Explore previous puzzles",
+        "dex": "Get familiar with our data",
+
+        "disclaimer": "O Pokesort não é afiliado à Nintendo e não possui nem reivindica quaisquer direitos sobre as marcas registradas da Nintendo ou da franquia Pokémon. Todas as referências feitas a essas marcas são utilizadas apenas para fins de comentário e informação."
+    },
     "header": {
         "daily": "Daily",
         "archive": "Archive",
@@ -10,7 +19,8 @@
         "oops": "Uh-oh...",
         "error": "Error",
         "not-found": "We couldn't find what you asked.",
-        "internal": "Something unexpected happened.",
+        "internal": "Something unexpected happened.",        
+        "maintenance": "Pokesort is undergoing maintenance. Pleace hold for a bit!",
         "go-back": "Go back"
     },
 
@@ -26,7 +36,8 @@
         },
         "dex-tabs": {
             "traits": "Traits",
-            "moves": "Moves",
+            "moves": "Moves",            
+            "moves-level": "Learned by Level-Up",
             "related": "Related",
             "received-damage": "Damage Received by Type",
             "evolution-chain": "Evolution Chain:",

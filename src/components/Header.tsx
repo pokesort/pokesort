@@ -40,25 +40,28 @@ export default function Header ({ pathname }: HeaderProps) {
     
 
     return (
-        <header>
+        <header data-path={pathname}>
             <Link id="home" href="/">
                 <SvgLogo/>
                 <h1>POKESORT</h1>
             </Link>
             
+            <div className={`menu ${menuOpen ? 'open' : ''}`}>
+                <nav>
+                    {pages && pages.map((page: Page, index: number) => (
+                        <Link
+                            key={index}
+                            href={page.route}
+                            className={pathname === page.route ? 'selected' : ''}>
+                                {page.label}{page.beta ? ' ᵇᵉᵗᵃ' : ''}
+                        </Link>
+                    ))}
+                </nav>
+                {/* <p>?</p> */}
+            </div>
             <button id="menu-icon" onClick={() => setMenuOpen(prev => !prev)}>
                 <HamburgerIcon/>
             </button>
-            <nav className={menuOpen ? 'open' : ''}>
-                {pages && pages.map((page: Page, index: number) => (
-                    <Link
-                        key={index}
-                        href={page.route}
-                        className={pathname === page.route ? 'selected' : ''}>
-                            {page.label}{page.beta ? ' ᵇᵉᵗᵃ' : ''}
-                    </Link>
-                ))}
-            </nav>
         </header>
     )
 }

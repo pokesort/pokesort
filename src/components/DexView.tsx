@@ -7,7 +7,7 @@ import Link from 'next/link';
 import '@/src/styles/components/DexView.scss';
 import helpDexImage from '@/src/assets/images/help_dex.png';
 import Loading from './Loading';
-import { REGIONALS, toTitleCase, includesAnySubstring } from '../scripts/utils';
+import { REGIONALS, toTitleCase, includesAnySubstring, compareArrays } from '../scripts/utils';
 import PokeSprite from './PokeSprite';
 import IconType from './IconType';
 
@@ -18,8 +18,12 @@ const processVarieties = (pokemon: any) => {
         pokemon.chain = pokemon.chain.filter((s: any) => s.chain_id == chain_id).sort((a: any, b: any) => a.step - b.step);
         const length = pokemon.chain.length;
 
-        pokemon.chain = pokemon.chain.map((mon: any) => {
-            if (mon.sprite_url == null) mon.sprite_url = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${mon.id}.png`;
+        pokemon.chain = pokemon.chain.map((mon: any, index: number) => {
+            // Remover formas alternativas redundantes da chain
+            console.log(pokemon.chain.filter((s: any) => s.dex_number == mon.dex_number && compareArrays(s.methods, mon.methods)).length);
+            if (index > 0 && mon.id > 10000 && pokemon.chain.filter((s: any) => s.dex_number == mon.dex_number && compareArrays(s.methods, mon.methods)).length > 1)
+                return null;
+            if (mon.id < 10000) mon.name = mon.species_name;
             if (mon.id == pokemon.id && mon.is_split) pokemon.is_split = 1;
             if (mon.id == pokemon.id && mon.has_split) pokemon.has_split = 1;
             if (mon.step_override != null) return mon;
@@ -38,7 +42,7 @@ const processVarieties = (pokemon: any) => {
             }
 
             return mon;
-        })
+        }).filter((mon: any) => mon !== null);
     } else {
         pokemon.chain = [{
             id: pokemon.id,
@@ -47,7 +51,7 @@ const processVarieties = (pokemon: any) => {
             species_name: pokemon.species_name,
             step_override: 'no_line',
             methods: [],
-            sprite_url: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`
+            sprite_default: pokemon.sprite_default
         }]
     }
 
@@ -58,13 +62,11 @@ const processVarieties = (pokemon: any) => {
         dex_number: pokemon.dex_number,
         name: pokemon.name,
         species_name: pokemon.species_name,
-        sprite_url: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`
+        sprite_default: pokemon.sprite_default
     });
     pokemon.other_forms = pokemon.other_forms.sort((a: any, b: any) => a.id - b.id);
     
     pokemon.other_forms = pokemon.other_forms.map((mon: any) => {
-        if (mon.sprite_url == null) mon.sprite_url = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${mon.id}.png`;
-
         if (mon.id < 10000) {
             mon.form_class = 'original';
             return mon;
@@ -97,7 +99,7 @@ interface DexDataProps {
 
 const DexData = React.memo(({pokemon, setSearchId}: DexDataProps) => {
     const t = useTranslations();
-    const default_url = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`;
+    const default_url = pokemon.sprite_default;
 
     const [currentTab, setCurrentTab] = useState<number>(0);
 
@@ -217,6 +219,10 @@ const DexData = React.memo(({pokemon, setSearchId}: DexDataProps) => {
             }
             {currentTab == 1 &&
                 <div className="v-group">
+                    <div className="block dark">
+                        <span>{t(`puzzle.dex-tabs.moves-level`)}</span>
+                    </div>
+
                     {pokemon.moves.map(( move: any, index: any) => (
                         <div key={index} className="block">
                             <IconType key={`icon-${index}`} folder="types" item={move.type} />
@@ -235,7 +241,7 @@ const DexData = React.memo(({pokemon, setSearchId}: DexDataProps) => {
                         <div className="h-group" key={index} style={{cursor: 'pointer'}}
                         onClick={() => setSearchId(step.id)} title={t(`puzzle.dex-tabs.move_to`)+toTitleCase(step.name)}>
                             <div className="sprite-block">
-                                <PokeSprite url={step.sprite_url} />
+                                <PokeSprite url={step.sprite_default} />
                             </div>
                             <div className="v-group">
                                 <div className="h-group">
@@ -270,7 +276,7 @@ const DexData = React.memo(({pokemon, setSearchId}: DexDataProps) => {
                         <div className="h-group" key={index} style={{cursor: 'pointer'}}
                         onClick={() => setSearchId(step.id)} title={t(`puzzle.dex-tabs.move_to`)+toTitleCase(step.name)}>
                             <div className="sprite-block">
-                                <PokeSprite url={step.sprite_url} />
+                                <PokeSprite url={step.sprite_default} />
                             </div>
                             <div className="v-group">
                                 <div className="h-group">

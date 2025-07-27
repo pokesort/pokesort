@@ -10,7 +10,7 @@ export const FIELD_OPTIONS = {
   moves: { min: 1, max: 919 },
   generation: { min: 1, max: 9 },
   abilities: { min: 1, max: 307 },
-  habitat: ['cave', 'forest', 'grassland', 'mountain', 'rare', 'rough-terrain', 'sea', 'urban', 'waters-edge'],
+  // habitat: ['cave', 'forest', 'grassland', 'mountain', 'rare', 'rough-terrain', 'sea', 'urban', 'waters-edge'],
   step: ['no_line', 'has_split', 'is_split'],
   weak: { min: 1, max: 18 },
   strong: { min: 1, max: 18 },
@@ -43,13 +43,23 @@ export const pickRandom = (array, count = 1) => {
   return result;
 };
 
+export const removeFieldValue = (obj, key, valueToRemove) => {
+
+  const target = obj[key];
+  obj[key] = target.filter(v => v !== valueToRemove);
+
+  if (obj[key].length === 0) {
+    delete obj[key];
+  }
+}
+
 export function pickRandomMult(array, count = 1) {
   const shuffled = array.sort(() => 0.5 - Math.random());
   return shuffled.slice(0, count);
 }
 
-export const getRandomFieldValue = (field) => {
-  const definition = FIELD_OPTIONS[field];
+export const getRandomFieldValue = (field, fields) => {
+  const definition = fields[field];
   if (Array.isArray(definition)) {
     return pickRandom(definition, 1)[0];
   } else if (typeof definition === 'object' && 'min' in definition && 'max' in definition) {
@@ -104,4 +114,24 @@ export function includesAnySubstring(mainString, substrings) {
 
 export function shuffleArray(array) {
     return [...array].sort(() => Math.random() - 0.5);
+}
+
+export function generateTips(ids, queries) {
+  const pokemons = pickRandomMult(ids, Math.floor(ids.length / 2));
+  
+  queries = queries.slice(1);
+  queries = queries.split('&');
+  
+  const text = pickRandom(queries)[0];
+  const values = pokemons;
+
+  return {
+    text,
+    values
+  };
+}
+
+export function compareArrays (a, b) {
+  if (a.length !== b.length) return false;
+  return a.slice().sort().every((val, i) => val === b.slice().sort()[i]);
 }

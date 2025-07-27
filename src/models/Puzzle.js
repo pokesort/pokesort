@@ -9,6 +9,22 @@ const groupSchema = new mongoose.Schema({
         type: [Number],
         required: true,
     },
+    tips: {
+        text: {
+            type: String,
+            required: true,
+        },
+        values: {
+            type: [Number],
+            validate: {
+                validator: function(arr) {
+                    return arr.length === 2 || arr.length === 3;
+                },
+                message: 'array length must be 2 or 3'
+            },
+            required: true,
+        }
+    }
 });
 
 const puzzleSchema = new mongoose.Schema({

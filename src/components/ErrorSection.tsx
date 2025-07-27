@@ -20,11 +20,11 @@ export default function ErrorSection ({ code, message }: ErrorPageProps) {
             <div className="flex">
                 <img alt="Mimikyu :(" src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${mimikyu}.png`}/>
                 <div>
-                    <h1>{t('error')} {code}</h1>
+                    {code != '' && <h1>{t('error')} {code}</h1>}
                     <p>{t(message)}</p>
                 </div>
             </div>
-            <button onClick={router.back}>{t('go-back')}</button>
+            {code != '' && <button onClick={router.back}>{t('go-back')}</button>}            
         </section>
     )
 }

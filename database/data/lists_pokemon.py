@@ -8,17 +8,18 @@ REGIONS = {
     '7': "alola",
     '8': "galar",
     '9': "paldea",
+    '0': 'hisui'
 }
 
 GENERATIONS = {
-    'primal': '6',
-    'mega': '6',
-    'alola': '7',
-    'gmax': '8',
-    'galar': '8',
-    'hisui': '8',
-    'origin': '8',
-    'paldea': '9'
+    '-primal': '6',
+    '-mega': '6',
+    '-alola': '7',
+    '-gmax': '8',
+    '-galar': '8',
+    '-hisui': '8',
+    '-origin': '8',
+    '-paldea': '9'
 }
 
 ABILITIES = {
@@ -104,12 +105,13 @@ PARADOX = [
     'iron-moth', 'iron-thorns', 'iron-valiant', 'iron-boulder', 'iron-crown',
 ]
 
+FOSSIL = [
+    'aerodactyl', 'amaura', 'aurorus', 'anorith', 'archen', 'archeops', 'arctovish', 'arctozolt',
+    'armaldo', 'bastiodon', 'carracosta', 'cradily', 'cranidos', 'dracovish', 'dracozolt', 'kabuto',
+    'kabutops', 'lileep', 'omanyte', 'omastar', 'rampardos', 'shieldon', 'tirtouga', 'tyrantrum', 'tyrunt'
+]
+
 FORMS_SWITCHABLE = [
     'zygarde', 'hoopa', 'oricorio', 'wishiwashi', 'silvally', 'minior', 'mimikyu', 'necrozma',
     'eiscue', 'morpeko', 'zacian', 'zamazenta', 'calyrex', 'palafin', 'ogerpon', 'terapagos'
 ]
-
-# Pokémons com o id da esquerda recebem o id da direita
-ID_EQUIVALENCE = {
-    10181: 10118
-}
