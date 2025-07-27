@@ -217,6 +217,10 @@ const DexData = React.memo(({pokemon, setSearchId}: DexDataProps) => {
             }
             {currentTab == 1 &&
                 <div className="v-group">
+                    <div className="block dark">
+                        <span>{t(`puzzle.dex-tabs.moves-level`)}</span>
+                    </div>
+
                     {pokemon.moves.map(( move: any, index: any) => (
                         <div key={index} className="block">
                             <IconType key={`icon-${index}`} folder="types" item={move.type} />

@@ -19,7 +19,8 @@
         "oops": "Uh-oh...",
         "error": "Error",
         "not-found": "We couldn't find what you asked.",
-        "internal": "Something unexpected happened.",
+        "internal": "Something unexpected happened.",        
+        "maintenance": "Pokesort is undergoing maintenance. Pleace hold for a bit!",
         "go-back": "Go back"
     },
 
@@ -35,7 +36,8 @@
         },
         "dex-tabs": {
             "traits": "Traits",
-            "moves": "Moves",
+            "moves": "Moves",            
+            "moves-level": "Moves learned by level-up",
             "related": "Related",
             "received-damage": "Damage Received by Type",
             "evolution-chain": "Evolution Chain:",

@@ -20,6 +20,7 @@
         "error": "Erro",
         "not-found": "Não conseguimos encontrar o que você pediu.",
         "internal": "Algo de estranho aconteceu.",
+        "maintenance": "O Pokesort está em manutenção. Por favor volte mais tarde!",
         "go-back": "Voltar"
     },
 
@@ -36,6 +37,7 @@
         "dex-tabs": {
             "traits": "Características",
             "moves": "Movimentos",
+            "moves-level": "Movimentos aprendidos por nível",
             "related": "Relacionados",
             "received-damage": "Dano Recebido por Tipo",
             "evolution-chain": "Cadeia Evolutiva:",
