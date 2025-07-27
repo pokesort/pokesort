@@ -43,13 +43,23 @@ export const pickRandom = (array, count = 1) => {
   return result;
 };
 
+export const removeFieldValue = (obj, key, valueToRemove) => {
+
+  const target = obj[key];
+  obj[key] = target.filter(v => v !== valueToRemove);
+
+  if (obj[key].length === 0) {
+    delete obj[key];
+  }
+}
+
 export function pickRandomMult(array, count = 1) {
   const shuffled = array.sort(() => 0.5 - Math.random());
   return shuffled.slice(0, count);
 }
 
-export const getRandomFieldValue = (field) => {
-  const definition = FIELD_OPTIONS[field];
+export const getRandomFieldValue = (field, fields) => {
+  const definition = fields[field];
   if (Array.isArray(definition)) {
     return pickRandom(definition, 1)[0];
   } else if (typeof definition === 'object' && 'min' in definition && 'max' in definition) {

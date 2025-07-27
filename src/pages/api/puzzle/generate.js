@@ -4,13 +4,14 @@ import {
   pickRandom,
   getRandomFieldValue,
   pickRandomMult,
-  generateTips
+  generateTips,
+  removeFieldValue
 } from '@/src/scripts/utils.js';
 
 import { populate } from './_utils';
 import { FetchPokemonError, MaxAttemptsError } from '../../../scripts/erros';
-
 let idsUsed = [];
+let fields = structuredClone(FIELD_OPTIONS);
 
 export default async function handler(req, res) {
 
@@ -27,6 +28,8 @@ export default async function handler(req, res) {
 
   if (!infinite && (password != process.env.AUTHORIZATION_BATCH)) return res.status(403).json({ success: false, message: "Usuário não permitido" });
 
+  fields = structuredClone(FIELD_OPTIONS);
+
   const randomInRange = (min, max) => {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   };
@@ -41,7 +44,12 @@ export default async function handler(req, res) {
     const groups = [];
     try {
       for (let j = 0; j < rows; j++) {
-        const group = await generateGroup(cols, generation, excludeFields, infinite);
+
+        let allFields = Object.keys(fields);
+        if (excludeFields != undefined) {
+          allFields = allFields.filter(f => !excludeFields.includes(f));
+        }
+        const group = await generateGroup(cols, generation, allFields, infinite);
         groups.push(group);
       }
     } catch (error) {
@@ -63,7 +71,9 @@ export default async function handler(req, res) {
     });
   }
 
+  //Validar Puzzle
   if (infinite) {
+    console.log(puzzles[0]);
     const dictionary = await populate(res, puzzles[0]);
     return res.status(200).json({ success: true, data: puzzles[0], dictionary: dictionary });
   }
@@ -80,27 +90,26 @@ export default async function handler(req, res) {
   return res.status(response.status).json(result);
 }
 
-export async function generateGroup(cols, generation, excludeFields, infinite) {
+export async function generateGroup(cols, generation, allFields, infinite) {
 
   const max_attempt = 5;
   let attempt = 0;
-
+  
   while (!infinite || infinite && attempt <= max_attempt) {
-
-    let allFields = Object.keys(FIELD_OPTIONS);
-    if (excludeFields != undefined) {
-      allFields = allFields.filter(f => !excludeFields.includes(f));
-    }
-
+    
+    let hasbreak = false;
     let numFields = 0;
     numFields = randomInRange(1, 3);
 
     const selectedFields = pickRandom(allFields, numFields);
 
     const queryParts = selectedFields.map((field) => {
-      const value = getRandomFieldValue(field);
+      const value = getRandomFieldValue(field, fields);
+      if (value == undefined) hasbreak = true;
       return `${field}=${value}`;
     });
+
+    if(hasbreak) continue;
 
     const query = '?' + queryParts.join('&');
     const route = `/api/pokemon/get${query}${generation ? `&max_generation=${generation}` : ''}`
@@ -109,7 +118,7 @@ export async function generateGroup(cols, generation, excludeFields, infinite) {
     if (!response.ok) {
       throw new FetchPokemonError(`Erro ao buscar pokémons: ${response.statusText}`);
     }
-
+    
     const { pokemons } = await response.json();
     const ids = pokemons.map(p => p.id);
 
@@ -122,6 +131,7 @@ export async function generateGroup(cols, generation, excludeFields, infinite) {
       idsUsed.push(...selected);
 
       const tips = generateTips(selected, query);
+      removeUsedQueries(query);
       
       return {
         query,
@@ -136,4 +146,15 @@ export async function generateGroup(cols, generation, excludeFields, infinite) {
   }
 
   throw new MaxAttemptsError("Máximo de Tentativas alcançado")
+}
+
+function removeUsedQueries(query){
+  
+  console.log("FIELD_OPTIONS: ", fields);
+  const queryObjects = query.slice(1).split('&');
+
+  queryObjects.forEach(element => {
+    let elements = element.split('=');
+    removeFieldValue(fields, elements[0], elements[1])
+  });
 }
