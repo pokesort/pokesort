@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import React, { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { useLocale } from 'next-intl';
-import { formatDate, isYesterday, shuffleArray, getNextRefresh } from '@/src/scripts/utils';
+import { formatDate, isYesterday, shuffleArray, getNextRefresh, toTitleCase, decodeTips } from '@/src/scripts/utils';
 import { useInView } from 'react-intersection-observer';
 import { redirect } from 'next/navigation';
 
@@ -146,7 +146,7 @@ const VictoryModal = React.memo(({type, guesses, dateOg, victoryOpen, setVictory
             <div className="modal-content-div">
                 <div className="guesses-container">
                     {guesses.map((guess: PuzzleGuess, index: number) => (
-                        <li key={index} className={`guess-${guess.accuracy >= 100 ? '1' : '0'}`}></li>
+                        <li key={index} className={`guess-${guess.accuracy >= 100 ? '1' : '0'} ${guess.type == 1 ? 'guess-2' : ''}`}></li>
                     ))}
                 </div>
                 <div className="guesses-container">
@@ -203,39 +203,110 @@ type PuzzleGuess = {
     accuracy: number;
     pokemons: number[];
     group: number | null;
+    tip: number | null;
+}
+
+type PuzzleTip = {
+    group: string;
+    tip: string;
 }
 
 interface GuessLogsInterface {
     guesses: PuzzleGuess[];
+    setGuesses: React.Dispatch<React.SetStateAction<PuzzleGuess[]>>;
+    availableTips: number;
+    setAvailableTips: React.Dispatch<React.SetStateAction<number>>;
     spritesMap:  React.RefObject<Record<number, string>>;
+    allTips: React.RefObject<PuzzleTip[]>;
+    solvedGroupNames: string[];
 }
 
-const GuessLogs = React.memo(({guesses, spritesMap}: GuessLogsInterface) => {
-const t = useTranslations('puzzle');
+const GuessLogs = React.memo(({guesses, setGuesses, availableTips, setAvailableTips, spritesMap, allTips, solvedGroupNames}: GuessLogsInterface) => {
+    const t = useTranslations('');
+    const viewedTips = useRef<number[]>([]);
 
-console.log(spritesMap);
+    const askForTip = () => {
+        if (availableTips <= 0 || viewedTips.current.length == allTips.current.length) return;
+
+        let guess: PuzzleGuess = {
+            type: 1,
+            accuracy: 0,
+            pokemons: [],
+            group: null,
+            tip: null
+        };
+        let tip: PuzzleTip | null = null;
+
+        while (!tip) {
+            const index = Math.floor(Math.random() * allTips.current.length);
+            const possibleTip: PuzzleTip = allTips.current[index];
+            if (!viewedTips.current.includes(index) && !solvedGroupNames.includes(possibleTip.group)) {
+                tip = possibleTip;
+                guess.tip = index;
+                viewedTips.current.push(index);
+            }
+        }
+
+        setAvailableTips(prev => prev-1);
+        setGuesses((prev: PuzzleGuess[]) => [...prev, guess]);
+    }
+
+    const renderTip = (allTips: React.RefObject<PuzzleTip[]>, tipIndex: number) => {
+        const tip: any = decodeTips(allTips.current[tipIndex].tip);
+
+        if (tip.type == 'pair') {
+            return (
+                <p className="tip">
+                    {tip.values.map((mon: string[], monIndex: number) => (
+                        <span key={monIndex}>
+                            <b>{toTitleCase(mon)}</b>
+                            {monIndex < tip.values.length-2 ? <>, </> : <></>}
+                            {monIndex == tip.values.length-2 ? <> {t(`puzzle.tips.and`)} </> : <></>}
+                        </span>
+                    ))}
+                    <> {t(`puzzle.tips.${tip.type}`)}</>
+                </p>
+            )
+        } else {
+            return (
+                <p className="tip">
+                    {t(`puzzle.tips.${tip.type}`)} <b>{t(`groupnames.${tip.values}.short`)}</b>
+                </p>
+            )
+        }        
+    }
 
     return (
-        <section className="puzzle-guess-logs">
-            {guesses.length > 0 ?
-                guesses.map((guess: PuzzleGuess, index: number) => (
-                    <div key={index} style={{'--accuracy': guess.accuracy} as CSSProperties}
-                        className={`puzzle-guess type-${guess.type} ${guess.accuracy == 100 ? 'correct' : ''}`}>
-                        <div className="accuracy-circle" title={`${guess.accuracy}% ${t('correct')}`}/>
-                        <div className="guess-group">
-                            {guess.pokemons.map((pokemon: number) => (
-                                <PokeSprite key={pokemon} url={spritesMap.current[pokemon]}/>
-                            ) )}
-                        </div>
-                    </div>
-                ))
-                :
-                <div className="tab-help">
-                    <img src={helpLogsImage.src}/>
-                    <p>{t('help.logs')}</p>
-                </div>
+        <>
+            {allTips.current.length > 0 &&
+                <button className="ask-tip" onClick={askForTip} data-tips={availableTips}>Pedir dica <span>x{availableTips}</span></button>
             }
-        </section>
+            <section className="puzzle-guess-logs">
+                {guesses.length > 0 ?
+                    <>                    
+                        {guesses.map((guess: PuzzleGuess, index: number) => (
+                            <div key={index} style={{'--accuracy': guess.accuracy} as CSSProperties}
+                                className={`puzzle-guess type-${guess.type} ${guess.accuracy == 100 ? 'correct' : ''}`}>
+                                <div className="accuracy-circle" title={`${guess.accuracy}% ${t('puzzle.correct')}`}/>
+                                <div className="guess-group">
+                                    {guess.tip != null &&
+                                        <>{renderTip(allTips, guess.tip)}</>
+                                    }
+                                    {guess.pokemons.map((pokemon: number) => (
+                                        <PokeSprite key={pokemon} url={spritesMap.current[pokemon]}/>
+                                    ) )}
+                                </div>
+                            </div>
+                        ))}
+                    </>
+                    :
+                    <div className="tab-help">
+                        <img src={helpLogsImage.src}/>
+                        <p>{t('puzzle.help.logs')}</p>
+                    </div>
+                }
+            </section>
+        </>
     )
 });
 
@@ -251,9 +322,11 @@ interface PuzzleGridProps {
     setVictoryOpen: React.Dispatch<React.SetStateAction<boolean>>
     setCurrentDexView: React.Dispatch<React.SetStateAction<number | undefined>>;
     scrollToTab: (target: number, behavior?: "instant" | "smooth") => void;
+    solvedGroupNames: string[];
+    resetAvailableTips: () => void;
 }
 
-const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, setGuesses, forcedGuesses=[], victoryOpen, setVictoryOpen, setCurrentDexView, scrollToTab}: PuzzleGridProps) => {
+const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, setGuesses, forcedGuesses=[], victoryOpen, setVictoryOpen, setCurrentDexView, scrollToTab, solvedGroupNames, resetAvailableTips}: PuzzleGridProps) => {
     const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
 
     const [groupSets, setGroupSets] = useState<Set<number>[]>([]);
@@ -261,7 +334,6 @@ const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, s
     const [correctGuessIds, setCorrectGuessIds] = useState<Set<number>>(new Set());
     const [solvedGroupIds, setSolvedGroupIds] = useState<Set<number>>(new Set());
     const [solvedInOrder, setSolvedInOrder] = useState<any[]>([]);
-    const [solvedGroupNames, setSolvedGroupNames] = useState<string[]>([]);
 
     useEffect(() => {
         let groupArray: Set<number>[] = [];
@@ -367,6 +439,7 @@ const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, s
             if (guess.accuracy >= 100) {
                 setCorrectGuessIds(selectedIds);
                 setTimeout(() => {
+                    resetAvailableTips();
                     markGroupAsSolved(selectedIds);
                     if (guess.group != null)
                         solvedGroupNames.push(puzzle.groups[guess.group].query);
@@ -469,9 +542,11 @@ interface PuzzleProps {
 export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, loading, setLoading, error, setError}: PuzzleProps) {
     const t = useTranslations('puzzle');
     const locale = useLocale();
+    const maxAvailableTips = 2;
+
     const mainTabRef = useRef<HTMLDivElement>(null);
     const spritesMap = useRef<Record<number, string>>({});
-    
+    const allTips = useRef<PuzzleTip[]>([]);
     const [guesses, setGuesses] = useState<PuzzleGuess[]>([]);
     const [forcedGuesses, setForcedGuesses] = useState<PuzzleGuess[]>([]);
 
@@ -512,9 +587,12 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
     const [mountVictoryModal, setMountVictoryModal] = useState<boolean>(false);
     const [visibleTab, setVisibleTab] = useState<number>(1);
     const [currentDexView, setCurrentDexView] = useState<number>();
+    const [solvedGroupNames, setSolvedGroupNames] = useState<string[]>([]);
+    const [availableTips, setAvailableTips] = useState<number>(maxAvailableTips);
 
     useEffect(() => {
         if (dictionary) {
+            allTips.current = dictionary.tips;
             setPokemons(shuffleArray(dictionary.pokemons));
             dictionary.pokemons.forEach((p: any) => {
                 spritesMap.current[p.id] = p.sprite_default;
@@ -537,7 +615,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
             setLoading(false);
             setRefresh(prev => !prev);
         }, 0);
-    }, [puzzle])
+    }, [puzzle])    
 
     useEffect(() => {
         const handleResize = () => {
@@ -571,6 +649,10 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
         }
     }, [puzzle]);
 
+    const resetAvailableAttempts = () => {
+        setAvailableTips(maxAvailableTips);
+    }
+
     return (
         <>
             {mountVictoryModal &&
@@ -584,7 +666,15 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
                             <LogsIcon/>
                             <p>{t('logs')}<span>{guesses.length}</span></p>
                         </section>
-                        <GuessLogs guesses={guesses} spritesMap={spritesMap} />
+                        <GuessLogs
+                            guesses={guesses}
+                            setGuesses={setGuesses}
+                            availableTips={availableTips}
+                            setAvailableTips={setAvailableTips}
+                            spritesMap={spritesMap}
+                            allTips={allTips}
+                            solvedGroupNames={solvedGroupNames}
+                        />
                     </div>
                 </PuzzleTab> : <div></div>}
                 <PuzzleTab setVisibleTab={setVisibleTab} tab={1}>
@@ -610,6 +700,8 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
                                 setVictoryOpen={setVictoryOpen}
                                 setCurrentDexView={setCurrentDexView}
                                 scrollToTab={scrollToTab}
+                                solvedGroupNames={solvedGroupNames}
+                                resetAvailableTips={resetAvailableAttempts}
                             />
                         )}
                     </div>

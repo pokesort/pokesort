@@ -125,10 +125,22 @@ export function generateTips(ids, queries) {
   const text = pickRandom(queries)[0];
   const values = pokemons;
 
+  return [
+    `text?${text}`,
+    `pair?${values}`
+  ];
+}
+
+export function decodeTips(tip) {
+  const split = tip.split('?');
+  const type = split[0];
+  const values = (type == 'pair') ?
+    split[1].split(',') :
+    split[1].split('=')[0]
+
   return {
-    text,
-    values
-  };
+    type, values
+  }
 }
 
 export function compareArrays (a, b) {

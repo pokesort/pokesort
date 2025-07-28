@@ -150,11 +150,10 @@ export async function generateGroup(cols, generation, allFields, infinite) {
 
 function removeUsedQueries(query){
   
-  console.log("FIELD_OPTIONS: ", fields);
-  const queryObjects = query.slice(1).split('&');
+  // const queryObjects = query.slice(1).split('&');
 
-  queryObjects.forEach(element => {
-    let elements = element.split('=');
-    removeFieldValue(fields, elements[0], elements[1])
-  });
+  // queryObjects.forEach(element => {
+  //   let elements = element.split('=');
+  //   removeFieldValue(fields, elements[0], elements[1])
+  // });
 }

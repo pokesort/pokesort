@@ -61,6 +61,11 @@
             "next-daily": "Next daily puzzle in",
             "back": "Back to Home",
             "generate": "Refresh Puzzle"
+        },
+        "tips": {
+            "and": "e",
+            "text": "A group includes the category",
+            "pair": "are in the same group"
         }
     },
     "groupnames": {

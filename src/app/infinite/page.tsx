@@ -45,6 +45,7 @@ export default function InfinitePage() {
 
                     if (errorData.code === 'MAX_ATTEMPTS') {
                         alert("Gerador falhou após várias tentativas. Tente novamente.");
+                        await fetchPageData();
                     }
                     
                     throw new Error('Erro ao obter informações do puzzle.');

@@ -22,13 +22,6 @@
         width: min(100%, calc(120px * var(--cols, 4)));
     }
 }
-@media (max-width: 1480px) {
-    .window-container:not(:has(section.puzzle)) {
-        min-height: 350px;
-        height: fit-content;
-        max-height: var(--height, 100%);
-    }
-}
 @media (max-width: 768px) {
     .window-container {
         padding-top: 0.1rem;
@@ -251,6 +244,7 @@ section.window-info-row {
 }
 
 .puzzle-guess-logs {
+    position: relative;
     display: flex;
     flex-direction: column;
     justify-content: start;
@@ -258,7 +252,7 @@ section.window-info-row {
     gap: var(--spacing);
     width: 100%;
     height: 100%;
-    overflow-y: auto;
+    overflow-y: auto;    
 
     div.puzzle-guess {
         display: flex;
@@ -272,7 +266,7 @@ section.window-info-row {
         
         transition: padding-top 0.3s ease;
 
-        &:first-child {
+        &:first-of-type {
             margin-top: auto;
         }
         &:last-child {
@@ -303,8 +297,31 @@ section.window-info-row {
             width: 48px;
         }
 
+        &:has(.tip) {
+            border: 2px solid color(selection4);
+
+            .accuracy-circle {
+                display: none;
+            }
+
+            .guess-group {
+                justify-self: center;
+                max-width: 90%;
+                height: 48px;
+
+                .tip {
+                    margin: auto 0;
+                    text-align: center;
+                }
+                b {
+                    font-weight: 500;
+                }
+            }
+        }
+
         &.correct {
             border: 2px solid color(selection3);
+
             .accuracy-circle {
                 background-image: unset;
                 background-color: color(selection3);
@@ -319,6 +336,29 @@ section.window-info-row {
                 }
             }
         }
+    }
+}
+
+button.ask-tip {
+    background-color: color(section2);
+    min-height: 68px;
+    flex: 0 0;
+    z-index: 10;
+
+    span {
+        color: color(text2);
+    }
+
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
+
+    &:hover {
+        box-shadow: 0px 0 70px color(darker);
+        z-index: 60;
+    }
+    &:active {
+        transform: scale(0.85);
     }
 }
 
@@ -345,7 +385,7 @@ section.window-info-row {
             background-color: color(selection3);
         }
         &.guess-2 {
-            background-color: color(selection1);
+            background-color: color(selection4);
         }
     }
 }
