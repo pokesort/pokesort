@@ -61,6 +61,12 @@
             "next-daily": "Próximo puzzle diário em",
             "back": "Voltar ao Início",
             "generate": "Gerar Novo Puzzle"
+        },
+        "tips": {
+            "ask": "Pedir Dica",
+            "and": "e",
+            "text": "Um grupo inclui a categoria",
+            "pair": "estão no mesmo grupo"
         }
     },
     "groupnames": {

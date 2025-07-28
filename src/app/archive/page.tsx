@@ -25,7 +25,6 @@ function Calendar({puzzles, loading}: CalendarProps) {
     if (puzzles) {
         dates = Object.keys(puzzles);
     }
-    console.log(dates);
 
     const renderHeader = () => (
         <section className="window-info-row">
@@ -64,7 +63,6 @@ function Calendar({puzzles, loading}: CalendarProps) {
                 const isCurrentMonth = isSameMonth(day, monthStart);
                 const dayString = format(day, "yyyy-MM-dd");
                 const userData: any = dates.includes(dayString) ? localStorage.getItem(`s_${puzzles[dayString]}`) : null
-                console.log(userData);
 
                 const blockClasses = clsx(
                     'calendar-cell',
