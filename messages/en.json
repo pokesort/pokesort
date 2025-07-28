@@ -63,6 +63,7 @@
             "generate": "Refresh Puzzle"
         },
         "tips": {
+            "ask": "Need a Hint?",
             "and": "e",
             "text": "A group includes the category",
             "pair": "are in the same group"

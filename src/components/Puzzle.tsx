@@ -225,8 +225,10 @@ const GuessLogs = React.memo(({guesses, setGuesses, availableTips, setAvailableT
     const t = useTranslations('');
     const viewedTips = useRef<number[]>([]);
 
-    const askForTip = () => {
+    const askForTip = () => {        
         if (availableTips <= 0 || viewedTips.current.length == allTips.current.length) return;
+
+        const logs = document.querySelector('.puzzle-guess-logs');
 
         let guess: PuzzleGuess = {
             type: 1,
@@ -247,6 +249,10 @@ const GuessLogs = React.memo(({guesses, setGuesses, availableTips, setAvailableT
             }
         }
 
+        logs?.scrollBy({
+            top: logs.scrollHeight,
+            behavior: "smooth",
+        });
         setAvailableTips(prev => prev-1);
         setGuesses((prev: PuzzleGuess[]) => [...prev, guess]);
     }
@@ -279,7 +285,7 @@ const GuessLogs = React.memo(({guesses, setGuesses, availableTips, setAvailableT
     return (
         <>
             {allTips.current.length > 0 &&
-                <button className="ask-tip" onClick={askForTip} data-tips={availableTips}>Pedir dica <span>x{availableTips}</span></button>
+                <button className="ask-tip" onClick={askForTip} data-tips={availableTips}>{t(`puzzle.tips.ask`)} <span>x{availableTips}</span></button>
             }
             <section className="puzzle-guess-logs">
                 {guesses.length > 0 ?

@@ -63,6 +63,7 @@
             "generate": "Gerar Novo Puzzle"
         },
         "tips": {
+            "ask": "Pedir Dica",
             "and": "e",
             "text": "Um grupo inclui a categoria",
             "pair": "estão no mesmo grupo"

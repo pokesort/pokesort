@@ -1,5 +1,6 @@
 import { connect, data } from '@/lib/mongodb';
 import mongoose from 'mongoose';
+import {generateTips} from '../../../scripts/utils';
 
 export const populate = async (res, existingPuzzle) => {
   await connect();
@@ -13,7 +14,7 @@ export const populate = async (res, existingPuzzle) => {
         pokemonsMap[m.id] = m.name;
       })
       dictionary['pokemons'].push(mons);
-      dictionary['tips'].push(populateTips(group.tips, pokemonsMap, group.query))
+      dictionary['tips'].push(populateTips(group.tips, group.pokemons, pokemonsMap, group.query))
       
       const queryParams = group.query.slice(1).split('&');
       for (const q of queryParams) {
@@ -38,10 +39,12 @@ export const populate = async (res, existingPuzzle) => {
   return res.status(200).json({success: true, data: existingPuzzle, dictionary: dictionary})
 }
 
-const populateTips = (tips, pokemonsMap, query) => {
+const populateTips = (tips, ids, pokemonsMap, query) => {
   const result = [];
 
-  if (!tips) return result;
+  if (tips.length <= 0) {
+    tips = generateTips(ids, query);
+  }
 
   for (let i = 0; i < tips.length; i++) {
     const tipObject = {group: query};
