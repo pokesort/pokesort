@@ -20,7 +20,6 @@ const processVarieties = (pokemon: any) => {
 
         pokemon.chain = pokemon.chain.map((mon: any, index: number) => {
             // Remover formas alternativas redundantes da chain
-            console.log(pokemon.chain.filter((s: any) => s.dex_number == mon.dex_number && compareArrays(s.methods, mon.methods)).length);
             if (index > 0 && mon.id > 10000 && pokemon.chain.filter((s: any) => s.dex_number == mon.dex_number && compareArrays(s.methods, mon.methods)).length > 1)
                 return null;
             if (mon.id < 10000) mon.name = mon.species_name;
