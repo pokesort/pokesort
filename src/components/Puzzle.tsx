@@ -284,7 +284,7 @@ const GuessLogs = React.memo(({guesses, setGuesses, availableTips, setAvailableT
 
     return (
         <>
-            {allTips.current.length > 0 &&
+            {guesses.length > 0 && allTips.current.length > 0 &&
                 <button className="ask-tip" onClick={askForTip} data-tips={availableTips}>{t(`puzzle.tips.ask`)} <span>x{availableTips}</span></button>
             }
             <section className="puzzle-guess-logs">
