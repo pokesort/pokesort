@@ -133,10 +133,12 @@ export function generateTips(ids, queries) {
 
 export function decodeTips(tip) {
   const split = tip.split('?');
-  const type = split[0];
-  const values = (type == 'pair') ?
+  let type = split[0];
+  let values = (type == 'pair') ?
     split[1].split(',') :
-    split[1].split('=')[0]
+    `${split[1].split('=')[0]}.short`
+  
+  if(split[1].includes('categories')) values = `categories.${split[1].split('=')[1]}`
 
   return {
     type, values

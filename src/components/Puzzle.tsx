@@ -276,7 +276,7 @@ const GuessLogs = React.memo(({guesses, setGuesses, availableTips, setAvailableT
         } else {
             return (
                 <p className="tip">
-                    {t(`puzzle.tips.${tip.type}`)} <b>{t(`groupnames.${tip.values}.short`)}</b>
+                    {t(`puzzle.tips.${tip.type}`)} <b>{t(`groupnames.${tip.values}`)}</b>
                 </p>
             )
         }        
