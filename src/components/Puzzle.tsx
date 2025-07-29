@@ -555,13 +555,15 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
     const allTips = useRef<PuzzleTip[]>([]);
     const [guesses, setGuesses] = useState<PuzzleGuess[]>([]);
     const [forcedGuesses, setForcedGuesses] = useState<PuzzleGuess[]>([]);
+    const [availableTips, setAvailableTips] = useState<number>(maxAvailableTips);
+
 
     const saveState = (id: string) => {
         if (id == '') return;
         let status = 0;
         if (guesses.filter((g: PuzzleGuess) => g.accuracy >= 100).length == puzzle?.rows)
             status = 1;
-        const state = {status, guesses};
+        const state = {status, guesses, tips: availableTips};
 
         localStorage.setItem(`s_${id}`, JSON.stringify(state));
     }
@@ -577,8 +579,11 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
         if (process.env.NODE_ENV === "development") {
             console.log(`Estado carregado para puzzle ${id}`);
         }
-        setGuesses(state.guesses);
-        setForcedGuesses(state.guesses.filter((g: PuzzleGuess) => g.accuracy >= 100));
+        if (state.guesses != undefined) {
+            setGuesses(state.guesses);
+            setForcedGuesses(state.guesses.filter((g: PuzzleGuess) => g.accuracy >= 100));
+        }
+        if (state.tips != undefined) setAvailableTips(state.tips);
         if (state.status > 0) {
             setTimeout(() => {
                 setVictoryOpen(true);
@@ -594,7 +599,6 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
     const [visibleTab, setVisibleTab] = useState<number>(1);
     const [currentDexView, setCurrentDexView] = useState<number>();
     const [solvedGroupNames, setSolvedGroupNames] = useState<string[]>([]);
-    const [availableTips, setAvailableTips] = useState<number>(maxAvailableTips);
 
     useEffect(() => {
         if (dictionary) {
