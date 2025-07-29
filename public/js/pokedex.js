@@ -1,0 +1,1 @@
+const P = new Pokedex.Pokedex({ cacheImages: true });
