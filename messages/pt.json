@@ -281,7 +281,7 @@
         },
         "dual": {
             "long": "Tipagem ",
-            "short": "Tipagem",
+            "short": "Número de Tipos",
 
             "1": "Única",
             "2": "Dupla"
