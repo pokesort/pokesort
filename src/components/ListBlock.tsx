@@ -66,7 +66,7 @@ export default React.memo(function PuzzleBlock({ pokemon, multiselect, isSelecte
                     onChange={handleThisBlockSelect}                    
                     hidden
                 />
-                <PokeSprite url={default_url} />
+                <PokeSprite slug={default_url} />
                 <h3>{p_name}</h3>
                 {p_surname != '' && (
                     <h4>{p_surname}</h4>

@@ -6,6 +6,7 @@ import feed_evolution_chain as evolutionChainDB
 import feed_evolution_methods as evolutionMethodDB
 import feed_pokemon as pokemon
 import feed_pokemon_form as pokemon_form
+import fix_sprite_urls
 from dotenv import load_dotenv
 import os
 
@@ -18,6 +19,7 @@ if __name__ == "__main__":
     # categoriesDB.init()
     # evolutionMethodDB.init()
     # evolutionChainDB.init()
-    pokemon.init()
-    pokemon_form.init()
+    # pokemon.init()
+    # pokemon_form.init()
 
+    fix_sprite_urls.init()

@@ -29,6 +29,10 @@ export default async function RootLayout({children,}: Readonly<{children: React.
   const locale = await getLocale();
   const headersList = await headers();
   const pathname = headersList.get('x-next-url') || '/';
+
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/serviceworker.js").catch(console.error);
+  }
   
   return (
     <html lang={locale}>
@@ -40,8 +44,6 @@ export default async function RootLayout({children,}: Readonly<{children: React.
             type="application/json"
             crossOrigin="anonymous"
           />
-        <script src="https://unpkg.com/pokeapi-js-wrapper/dist/index.js"></script>
-        <script src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/js/pokedex.js`}></script>
       </head>
       <NextIntlClientProvider>
         <body>
