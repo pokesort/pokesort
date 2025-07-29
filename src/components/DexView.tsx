@@ -117,7 +117,7 @@ const DexData = React.memo(({pokemon, setSearchId}: DexDataProps) => {
             <div className="v-group sticky">
                 <div className="h-group">
                     <div className="sprite-block">
-                        <PokeSprite url={default_url} />
+                        <PokeSprite slug={default_url} />
                     </div>
                     <div className="v-group">
                         <div className="block">
@@ -240,7 +240,7 @@ const DexData = React.memo(({pokemon, setSearchId}: DexDataProps) => {
                         <div className="h-group" key={index} style={{cursor: 'pointer'}}
                         onClick={() => setSearchId(step.id)} title={t(`puzzle.dex-tabs.move_to`)+toTitleCase(step.name)}>
                             <div className="sprite-block">
-                                <PokeSprite url={step.sprite_default} />
+                                <PokeSprite slug={step.sprite_default} />
                             </div>
                             <div className="v-group">
                                 <div className="h-group">
@@ -275,7 +275,7 @@ const DexData = React.memo(({pokemon, setSearchId}: DexDataProps) => {
                         <div className="h-group" key={index} style={{cursor: 'pointer'}}
                         onClick={() => setSearchId(step.id)} title={t(`puzzle.dex-tabs.move_to`)+toTitleCase(step.name)}>
                             <div className="sprite-block">
-                                <PokeSprite url={step.sprite_default} />
+                                <PokeSprite slug={step.sprite_default} />
                             </div>
                             <div className="v-group">
                                 <div className="h-group">

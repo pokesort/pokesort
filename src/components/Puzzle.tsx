@@ -299,7 +299,7 @@ const GuessLogs = React.memo(({guesses, setGuesses, availableTips, setAvailableT
                                         <>{renderTip(allTips, guess.tip)}</>
                                     }
                                     {guess.pokemons.map((pokemon: number) => (
-                                        <PokeSprite key={pokemon} url={spritesMap.current[pokemon]}/>
+                                        <PokeSprite key={pokemon} slug={spritesMap.current[pokemon]}/>
                                     ) )}
                                 </div>
                             </div>

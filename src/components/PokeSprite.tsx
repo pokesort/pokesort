@@ -5,10 +5,11 @@ import fallback from '@/src/assets/images/pk_fallback.svg';
 import React, { useEffect, useState } from 'react';
 
 interface SpriteProps {
-    url: string;
+    slug: string;
 }
 
-export default React.memo(function PokeSprite({ url }: SpriteProps) {
+export default React.memo(function PokeSprite({ slug }: SpriteProps) {
+    const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/sprites/${slug}`
     const [loadedImage, setLoadedImage] = useState<string | null>(null);
 
     const { ref, inView } = useInView({
