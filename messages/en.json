@@ -139,7 +139,7 @@
             "humanoid": "Humanoid-shaped",
             "tentacles": "Tentacles-shaped"
         },
-        "egg-groups": {
+        "egg_groups": {
             "long": "In the egg group ",
             "short": "Egg Group",
 

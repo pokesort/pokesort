@@ -136,9 +136,7 @@ export function decodeTips(tip) {
   let type = split[0];
   let values = (type == 'pair') ?
     split[1].split(',') :
-    `${split[1].split('=')[0]}.short`
-  
-  if(split[1].includes('categories')) values = `categories.${split[1].split('=')[1]}`
+    [{ key: split[1].split('=')[0], value: split[1].split('=')[1] }]
 
   return {
     type, values

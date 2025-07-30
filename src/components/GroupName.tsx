@@ -28,8 +28,7 @@ function getGroupList (queries: string) {
     return groupList;
 }
 
-function getNaturalGroupnames (groups: Group[], dictionary: any) {
-    const t = useTranslations();
+export function getNaturalGroupnames (groups: Group[], dictionary: any, t: any) {
     const direct = ['region'];
     const from_dict = ['abilities', 'moves'];
     const types = ['types', 'weak', 'strong', 'immune'];
@@ -38,6 +37,7 @@ function getNaturalGroupnames (groups: Group[], dictionary: any) {
 
     for (const group of groups) {
         let output = '';
+        group.key = group.key.replaceAll('-', '_');
         output += t(`groupnames.${group.key}.long`)
         if (direct.includes(group.key)) {            
             output += toTitleCase(group.value.replaceAll('-', ' '));
@@ -54,14 +54,14 @@ function getNaturalGroupnames (groups: Group[], dictionary: any) {
     return groupNames;
 }
 
-export default function GroupName ({query, dictionary}: GroupNameProps) {
+export function GroupName ({query, dictionary}: GroupNameProps) {
     const t = useTranslations();
     
     if (query[0] !== '?')
         return ( <span>{t(`groupname.custom.${query}`)}</span> )
 
     const groupList = getGroupList(query);
-    const naturalGroupNames = getNaturalGroupnames(groupList, dictionary);
+    const naturalGroupNames = getNaturalGroupnames(groupList, dictionary, t);
     let result = naturalGroupNames.join('  ·  ');
 
     return ( <span>{result}</span> )
