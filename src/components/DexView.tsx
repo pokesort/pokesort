@@ -173,10 +173,10 @@ const DexData = React.memo(({pokemon, setSearchId}: DexDataProps) => {
                         </div>
                     </div>
                     <div className="block">
-                        <span>{t(`groupnames.egg-groups.short`)}:</span>
+                        <span>{t(`groupnames.egg_groups.short`)}:</span>
                         {pokemon.egg_groups.map((group: string, index: number) => (
                             <div className="map-container" key={index}>
-                                <p>{t(`groupnames.egg-groups.${group}`)}</p>
+                                <p>{t(`groupnames.egg_groups.${group}`)}</p>
                                 {index != pokemon.egg_groups.length-1 ? <span>|</span> : <></>}
                             </div>
                         ))}

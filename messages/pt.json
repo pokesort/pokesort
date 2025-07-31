@@ -139,7 +139,7 @@
             "humanoid": "Humanóide",
             "tentacles": "com Tentáculos"
         },
-        "egg-groups": {
+        "egg_groups": {
             "long": "No Grupo de Reprodução ",
             "short": "Grupo de Reprodução",
 

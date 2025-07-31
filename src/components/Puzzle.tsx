@@ -11,7 +11,7 @@ import { redirect } from 'next/navigation';
 import type { PuzzleData } from '@/src/assets/types/PuzzleApiResponse';
 import "@/src/styles/components/Puzzle.scss";
 import PokemonBlock from '@/src/components/PuzzleBlock';
-import GroupName from '@/src/components/GroupName';
+import { GroupName, getNaturalGroupnames } from '@/src/components/GroupName';
 import Modal from '@/src/components/Modal';
 import Countdown from '@/src/components/Countdown';
 import Loading from '@/src/components/Loading';
@@ -82,6 +82,7 @@ const VictoryModal = React.memo(({type, guesses, dateOg, victoryOpen, setVictory
     const t = useTranslations('puzzle');
     const locale = useLocale();
     const date = formatDate(dateOg, locale, false);
+    const realGUesses = guesses.filter((g: PuzzleGuess) => g.type != 1);
 
     const [streak, setStreak] = useState<number>(1);
 
@@ -112,7 +113,7 @@ const VictoryModal = React.memo(({type, guesses, dateOg, victoryOpen, setVictory
         const shareData: ShareData = {
             text: `${text}\n${emojis}\n${url}`,
         };
-        try {            
+        try {
             if (navigator.canShare(shareData)) {
                 navigator.share(shareData);
             } else {
@@ -150,7 +151,7 @@ const VictoryModal = React.memo(({type, guesses, dateOg, victoryOpen, setVictory
                     ))}
                 </div>
                 <div className="guesses-container">
-                    <p>{t(`victory.attempts-1`)}<b>{guesses.length}</b>{t(`victory.attempts-2`)}</p>
+                    <p>{t(`victory.attempts-1`)}<b>{realGUesses.length}</b>{t(`victory.attempts-2`)}</p>
                     <button onClick={shareButton} title="Compartilhar">
                         <ShareIcon/>
                     </button>
@@ -218,10 +219,11 @@ interface GuessLogsInterface {
     setAvailableTips: React.Dispatch<React.SetStateAction<number>>;
     spritesMap:  React.RefObject<Record<number, string>>;
     allTips: React.RefObject<PuzzleTip[]>;
-    solvedGroupNames: string[];
+    solvedGroupNames: string[];    
+    dictionary: any;
 }
 
-const GuessLogs = React.memo(({guesses, setGuesses, availableTips, setAvailableTips, spritesMap, allTips, solvedGroupNames}: GuessLogsInterface) => {
+const GuessLogs = React.memo(({guesses, setGuesses, availableTips, setAvailableTips, spritesMap, allTips, solvedGroupNames, dictionary}: GuessLogsInterface) => {
     const t = useTranslations('');
     const viewedTips = useRef<number[]>([]);
 
@@ -276,7 +278,7 @@ const GuessLogs = React.memo(({guesses, setGuesses, availableTips, setAvailableT
         } else {
             return (
                 <p className="tip">
-                    {t(`puzzle.tips.${tip.type}`)} <b>{t(`groupnames.${tip.values}`)}</b>
+                    {t(`puzzle.tips.${tip.type}`)} <b>{getNaturalGroupnames(tip.values, dictionary, t).join('  ·  ')}</b>
                 </p>
             )
         }        
@@ -684,6 +686,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
                             spritesMap={spritesMap}
                             allTips={allTips}
                             solvedGroupNames={solvedGroupNames}
+                            dictionary={dictionary}
                         />
                     </div>
                 </PuzzleTab> : <div></div>}
