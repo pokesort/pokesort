@@ -221,11 +221,11 @@ interface GuessLogsInterface {
     allTips: React.RefObject<PuzzleTip[]>;
     solvedGroupNames: string[];    
     dictionary: any;
+    viewedTips: React.RefObject<number[]>;
 }
 
-const GuessLogs = React.memo(({guesses, setGuesses, availableTips, setAvailableTips, spritesMap, allTips, solvedGroupNames, dictionary}: GuessLogsInterface) => {
+const GuessLogs = React.memo(({guesses, setGuesses, availableTips, setAvailableTips, spritesMap, allTips, solvedGroupNames, dictionary, viewedTips}: GuessLogsInterface) => {
     const t = useTranslations('');
-    const viewedTips = useRef<number[]>([]);
 
     const askForTip = () => {        
         if (availableTips <= 0 || viewedTips.current.length == allTips.current.length) return;
@@ -555,17 +555,17 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
     const mainTabRef = useRef<HTMLDivElement>(null);
     const spritesMap = useRef<Record<number, string>>({});
     const allTips = useRef<PuzzleTip[]>([]);
+    const viewedTips = useRef<number[]>([]);
     const [guesses, setGuesses] = useState<PuzzleGuess[]>([]);
     const [forcedGuesses, setForcedGuesses] = useState<PuzzleGuess[]>([]);
     const [availableTips, setAvailableTips] = useState<number>(maxAvailableTips);
-
 
     const saveState = (id: string) => {
         if (id == '') return;
         let status = 0;
         if (guesses.filter((g: PuzzleGuess) => g.accuracy >= 100).length == puzzle?.rows)
             status = 1;
-        const state = {status, guesses, tips: availableTips};
+        const state = {status, guesses, tips: {uses: availableTips, seen: viewedTips.current}};
 
         localStorage.setItem(`s_${id}`, JSON.stringify(state));
     }
@@ -585,7 +585,10 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
             setGuesses(state.guesses);
             setForcedGuesses(state.guesses.filter((g: PuzzleGuess) => g.accuracy >= 100));
         }
-        if (state.tips != undefined) setAvailableTips(state.tips);
+        if (state.tips.uses != undefined) {
+            setAvailableTips(state.tips.uses);
+            viewedTips.current = state.tips.seen;
+        }
         if (state.status > 0) {
             setTimeout(() => {
                 setVictoryOpen(true);
@@ -687,6 +690,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
                             allTips={allTips}
                             solvedGroupNames={solvedGroupNames}
                             dictionary={dictionary}
+                            viewedTips={viewedTips}
                         />
                     </div>
                 </PuzzleTab> : <div></div>}
