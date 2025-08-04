@@ -42,7 +42,7 @@ export const populate = async (res, existingPuzzle) => {
 const populateTips = (tips, ids, pokemonsMap, query) => {
   const result = [];
 
-  if (tips == undefined) {
+  if (tips == undefined || tips.length < 1) {
     tips = generateTips(ids, query);
   }
 
