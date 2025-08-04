@@ -323,6 +323,7 @@ interface PuzzleGridProps {
     pause: boolean,
     setPause: (pause: boolean) => void;
     pokemons: any[];
+    shinies: React.RefObject<number[]>;
     dictionary: any;
     setGuesses: React.Dispatch<React.SetStateAction<PuzzleGuess[]>>;
     forcedGuesses?: PuzzleGuess[];
@@ -334,7 +335,7 @@ interface PuzzleGridProps {
     resetAvailableTips: () => void;
 }
 
-const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, setGuesses, forcedGuesses=[], victoryOpen, setVictoryOpen, setCurrentDexView, scrollToTab, solvedGroupNames, resetAvailableTips}: PuzzleGridProps) => {
+const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, shinies, dictionary, setGuesses, forcedGuesses=[], victoryOpen, setVictoryOpen, setCurrentDexView, scrollToTab, solvedGroupNames, resetAvailableTips}: PuzzleGridProps) => {
     const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
 
     const [groupSets, setGroupSets] = useState<Set<number>[]>([]);
@@ -502,6 +503,7 @@ const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, s
                         <PokemonBlock
                             key={p.id}
                             pokemon={p}
+                            shiny={shinies.current.includes(p.id)}
                             multiselect={true}
                             isSelected={isSelected}
                             isSolved={true}
@@ -521,6 +523,7 @@ const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, dictionary, s
                         <PokemonBlock
                             key={p.id}
                             pokemon={p}
+                            shiny={shinies.current.includes(p.id)}
                             multiselect={true}
                             isSelected={isSelected}
                             isSolved={false}
@@ -556,9 +559,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
     const spritesMap = useRef<Record<number, string>>({});
     const allTips = useRef<PuzzleTip[]>([]);
     const viewedTips = useRef<number[]>([]);
-    const [guesses, setGuesses] = useState<PuzzleGuess[]>([]);
-    const [forcedGuesses, setForcedGuesses] = useState<PuzzleGuess[]>([]);
-    const [availableTips, setAvailableTips] = useState<number>(maxAvailableTips);
+    const shinies = useRef<number[]>([718]);
 
     const saveState = (id: string) => {
         if (id == '') return;
@@ -596,6 +597,9 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
         }
     }
     
+    const [guesses, setGuesses] = useState<PuzzleGuess[]>([]);
+    const [forcedGuesses, setForcedGuesses] = useState<PuzzleGuess[]>([]);
+    const [availableTips, setAvailableTips] = useState<number>(maxAvailableTips);
     const [refresh, setRefresh] = useState<boolean>(false);
     const [pause, setPause] = useState<boolean>(false);
     const [pokemons, setPokemons] = useState<any>([]);
@@ -710,6 +714,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
                                 pause={pause}
                                 setPause={setPause}
                                 pokemons={pokemons}
+                                shinies={shinies}
                                 dictionary={dictionary}
                                 setGuesses={setGuesses}
                                 forcedGuesses={forcedGuesses}

@@ -6,10 +6,12 @@ import { motion, AnimatePresence, Variants } from 'framer-motion';
 import clsx from 'clsx';
 
 import '@/src/styles/components/PokemonBlock.scss';
+import ShinyGif from '@/src/assets/images/shiny.gif';
 import PokeSprite from './PokeSprite';
 
 interface BlockProps {
     pokemon: any;
+    shiny: boolean;
     multiselect: boolean;
     isSelected: boolean;
     isSolved?: boolean;
@@ -42,9 +44,8 @@ function getSurname(name: string, species_name: string) {
     return surname;
 }
 
-export default React.memo(function PuzzleBlock({ pokemon, multiselect, isSelected, isSolved=false, isCorrect=false, isIncorrect=false, onSelect, onPress }: BlockProps) {
-    const default_url = pokemon.sprite_default;
-    const shiny_url = pokemon.sprite_shiny;
+export default React.memo(function PuzzleBlock({ pokemon, shiny, multiselect, isSelected, isSolved=false, isCorrect=false, isIncorrect=false, onSelect, onPress }: BlockProps) {
+    const default_url = !shiny ? pokemon.sprite_default : pokemon.sprite_shiny;
 
     const handleThisBlockSelect = useCallback(() => {
         onSelect(pokemon.id);
@@ -61,6 +62,7 @@ export default React.memo(function PuzzleBlock({ pokemon, multiselect, isSelecte
     const blockClasses = clsx(
         'pokemon-block',
         {
+            'shiny': shiny,
             'solved': isSolved,
             'correct': isCorrect,
             'incorrect': isIncorrect,
@@ -94,6 +96,7 @@ export default React.memo(function PuzzleBlock({ pokemon, multiselect, isSelecte
                     <h4>{p_surname}</h4>
                 )}
             </div>
+            {shiny && <img className="shiny-gif" src={ShinyGif.src}/>}
         </motion.label>
     )
 })

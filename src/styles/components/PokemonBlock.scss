@@ -3,6 +3,7 @@
 label.block-container {
     --selection: #{color(selection1)};
     
+    position: relative;
     container-type: inline-size;
     cursor: pointer;
 
@@ -156,12 +157,26 @@ label.block-container {
             transform: scale(90%);
         }
 
+        &.shiny {
+
+        }
+
         @media (max-width: 768px) {
             &:hover {
                 box-shadow: unset;
             }
         }
     }
+}
+
+.shiny-gif {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-45%, -50%);
+
+    mix-blend-mode: lighten;
+    z-index: 50;
 }
 
 .cols-4 label.block-container:has(.solved) {
