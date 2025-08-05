@@ -668,11 +668,12 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
 
     useEffect(() => {
         const randomShinies = () => {
+            const mons = pokemons.map((mon: any) => mon.dex_number);
             for (let i = 1; i <= 3; i++) {
-                let chance = randomInRange(1, 1200);
-                const mons = pokemons.map((mon: any) => mon.dex_number);
-                if (mons.includes(chance)) {
-                    setShinies((prev) => [...prev, chance]);
+                const chance = randomInRange(1, 30);
+                if (chance == 1) {
+                    const shinyTarget = randomInRange(0, mons.length);
+                    setShinies((prev) => [...prev, mons[shinyTarget]]);
                 }
             }
         }
