@@ -3,6 +3,7 @@
 label.block-container {
     --selection: #{color(selection1)};
     
+    position: relative;
     container-type: inline-size;
     cursor: pointer;
 
@@ -156,12 +157,36 @@ label.block-container {
             transform: scale(90%);
         }
 
+        &.shiny:not(.solved)::before {
+            display: block;
+            content: '';
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+
+            background: linear-gradient(135deg, transparent 10%, rgba(0, 234, 255, 0.2) 50%, transparent 90%);
+            background-size: 300% 300%;
+            background-repeat: no-repeat; 
+            animation: shine 2.5s linear infinite;
+        }
+
         @media (max-width: 768px) {
             &:hover {
                 box-shadow: unset;
             }
         }
     }
+}
+
+.shiny-gif {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-45%, -50%);
+
+    mix-blend-mode: lighten;
+    z-index: 50;
 }
 
 .cols-4 label.block-container:has(.solved) {
@@ -297,5 +322,17 @@ label.block-container {
     }
     100% {
         transform: scale(var(--scale, 1)) translate(var(--x, 0), var(--y, 0));
+    }
+}
+
+@keyframes shine {
+    0% {
+        background-position: -200% -200%;
+    }
+    66% {
+        background-position: 200% 200%;
+    }
+    100% {
+        background-position: 200% 200%;
     }
 }
