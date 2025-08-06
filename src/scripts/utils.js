@@ -147,3 +147,8 @@ export function compareArrays (a, b) {
   if (a.length !== b.length) return false;
   return a.slice().sort().every((val, i) => val === b.slice().sort()[i]);
 }
+
+export function isMobile () {
+  const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+  return /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
+};

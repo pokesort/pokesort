@@ -60,7 +60,9 @@
             "attempts-2": " attempts",
             "next-daily": "Next daily puzzle in",
             "back": "Back to Home",
-            "generate": "Refresh Puzzle"
+            "generate": "Refresh Puzzle",
+            "share": "Share",
+            "shinies": "You found"
         },
         "tips": {
             "ask": "Need a Hint?",
