@@ -179,6 +179,71 @@ label.block-container {
     }
 }
 
+label.block-container:has(.list-view) {
+    width: 100%;
+    aspect-ratio: unset;
+    flex: 1 0 auto;
+    overflow: hidden;
+
+    div.pokemon-block {
+        width: 100%;
+        height: 100%;
+
+        display: flex;
+        flex-direction: row;
+        justify-content: start;
+        align-items: center;
+        position: relative;
+        gap: 0.25rem;
+    
+        z-index: 0;
+        padding: 1rem;
+        background-color: color(section2);
+        
+        img {
+            position: absolute;
+            top: -10px;
+            left: 10px;
+            
+            width: 20%;
+            z-index: 1;
+        }
+        
+        h3 {
+            margin-left: 25%;
+            font-size: unset;
+        }
+        h4 {
+            width: fit-content;
+            max-width: 60%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: unset;
+        }
+        h3, h4 {
+            display: inline;
+            text-align: start;
+            width: fit-content;
+            z-index: 5;
+            font-size: text(regular);
+        }
+        
+        &:has(input:checked)::after {
+            display: block;
+            content: '';
+            background-color: var(--selection);
+            width: 4%;
+            aspect-ratio: 1;
+
+            position: absolute;
+            right: 0;
+            top: -1px;
+
+            clip-path: polygon(0% 0%, 100% 100%, 100% 0%);
+        }
+    }
+}
+
 .shiny-gif {
     position: absolute;
     top: 50%;
