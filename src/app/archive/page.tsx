@@ -11,6 +11,7 @@ import { useLocale } from 'next-intl';
 import Loading from '@/src/components/Loading';
 import ArrowLeft from '@/src/components/svg/ArrowLeft';
 import ArrowRight from '@/src/components/svg/ArrowRight';
+import Shiny from '@/src/components/svg/Shiny';
 
 interface CalendarProps {
     puzzles: Record<string, string> | undefined;
@@ -63,6 +64,7 @@ function Calendar({puzzles, loading}: CalendarProps) {
                 const isCurrentMonth = isSameMonth(day, monthStart);
                 const dayString = format(day, "yyyy-MM-dd");
                 const userData: any = dates.includes(dayString) ? localStorage.getItem(`s_${puzzles[dayString]}`) : null
+                const shinies = JSON.parse(userData)?.shiny;
 
                 const blockClasses = clsx(
                     'calendar-cell',
@@ -78,6 +80,9 @@ function Calendar({puzzles, loading}: CalendarProps) {
                 days.push(
                     <Link href={`puzzle/${dayString}`} key={dayString} className={blockClasses}>
                         {format(day, "dd")}
+                        {shinies != undefined && shinies.length > 0 && 
+                            <div className="shiny"><Shiny /></div>
+                        }
                     </Link>
                 );
 

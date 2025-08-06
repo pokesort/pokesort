@@ -60,7 +60,9 @@
             "attempts-2": " tentativas",
             "next-daily": "Próximo puzzle diário em",
             "back": "Voltar ao Início",
-            "generate": "Gerar Novo Puzzle"
+            "generate": "Gerar Novo Puzzle",
+            "share": "Compartilhar",
+            "shinies": "Você encontrou"
         },
         "tips": {
             "ask": "Pedir Dica",

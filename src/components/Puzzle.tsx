@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import React, { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { useLocale } from 'next-intl';
-import { formatDate, isYesterday, shuffleArray, getNextRefresh, toTitleCase, decodeTips, randomInRange } from '@/src/scripts/utils';
+import { formatDate, isYesterday, shuffleArray, getNextRefresh, toTitleCase, decodeTips, randomInRange, isMobile } from '@/src/scripts/utils';
 import { useInView } from 'react-intersection-observer';
 import { redirect } from 'next/navigation';
 
@@ -86,6 +86,7 @@ const VictoryModal = React.memo(({type, guesses, shinies, dateOg, victoryOpen, s
     const realGUesses = guesses.filter((g: PuzzleGuess) => g.type != 1);
 
     const [streak, setStreak] = useState<number>(1);
+    const [isCopied, setIsCopied] = useState<'share' | 'copy' | 'done'>(isMobile() ? 'share' : 'copy');
 
     useEffect(() => {
         const streakData = localStorage.getItem(streakKey);
@@ -94,6 +95,9 @@ const VictoryModal = React.memo(({type, guesses, shinies, dateOg, victoryOpen, s
 
     const getGuessEmojis = (): string => {
         let output: string = '';
+        shinies.forEach(() => {
+            output += "✨"
+        })
         guesses.forEach(guess => {
             if (guess.accuracy >= 100) { // correct
                 output += "🟩"
@@ -109,16 +113,23 @@ const VictoryModal = React.memo(({type, guesses, shinies, dateOg, victoryOpen, s
     const shareButton = () => {
         const url = window.location.href;
         const emojis = getGuessEmojis();
-        const text = `Pokesort · ${type == 'daily' ? formatDate(dateOg, locale, false) : t('puzzle.infinite')}`
+        let text = `Pokesort · ${type == 'daily' ? formatDate(dateOg, locale, false) : t('puzzle.infinite')}`
+        if (type == 'daily' && streak > 1) {
+            text += ` · 🔥${streak}`
+        }
         
         const shareData: ShareData = {
             text: `${text}\n${emojis}\n${url}`,
         };
         try {
-            if (navigator.canShare(shareData)) {
+            if (isMobile()) {
                 navigator.share(shareData);
             } else {
+                setIsCopied('done');
                 navigator.clipboard.writeText(shareData.text || window.location.href);
+                setTimeout(() => {
+                    setIsCopied('copy');
+                }, 1000);
             }
         } catch (error) {
             console.error("Não foi possível compartilhar. O problema talvez seja pela falta de uma conexão segura (HTTPS)");
@@ -153,11 +164,18 @@ const VictoryModal = React.memo(({type, guesses, shinies, dateOg, victoryOpen, s
                 </div>
                 <div className="guesses-container">
                     <p>{t(`victory.attempts-1`)}<b>{realGUesses.length}</b>{t(`victory.attempts-2`)}</p>
-                    <button onClick={shareButton} title="Compartilhar">
-                        <ShareIcon/>
+                    <button onClick={shareButton} title={t(`victory.share`)}>
+                        <ShareIcon mode={isCopied}/>
                     </button>
                 </div>
             </div>
+            {shinies.length > 0 &&
+                <div className="modal-content-div">
+                    <p style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+                        {t(`victory.shinies`)} <b>{shinies.length}</b> {shinies.length > 1 ? 'Shinies' : 'Shiny'}!
+                    </p>                    
+                </div>
+            }
             {type == 'daily' ? (
                 <>
                 <div className="modal-content-div">
