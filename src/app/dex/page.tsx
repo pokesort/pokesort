@@ -45,6 +45,7 @@ export default React.memo(function Home() {
             key={p.id}
             pokemon={p}
             multiselect={false}
+            aspect="square"
             isSelected={false}
             onSelect={() => handleSelect(p.id)}
             onPress={() => handleSelect(p.id)}

@@ -156,6 +156,13 @@ const VictoryModal = React.memo(({type, guesses, shinies, dateOg, victoryOpen, s
                     </div>
                 </div>
             }
+            {shinies.length > 0 &&
+                <div className="modal-content-div">
+                    <p style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+                        {t(`victory.shinies`)} <b>{shinies.length}</b> {shinies.length > 1 ? 'Shinies' : 'Shiny'}!
+                    </p>                    
+                </div>
+            }
             <div className="modal-content-div">
                 <div className="guesses-container">
                     {guesses.map((guess: PuzzleGuess, index: number) => (
@@ -169,13 +176,6 @@ const VictoryModal = React.memo(({type, guesses, shinies, dateOg, victoryOpen, s
                     </button>
                 </div>
             </div>
-            {shinies.length > 0 &&
-                <div className="modal-content-div">
-                    <p style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
-                        {t(`victory.shinies`)} <b>{shinies.length}</b> {shinies.length > 1 ? 'Shinies' : 'Shiny'}!
-                    </p>                    
-                </div>
-            }
             {type == 'daily' ? (
                 <>
                 <div className="modal-content-div">
