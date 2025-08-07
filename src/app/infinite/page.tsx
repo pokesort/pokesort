@@ -6,6 +6,7 @@ import type { PuzzleData } from '@/src/assets/types/PuzzleApiResponse';
 import { useCallback, useEffect, useState } from 'react';
 import { FIELD_OPTIONS } from '@/src/scripts/utils';
 import Modal from '@/src/components/Modal';
+import Input from '@/src/components/forms/Input';
 
 export default function InfinitePage() {
     const t = useTranslations();
@@ -84,7 +85,9 @@ export default function InfinitePage() {
         <>
             <Modal title="Gerar Puzzle" background={false} id="generate-modal" canClose={false} isOpen={!generated}>
                 <div style={{display: 'flex', maxWidth: '500px', flexWrap: 'wrap', gap: '0.5rem'}}>
-                    <label style={{display: 'flex', flexDirection: 'column', width: '100%'}}>
+                <Input type="text" label="name" name="name" />
+                <Input type="number" label="name" name="name" />
+                    {/* <label style={{display: 'flex', flexDirection: 'column', width: '100%'}}>
                         Limite de geração:
                         <select value={generationLimit} onChange={(e) => setGenerationLimit(Number(e.target.value))}>
                             {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((generation) => (
@@ -100,7 +103,7 @@ export default function InfinitePage() {
                             <input type="checkbox" onChange={(e) => handleCheckbox(option)} checked={excludeFields.includes(option)}/>
                             {option}
                         </label>
-                    ))}
+                    ))} */}
                 </div>
                 <button className="modal-content-div" onClick={() => {if(!loading) setGenerated(true)}}>
                     Gerar
