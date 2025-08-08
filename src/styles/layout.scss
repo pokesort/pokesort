@@ -50,6 +50,27 @@ button {
 	cursor: pointer;
 	outline: inherit;
 }
+button.form-button {
+    font-weight: 700;
+    background-color: color(section2);
+    min-height: 40px;
+    width: 100%;
+    padding: 0.5rem;
+    background-color: color(section2);
+    text-align: center;
+
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
+
+    &:hover {
+        box-shadow: 0px 0 40px color(darker);
+        z-index: 60;
+    }
+    &:active {
+        transform: scale(0.85);
+    }
+}
 
 h1 {
     font-size: text(large);

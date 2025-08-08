@@ -664,8 +664,8 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
         } else {
             loaded.current = false;
         }
-        scrollToTab(1, 'instant');
         setTimeout(() => {
+            scrollToTab(1, 'instant');
             setLoading(false);
             setRefresh(prev => !prev);
         }, 0);
@@ -682,7 +682,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
         return () => {
             window.removeEventListener("resize", handleResize);
         };
-    }, []);
+    }, [puzzle]);
 
     useEffect(() => {
         const randomShinies = () => {

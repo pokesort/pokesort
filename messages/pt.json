@@ -26,6 +26,7 @@
 
     "puzzle": {
         "infinite": "Modo Infinito",
+        "infinite-generate": "Gerar Puzzle",
         "logs": "Logs",
         "puzzle": "Puzzle",
         "dex": "Dex",

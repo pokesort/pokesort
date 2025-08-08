@@ -3,27 +3,32 @@
 import { useTranslations } from 'next-intl';
 import Puzzle from '@/src/components/Puzzle';
 import type { PuzzleData } from '@/src/assets/types/PuzzleApiResponse';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { FIELD_OPTIONS } from '@/src/scripts/utils';
+
 import Modal from '@/src/components/Modal';
 import Input from '@/src/components/forms/Input';
+import GridIcon from '@/src/components/svg/GridIcon';
+import Loading from '@/src/components/Loading';
 
 export default function InfinitePage() {
     const t = useTranslations();
+    const generateRef = useRef<any>(undefined);
 
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
-    const [generated, setGenerated] = useState<boolean>(false);
+    const [refresh, setRefresh] = useState<boolean>(false);
+    const [initial, setInitial] = useState<boolean>(true);
 
-    const [puzzle, setPuzzle] = useState<PuzzleData>();
+    const [puzzle, setPuzzle] = useState<PuzzleData | undefined>(undefined);
     const [dictionary, setDictionary] = useState<any>();
     const [generationLimit, setGenerationLimit] = useState<number>(9);
     const [excludeFields, setExcludeFields] = useState<string[]>([]);
 
     useEffect(() => {
-        if (!generated)
-            return;
+        if (initial) return;
 
+        setPuzzle(undefined);
         setLoading(true);
         setError(null);
 
@@ -69,7 +74,14 @@ export default function InfinitePage() {
         };
 
         fetchPageData();
-    }, [generated])
+    }, [refresh])
+
+    const generatePuzzle = useCallback(() => {
+        if(!loading) {
+            setInitial(false);
+            setRefresh(prev => !prev);
+        }
+    }, [loading])
 
     const handleCheckbox = useCallback((option: string) => {
         setExcludeFields((prev: string[]) => {
@@ -83,7 +95,34 @@ export default function InfinitePage() {
 
     return (
         <>
-            <Modal title="Gerar Puzzle" background={false} id="generate-modal" canClose={false} isOpen={!generated}>
+            {!initial &&
+                (loading ?
+                    <>
+                        <div className={`window-container cut-left`}>
+                            <section className="window-info-row">
+                                <p></p>
+                            </section>
+                            <Loading expand={true} />
+                        </div>
+                    </>
+                    :                
+                    <Puzzle
+                        puzzle={puzzle}
+                        setPuzzle={setPuzzle}
+                        type="infinite"
+                        dictionary={dictionary}
+                        loading={loading}
+                        setLoading={setLoading}
+                        error={error}
+                        setError={setError}
+                    />
+                )
+            }            
+            <div className={`window-container cut-left ${!initial ? "floating": ""}`}>
+                <section className="window-info-row">
+                    <GridIcon/>
+                    <p>{t('puzzle.infinite-generate')}</p>
+                </section>
                 <div style={{display: 'flex', maxWidth: '500px', flexWrap: 'wrap', gap: '0.5rem'}}>
                 <Input type="text" label="name" name="name" />
                 <Input type="number" label="name" name="name" />
@@ -105,20 +144,10 @@ export default function InfinitePage() {
                         </label>
                     ))} */}
                 </div>
-                <button className="modal-content-div" onClick={() => {if(!loading) setGenerated(true)}}>
+                <button className="form-button" onClick={generatePuzzle}>
                     Gerar
                 </button>
-            </Modal>            
-            {generated && <Puzzle
-                puzzle={puzzle}
-                setPuzzle={setPuzzle}
-                type="infinite"
-                dictionary={dictionary}
-                loading={loading}
-                setLoading={setLoading}
-                error={error}
-                setError={setError}
-            />}
+            </div>
         </>
     )
 }
