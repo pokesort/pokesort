@@ -123,9 +123,9 @@ export default function InfinitePage() {
                     <GridIcon/>
                     <p>{t('puzzle.infinite-generate')}</p>
                 </section>
-                <div style={{display: 'flex', maxWidth: '500px', flexWrap: 'wrap', gap: '0.5rem'}}>
-                <Input type="text" label="name" name="name" />
-                <Input type="number" label="name" name="name" />
+                <div style={{display: 'flex', maxWidth: '500px', gap: '0.5rem'}}>
+                    <Input type="text" label="name" name="name" />
+                    <Input type="number" label="number" name="number" />
                     {/* <label style={{display: 'flex', flexDirection: 'column', width: '100%'}}>
                         Limite de geração:
                         <select value={generationLimit} onChange={(e) => setGenerationLimit(Number(e.target.value))}>

@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import InputMask from 'react-input-mask';
 import { useForm, SubmitHandler } from "react-hook-form";
 
 import '@/src/styles/components/FormInput.scss';
@@ -17,22 +18,21 @@ interface InputProps {
 
 export default React.memo(function Input({type, label, name, readonly=false, disabled=false, required=false}: InputProps) {
     
-    const { register, handleSubmit, watch } = useForm();
-    const watchedFields = watch();
+    const form = useForm();
+    const watchedFields = form.watch();
+
+    const watched = form.watch(name);
 
     switch (type) {
         case 'text':
         case 'number':
+        case 'date':
             return (
                 <label className="form-label">
                     <span>{label}</span>
-                    <input className="inner-input" type={type} defaultValue=""
-                        {...register(name, { required })} readOnly={readonly} disabled={disabled} />
+                    <input className="inner-input" type={type} defaultValue="" autoComplete="off"
+                        {...form.register(name, { required })} readOnly={readonly} disabled={disabled} />
                 </label>
-            )
-        case 'date':
-            return (
-                <p>Date</p>
             )
         case 'select':
         case 'multiselect':

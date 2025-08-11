@@ -3,7 +3,7 @@
 .form-label {
     display: flex;
     flex-direction: column;
-    min-width: 100px;
+    min-width: 10px;
     flex: 1 1 auto;
     gap: 0.25rem;
 
@@ -24,5 +24,11 @@
         font-size: text(regular);
         padding: 0.5rem 0.75rem;
         clip-path: polygon(0% 10px, 10px 0%, 100% 0%, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0% 100%);
+    }
+
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
     }
 }
