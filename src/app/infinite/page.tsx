@@ -125,7 +125,11 @@ export default function InfinitePage() {
                 </section>
                 <div style={{display: 'flex', maxWidth: '500px', gap: '0.5rem'}}>
                     <Input type="text" label="name" name="name" />
-                    <Input type="number" label="number" name="number" />
+                    <Input type="select" label="Select a value" name="select" options={{
+                        '1': 'Option 1',
+                        '2': 'Option 2',
+                        '3': 'Option 3'
+                    }} />
                     {/* <label style={{display: 'flex', flexDirection: 'column', width: '100%'}}>
                         Limite de geração:
                         <select value={generationLimit} onChange={(e) => setGenerationLimit(Number(e.target.value))}>
