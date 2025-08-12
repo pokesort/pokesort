@@ -10,10 +10,13 @@ import Modal from '@/src/components/Modal';
 import Input from '@/src/components/forms/Input';
 import GridIcon from '@/src/components/svg/GridIcon';
 import Loading from '@/src/components/Loading';
+import { useForm } from 'react-hook-form';
 
 export default function InfinitePage() {
     const t = useTranslations();
     const generateRef = useRef<any>(undefined);
+    const form = useForm();
+    const formWatch = form.watch();
 
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
@@ -22,8 +25,6 @@ export default function InfinitePage() {
 
     const [puzzle, setPuzzle] = useState<PuzzleData | undefined>(undefined);
     const [dictionary, setDictionary] = useState<any>();
-    const [generationLimit, setGenerationLimit] = useState<number>(9);
-    const [excludeFields, setExcludeFields] = useState<string[]>([]);
 
     useEffect(() => {
         if (initial) return;
@@ -37,10 +38,9 @@ export default function InfinitePage() {
                 const headers = {
                     'Content-Type': 'application/json'
                 };
-                const body = JSON.stringify({
-                    'generation': generationLimit,
-                    'excludeFields': excludeFields
-                })
+                const body = JSON.stringify(
+                    formWatch
+                )
                 const [puzzleResponse] = await Promise.all([
                     fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/puzzle/generate?infinite=true`, {
                         method: 'POST', headers, body
@@ -83,15 +83,14 @@ export default function InfinitePage() {
         }
     }, [loading])
 
-    const handleCheckbox = useCallback((option: string) => {
-        setExcludeFields((prev: string[]) => {
-            if (prev.includes(option)) {
-                return [...prev].filter(item => item !== option);
-            } else {
-                return [...prev, option];
-            }
-        });
-    }, []);
+    const gen_options: Record<string, string> = {};
+    [1, 2, 3, 4, 5, 6, 7, 8, 9].forEach((gen: number) => {
+        gen_options[`${gen}`] = 'Geração '+t(`groupnames.generation.${gen}`);
+    });
+    const exclude_options: Record<string, string> = {};
+    {Object.keys(FIELD_OPTIONS).forEach((option: string) => {
+        exclude_options[option] = t(`groupnames.${option}.short`);
+    });
 
     return (
         <>
@@ -123,30 +122,9 @@ export default function InfinitePage() {
                     <GridIcon/>
                     <p>{t('puzzle.infinite-generate')}</p>
                 </section>
-                <div style={{display: 'flex', maxWidth: '500px', gap: '0.5rem'}}>
-                    <Input type="text" label="name" name="name" />
-                    <Input type="select" label="Select a value" name="select" options={{
-                        '1': 'Option 1',
-                        '2': 'Option 2',
-                        '3': 'Option 3'
-                    }} />
-                    {/* <label style={{display: 'flex', flexDirection: 'column', width: '100%'}}>
-                        Limite de geração:
-                        <select value={generationLimit} onChange={(e) => setGenerationLimit(Number(e.target.value))}>
-                            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((generation) => (
-                                <option value={generation} key={generation}>Geração {t(`groupnames.generation.${generation}`)}</option>
-                            ))}
-                        </select>
-                    </label>
-                    <label>
-                        Excluir categorias:
-                    </label>
-                    {Object.keys(FIELD_OPTIONS).map((option, index) => (
-                        <label key={index}>
-                            <input type="checkbox" onChange={(e) => handleCheckbox(option)} checked={excludeFields.includes(option)}/>
-                            {option}
-                        </label>
-                    ))} */}
+                <div style={{display: 'flex', flexDirection: 'column', maxWidth: '500px', gap: '0.5rem'}}>
+                    <Input type="select" label="Limite de Geração" name="generation" default="9" options={gen_options} form={form} />
+                    <Input type="cloud" label="Ignorar Categorias" name="excludeFields" options={exclude_options} form={form} />
                 </div>
                 <button className="form-button" onClick={generatePuzzle}>
                     Gerar
@@ -154,4 +132,4 @@ export default function InfinitePage() {
             </div>
         </>
     )
-}
+}}
