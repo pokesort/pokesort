@@ -1,0 +1,117 @@
+@use "../abstract" as *;
+
+.form-label {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 10px;
+    flex: 0 1 auto;
+    gap: 0.25rem;
+    height: auto;
+
+    & > span {
+        font-size: text(small);
+        color: color(text2);
+        text-transform: uppercase;
+        margin-left: 10px;
+    }
+
+    .inner-input {
+        -webkit-appearance: none;
+        appearance: none;
+        outline: unset;
+        border: unset;
+
+        background-color: color(section2);
+        font-size: text(small);
+        padding: 0.5rem 0.75rem;
+        clip-path: polygon(0% 10px, 10px 0%, 100% 0%, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0% 100%);
+    }
+
+    input[type=checkbox], input[type=radio] {
+        display: none;
+    }
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    &:has(.select-options) {
+        .inner-input {
+            cursor: default;
+        }
+        svg {
+            position: absolute;
+            right: 0.25rem;
+            top: 1.65rem;
+            pointer-events: none;
+        }
+    }
+}
+
+.select-options {
+    position: absolute;
+    top: 1rem;
+    max-height: 0px;
+    visibility: hidden;
+    pointer-events: none;
+
+    display: flex;
+    flex-direction: column;
+    z-index: 90;
+    width: 100%;
+    background-color: color(section2);
+    overflow-y: scroll;
+
+    transition: max-height 0.35s ease;
+    clip-path: polygon(0% 10px, 10px 0%, 100% 0%, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0% 100%);
+
+    label {
+        padding: 0.5rem 0.75rem;
+        transition: background-color 0.15s ease;
+
+        span {
+            font-size: text(small);
+            color: color(text1);
+        }
+
+        &:hover {
+            background-color: rgba(0, 234, 255, 0.05);
+        }
+
+        &:has(input:checked) {
+            background-color: rgba(0, 234, 255, 0.2);
+        }
+    }
+
+    &.open {
+        max-height: var(--height, 200px);
+        visibility: visible;
+        pointer-events: all;
+    }
+}
+
+.checkbox-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: inherit;
+    
+    label {
+        cursor: pointer;
+        transition: background-color 0.15s ease;
+    
+        span {
+            font-size: text(small);
+            color: color(text1);
+        }
+    
+        &:hover {
+            background-color: #21314D;
+        }
+    
+        &:has(input:checked) {
+            background-color: #1C4E69;
+        }
+    }
+}

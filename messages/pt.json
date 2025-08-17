@@ -26,6 +26,7 @@
 
     "puzzle": {
         "infinite": "Modo Infinito",
+        "infinite-generate": "Gerar Puzzle",
         "logs": "Logs",
         "puzzle": "Puzzle",
         "dex": "Dex",
@@ -59,6 +60,7 @@
         "victory": {
             "streak": "Sequência",
             "streak-desc": "Jogue o Pokesort diariamente para aumentar sua sequência",
+            "infinite-count": "Puzzles infinitos resolvidos",
             "attempts-1": "Resolvido em ",
             "attempts-2": " tentativas",
             "next-daily": "Próximo puzzle diário em",

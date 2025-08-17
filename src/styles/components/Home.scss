@@ -63,7 +63,7 @@ section#home {
                 color: color(text2);
             }
 
-            svg {
+            & > svg {
                 position: absolute;
                 right: 1.75rem;
                 top: 50%;
@@ -71,6 +71,24 @@ section#home {
 
                 width: 2rem;
                 height: 2rem;
+            }
+
+            hgroup.card-title {
+                display: flex;
+                flex-direction: row;
+                justify-content: start;
+                align-items: center;
+                text-align: start;
+
+                width: 100%;
+                gap: 0.65rem;
+
+                div {
+                    display: inherit;
+                    align-items: inherit;
+                    gap: 0.25rem;
+                    color: color(text2)
+                }
             }
 
             &:hover {

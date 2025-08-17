@@ -19,6 +19,7 @@ import Loading from '@/src/components/Loading';
 import CalendarIcon from '@/src/components/svg/CalendarIcon';
 import ShareIcon from '@/src/components/svg/ShareIcon';
 import StreakIcon from '@/src/components/svg/StreakIcon';
+import TickIcon from '@/src/components/svg/TickIcon';
 import GridIcon from '@/src/components/svg/GridIcon';
 import LogsIcon from '@/src/components/svg/LogsIcon';
 import DexIcon from '@/src/components/svg/DexIcon';
@@ -27,6 +28,7 @@ import DexView from './DexView';
 import PokeSprite from './PokeSprite';
 
 const streakKey = 'u_dailystreak';
+const infiniteCount = 'u_infinitecount';
 
 const containerVariants: Variants = {
   hidden: { opacity: 1 },
@@ -50,6 +52,13 @@ const recordStreak = (today: string) => {
     streakObj.latest = today;
 
     localStorage.setItem(streakKey, JSON.stringify(streakObj));
+}
+
+const recordInfiniteCount = () => {
+    const streak = localStorage.getItem(infiniteCount) || '0';
+    const newStreak = parseInt(streak) + 1;
+
+    localStorage.setItem(infiniteCount, JSON.stringify(newStreak));
 }
 
 interface SolvedGroupsGridProps {
@@ -77,9 +86,10 @@ interface VictoryModalProps {
     dateOg: string | undefined,
     victoryOpen: boolean,
     setVictoryOpen: React.Dispatch<React.SetStateAction<boolean>>
+    refreshInfinite?: () => void;
 }
 
-const VictoryModal = React.memo(({type, guesses, shinies, dateOg, victoryOpen, setVictoryOpen}: VictoryModalProps) => {
+const VictoryModal = React.memo(({type, guesses, shinies, dateOg, victoryOpen, setVictoryOpen, refreshInfinite}: VictoryModalProps) => {
     const t = useTranslations('puzzle');
     const locale = useLocale();
     const date = formatDate(dateOg, locale, false);
@@ -89,8 +99,13 @@ const VictoryModal = React.memo(({type, guesses, shinies, dateOg, victoryOpen, s
     const [isCopied, setIsCopied] = useState<'share' | 'copy' | 'done'>(isMobile() ? 'share' : 'copy');
 
     useEffect(() => {
-        const streakData = localStorage.getItem(streakKey);
-        if (streakData != null) setStreak(JSON.parse(streakData).streak);
+        if (type != 'infinite') {
+            const streakData = localStorage.getItem(streakKey);
+            if (streakData != null) setStreak(JSON.parse(streakData).streak);
+        } else {
+            const streakData = localStorage.getItem(infiniteCount);
+            if (streakData != null) setStreak(parseInt(streakData));
+        }
     }, [victoryOpen])
 
     const getGuessEmojis = (): string => {
@@ -139,7 +154,7 @@ const VictoryModal = React.memo(({type, guesses, shinies, dateOg, victoryOpen, s
     return (
         <Modal id="victory-modal" title="Gotcha!" isOpen={victoryOpen} setIsOpen={setVictoryOpen}>
             <>
-            {type == 'daily' &&
+            {type == 'daily' ?
                 <div style={{display: 'flex', gap: 'inherit'}}>
                     {date &&
                         <div className="modal-content-div">
@@ -154,6 +169,13 @@ const VictoryModal = React.memo(({type, guesses, shinies, dateOg, victoryOpen, s
                             {t(`victory.streak`)}: {streak}
                         </p>
                     </div>
+                </div>
+                :
+                <div className="modal-content-div">
+                    <p style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+                        <TickIcon/>
+                        {t(`victory.infinite-count`)}: {streak}
+                    </p>
                 </div>
             }
             {shinies.length > 0 &&
@@ -187,9 +209,13 @@ const VictoryModal = React.memo(({type, guesses, shinies, dateOg, victoryOpen, s
                 </button>
                 </>
             ) : (
-                <button className="modal-content-div" onClick={ () => window.location.reload() }>
-                    <p>{t(`victory.generate`)}</p>
-                </button>
+                <>
+                    {refreshInfinite &&
+                        <button className="modal-content-div" onClick={ () => {refreshInfinite(); setVictoryOpen(false)} }>
+                            <p>{t(`victory.generate`)}</p>
+                        </button>
+                    }
+                </>
             )}
             </>
         </Modal>
@@ -339,6 +365,7 @@ const GuessLogs = React.memo(({guesses, setGuesses, availableTips, setAvailableT
 
 interface PuzzleGridProps {
     puzzle: PuzzleData;
+    type:  'daily' | 'infinite';
     pause: boolean,
     setPause: (pause: boolean) => void;
     pokemons: any[];
@@ -354,7 +381,7 @@ interface PuzzleGridProps {
     resetAvailableTips: () => void;
 }
 
-const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, shinies, dictionary, setGuesses, forcedGuesses=[], victoryOpen, setVictoryOpen, setCurrentDexView, scrollToTab, solvedGroupNames, resetAvailableTips}: PuzzleGridProps) => {
+const PuzzleGrid = React.memo(({puzzle, type, pause, setPause, pokemons, shinies, dictionary, setGuesses, forcedGuesses=[], victoryOpen, setVictoryOpen, setCurrentDexView, scrollToTab, solvedGroupNames, resetAvailableTips}: PuzzleGridProps) => {
     const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
 
     const [groupSets, setGroupSets] = useState<Set<number>[]>([]);
@@ -473,7 +500,11 @@ const PuzzleGrid = React.memo(({puzzle, pause, setPause, pokemons, shinies, dict
                         solvedGroupNames.push(puzzle.groups[guess.group].query);
                     setSelectedIds(new Set());
                     if (solvedGroupNames.length == puzzle.rows) {
-                        if (puzzle.daily) recordStreak(puzzle.date);
+                        if (puzzle.daily) {
+                            recordStreak(puzzle.date);
+                        } else if (type == 'infinite') {
+                            recordInfiniteCount();
+                        }
                         setTimeout(() => {
                             setVictoryOpen(true);
                         }, 1600);
@@ -567,9 +598,10 @@ interface PuzzleProps {
     setLoading: (loading: boolean) => void;
     error: string | null;
     setError: (error: string | null) => void;
+    refreshInfinite?: () => void;
 }
 
-export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, loading, setLoading, error, setError}: PuzzleProps) {
+export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, loading, setLoading, error, setError, refreshInfinite}: PuzzleProps) {
     const t = useTranslations('puzzle');
     const locale = useLocale();
     const maxAvailableTips = 2;
@@ -665,8 +697,8 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
         } else {
             loaded.current = false;
         }
-        scrollToTab(1, 'instant');
         setTimeout(() => {
+            scrollToTab(1, 'instant');
             setLoading(false);
             setRefresh(prev => !prev);
         }, 0);
@@ -683,7 +715,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
         return () => {
             window.removeEventListener("resize", handleResize);
         };
-    }, []);
+    }, [puzzle]);
 
     useEffect(() => {
         const randomShinies = () => {
@@ -699,7 +731,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
 
         if (loaded.current == false)
             randomShinies();
-    }, [pokemons])    
+    }, [pokemons])
 
     const scrollToTab = (target: number, behavior: ('smooth' | 'instant') = 'smooth') => {
         if (target !== visibleTab) {
@@ -757,7 +789,9 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
                     shinies={shinies}
                     dateOg={puzzle?.date}
                     victoryOpen={victoryOpen}
-                    setVictoryOpen={setVictoryOpen} />
+                    setVictoryOpen={setVictoryOpen}
+                    refreshInfinite={refreshInfinite}
+                />
             }
             <ul className="puzzle-tabs-container" style={{'--height': `${tabsHeight}px`, '--cols': puzzle ? puzzle.cols : 4, '--rows': puzzle ? puzzle.rows : 4} as React.CSSProperties}>
                 {puzzle ?
@@ -793,6 +827,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
                         ): (
                             <PuzzleGrid
                                 puzzle={puzzle}
+                                type={type}
                                 pause={pause}
                                 setPause={setPause}
                                 pokemons={pokemons}
