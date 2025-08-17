@@ -34,16 +34,17 @@ export default function InfinitePage() {
         setError(null);
 
         const fetchPageData = async () => {
+
             try {
                 const headers = {
                     'Content-Type': 'application/json'
                 };
-                const body = JSON.stringify(
-                    formWatch
-                )
+                const body = {...formWatch};
+                if (body.excludeFields == false) body.excludeFields = [];
+                
                 const [puzzleResponse] = await Promise.all([
                     fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/puzzle/generate?infinite=true`, {
-                        method: 'POST', headers, body
+                        method: 'POST', headers, body: JSON.stringify(body)
                     }),
                 ]);
                 if (!puzzleResponse.ok) {
@@ -123,7 +124,7 @@ export default function InfinitePage() {
                     <p>{t('puzzle.infinite-generate')}</p>
                 </section>
                 <div style={{display: 'flex', flexDirection: 'column', maxWidth: '500px', gap: '0.5rem'}}>
-                    <Input type="select" label="Limite de Geração" name="generation" default="9" options={gen_options} form={form} />
+                    <Input type="select" label="Limite de Geração" name="generation" defaultValue="9" options={gen_options} form={form} />
                     <Input type="cloud" label="Ignorar Categorias" name="excludeFields" options={exclude_options} form={form} />
                 </div>
                 <button className="form-button" onClick={generatePuzzle}>

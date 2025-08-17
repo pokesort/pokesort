@@ -15,7 +15,7 @@ interface InputProps {
     readonly?: boolean;
     disabled?: boolean;
     required?: boolean;
-    defaultValue?: string;
+    defaultValue?: string | string[];
 }
 
 export default React.memo(function Input({type, label, name, form=undefined, options={}, readonly=false, disabled=false, required=false, defaultValue=""}: InputProps) {
@@ -25,9 +25,9 @@ export default React.memo(function Input({type, label, name, form=undefined, opt
     }
     const watched = form.watch(name);
 
-    useEffect(() => {
-        console.log(watched);
-    }, [watched])
+    // useEffect(() => {
+    //     console.log(watched);
+    // }, [watched])
 
     switch (type) {
         case 'text':
@@ -65,6 +65,14 @@ export default React.memo(function Input({type, label, name, form=undefined, opt
             }
             return "";
             }, [watched]);
+
+            useEffect(() => {
+                Object.keys(options).forEach((value: string) => {
+                    if (defaultValue.includes(value)) {
+                        form.setValue(name, [value]);
+                    }
+                })
+            }, [defaultValue])
 
             return (
                 <div className="form-label" ref={selectWrapper} onFocus={() => setOpen(true)}>

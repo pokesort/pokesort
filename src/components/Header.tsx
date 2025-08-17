@@ -23,7 +23,7 @@ export default function Header ({ pathname }: HeaderProps) {
 
     const pages = [
         {route: '/daily', label: t('daily'), beta: false},
-        {route: '/infinite', label: t('infinite'), beta: true},
+        {route: '/infinite', label: t('infinite'), beta: false},
         {route: '/archive', label: t('archive'), beta: false},
         {route: '/dex', label: t('dex'), beta: false},
     ] as Page[];
