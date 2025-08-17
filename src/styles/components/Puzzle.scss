@@ -20,7 +20,7 @@
     }
     &.puzzle-window {
         width: min(100%, calc(120px * var(--cols, 4)));
-    }
+    }    
 }
 @media (max-width: 768px) {
     .window-container {
@@ -43,6 +43,26 @@
     }
     .window-container:not(:has(section.puzzle)) {
         min-height: unset;
+    }
+}
+
+.window-container.floating {
+    &:not(:has(section.puzzle)) {
+        height: unset;
+    }
+
+    position: fixed;
+    top: calc(100% - 36px);
+
+    min-height: unset;
+    max-height: unset;
+    height: auto;
+
+    transition: top 0.3s ease, bottom 0.3s ease;
+    animation: become-floating 0.15s ease-in 0s 1;
+
+    &:hover {
+        top: calc(100% - 343px);
     }
 }
 
@@ -399,5 +419,14 @@ button.ask-tip {
     }
     100% {
         opacity: 1;
+    }
+}
+
+@keyframes become-floating {
+    0% {
+        top: calc(50% - 80px);
+    }
+    100% {
+        top: calc(100% - 32px);
     }
 }

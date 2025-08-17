@@ -3,41 +3,48 @@
 import { useTranslations } from 'next-intl';
 import Puzzle from '@/src/components/Puzzle';
 import type { PuzzleData } from '@/src/assets/types/PuzzleApiResponse';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { FIELD_OPTIONS } from '@/src/scripts/utils';
+
 import Modal from '@/src/components/Modal';
+import Input from '@/src/components/forms/Input';
+import GridIcon from '@/src/components/svg/GridIcon';
+import Loading from '@/src/components/Loading';
+import { useForm } from 'react-hook-form';
 
 export default function InfinitePage() {
     const t = useTranslations();
+    const generateRef = useRef<any>(undefined);
+    const form = useForm();
+    const formWatch = form.watch();
 
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
-    const [generated, setGenerated] = useState<boolean>(false);
+    const [refresh, setRefresh] = useState<boolean>(false);
+    const [initial, setInitial] = useState<boolean>(true);
 
-    const [puzzle, setPuzzle] = useState<PuzzleData>();
+    const [puzzle, setPuzzle] = useState<PuzzleData | undefined>(undefined);
     const [dictionary, setDictionary] = useState<any>();
-    const [generationLimit, setGenerationLimit] = useState<number>(9);
-    const [excludeFields, setExcludeFields] = useState<string[]>([]);
 
     useEffect(() => {
-        if (!generated)
-            return;
+        if (initial) return;
 
+        setPuzzle(undefined);
         setLoading(true);
         setError(null);
 
         const fetchPageData = async () => {
+
             try {
                 const headers = {
                     'Content-Type': 'application/json'
                 };
-                const body = JSON.stringify({
-                    'generation': generationLimit,
-                    'excludeFields': excludeFields
-                })
+                const body = {...formWatch};
+                if (body.excludeFields == false) body.excludeFields = [];
+                
                 const [puzzleResponse] = await Promise.all([
                     fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/puzzle/generate?infinite=true`, {
-                        method: 'POST', headers, body
+                        method: 'POST', headers, body: JSON.stringify(body)
                     }),
                 ]);
                 if (!puzzleResponse.ok) {
@@ -68,54 +75,67 @@ export default function InfinitePage() {
         };
 
         fetchPageData();
-    }, [generated])
+    }, [refresh])
 
-    const handleCheckbox = useCallback((option: string) => {
-        setExcludeFields((prev: string[]) => {
-            if (prev.includes(option)) {
-                return [...prev].filter(item => item !== option);
-            } else {
-                return [...prev, option];
-            }
-        });
-    }, []);
+    const refreshInfinite = () => {
+        setRefresh(prev => !prev);
+    }
+
+    const generatePuzzle = useCallback(() => {
+        if(!loading) {
+            setInitial(false);
+            refreshInfinite();
+        }
+    }, [loading])
+
+    const gen_options: Record<string, string> = {};
+    [1, 2, 3, 4, 5, 6, 7, 8, 9].forEach((gen: number) => {
+        gen_options[`${gen}`] = 'Geração '+t(`groupnames.generation.${gen}`);
+    });
+    const exclude_options: Record<string, string> = {};
+    {Object.keys(FIELD_OPTIONS).forEach((option: string) => {
+        exclude_options[option] = t(`groupnames.${option}.short`);
+    });
 
     return (
         <>
-            <Modal title="Gerar Puzzle" background={false} id="generate-modal" canClose={false} isOpen={!generated}>
-                <div style={{display: 'flex', maxWidth: '500px', flexWrap: 'wrap', gap: '0.5rem'}}>
-                    <label style={{display: 'flex', flexDirection: 'column', width: '100%'}}>
-                        Limite de geração:
-                        <select value={generationLimit} onChange={(e) => setGenerationLimit(Number(e.target.value))}>
-                            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((generation) => (
-                                <option value={generation} key={generation}>Geração {t(`groupnames.generation.${generation}`)}</option>
-                            ))}
-                        </select>
-                    </label>
-                    <label>
-                        Excluir categorias:
-                    </label>
-                    {Object.keys(FIELD_OPTIONS).map((option, index) => (
-                        <label key={index}>
-                            <input type="checkbox" onChange={(e) => handleCheckbox(option)} checked={excludeFields.includes(option)}/>
-                            {option}
-                        </label>
-                    ))}
+            {!initial &&
+                (loading ?
+                    <>
+                        <div className={`window-container cut-left`}>
+                            <section className="window-info-row">
+                                <p></p>
+                            </section>
+                            <Loading expand={true} />
+                        </div>
+                    </>
+                    :
+                    <Puzzle
+                        puzzle={puzzle}
+                        setPuzzle={setPuzzle}
+                        type="infinite"
+                        dictionary={dictionary}
+                        loading={loading}
+                        setLoading={setLoading}
+                        error={error}
+                        setError={setError}
+                        refreshInfinite={refreshInfinite}
+                    />
+                )
+            }            
+            <div className={`window-container cut-left ${!initial ? "floating": ""}`}>
+                <section className="window-info-row">
+                    <GridIcon/>
+                    <p>{t('puzzle.infinite-generate')}</p>
+                </section>
+                <div style={{display: 'flex', flexDirection: 'column', maxWidth: '500px', gap: '0.5rem'}}>
+                    <Input type="select" label="Limite de Geração" name="generation" defaultValue="9" options={gen_options} form={form} />
+                    <Input type="cloud" label="Ignorar Categorias" name="excludeFields" options={exclude_options} form={form} />
                 </div>
-                <button className="modal-content-div" onClick={() => {if(!loading) setGenerated(true)}}>
+                <button className="form-button" onClick={generatePuzzle}>
                     Gerar
                 </button>
-            </Modal>            
-            {generated && <Puzzle
-                puzzle={puzzle}
-                setPuzzle={setPuzzle}
-                type="infinite"
-                dictionary={dictionary}
-                loading={loading}
-                setLoading={setLoading}
-                error={error}
-                setError={setError}
-            />}
+            </div>
         </>
     )
-}
+}}
