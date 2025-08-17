@@ -1,6 +1,6 @@
 "use client"
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { toTitleCase } from '@/src/scripts/utils';
 
 interface GroupNameProps {
@@ -54,11 +54,19 @@ export function getNaturalGroupnames (groups: Group[], dictionary: any, t: any) 
     return groupNames;
 }
 
+export function getCustomGroupName (query: string, locale: string) {
+    if (!query.includes('|')) return query;
+
+    const names = query.split('|');
+    return locale.includes('pt') ? names[0] : names[1]
+}
+
 export function GroupName ({query, dictionary}: GroupNameProps) {
     const t = useTranslations();
+    const locale = useLocale();
     
     if (query[0] !== '?')
-        return ( <span>{t(`groupname.custom.${query}`)}</span> )
+        return ( <span>{getCustomGroupName(query, locale)}</span> )
 
     const groupList = getGroupList(query);
     const naturalGroupNames = getNaturalGroupnames(groupList, dictionary, t);

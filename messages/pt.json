@@ -31,6 +31,9 @@
         "puzzle": "Puzzle",
         "dex": "Dex",
         "correct": "correto",
+        "custom-groups-1": "Este puzzle possui categorias customizadas.",
+        "custom-groups-2": "Tente pensar fora da caixa!",
+        "okay": "Okay!",
         "help": {
             "logs": "A acurácia de cada uma de suas tentativas será exibida aqui.",
             "dex": "Pressione um bloco ou clique com o botão direito para pesquisar na Dex."

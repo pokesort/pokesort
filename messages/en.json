@@ -31,6 +31,9 @@
         "puzzle": "Puzzle",
         "dex": "Dex",
         "correct": "correto",
+        "custom-groups-1": "This puzzle includes custom categories.",
+        "custom-groups-2": "Try thinking outside the box!",
+        "okay": "Got it!",
         "help": {
             "logs": "Each of your attempts and its accuracy will be shown here.",
             "dex": "Press and hold a block or right-click it to search on the Dex."

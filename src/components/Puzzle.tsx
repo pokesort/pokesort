@@ -635,6 +635,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
     const [pokemons, setPokemons] = useState<any>([]);
     const [shinies, setShinies] = useState<number[]>([]);
     const [victoryOpen, setVictoryOpen] = useState<boolean>(false);
+    const [customGroupsOpen, setCustomGroupsOpen] = useState<boolean>(false);
     const [mountVictoryModal, setMountVictoryModal] = useState<boolean>(false);
     const [visibleTab, setVisibleTab] = useState<number>(1);
     const [currentDexView, setCurrentDexView] = useState<number>();
@@ -719,12 +720,36 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
         }
     }, [puzzle]);
 
+    const hasCustomGroups = useMemo(() => {
+        let output = false;
+
+        puzzle?.groups.forEach((group: any) => {
+            output = output || !group.query.includes('?');
+        });
+        if (output) setCustomGroupsOpen(true);
+
+        return output;
+    }, [puzzle, mountVictoryModal]);
+
     const resetAvailableAttempts = () => {
         setAvailableTips(maxAvailableTips);
     }
 
     return (
         <>
+            {hasCustomGroups &&
+                <Modal id="custom-groups-modal" isOpen={customGroupsOpen} canClose={false} setIsOpen={setCustomGroupsOpen}>
+                    <>
+                        <div className="modal-content-div">
+                            <p>{t(`custom-groups-1`)}</p>
+                            <p>{t(`custom-groups-2`)}</p>
+                        </div>
+                        <button className="modal-content-div" onClick={() => setCustomGroupsOpen(false)}>
+                            <p>{t(`okay`)}</p>
+                        </button>
+                    </>
+                </Modal>
+            }
             {mountVictoryModal &&
                 <VictoryModal
                     type={type}
