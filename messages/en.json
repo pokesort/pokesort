@@ -60,6 +60,7 @@
         "victory": {
             "streak": "Streak",
             "streak-desc": "Play Pokesort daily to increase your streak",
+            "infinite-count": "Solved infinite puzzles",
             "attempts-1": "Solved in ",
             "attempts-2": " attempts",
             "next-daily": "Next daily puzzle in",

@@ -77,10 +77,14 @@ export default function InfinitePage() {
         fetchPageData();
     }, [refresh])
 
+    const refreshInfinite = () => {
+        setRefresh(prev => !prev);
+    }
+
     const generatePuzzle = useCallback(() => {
         if(!loading) {
             setInitial(false);
-            setRefresh(prev => !prev);
+            refreshInfinite();
         }
     }, [loading])
 
@@ -105,7 +109,7 @@ export default function InfinitePage() {
                             <Loading expand={true} />
                         </div>
                     </>
-                    :                
+                    :
                     <Puzzle
                         puzzle={puzzle}
                         setPuzzle={setPuzzle}
@@ -115,6 +119,7 @@ export default function InfinitePage() {
                         setLoading={setLoading}
                         error={error}
                         setError={setError}
+                        refreshInfinite={refreshInfinite}
                     />
                 )
             }            
