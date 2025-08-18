@@ -42,12 +42,15 @@ export default function Home() {
     const newCounts = [...counts];
 
     pages.map((page: Page, index: number) => {
-      let streak = null;
+      let streak = 0;
       if (page.countType != undefined) {
 
         if (page.countType != 'count') {
-            const streakData = localStorage.getItem(streakKey);
-            if (streakData != null) streak = JSON.parse(streakData).streak;
+            const streakJson = localStorage.getItem(streakKey);
+            if (streakJson != null) {
+              const streakData = JSON.parse(streakJson);
+              streak = streakData.streak;
+            }
         } else {
             const streakData = localStorage.getItem(infiniteCount);
             if (streakData != null) streak = parseInt(streakData);
@@ -72,7 +75,7 @@ export default function Home() {
         {pages.map((page: Page, index: number) => {
           let StreakCount = <></>
 
-          if (page.countType != undefined) {
+          if (page.countType != undefined && counts[index] > 0) {
             StreakCount = (
               <div>
                 {page.countType != 'count' ?

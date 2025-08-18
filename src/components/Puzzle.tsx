@@ -264,12 +264,13 @@ interface GuessLogsInterface {
     setAvailableTips: React.Dispatch<React.SetStateAction<number>>;
     spritesMap:  React.RefObject<Record<number, string>>;
     allTips: React.RefObject<PuzzleTip[]>;
-    solvedGroupNames: string[];    
+    solvedGroupNames: string[];
+    puzzleRows: number;
     dictionary: any;
     viewedTips: React.RefObject<number[]>;
 }
 
-const GuessLogs = React.memo(({guesses, setGuesses, availableTips, setAvailableTips, spritesMap, allTips, solvedGroupNames, dictionary, viewedTips}: GuessLogsInterface) => {
+const GuessLogs = React.memo(({guesses, setGuesses, availableTips, setAvailableTips, spritesMap, allTips, solvedGroupNames, puzzleRows, dictionary, viewedTips}: GuessLogsInterface) => {
     const t = useTranslations('');
 
     const askForTip = () => {        
@@ -329,9 +330,16 @@ const GuessLogs = React.memo(({guesses, setGuesses, availableTips, setAvailableT
         }        
     }
 
+    const isSolved = useMemo(() => {
+        const solved = guesses.filter((g: PuzzleGuess) => g.accuracy >= 100);
+
+        return solved.length >= puzzleRows;;
+    }, [guesses, puzzleRows])
+
     return (
         <>
-            {guesses.length > 0 && allTips.current.length > 0 &&
+            {isSolved}
+            {guesses.length > 0 && allTips.current.length > 0 && !isSolved &&
                 <button className="ask-tip" onClick={askForTip} data-tips={availableTips}>{t(`puzzle.tips.ask`)} <span>x{availableTips}</span></button>
             }
             <section className="puzzle-guess-logs">
@@ -809,6 +817,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
                             spritesMap={spritesMap}
                             allTips={allTips}
                             solvedGroupNames={solvedGroupNames}
+                            puzzleRows={puzzle ? puzzle.rows : 4}
                             dictionary={dictionary}
                             viewedTips={viewedTips}
                         />
