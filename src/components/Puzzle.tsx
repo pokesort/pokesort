@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import React, { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { useLocale } from 'next-intl';
+import html2canvas from "html2canvas";
 import { formatDate, isYesterday, shuffleArray, getNextRefresh, toTitleCase, decodeTips, randomInRange, isMobile } from '@/src/scripts/utils';
 import { useInView } from 'react-intersection-observer';
 import { redirect } from 'next/navigation';
@@ -664,7 +665,6 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
         }
 
         return true;
-
     }
     
     const [guesses, setGuesses] = useState<PuzzleGuess[]>([]);
@@ -770,6 +770,34 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
 
         return output;
     }, [puzzle, mountVictoryModal]);
+
+    const puzzleImage = async () => {
+        const element: HTMLElement | null = document.querySelector('.puzzle-tab[data-tab="1"]');
+        if (!element || !puzzle) return null;
+
+        const canvas = await html2canvas(element, {
+            backgroundColor: '#151B35',
+            useCORS: true,
+            allowTaint: false,
+            foreignObjectRendering: true
+        });
+        return await new Promise<Blob | null>((resolve) =>
+            canvas.toBlob((blob: any) => resolve(blob), "image/png")
+        );
+    };
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            puzzleImage().then(blob => {
+                if (!blob) return;
+                const url = URL.createObjectURL(blob);
+
+                console.log(url);
+            });
+        }, 5000);
+
+        return () => clearTimeout(timer);
+    }, [puzzle]);
 
     const resetAvailableAttempts = () => {
         setAvailableTips(maxAvailableTips);

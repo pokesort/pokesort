@@ -9,7 +9,7 @@
     gap: var(--spacing);
     padding: var(--spacing);
     padding-top: 0.25rem;
-    clip-path: polygon(0% 0%, 45% 0%, calc(45% + 37px) 37px, 100% 37px, 100% 100%, 0% 100%);
+    // clip-path: polygon(0% 0%, 45% 0%, calc(45% + 37px) 37px, 100% 37px, 100% 100%, 0% 100%);
 
     transition:
         height 0.3s ease
@@ -25,7 +25,7 @@
 @media (max-width: 768px) {
     .window-container {
         padding-top: 0.1rem;
-        clip-path: polygon(0% 0%, calc(100% - 37px) 0%, 100% 37px, 100% 37px, 100% 100%, 0% 100%);
+        // clip-path: polygon(0% 0%, calc(100% - 37px) 0%, 100% 37px, 100% 37px, 100% 100%, 0% 100%);
     
         &:not(:has(section.puzzle)) {
             height: var(--height, 100%);
@@ -239,7 +239,7 @@ section.solved-groups-grid {
             right: 0;
             top: -1px;
 
-            clip-path: polygon(0% 0%, 100% 100%, 100% 0%);
+            // clip-path: polygon(0% 0%, 100% 100%, 100% 0%);
             animation: solved-text 1.0s ease 1;
         }
     }
