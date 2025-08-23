@@ -28,10 +28,14 @@ function getGroupList (queries: string) {
     return groupList;
 }
 
-export function getNaturalGroupnames (groups: Group[], dictionary: any, t: any) {
+export function getNaturalGroupnames (groups: Group[], dictionary: any, t: any, locale: any) {
     const direct = ['region'];
     const from_dict = ['abilities', 'moves'];
     const types = ['types', 'weak', 'strong', 'immune'];
+
+    if (groups[0].key.includes('|')) {
+        return [getCustomGroupName(groups[0].key, locale)];
+    }
 
     let groupNames: string[] = [];
 
@@ -69,7 +73,7 @@ export function GroupName ({query, dictionary}: GroupNameProps) {
         return ( <span>{getCustomGroupName(query, locale)}</span> )
 
     const groupList = getGroupList(query);
-    const naturalGroupNames = getNaturalGroupnames(groupList, dictionary, t);
+    const naturalGroupNames = getNaturalGroupnames(groupList, dictionary, t, locale);
     let result = naturalGroupNames.join('  ·  ');
 
     return ( <span>{result}</span> )

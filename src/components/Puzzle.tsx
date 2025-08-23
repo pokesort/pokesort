@@ -272,6 +272,7 @@ interface GuessLogsInterface {
 
 const GuessLogs = React.memo(({guesses, setGuesses, availableTips, setAvailableTips, spritesMap, allTips, solvedGroupNames, puzzleRows, dictionary, viewedTips}: GuessLogsInterface) => {
     const t = useTranslations('');
+    const locale = useLocale();
 
     const askForTip = () => {        
         if (availableTips <= 0 || viewedTips.current.length == allTips.current.length) return;
@@ -305,7 +306,7 @@ const GuessLogs = React.memo(({guesses, setGuesses, availableTips, setAvailableT
         setGuesses((prev: PuzzleGuess[]) => [...prev, guess]);
     }
 
-    const renderTip = (allTips: React.RefObject<PuzzleTip[]>, tipIndex: number) => {
+    const renderTip = (allTips: React.RefObject<PuzzleTip[]>, tipIndex: number, locale: string) => {
         const tip: any = decodeTips(allTips.current[tipIndex].tip);
 
         if (tip.type == 'pair') {
@@ -324,7 +325,7 @@ const GuessLogs = React.memo(({guesses, setGuesses, availableTips, setAvailableT
         } else {
             return (
                 <p className="tip">
-                    {t(`puzzle.tips.${tip.type}`)} <b>{getNaturalGroupnames(tip.values, dictionary, t).join('  ·  ')}</b>
+                    {t(`puzzle.tips.${tip.type}`)} <b>{getNaturalGroupnames(tip.values, dictionary, t, locale).join('  ·  ')}</b>
                 </p>
             )
         }        
@@ -351,7 +352,7 @@ const GuessLogs = React.memo(({guesses, setGuesses, availableTips, setAvailableT
                                 <div className="accuracy-circle" title={`${guess.accuracy}% ${t('puzzle.correct')}`}/>
                                 <div className="guess-group">
                                     {guess.tip != null &&
-                                        <>{renderTip(allTips, guess.tip)}</>
+                                        <>{renderTip(allTips, guess.tip, locale)}</>
                                     }
                                     {guess.pokemons.map((pokemon: number) => (
                                         <PokeSprite key={pokemon} slug={spritesMap.current[pokemon]}/>
@@ -727,9 +728,9 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
 
     useEffect(() => {
         const randomShinies = () => {
-            const mons = pokemons.map((mon: any) => mon.dex_number);
+            const mons = pokemons.map((mon: any) => mon.id);
             for (let i = 1; i <= 3; i++) {
-                const chance = randomInRange(1, 30);
+                const chance = randomInRange(1, 100);
                 if (chance == 1) {
                     const shinyTarget = randomInRange(0, mons.length);
                     setShinies((prev) => [...prev, mons[shinyTarget]]);
