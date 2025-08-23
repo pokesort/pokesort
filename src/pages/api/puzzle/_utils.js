@@ -34,7 +34,7 @@ export const populate = async (res, existingPuzzle) => {
     })
   );
   dictionary.pokemons = dictionary.pokemons.flat();
-  dictionary.tips = dictionary.tips.flat();
+  dictionary.tips = dictionary.tips.flat().sort((a, b) => a.group.localeCompare(b.group));
 
   return res.status(200).json({success: true, data: existingPuzzle, dictionary: dictionary})
 }
