@@ -6,6 +6,10 @@ section#dex-section {
   flex: 1 0 auto;
 
   align-items: center;
+
+  @media(max-width: 768px) {
+    width: 100%;
+  }
 }
 
 ul#dex-list {
