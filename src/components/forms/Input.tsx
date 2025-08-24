@@ -12,6 +12,7 @@ interface InputProps {
     name: string;
     form?: UseFormReturn<FieldValues, any, FieldValues>
     options?: Record<string, string>;
+    placeholder?: string;
     readonly?: boolean;
     disabled?: boolean;
     required?: boolean;
@@ -19,7 +20,7 @@ interface InputProps {
     onInput?: () => void;
 }
 
-export default React.memo(function Input({type, label, name, form=undefined, options={}, readonly=false, disabled=false, required=false, defaultValue="", onInput=undefined}: InputProps) {
+export default React.memo(function Input({type, label, name, form=undefined, options={}, placeholder="", readonly=false, disabled=false, required=false, defaultValue="", onInput=undefined}: InputProps) {
     
     if (form == undefined) {
         form = useForm();
@@ -37,7 +38,7 @@ export default React.memo(function Input({type, label, name, form=undefined, opt
             return (
                 <label className="form-label">
                     {label && <span>{label}</span>}
-                    <input className="inner-input" type={type} defaultValue={defaultValue} autoComplete="off" onInput={onInput}
+                    <input className="inner-input" type={type} defaultValue={defaultValue} autoComplete="off" onInput={onInput} placeholder={placeholder}
                         {...form.register(name, { required })} readOnly={readonly} disabled={disabled} />
                 </label>
             )

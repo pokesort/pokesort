@@ -36,6 +36,9 @@
         -webkit-appearance: none;
         margin: 0;
     }
+    input::placeholder {
+        color: color(text3);
+    }
 
     &:has(.select-options) {
         .inner-input {

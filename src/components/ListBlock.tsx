@@ -30,7 +30,7 @@ function getSurname(name: string, species_name: string) {
     return surname;
 }
 
-export default React.memo(function PuzzleBlock({ pokemon, multiselect, aspect, isSelected, onSelect, onPress }: BlockProps) {
+export default React.memo(function ListBlock({ pokemon, multiselect, aspect, isSelected, onSelect, onPress }: BlockProps) {
     const default_url = pokemon.sprite_default;
     const shiny_url = pokemon.sprite_shiny;
 

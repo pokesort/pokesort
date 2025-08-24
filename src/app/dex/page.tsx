@@ -11,6 +11,8 @@ import Loading from '@/src/components/Loading';
 import { useForm } from 'react-hook-form';
 import Input from '@/src/components/forms/Input';
 import SearchIcon from '@/src/components/svg/SearchIcon';
+import FilterIcon from '@/src/components/svg/FilterIcon';
+import { FIELD_OPTIONS } from '@/src/scripts/utils';
 
 interface DexFiltersProps {
   queries: string | undefined;
@@ -23,9 +25,10 @@ function DexFilters ({queries, setQueries}: DexFiltersProps) {
   const formWatch = form.watch();
 
   const [unlock, setUnlock] = useState<boolean>(false);
+  const [openFilterModal, setOpenFilterModal] = useState<boolean>(false);
 
   useEffect(() => {
-    if (!unlock) return;
+    if (!unlock || openFilterModal) return;
 
     const formTimeout = setTimeout(() => {
       const formBody = formWatch;
@@ -36,19 +39,35 @@ function DexFilters ({queries, setQueries}: DexFiltersProps) {
     }, 500);
 
     return () => clearTimeout(formTimeout);
-  }, [formWatch, unlock]);
+  }, [formWatch, unlock, openFilterModal]);
 
   const unlockFetch = () => {
     setUnlock(true);
   }
 
   return (
-    <section id="dex-filters">
-      <label className="search-container">
-        <Input type="text" name="search" form={form} onInput={unlockFetch}/>
-        <SearchIcon />
-      </label>
-    </section>
+    <>
+      <Modal id="filter-modal" background={true} isOpen={openFilterModal} setIsOpen={setOpenFilterModal} canClose={true}>
+        <div style={{display: 'flex', flexDirection: 'column', maxWidth: '500px', gap: '0.5rem'}}>
+          {Object.keys(FIELD_OPTIONS).map((key: string, index: number) => {
+            return (
+              <Input type="select" label={t(`groupnames.${key}.short`)} name={key} form={form} />
+            )
+          })}
+        </div>
+      </Modal>
+
+      <section id="dex-filters">
+        <label className="search-container">
+          <Input type="text" name="search" form={form} placeholder={"Buscar"} onInput={unlockFetch}/>
+          <SearchIcon />
+        </label>
+        <button onClick={() => setOpenFilterModal(true)}>
+          <FilterIcon />
+          Filtros
+        </button>
+      </section>
+    </>
   )
 }
 
