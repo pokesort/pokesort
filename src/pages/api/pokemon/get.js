@@ -20,6 +20,7 @@ export default async function handler(req, res) {
     const form = req.query.form;
     const dual = req.query.dual;
     const max_generation = req.query.max_generation;
+    const search = req.query.search;
 
     const relations_query = {
       "weak": { $gte: 2 },
@@ -84,6 +85,7 @@ export default async function handler(req, res) {
 
     if (dual != undefined) delete req.query.dual;
     if (max_generation != undefined) delete req.query.max_generation;
+    if (search != undefined) delete req.query.search;
     
     if (pokemonIds.length > 0){
       pokemonIds = pokemonIds.filter((item, index) => pokemonIds.indexOf(item) === index);
@@ -110,6 +112,9 @@ export default async function handler(req, res) {
     }
     if (max_generation != undefined){
       filter = await handleMaxGeneration(parseInt(max_generation), filter);
+    }
+    if (search != undefined){
+      filter = await handleSearch(search, filter);
     }
 
   let pokemons = await data.db.collection('pokemon').find(filter, { projection: { name: 1, id: 1, species_name: 1, dex_number: 1, sprite_default: 1, sprite_shiny: 1, cry: 1, _id: 0 } }).sort({ dex_number: 1, id: 1}).toArray();
@@ -636,6 +641,24 @@ async function handleMaxGeneration(max_generation, filter) {
   }
 
   newAnd.push({ generation: { $lte: max_generation } });
+
+  filter = { $and: newAnd };
+
+  return filter;
+}
+
+async function handleSearch(search, filter) {
+  const newAnd = [];
+
+  if (filter.$and) {
+    newAnd.push(...filter.$and);
+  } else {
+    newAnd.push(filter);
+  }
+
+  if (search && search.trim() !== "") {
+    newAnd.push({ name: { $regex: search, $options: "i" } });
+  }
 
   filter = { $and: newAnd };
 

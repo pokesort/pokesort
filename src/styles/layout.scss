@@ -115,6 +115,90 @@ section#page {
     user-select: none;
 }
 
+.window-container {
+    display: flex;
+    flex-direction: column;
+    width: min(100%, 400px);
+    background-color: color(section1);
+
+    gap: var(--spacing);
+    padding: var(--spacing);
+    padding-top: 0.25rem;
+    clip-path: polygon(0% 0%, 45% 0%, calc(45% + 37px) 37px, 100% 37px, 100% 100%, 0% 100%);
+
+    transition:
+        height 0.3s ease
+        width 0.3s ease;
+
+    &:not(:has(section.puzzle)) {
+        height: 100%;
+    }
+    &.puzzle-window {
+        width: min(100%, calc(120px * var(--cols, 4)));
+    }    
+}
+@media (max-width: 768px) {
+    .window-container {
+        padding-top: 0.1rem;
+        clip-path: polygon(0% 0%, calc(100% - 37px) 0%, 100% 37px, 100% 37px, 100% 100%, 0% 100%);
+    
+        &:not(:has(section.puzzle)) {
+            height: var(--height, 100%);
+        }
+    }
+
+    section.window-info-row {
+        margin: 0.25rem 0;
+    }
+}
+@media (max-width: 640px) {
+    .window-container {
+        width: 100%;
+        padding-top: 0;
+    }
+    .window-container:not(:has(section.puzzle)) {
+        min-height: unset;
+    }
+}
+
+.window-container.floating {
+    &:not(:has(section.puzzle)) {
+        height: unset;
+    }
+
+    position: fixed;
+    top: calc(100% - 36px);
+
+    min-height: unset;
+    max-height: unset;
+    height: auto;
+
+    transition: top 0.3s ease, bottom 0.3s ease;
+    animation: become-floating 0.15s ease-in 0s 1;
+
+    &:hover {
+        top: calc(100% - 343px);
+    }
+}
+
+section.window-info-row {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    height: fit-content;
+    gap: var(--spacing);
+    padding: var(--spacing);
+    font-size: text(small);
+    
+    width: min(100%, 550px);   
+
+    span {
+        color: color(text2);
+        padding: 0.2rem 0.4rem;
+        padding-left: 0.5rem;
+    }
+}
+
 ::selection {
   background: color(text3);
   color: color(text1);

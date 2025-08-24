@@ -8,7 +8,7 @@ import SelectHandle from '../svg/SelectHandle';
 
 interface InputProps {
     type: 'text' | 'number' | 'date' | 'select' | 'multiselect' | 'cloud';
-    label: string;
+    label?: string;
     name: string;
     form?: UseFormReturn<FieldValues, any, FieldValues>
     options?: Record<string, string>;
@@ -16,9 +16,10 @@ interface InputProps {
     disabled?: boolean;
     required?: boolean;
     defaultValue?: string | string[];
+    onInput?: () => void;
 }
 
-export default React.memo(function Input({type, label, name, form=undefined, options={}, readonly=false, disabled=false, required=false, defaultValue=""}: InputProps) {
+export default React.memo(function Input({type, label, name, form=undefined, options={}, readonly=false, disabled=false, required=false, defaultValue="", onInput=undefined}: InputProps) {
     
     if (form == undefined) {
         form = useForm();
@@ -35,8 +36,8 @@ export default React.memo(function Input({type, label, name, form=undefined, opt
         case 'date':
             return (
                 <label className="form-label">
-                    <span>{label}</span>
-                    <input className="inner-input" type={type} defaultValue={defaultValue} autoComplete="off"
+                    {label && <span>{label}</span>}
+                    <input className="inner-input" type={type} defaultValue={defaultValue} autoComplete="off" onInput={onInput}
                         {...form.register(name, { required })} readOnly={readonly} disabled={disabled} />
                 </label>
             )
@@ -76,7 +77,7 @@ export default React.memo(function Input({type, label, name, form=undefined, opt
 
             return (
                 <div className="form-label" ref={selectWrapper} onFocus={() => setOpen(true)}>
-                    <span>{label}</span>
+                    {label && <span>{label}</span>}
                     <input className="inner-input" type="text" defaultValue={selectValue} autoComplete="off"/>
                     <SelectHandle />
                     <ul className={`select-options ${open ? 'open' : ''}`}>
@@ -93,7 +94,7 @@ export default React.memo(function Input({type, label, name, form=undefined, opt
         case 'cloud':
             return (
                 <div className="form-label">
-                    <span>{label}</span>
+                    {label && <span>{label}</span>}
                     <ul className="checkbox-cloud">
                         {Object.keys(options).map((value: string) => (
                             <label className="inner-input" key={value}>
