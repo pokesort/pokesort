@@ -22,6 +22,14 @@ ul#dex-list {
   gap: var(--spacing);
   width: 50vw;
 
+  transition: transform 0.20s ease;
+
+  @media(min-width: 768px) {
+    &.open-filter {
+      transform: translateX(-15%);
+    }
+  }
+
   @media(max-width: 768px) {
     --cols: 4;
     width: 100%;
@@ -95,6 +103,37 @@ ul#dex-list {
 
   @media(max-width: 768px) {
     top: 45px;
+  }
+}
+
+.filter-form {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  z-index: 80;
+
+  position: fixed;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  
+  transition: opacity 0.15s ease;
+
+  &:not(.open) {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  @media(max-width: 768px) {
+    --offset: 87px;
+
+    transform: unset;
+    background-color: color(section1);
+    top: var(--offset);
+    right: 0;
+    width: 100%;
+    padding: var(--spacing);
+    padding-bottom: 50vh;
   }
 }
 

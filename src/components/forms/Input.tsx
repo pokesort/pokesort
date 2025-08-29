@@ -79,7 +79,7 @@ export default React.memo(function Input({type, label, name, form=undefined, opt
             return (
                 <div className="form-label" ref={selectWrapper} onFocus={() => setOpen(true)}>
                     {label && <span>{label}</span>}
-                    <input className="inner-input" type="text" defaultValue={selectValue} autoComplete="off"/>
+                    <input className="inner-input" type="text" defaultValue={selectValue} readOnly={true} autoComplete="off"/>
                     <SelectHandle />
                     <ul className={`select-options ${open ? 'open' : ''}`}>
                         {Object.keys(options).map((value: string) => (
