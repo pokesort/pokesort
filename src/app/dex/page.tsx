@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import "@/src/styles/components/Dex.scss";
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import ListBlock from '@/src/components/ListBlock';
 import Modal from '@/src/components/Modal';
@@ -12,13 +12,14 @@ import { useForm } from 'react-hook-form';
 import Input from '@/src/components/forms/Input';
 import SearchIcon from '@/src/components/svg/SearchIcon';
 import FilterIcon from '@/src/components/svg/FilterIcon';
-import { FIELD_OPTIONS } from '@/src/scripts/utils';
+import { FIELD_OPTIONS, toTitleCase } from '@/src/scripts/utils';
 
 interface DexFiltersProps {
   queries: string | undefined;
   setQueries: React.Dispatch<React.SetStateAction<string | undefined>>;
   openFilter: boolean;
   setOpenFilter: React.Dispatch<React.SetStateAction<boolean>>;
+  dictionary: React.RefObject<Record<string, string[]>>;
 }
 
 type Range = {
@@ -26,7 +27,7 @@ type Range = {
   max: number;
 }
 
-function DexFilters ({queries, setQueries, openFilter, setOpenFilter}: DexFiltersProps) {
+function DexFilters ({queries, setQueries, openFilter, setOpenFilter, dictionary}: DexFiltersProps) {
   const t = useTranslations();
   const form = useForm();
   const formWatch = form.watch();
@@ -42,7 +43,7 @@ function DexFilters ({queries, setQueries, openFilter, setOpenFilter}: DexFilter
 
     for (let i = min; i <= max; i++) {
       if (['abilities', 'moves'].includes(key)) {
-        record[`${i}`] = `${i}`;
+        record[`${i}`] = `${toTitleCase(dictionary.current[key][i-1])}`;
       } else {
         record[`${i}`] = `${t(`groupnames.${key}.${i}`)}`;
       }
@@ -51,19 +52,24 @@ function DexFilters ({queries, setQueries, openFilter, setOpenFilter}: DexFilter
   };
 
   useEffect(() => {
-
     const formTimeout = setTimeout(() => {
       const formBody = formWatch;
       formBody.search = formBody.search.replaceAll(' ', '-');
-      for (const key in formBody) {
-        if (formBody[key] === null || formBody[key] === false) {
-          delete formBody[key];
-        }
-      }
 
-      const newQueries = new URLSearchParams(formBody).toString();
-      console.log(newQueries);
-      setQueries(newQueries);
+      let newQueries = new URLSearchParams();
+
+      if (Object.entries.length <= 0) return;
+      Object.entries(formBody).forEach(([key, value]) => {
+        if (!formBody[key]) return;
+
+        if (Array.isArray(value)) {
+          value.forEach(v => newQueries.append(key, v));
+        } else {
+          newQueries.append(key, value);
+        }
+      });
+
+      setQueries(newQueries.toString());
     }, 500);
 
     return () => clearTimeout(formTimeout);
@@ -106,6 +112,9 @@ function DexFilters ({queries, setQueries, openFilter, setOpenFilter}: DexFilter
 
 export default React.memo(function Home() {
   const t = useTranslations();
+
+  const dictionary = useRef<Record<string, string[]>>({});
+
   const [pokemons, setPokemons] = useState<any[]>([]);
   const [queries, setQueries] = useState<string | undefined>(undefined);
   const [selected, setSelected] = useState<number>();
@@ -137,6 +146,40 @@ export default React.memo(function Home() {
       })
   }, [queries])
 
+  useEffect(() => {
+    const fetchDisctionary = async () => {
+        try {
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            const [abilitiesResponse, movesResponse] = await Promise.all([
+                fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/abilities/get`, {
+                    method: 'GET', headers
+                }),
+                fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/moves/get`, {
+                    method: 'GET', headers
+                }),
+            ]);
+            if (!abilitiesResponse.ok || !movesResponse.ok) {
+                throw new Error('Erro ao obter informações.');
+            }
+            const [abilitiesData, movesData] = await Promise.all([
+                abilitiesResponse.json(),
+                movesResponse.json(),
+            ]);
+          
+            dictionary.current['abilities'] = abilitiesData.abilities;
+            dictionary.current['moves'] = movesData.moves;
+        } catch (e) {
+            console.error(e);
+        } finally {                
+            // setLoading(false);
+        }
+    };
+
+    fetchDisctionary();
+  }, [])
+
   const handleSelect = useCallback((id: number) => {
     setSelected(id);
     setDexModalOpen(true);
@@ -151,7 +194,7 @@ export default React.memo(function Home() {
         <Loading expand={false} />
       :
         <section id="dex-section">
-          <DexFilters queries={queries} setQueries={setQueries} openFilter={openFilter} setOpenFilter={setOpenFilter} />
+          <DexFilters queries={queries} setQueries={setQueries} openFilter={openFilter} setOpenFilter={setOpenFilter} dictionary={dictionary} />
           <ul id="dex-list" className={`${loading ? 'loading': ''} ${openFilter ? 'open-filter' : ''}`}>
             {pokemons && pokemons.map((p: any, index: number) => (
               <ListBlock
