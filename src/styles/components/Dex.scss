@@ -22,7 +22,13 @@ ul#dex-list {
   gap: var(--spacing);
   width: 50vw;
 
-  // transition: opacity 0.3s ease;
+  transition: transform 0.20s ease;
+
+  @media(min-width: 768px) {
+    &.open-filter {
+      transform: translateX(-15%);
+    }
+  }
 
   @media(max-width: 768px) {
     --cols: 4;
@@ -40,16 +46,15 @@ ul#dex-list {
     opacity: 0.75;
     pointer-events: none;
   }
-
-  & > * {
-    animation: dex-list-fade-in 0.15s ease 0s 1;
-  }
 }
 
 #dex-filters {
   position: sticky;
   top: 59px;
   z-index: 15;
+
+  display: flex;
+  gap: var(--spacing);
 
   width: 100%;
   height: fit-content;
@@ -59,16 +64,76 @@ ul#dex-list {
   font-size: text(regular);
   box-shadow: 0px 0 70px color(darker);
 
-  .search-container svg {
-    position: absolute;
-    right: 1.5rem;
-    top: calc(50% - 7px);
+  .search-container {
+    width: 100%;
 
-    color: color(text1);
+    svg {
+      position: absolute;
+      left: 1.15rem;
+      top: calc(50% - 7px);
+
+      color: color(text1);
+    }
+    input {
+      padding-left: 2.15rem;
+    }
+  }
+
+  button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    background-color: color(section2);
+    font-size: 0.75rem;
+    padding: 0 0.5rem;
+
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
+
+    &:hover {
+        box-shadow: 0px 0 40px color(darker);
+        z-index: 60;
+    }
+    &:active {
+        transform: scale(0.85);
+    }
   }
 
   @media(max-width: 768px) {
     top: 45px;
+  }
+}
+
+.filter-form {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  z-index: 80;
+
+  position: fixed;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  
+  transition: opacity 0.15s ease;
+
+  &:not(.open) {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  @media(max-width: 768px) {
+    --offset: 87px;
+
+    transform: unset;
+    background-color: color(section1);
+    top: var(--offset);
+    right: 0;
+    width: 100%;
+    padding: var(--spacing);
+    padding-bottom: 50vh;
   }
 }
 

@@ -117,7 +117,18 @@
         },
         "region": {
             "long": "Da Região de ",
-            "short": "Região"
+            "short": "Região",
+
+            "kanto": "Kanto",
+            "johto": "Johto",
+            "hoenn": "Hoeen",
+            "sinnoh": "Sinnoh",
+            "unova": "Unova",
+            "kalos": "Kalos",
+            "alola": "Alola",
+            "galar": "Galar",
+            "hisui": "Hisui",
+            "paldea": "Paldea"
         },
         "moves": {
             "long": "Aprende ",
@@ -156,6 +167,7 @@
             "bug": "Inseto",
             "flying": "Voador",
             "ground": "Campo",
+            "field": "Campo",
             "fairy": "Fada",
             "plant": "Planta",
             "humanshape": "Humanóide",
@@ -287,11 +299,11 @@
             "no_line": "Sem Evoluções"
         },
         "dual": {
-            "long": "Tipagem ",
+            "long": "",
             "short": "Número de Tipos",
 
-            "1": "Única",
-            "2": "Dupla"
+            "1": "Tipagem Única",
+            "2": "Tipagem Dupla"
         }
     }
 }
