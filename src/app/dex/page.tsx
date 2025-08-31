@@ -19,7 +19,7 @@ interface DexFiltersProps {
   setQueries: React.Dispatch<React.SetStateAction<string | undefined>>;
   openFilter: boolean;
   setOpenFilter: React.Dispatch<React.SetStateAction<boolean>>;
-  dictionary: React.RefObject<Record<string, string[]>>;
+  dictionary: Record<string, string[]> | undefined;
 }
 
 type Range = {
@@ -34,7 +34,7 @@ function DexFilters ({queries, setQueries, openFilter, setOpenFilter, dictionary
 
   const [unlock, setUnlock] = useState<boolean>(false);
 
-  function rangeToRecord(key: string, { min, max }: Range): Record<string, string> {
+  const rangeToRecord = useCallback((key: string, { min, max }: Range): Record<string, string> => {
     const record: Record<string, string> = {};
 
     if (['weak', 'strong'].includes(key)) {
@@ -43,13 +43,17 @@ function DexFilters ({queries, setQueries, openFilter, setOpenFilter, dictionary
 
     for (let i = min; i <= max; i++) {
       if (['abilities', 'moves'].includes(key)) {
-        record[`${i}`] = `${toTitleCase(dictionary.current[key][i-1])}`;
+        if (dictionary && dictionary[key]) {
+          record[`${i}`] = `${toTitleCase(dictionary[key][i-1])}`;
+        } else {
+          record[`${i}`] = `${i-1}`;  
+        }
       } else {
         record[`${i}`] = `${t(`groupnames.${key}.${i}`)}`;
       }
     }
     return record;
-  };
+  }, [dictionary]);
 
   useEffect(() => {
     const formTimeout = setTimeout(() => {
@@ -86,41 +90,42 @@ function DexFilters ({queries, setQueries, openFilter, setOpenFilter, dictionary
             <Input type="text" name="search" form={form} placeholder={"Buscar"} onInput={unlockFetch}/>
             <SearchIcon />
           </label>
-          <button onClick={() => setOpenFilter((prev: boolean) => !prev)}>
+          <button className={`${openFilter ? 'open' : ''}`} onClick={() => setOpenFilter((prev: boolean) => !prev)}>
             <FilterIcon />
             Filtros
           </button>
       </section>
-      <div className={`filter-form ${openFilter ? 'open' : ''}`}>
-        {Object.keys(FIELD_OPTIONS).map((key: string, index: number) => {
-          const records: Record<string, unknown> = FIELD_OPTIONS;
-          let options: Record<string, string> = {};
-          if (Array.isArray(records[key])) {
-            options = Object.fromEntries(records[key].map((item: string) => [item, t(`groupnames.${key}.${item}`)])) as Record<string, string>;
-          } else {
-            options = rangeToRecord(key, records[key] as Range);
-          }
+      {dictionary != undefined &&
+        <div className={`filter-form ${openFilter ? 'open' : ''}`}>
+          {Object.keys(FIELD_OPTIONS).map((key: string, index: number) => {
+            const records: Record<string, unknown> = FIELD_OPTIONS;
+            let options: Record<string, string> = {};
+            if (Array.isArray(records[key])) {
+              options = Object.fromEntries(records[key].map((item: string) => [item, t(`groupnames.${key}.${item}`)])) as Record<string, string>;
+            } else {
+              options = rangeToRecord(key, records[key] as Range);
+            }
 
-          return (
-            <Input key={key} type="multiselect" label={t(`groupnames.${key}.short`)} name={key} form={form} options={options} />
-          )
-        })}
-      </div>
+            return (
+              <Input key={key} type="multiselect" label={t(`groupnames.${key}.short`)} name={key} form={form} options={options} />
+            )
+          })}
+        </div>
+      }
     </>
   )
 }
 
-export default React.memo(function Home() {
+export default React.memo(function Dex() {
   const t = useTranslations();
-
-  const dictionary = useRef<Record<string, string[]>>({});
 
   const [pokemons, setPokemons] = useState<any[]>([]);
   const [queries, setQueries] = useState<string | undefined>(undefined);
   const [selected, setSelected] = useState<number>();
   const [dexModalOpen, setDexModalOpen] = useState<boolean>(false);
   const [openFilter, setOpenFilter] = useState<boolean>(false);
-
+  const [dictionary, setDictionary] = useState<Record<string, string[]>>();
+  
   const [loading, setLoading] = useState<boolean>(true);
   const [firstFetch, setFirstFetch] = useState<boolean>(true);
 
@@ -130,7 +135,7 @@ export default React.memo(function Home() {
   }, []);
 
   useEffect(() => {
-    if (queries == undefined) return;
+    if (queries == undefined || !dictionary) return;
 
     setLoading(true);
     fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/pokemon/get?${queries}`, {
@@ -144,10 +149,10 @@ export default React.memo(function Home() {
           setLoading(false);
           setPokemons(result.pokemons);
       })
-  }, [queries])
+  }, [queries, dictionary]);
 
   useEffect(() => {
-    const fetchDisctionary = async () => {
+    const fetchDictionary = async () => {
         try {
             const headers = {
                 'Content-Type': 'application/json'
@@ -160,16 +165,18 @@ export default React.memo(function Home() {
                     method: 'GET', headers
                 }),
             ]);
-            if (!abilitiesResponse.ok || !movesResponse.ok) {
-                throw new Error('Erro ao obter informações.');
-            }
+            // if (!abilitiesResponse.ok || !movesResponse.ok) {
+            //     throw new Error('Erro ao obter informações.');
+            // }
             const [abilitiesData, movesData] = await Promise.all([
                 abilitiesResponse.json(),
                 movesResponse.json(),
             ]);
-          
-            dictionary.current['abilities'] = abilitiesData.abilities;
-            dictionary.current['moves'] = movesData.moves;
+
+            setDictionary({
+              'abilities': abilitiesData.abilities,
+              'moves': movesData.moves
+            });
         } catch (e) {
             console.error(e);
         } finally {                
@@ -177,7 +184,7 @@ export default React.memo(function Home() {
         }
     };
 
-    fetchDisctionary();
+    fetchDictionary();
   }, [])
 
   const handleSelect = useCallback((id: number) => {
