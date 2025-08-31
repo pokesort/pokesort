@@ -15,9 +15,10 @@ export interface Pokemon {
  * Represents a group of related Pokémon within the puzzle grid.
  */
 export interface PuzzleGroup {
-  _id: string;
+  _id?: string;
   query: string;
   pokemons: number[];
+  tips: string[];
 }
 
 /**

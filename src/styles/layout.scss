@@ -135,7 +135,7 @@ section#page {
     }
     &.puzzle-window {
         width: min(100%, calc(120px * var(--cols, 4)));
-    }    
+    }
 }
 @media (max-width: 768px) {
     .window-container {

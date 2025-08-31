@@ -28,6 +28,11 @@ function getGroupList (queries: string) {
     return groupList;
 }
 
+export function getGroupnameFromQuery (query: string, dictionary: any, t: any, locale: any) {
+    const groups = getGroupList(query);
+    return getNaturalGroupnames(groups, dictionary, t, locale);
+}
+
 export function getNaturalGroupnames (groups: Group[], dictionary: any, t: any, locale: any) {
     const direct = ['region'];
     const from_dict = ['abilities', 'moves'];
