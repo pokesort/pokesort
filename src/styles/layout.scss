@@ -87,6 +87,13 @@ ul, li {
   list-style-type: none;
 }
 
+* {
+    caret-color: transparent;
+}
+input {
+    caret-color: color(text2);
+}
+
 section#page {
     --spacing: .5rem;
 
