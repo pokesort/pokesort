@@ -69,12 +69,11 @@ export default React.memo(function Input({type, label, name, form=undefined, opt
             }, [watched]);
 
             useEffect(() => {
-                Object.keys(options).forEach((value: string) => {
-                    if (defaultValue.includes(value)) {
-                        form.setValue(name, [value]);
-                    }
-                })
-            }, [defaultValue])
+                if (!defaultValue) return;
+
+                const normalized = Array.isArray(defaultValue) ? defaultValue : [defaultValue];
+                form.setValue(name, normalized);
+            }, [defaultValue, form, name]);
 
             return (
                 <div className="form-label" ref={selectWrapper} onFocus={() => setOpen(true)}>
@@ -85,6 +84,7 @@ export default React.memo(function Input({type, label, name, form=undefined, opt
                         {Object.keys(options).map((value: string) => (
                             <label key={value}>
                                 <input type={type == 'select' ? 'radio' : 'checkbox'}
+                                checked={!Array.isArray(watched) ? watched === value : watched.includes(value)}
                                 {...form.register(name)} value={value} readOnly={readonly} disabled={disabled} />
                                 <span>{options[value]}</span>
                             </label>

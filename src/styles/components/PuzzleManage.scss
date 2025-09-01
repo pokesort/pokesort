@@ -7,10 +7,37 @@ section#group-list {
 
     width: min(calc(100% + (var(--spacing) * 2)), calc(140px * var(--cols, 4)));
 
-    transition: width 0.3s ease;
+    transition:
+        width 0.3s ease,
+        transform 0.3s ease;
+    animation: group-list-appear 0.3s ease 0s 1;
+
+    &.group-open {
+        transform: translateX(calc(-250% / var(--cols)));
+    }
+}
+
+section#group-form {
+    position: fixed;
+    right: 10%;
+    top: 50%;
+    height: fit-content;
+
+    transform: translateY(-50%);
+
+    transition: opacity 0.15s ease;
+
+    &:not(.group-open) {
+        opacity: 0;
+        pointer-events: none;
+    }
 }
 
 .puzzle-header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing);
+    
     padding: calc(var(--spacing) + 0.25rem) var(--spacing);
     background-color: color(section1);
 }
@@ -67,4 +94,36 @@ div.group-card {
 
     color: color(text3);
     font-size: 4rem;
+}
+
+.form-flex {
+    width: 100%;
+    display: flex;
+    gap: inherit;
+
+    .form-label {
+        width: 100%;
+    }
+}
+
+#click-catcher {
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    width: 100vw;
+    height: 100vh;
+    opacity: 0;
+}
+
+@keyframes group-list-appear {
+    0% {
+        width: min(calc(100% + (var(--spacing) * 2)), calc(140px * var(--cols, 4)));
+        opacity: 0;
+        transform: scale(1.2);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
