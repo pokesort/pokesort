@@ -16,11 +16,12 @@ interface InputProps {
     readonly?: boolean;
     disabled?: boolean;
     required?: boolean;
+    max?: number;
     defaultValue?: string | string[];
     onInput?: () => void;
 }
 
-export default React.memo(function Input({type, label, name, form=undefined, options={}, placeholder="", readonly=false, disabled=false, required=false, defaultValue="", onInput=undefined}: InputProps) {
+export default React.memo(function Input({type, label, name, form=undefined, options={}, placeholder="", readonly=false, disabled=false, required=false, max=0, defaultValue="", onInput=undefined}: InputProps) {
     
     if (form == undefined) {
         form = useForm();
@@ -46,6 +47,7 @@ export default React.memo(function Input({type, label, name, form=undefined, opt
         case 'multiselect':
             const [open, setOpen] = useState(false);
             const selectWrapper = useRef<HTMLDivElement>(null);
+            const history = useRef<string[]>([]);
 
             useEffect(() => {
                 function handleClickOutside(e: MouseEvent) {
@@ -57,15 +59,34 @@ export default React.memo(function Input({type, label, name, form=undefined, opt
                 return () => document.removeEventListener("mousedown", handleClickOutside);
             }, []);
 
+            useEffect(() => {
+                if (!watched) return;
+                if (Array.isArray(watched)) {
+                    watched.forEach((e: string) => {
+                        if (!history.current.includes(e))
+                            history.current.push(e);
+                    })
+                } else {
+                    if (!history.current.includes(watched))
+                            history.current.push(watched);
+                }
+
+                if (max > 0 && Array.isArray(watched) && watched.length > max) {
+                    const [, ...shifted] = history.current;
+                    history.current = shifted;
+                    form.setValue(name, shifted);
+                }
+            }, [watched]);
+
             const selectValue = useMemo(() => {
-            if (typeof watched === "string") {
-                return options[watched] || "";
-            } else if (Array.isArray(watched)) {
-                return watched
-                .map((e: string) => options[e] || "")
-                .join(", ");
-            }
-            return "";
+                if (typeof watched === "string") {
+                    return options[watched] || "";
+                } else if (Array.isArray(watched)) {
+                    return watched
+                    .map((e: string) => options[e] || "")
+                    .join(", ");
+                }
+                return "";
             }, [watched]);
 
             useEffect(() => {
