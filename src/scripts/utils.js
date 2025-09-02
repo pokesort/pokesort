@@ -19,6 +19,27 @@ export const FIELD_OPTIONS = {
   dual: { min: 1, max: 2 },
 };
 
+export const MAX_SELECT = {
+  types: 2, 
+  color: 1,
+  region: 1,
+  shape: 1,
+  egg_groups: 2,
+  categories: 0,
+  others: 1,
+  methods: 1,
+  moves: 0,
+  generation: 1,
+  abilities: 3,
+  // habitat: 1,
+  step: 1,
+  weak: 0,
+  strong: 0,
+  // immune: 0,
+  form: 1,
+  dual: 1,
+};
+
 export const REGIONALS = ['-alola', '-galar', '-hisui', '-paldea'];
 
 export const getNextRefresh = () => {

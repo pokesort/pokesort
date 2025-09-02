@@ -90,6 +90,7 @@ ul#dex-list {
 
     transition:
         transform 0.15s ease,
+        background-color 0.3s ease,
         box-shadow 0.15s ease;
 
     &:hover {
@@ -98,6 +99,10 @@ ul#dex-list {
     }
     &:active {
         transform: scale(0.85);
+    }
+
+    &.open {
+      background-color: #1C4E69;
     }
   }
 
@@ -116,6 +121,8 @@ ul#dex-list {
   right: 1rem;
   top: 50%;
   transform: translateY(-50%);
+  background-color: color(section1);
+  padding: var(--spacing);
   
   transition: opacity 0.15s ease;
 
@@ -128,11 +135,9 @@ ul#dex-list {
     --offset: 87px;
 
     transform: unset;
-    background-color: color(section1);
     top: var(--offset);
     right: 0;
     width: 100%;
-    padding: var(--spacing);
     padding-bottom: 50vh;
   }
 }
