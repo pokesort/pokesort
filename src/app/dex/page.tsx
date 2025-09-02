@@ -12,7 +12,7 @@ import { useForm } from 'react-hook-form';
 import Input from '@/src/components/forms/Input';
 import SearchIcon from '@/src/components/svg/SearchIcon';
 import FilterIcon from '@/src/components/svg/FilterIcon';
-import { FIELD_OPTIONS, toTitleCase } from '@/src/scripts/utils';
+import { FIELD_OPTIONS, MAX_SELECT, toTitleCase } from '@/src/scripts/utils';
 
 interface DexFiltersProps {
   queries: string | undefined;
@@ -42,6 +42,9 @@ function DexFilters ({queries, setQueries, openFilter, setOpenFilter, dictionary
     }
 
     for (let i = min; i <= max; i++) {
+      if (key == 'categories' && i == 16)
+        continue;
+
       if (['abilities', 'moves'].includes(key)) {
         if (dictionary && dictionary[key]) {
           record[`${i}`] = `${toTitleCase(dictionary[key][i-1])}`;
@@ -99,6 +102,7 @@ function DexFilters ({queries, setQueries, openFilter, setOpenFilter, dictionary
         <div className={`filter-form ${openFilter ? 'open' : ''}`}>
           {Object.keys(FIELD_OPTIONS).map((key: string, index: number) => {
             const records: Record<string, unknown> = FIELD_OPTIONS;
+
             let options: Record<string, string> = {};
             if (Array.isArray(records[key])) {
               options = Object.fromEntries(records[key].map((item: string) => [item, t(`groupnames.${key}.${item}`)])) as Record<string, string>;
@@ -107,7 +111,11 @@ function DexFilters ({queries, setQueries, openFilter, setOpenFilter, dictionary
             }
 
             return (
-              <Input key={key} type="multiselect" label={t(`groupnames.${key}.short`)} name={key} form={form} options={options} />
+              <Input key={key} type="multiselect"
+                max={MAX_SELECT[key as keyof typeof MAX_SELECT]}
+                label={t(`groupnames.${key}.short`)}
+                name={key} form={form} options={options}
+              />
             )
           })}
         </div>
