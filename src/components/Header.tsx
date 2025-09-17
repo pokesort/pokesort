@@ -6,6 +6,12 @@ import SvgLogo from './svg/SvgLogo';
 import HamburgerIcon from './svg/HamburgerIcon';
 import { useEffect, useState } from 'react';
 
+import HeaderHelp from './svg/HeaderHelp';
+import HeaderInfo from './svg/HeaderInfo';
+import HeaderTwitter from './svg/HeaderTwitter';
+import HeaderGit from './svg/HeaderGit';
+import HeaderNotice from './svg/HeaderNotice';
+
 type Page = {
     route: string;
     label: string;
@@ -57,7 +63,23 @@ export default function Header ({ pathname }: HeaderProps) {
                         </Link>
                     ))}
                 </nav>
-                {/* <p>?</p> */}
+                <ul className="icons">
+                    <Link href="">
+                        <HeaderNotice />
+                    </Link>
+                    <Link href="">
+                        <HeaderHelp />
+                    </Link>
+                    <Link href="">
+                        <HeaderInfo />
+                    </Link>
+                    {/* <Link target="_blank" href="https://x.com/bunnysammy_">
+                        <HeaderTwitter />
+                    </Link>
+                    <Link target="_blank" href="https://github.com/bunny-sammy/pokesort">
+                        <HeaderGit />
+                    </Link> */}
+                </ul>
             </div>
             <button id="menu-icon" onClick={() => setMenuOpen(prev => !prev)}>
                 <HamburgerIcon/>
