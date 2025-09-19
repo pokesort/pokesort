@@ -138,7 +138,7 @@ export default function PuzzleManage ({}: PuzzleManageProps) {
                 <section id="group-list" className={`cut-in ${groupFormOpen ? 'group-open' : ''}`}
                     style={{'--rows': rows, '--cols': cols} as React.CSSProperties}>
                     <div className="puzzle-header">
-                        <p className="edit-hover">
+                        <p className="group-name edit-hover">
                             Novo Puzzle
                             <TickIcon />
                         </p>

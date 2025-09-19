@@ -9,11 +9,21 @@ section#group-list {
 
     transition:
         width 0.3s ease,
+        filter 0.3s ease,
         transform 0.3s ease;
     animation: group-list-appear 0.3s ease 0s 1;
 
     &.group-open {
         transform: translateX(calc(-250% / var(--cols)));
+    }
+
+    @media (max-width: 1500px) {
+        &.group-open {
+            transform: unset;
+            filter: brightness(0.5);
+            opacity: 0.85;
+            pointer-events: none;
+        }
     }
 }
 
@@ -30,6 +40,15 @@ section#group-form {
     &:not(.group-open) {
         opacity: 0;
         pointer-events: none;
+    }
+
+    @media (max-width: 1500px) {
+        right: 50%;
+        transform: translate(50%, -50%);
+    }
+
+    @media (max-width: 768px) {
+        width: 100vw;
     }
 }
 
