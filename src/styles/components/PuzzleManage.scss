@@ -49,7 +49,68 @@ section#group-form {
 
     @media (max-width: 768px) {
         width: 100vw;
+
+        .window-container {
+            width: 100%;
+        }
     }
+}
+
+.tabs-list {
+    display: flex;
+    gap: var(--spacing);
+    width: 100%;
+
+    button.tab {
+        position: sticky;
+        top: 0;
+
+        padding: var(--spacing);
+        width: 100%;
+        height: fit-content;
+        color: color(text2);
+        text-align: center;
+        font-size: text(small);
+        border-bottom: 2px solid transparent;
+
+        transition:
+            border-bottom 0.15s ease,
+            color 0.15s ease;
+
+        &.active {
+            color: color(text1);
+            border-bottom: 2px solid color(text1);
+        }
+    }
+}
+
+.group-form-content {
+    display: flex;
+    flex-direction: columm;
+    gap: var(--spacing);
+
+    min-width: 349px;
+    min-height: 505px;
+
+    padding: var(--spacing);
+    background-color: color(section1);
+
+    div.tab-content {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing);
+        width: 100%;
+
+        &:not(.active) {
+            display: none;
+        }
+    }    
+}
+
+.filter-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing);
 }
 
 .puzzle-header {

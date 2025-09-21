@@ -3,6 +3,7 @@
 import type { PuzzleData, PuzzleGroup } from '@/src/assets/types/PuzzleApiResponse';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { notFound, redirect, useParams } from 'next/navigation';
+import { FIELD_OPTIONS, MAX_SELECT, toTitleCase } from '@/src/scripts/utils';
 
 import "@/src/styles/components/PuzzleManage.scss";
 import { getGroupnameFromQuery, getNaturalGroupnames } from './GroupName';
@@ -18,6 +19,11 @@ interface PuzzleManageProps {
 
 }
 
+type Range = {
+  min: number;
+  max: number;
+}
+
 export default function PuzzleManage ({}: PuzzleManageProps) {
     const t = useTranslations('');
     const locale = useLocale();
@@ -30,6 +36,8 @@ export default function PuzzleManage ({}: PuzzleManageProps) {
     const [rows, setRows] = useState<number>(4);
     const [cols, setCols] = useState<number>(4);
     const [groupFormOpen, setGroupFormOpen] = useState<boolean>(false);
+    const [groupFormTab, setGroupFormTab] = useState<number>(0);
+    const [groupFormIndex, setGroupFormIndex] = useState<number>(0);
     
     useEffect(() => {
         setGroups(
@@ -42,6 +50,34 @@ export default function PuzzleManage ({}: PuzzleManageProps) {
             ]
         )
     }, [])
+
+    useEffect(() => {
+        console.log(formWatch);
+    }, [formWatch])
+
+    const rangeToRecord = useCallback((key: string, { min, max }: Range): Record<string, string> => {
+        const record: Record<string, string> = {};
+
+        if (['weak', 'strong'].includes(key)) {
+            key = 'types';
+        }
+
+        for (let i = min; i <= max; i++) {
+            if (key == 'categories' && i == 16)
+            continue;
+
+            if (['abilities', 'moves'].includes(key)) {
+            if (dictionary && dictionary[key]) {
+                record[`${i}`] = `${toTitleCase(dictionary[key][i-1])}`;
+            } else {
+                record[`${i}`] = `${i-1}`;  
+            }
+            } else {
+            record[`${i}`] = `${t(`groupnames.${key}.${i}`)}`;
+            }
+        }
+        return record;
+    }, [dictionary]);
 
     useEffect(() => {
         const fetchDictionary = async () => {
@@ -121,12 +157,13 @@ export default function PuzzleManage ({}: PuzzleManageProps) {
 
     const openGroupForm = useCallback((index: number, tab: number) => {
         setGroupFormOpen(true);
+        setGroupFormIndex(index);
+        setGroupFormTab(tab);
     }, [groups]);
     
     useEffect(() => {
       console.log(dictionary)
     }, [dictionary])
-    
 
     return (
     <>
@@ -197,10 +234,53 @@ export default function PuzzleManage ({}: PuzzleManageProps) {
                         )
                     })}
                 </section>
-                <section id="group-form" className={`window-container ${groupFormOpen ? 'group-open' : ''}`}>
-                    <section className="window-info-row">
-                        <p>Gerenciar Grupo</p>
-                    </section>
+                <section id="group-form" className={`${groupFormOpen ? 'group-open' : ''}`}>
+                    <div className="window-container">
+                        <section className="window-info-row">
+                            <p>Gerenciar Grupo</p>
+                        </section>
+                        <ul className="tabs-list">
+                            <button className={`tab ${groupFormTab == 0 ? 'active' : ''}`} onClick={() => setGroupFormTab(0)}>
+                                Categoria
+                            </button>
+                            <button className={`tab ${groupFormTab == 1 ? 'active' : ''}`} onClick={() => setGroupFormTab(1)}>
+                                Membros
+                            </button>
+                        </ul>
+                    </div>
+                    <div className="group-form-content">
+                        <div className={`tab-content ${groupFormTab == 0 ? 'active' : ''}`}>
+                            <Input type="select" label="Tipo de Grupo" name={`groups.${groupFormIndex}.categoryType`} form={form} options={{
+                                'auto': 'Filtrado',
+                                'custom': 'Customizado'
+                            }} />
+                            {dictionary != undefined &&
+                                <div className="filter-list">
+                                    {Object.keys(FIELD_OPTIONS).map((key: string, index: number) => {
+                                        const records: Record<string, unknown> = FIELD_OPTIONS;
+                            
+                                        let options: Record<string, string> = {};
+                                        if (Array.isArray(records[key])) {
+                                            options = Object.fromEntries(records[key].map((item: string) => [item, t(`groupnames.${key}.${item}`)])) as Record<string, string>;
+                                        } else {
+                                            options = rangeToRecord(key, records[key] as Range);
+                                        }
+                            
+                                        return (
+                                            <Input key={key} type="multiselect"
+                                            max={MAX_SELECT[key as keyof typeof MAX_SELECT]}
+                                            label={t(`groupnames.${key}.short`)}
+                                            name={`groups.${groupFormIndex}.${key}`} form={form} options={options}
+                                            />
+                                        )
+                                    })}
+                                </div>
+                            }
+                        </div>
+                        <div className={`tab-content ${groupFormTab == 1 ? 'active' : ''}`}>
+                            Tab 2 !!
+                        </div>
+                    </div>
                 </section>
             </>
         }
