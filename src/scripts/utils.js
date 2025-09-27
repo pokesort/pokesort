@@ -64,15 +64,6 @@ export const pickRandom = (array, count = 1) => {
   return result;
 };
 
-export const removeFieldValue = (obj, key, valueToRemove) => {
-
-  const target = obj[key];
-  obj[key] = target.filter(v => v !== valueToRemove);
-
-  if (obj[key].length === 0) {
-    delete obj[key];
-  }
-}
 
 export function pickRandomMult(array, count = 1) {
   const shuffled = array.sort(() => 0.5 - Math.random());

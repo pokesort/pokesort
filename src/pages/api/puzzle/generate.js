@@ -1,141 +1,113 @@
-import {
-  FIELD_OPTIONS,
-  randomInRange,
-  pickRandom,
-  getRandomFieldValue,
-  pickRandomMult,
-  generateTips,
-} from '@/src/scripts/utils.js';
-
-import { populate } from './_utils';
-import { FetchPokemonError, MaxAttemptsError } from '../../../scripts/erros';
-import {filterPokemons} from '../../../scripts/server_utils'
-let idsUsed = [];
-let fields = structuredClone(FIELD_OPTIONS);
+import { connect, data } from "@/lib/mongodb";
 
 export default async function handler(req, res) {
 
-  let amount = req.query.amount;
-  if (!amount) amount = 1;
+  try {
 
-  const password = req.query.password;
-  const infinite = req.query.infinite == 'true';
-
-  if (infinite && req.method !== 'POST') return res.status(403).json({ success: false, message: "Método não suportado" });
-  const { generation, excludeFields } = req.body;
-
-  if (amount > 30) return res.status(403).json({ success: false, message: "Quantidade de puzzles pedidos maior que o permitido" });
-
-  if (!infinite && (password != process.env.AUTHORIZATION_BATCH)) return res.status(403).json({ success: false, message: "Usuário não permitido" });
-
-  fields = structuredClone(FIELD_OPTIONS);
-
-  const puzzles = [];
-
-  console.time('Generate');
-  for (let i = 0; i < amount; i++) {
-    const rows = randomInRange(4, 5);
-    const cols = randomInRange(4, 6);
-    idsUsed = [];
-
-    const groups = [];
-    try {
-      for (let j = 0; j < rows; j++) {
-
-        let allFields = Object.keys(fields);
-        if (excludeFields != undefined) {
-          allFields = allFields.filter(f => !excludeFields.includes(f));
-        }
-        const group = await generateGroup(cols, generation, allFields, infinite);
-        groups.push(group);
-      }
-    } catch (error) {
-      if (error instanceof MaxAttemptsError) {
-        return res.status(503).json({ error: error.message, code: 'MAX_ATTEMPTS' });
-      }
-
-      if (error instanceof FetchPokemonError) {
-        return res.status(502).json({ error: error.message, code: 'FETCH_POKEMON_FAIL' });
-      }
+    const validatedParams = validateParams(req.query);
+    if (validatedParams.error) {
+      return res.status(validatedParams.status).json({ error: validatedParams.error });
     }
+    const { amount, rows, cols, challenge } = validatedParams;
 
-    puzzles.push({
-      author: "admin",
-      from: "system",
-      rows,
-      cols,
-      groups
+    await connect();
+
+    // Aqui você pode adicionar a lógica para gerar os puzzles
+    // com os parâmetros validados
+
+    return res.status(200).json({
+      message: 'Parâmetros validados com sucesso',
+      data: {
+        amount,
+        rows,
+        cols,
+        challenge
+      }
     });
+
+  } catch (error) {
+    console.error('Erro ao gerar puzzle:', error);
+    return res.status(500).json({ error: 'Erro ao gerar puzzle' });
   }
-
-  //Validar Puzzle
-  if (infinite) {
-    const dictionary = await populate(res, puzzles[0]);
-    return res.status(200).json({ success: true, data: puzzles[0], dictionary: dictionary });
-  }
-
-  console.timeEnd('Generate');
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/puzzle/batch`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(puzzles)
-  });
-
-  const result = await response.json();
-  return res.status(response.status).json(result);
 }
 
-export async function generateGroup(cols, generation, allFields, infinite) {
+export function validateParams(params) {
+  const { amount, password, rows, cols, challenge } = params;
+  const errors = [];
 
-  const max_attempt = 50;
-  let attempt = 0;
-  
-  while (!infinite || attempt <= max_attempt) {
-    
-    let hasbreak = false;
-    let numFields = 0;
-    numFields = randomInRange(1, 3);
-
-    const selectedFields = pickRandom(allFields, numFields);
-
-    const queryParts = selectedFields.map((field) => {
-      const value = getRandomFieldValue(field, fields);
-      if (value == undefined) hasbreak = true;
-      return `${field}=${value}`;
-    });
-
-    if(hasbreak) continue;
-
-    const query = '?' + queryParts.join('&');
-    
-    const pokemons = await filterPokemons({
-      ...Object.fromEntries(queryParts.map(q => q.split('='))),
-      ...(generation ? { max_generation: generation } : 9)
-    });
-    
-    const ids = pokemons.map(p => p.id);
-
-    if (ids.length >= cols) {
-
-      const selected = pickRandomMult(ids, cols);
-      const hasOverlap = selected.some(id => idsUsed.includes(id));
-
-      if (hasOverlap) continue;
-      idsUsed.push(...selected);
-
-      const tips = generateTips(selected, query);
-      
-      return {
-        query,
-        pokemons: selected,
-        tips
-      };
-    }
-
-    attempt -= -1;
+  if (!amount || amount > 30 || amount < 1) {
+    errors.push('Quantidade máxima de puzzles deve ser um número entre 1 e 30');
   }
 
-  throw new MaxAttemptsError("Máximo de Tentativas alcançado")
+  if (!password || password !== process.env.AUTHORIZATION_BATCH) {
+    errors.push('Senha inválida');
+  }
+
+  const validDifficulties = ['trainer', 'gym_leader', 'elite_four', 'champion'];
+  if (!challenge || !validDifficulties.includes(challenge)) {
+    errors.push('Nível de desafio inválido para essa liga pokemon');
+  }
+
+  // Estrutura mais simples: mapeia challenge diretamente para configurações
+  const challengeConfigs = {
+    'trainer': [
+      { rows: 4, cols: 4 }
+    ],
+    'gym_leader': [
+      { rows: 4, cols: 5 },
+      { rows: 5, cols: 4 }
+    ],
+    'elite_four': [
+      { rows: 4, cols: 6 },
+      { rows: 5, cols: 5 }
+    ],
+    'champion': [
+      { rows: 5, cols: 6 }
+    ]
+  };
+
+  let finalRows = rows;
+  let finalCols = cols;
+
+  // Se rows ou cols não foram fornecidos, escolher baseado no challenge
+  if (!rows || !cols) {
+    const availableConfigs = challengeConfigs[challenge];
+    if (availableConfigs && availableConfigs.length > 0) {
+      // Escolher configuração aleatória
+      const randomConfig = availableConfigs[Math.floor(Math.random() * availableConfigs.length)];
+      finalRows = randomConfig.rows;
+      finalCols = randomConfig.cols;
+    } else {
+      // Fallback
+      finalRows = 4;
+      finalCols = 4;
+    }
+  } else {
+    // Validar se a combinação fornecida é válida para o challenge
+    const availableConfigs = challengeConfigs[challenge];
+    const isValidCombo = availableConfigs?.some(config =>
+      config.rows === parseInt(rows) && config.cols === parseInt(cols)
+    );
+
+    if (!isValidCombo) {
+      errors.push(`Combinação ${rows}x${cols} inválida para challenge ${challenge}`);
+    } else {
+      finalRows = parseInt(rows);
+      finalCols = parseInt(cols);
+    }
+  }
+
+  if (errors.length > 0) {
+    return {
+      error: errors.join('; '),
+      status: 400
+    };
+  }
+
+  return {
+    amount,
+    rows: finalRows,
+    cols: finalCols,
+    challenge
+  };
 }
