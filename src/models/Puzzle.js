@@ -52,6 +52,10 @@ const puzzleSchema = new mongoose.Schema({
         },
         default: null,
     },
+    challenge: {
+        type: Number,
+        required: true,
+    },
     rows: {
         type: Number,
         min: 4,
