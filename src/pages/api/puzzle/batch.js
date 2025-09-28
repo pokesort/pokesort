@@ -19,15 +19,15 @@ export default async function handler(req, res) {
 
     for (const puzzle of puzzles) {
       const instance = new Puzzle(puzzle);
+      
       await instance.validate();
     }
 
-    const savedPuzzles = await Puzzle.insertMany(puzzles);
-    return res.status(201).json({ success: true, data: savedPuzzles });
+    // const savedPuzzles = await Puzzle.insertMany(puzzles);
+    // return res.status(201).json({ success: true, data: savedPuzzles });
     
-    // return res.status(200).json({ success: true, puzzles });
+    return res.status(200).json({ success: true, puzzles });
 
-    
   } catch (error) {
     if (error.name === 'ValidationError') {
       return res.status(400).json({ success: false, error: error.message });
