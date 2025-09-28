@@ -52,7 +52,7 @@ function DexFilters ({queries, setQueries, openFilter, setOpenFilter, dictionary
           record[`${i}`] = `${i-1}`;  
         }
       } else {
-        record[`${i}`] = `${t(`groupnames.${key}.${i}`)}`;
+        record[`${i}`] = `${toTitleCase(t(`groupnames.${key}.${i}`))}`;
       }
     }
     return record;
@@ -88,7 +88,7 @@ function DexFilters ({queries, setQueries, openFilter, setOpenFilter, dictionary
 
   return (
     <>
-      <section id="dex-filters">
+      <section id="dex-filters">          
           <label className="search-container">
             <Input type="text" name="search" form={form} placeholder={"Buscar"} onInput={unlockFetch}/>
             <SearchIcon />
@@ -100,24 +100,32 @@ function DexFilters ({queries, setQueries, openFilter, setOpenFilter, dictionary
       </section>
       {dictionary != undefined &&
         <div className={`filter-form ${openFilter ? 'open' : ''}`}>
-          {Object.keys(FIELD_OPTIONS).map((key: string, index: number) => {
-            const records: Record<string, unknown> = FIELD_OPTIONS;
+          <div className="window-container">
+              <section className="window-info-row">
+                  <FilterIcon />
+                  <p>Filtros</p>
+              </section>
+          </div>
+          <div className="filter-grid">
+            {Object.keys(FIELD_OPTIONS).map((key: string, index: number) => {
+              const records: Record<string, unknown> = FIELD_OPTIONS;
 
-            let options: Record<string, string> = {};
-            if (Array.isArray(records[key])) {
-              options = Object.fromEntries(records[key].map((item: string) => [item, t(`groupnames.${key}.${item}`)])) as Record<string, string>;
-            } else {
-              options = rangeToRecord(key, records[key] as Range);
-            }
+              let options: Record<string, string> = {};
+              if (Array.isArray(records[key])) {
+                options = Object.fromEntries(records[key].map((item: string) => [item, t(`groupnames.${key}.${item}`)])) as Record<string, string>;
+              } else {
+                options = rangeToRecord(key, records[key] as Range);
+              }
 
-            return (
-              <Input key={key} type="multiselect"
-                max={MAX_SELECT[key as keyof typeof MAX_SELECT]}
-                label={t(`groupnames.${key}.short`)}
-                name={key} form={form} options={options}
-              />
-            )
-          })}
+              return (
+                <Input key={key} type="multiselect"
+                  max={MAX_SELECT[key as keyof typeof MAX_SELECT]}
+                  label={t(`groupnames.${key}.short`)}
+                  name={key} form={form} options={options}
+                />
+              )
+            })}
+          </div>
         </div>
       }
     </>

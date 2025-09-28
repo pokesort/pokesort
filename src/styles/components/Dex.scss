@@ -111,20 +111,22 @@ ul#dex-list {
   }
 }
 
-.filter-form {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.5rem;
-  z-index: 80;
-
+.filter-form { 
   position: fixed;
   right: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  background-color: color(section1);
-  padding: var(--spacing);
+  z-index: 80;
   
   transition: opacity 0.15s ease;
+
+  .filter-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+    background-color: color(section1);
+    padding: var(--spacing);
+  }
 
   &:not(.open) {
     opacity: 0;
@@ -139,6 +141,10 @@ ul#dex-list {
     right: 0;
     width: 100%;
     padding-bottom: 50vh;
+
+    .window-container {
+      display: none;
+    }
   }
 }
 
