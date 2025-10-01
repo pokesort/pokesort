@@ -90,7 +90,8 @@ section#group-form {
     gap: var(--spacing);
 
     min-width: 349px;
-    min-height: 505px;
+    height: 520px;
+    overflow-y: auto;
 
     padding: var(--spacing);
     background-color: color(section1);
@@ -202,6 +203,22 @@ div.group-card {
     width: 100vw;
     height: 100vh;
     opacity: 0;
+}
+
+.search-container {
+    position: relative;
+    width: 100%;
+
+    svg {
+        position: absolute;
+        right: .75rem;
+        top: calc(50% - 7px);
+
+        color: color(text1);
+    }
+    input {
+        padding-left: 2.15rem;
+    }
 }
 
 @keyframes group-list-appear {

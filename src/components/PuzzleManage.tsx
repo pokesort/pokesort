@@ -15,6 +15,7 @@ import TickIcon from '@/src/components/svg/TickIcon';
 import { useForm } from 'react-hook-form';
 import Input from './forms/Input';
 import GridIcon from './svg/GridIcon';
+import SearchIcon from './svg/SearchIcon';
 
 type Range = { min: number; max: number };
 
@@ -26,9 +27,10 @@ export default function PuzzleManage () {
 
     const [dictionary, setDictionary] = useState<Record<string, any>>();
     const [groups, setGroups] = useState<PuzzleGroup[]>([]);
-    const [groupFormOpen, setGroupFormOpen] = useState(false);
-    const [groupFormTab, setGroupFormTab] = useState(0);
-    const [groupFormIndex, setGroupFormIndex] = useState(0);
+    const [groupFormOpen, setGroupFormOpen] = useState<boolean>(false);
+    const [groupFormTab, setGroupFormTab] = useState<number>(0);
+    const [groupFormIndex, setGroupFormIndex] = useState<number>(0);
+    const [groupPokemonPool, setGroupPokemonPool] = useState<Record<number, any[]>>({});
 
     const rows = parseInt(form.watch("rows", 4));
     const cols = parseInt(form.watch("cols", 4));
@@ -52,6 +54,62 @@ export default function PuzzleManage () {
         }
         return record;
     }, [dictionary, t]);
+
+    const getQueries = (formBody: any) => {
+        let newQueries = new URLSearchParams();
+
+        if (Object.entries.length <= 0) return "";
+        Object.entries(formBody).forEach(([key, value]: any) => {
+            if (!formBody[key] || !value) return;
+            if (['categoryType', 'custom_groupname'].includes(key)) return;
+
+            if (Array.isArray(value)) {
+                value.forEach(v => newQueries.append(key, v));
+            } else {
+                newQueries.append(key, value);
+            }
+        });
+
+        return "?"+newQueries.toString();
+    }
+
+    const setGroupQuery = (target: number, queries: string) => {
+        const filters = form.watch(`groups.${target}`);
+
+        if (filters.categoryType == "auto") {
+            queries = getQueries(filters);
+            setGroups(prevGroups => 
+                prevGroups.map((group, index) =>
+                    index === target
+                    ? { ...group, query: queries }
+                    : group
+                )
+            );
+        } else {
+            setGroups(prevGroups => 
+                prevGroups.map((group, index) =>
+                    index === target
+                    ? { ...group, query: `${filters.custom_groupname.pt}|${filters.custom_groupname.en}` }
+                    : group
+                )
+            );
+        }
+    }
+    
+    const fetchPokemonPool = async (target: number, filters: any, queries: string) => {
+        if (filters.categoryType == "auto") {
+            queries = getQueries(filters);
+        }
+
+        const headers = { 'Content-Type': 'application/json' };
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/pokemon/get${queries}`, { method: 'GET', headers });
+        const data = await response.json();
+
+        setGroupPokemonPool(prev => ({
+            ...prev,
+            [target]: data.pokemons,
+        }));
+    }
 
     useEffect(() => {
         const fetchDictionary = async () => {
@@ -84,7 +142,17 @@ export default function PuzzleManage () {
             }
         };
         fetchDictionary();
-    }, []); 
+    }, []);
+
+    useEffect(() => {
+        const filters = form.watch(`groups.${groupFormIndex}`);
+        if (!filters) return;
+
+        setGroupQuery(groupFormIndex, filters);
+        if (groupFormTab == 1) {
+            fetchPokemonPool(groupFormIndex, filters, "");
+        }
+    }, [groupFormOpen, groupFormIndex, groupFormTab]);
 
     const rowCounter = useMemo(() => {
         const array: number[] = [];
@@ -101,11 +169,29 @@ export default function PuzzleManage () {
         return Array.from({ length: cols }, (_, i) => i);
     }, [cols]);
 
-    const openGroupForm = useCallback((index: number, tab: number) => {
+    const openGroupForm = (index: number, tab: number) => {
         setGroupFormOpen(true);
         setGroupFormIndex(index);
         setGroupFormTab(tab);
-    }, []);
+    };
+
+    const selectPokemon = (pokemon: any, target: number) => {
+        setGroups(prevGroups => 
+            prevGroups.map((group, index) => {
+                if (index !== target) return group;
+
+                const isAlreadySelected = group.pokemons.some(p => p === pokemon.id);
+
+                const response = {
+                        ...group,
+                        pokemons: isAlreadySelected
+                        ? group.pokemons.filter(p => p !== pokemon.id)
+                        : [...group.pokemons, pokemon.id],
+                    }
+                return response;
+            })
+        )
+    };
 
     return (
         <>
@@ -139,8 +225,8 @@ export default function PuzzleManage () {
                             return (
                                 <div className="group-card cut-in" key={rowIndex}>
                                     <p className="group-name edit-hover" onClick={() => openGroupForm(rowIndex, 0)}>
-                                        {group.query ?
-                                            getGroupnameFromQuery(group.query, dictionary, t, locale).join('  ·  ')
+                                        {group.query && group.query != "|" ?
+                                            getGroupnameFromQuery(group.query, dictionary, t, locale, true)
                                         :
                                             <>Novo Grupo</>
                                         }
@@ -228,7 +314,21 @@ export default function PuzzleManage () {
                                 </div>
                             </div>
                             <div className={`tab-content ${groupFormTab == 1 ? 'active' : ''}`}>
-                                Tab 2 !!
+                                <label className="search-container">
+                                    <Input type="text" name="search" form={form} placeholder={"Buscar"} />
+                                    <SearchIcon />
+                                </label>
+                                {groupPokemonPool[groupFormIndex] && groupPokemonPool[groupFormIndex].map((pokemon: any) => (
+                                    <ListBlock
+                                        key={pokemon.id}
+                                        pokemon={pokemon}
+                                        multiselect={true}
+                                        aspect="list"
+                                        isSelected={groups[groupFormIndex].pokemons.includes(pokemon.id)}
+                                        onSelect={()=>selectPokemon(pokemon, groupFormIndex)}
+                                        onPress={()=>{}}
+                                    />
+                                ))}
                             </div>
                         </div>
                     </section>

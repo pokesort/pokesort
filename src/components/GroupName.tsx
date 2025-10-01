@@ -28,12 +28,16 @@ function getGroupList (queries: string) {
     return groupList;
 }
 
-export function getGroupnameFromQuery (query: string, dictionary: any, t: any, locale: any) {
-    const groups = getGroupList(query);
-    return getNaturalGroupnames(groups, dictionary, t, locale);
+export function getGroupnameFromQuery (query: string, dictionary: any, t: any, locale: any, join: boolean=false) {
+    if (query[0] == '?') {
+        const groups = getGroupList(query);
+        return getNaturalGroupnames(groups, dictionary, t, locale, join);
+    } else {
+        return getCustomGroupName(query, locale);
+    }
 }
 
-export function getNaturalGroupnames (groups: Group[], dictionary: any, t: any, locale: any) {
+export function getNaturalGroupnames (groups: Group[], dictionary: any, t: any, locale: any, join: boolean=false) {
     const direct = ['region'];
     const from_dict = ['abilities', 'moves'];
     const types = ['types', 'weak', 'strong', 'immune'];
@@ -60,6 +64,10 @@ export function getNaturalGroupnames (groups: Group[], dictionary: any, t: any, 
         groupNames.push(output);
     }
 
+    if (join) {
+        return groupNames.join('  ·  ');
+    }
+
     return groupNames;
 }
 
@@ -67,7 +75,7 @@ export function getCustomGroupName (query: string, locale: string) {
     if (!query.includes('|')) return query;
 
     const names = query.split('|');
-    return locale.includes('pt') ? names[0] : names[1]
+    return locale.includes('pt') ? names[0] : names[1];
 }
 
 export function GroupName ({query, dictionary}: GroupNameProps) {
@@ -78,8 +86,7 @@ export function GroupName ({query, dictionary}: GroupNameProps) {
         return ( <span>{getCustomGroupName(query, locale)}</span> )
 
     const groupList = getGroupList(query);
-    const naturalGroupNames = getNaturalGroupnames(groupList, dictionary, t, locale);
-    let result = naturalGroupNames.join('  ·  ');
+    const naturalGroupNames = getNaturalGroupnames(groupList, dictionary, t, locale, true);
 
-    return ( <span>{result}</span> )
+    return ( <span>{naturalGroupNames}</span> )
 }
