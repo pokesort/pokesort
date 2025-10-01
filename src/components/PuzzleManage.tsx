@@ -12,7 +12,7 @@ import ListBlock from './ListBlock';
 import Loading from './Loading';
 import EditIcon from '@/src/components/svg/EditIcon';
 import TickIcon from '@/src/components/svg/TickIcon';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import Input from './forms/Input';
 import GridIcon from './svg/GridIcon';
 import SearchIcon from './svg/SearchIcon';
@@ -32,8 +32,8 @@ export default function PuzzleManage () {
     const [groupFormIndex, setGroupFormIndex] = useState<number>(0);
     const [groupPokemonPool, setGroupPokemonPool] = useState<Record<number, any[]>>({});
 
-    const rows = parseInt(form.watch("rows", 4));
-    const cols = parseInt(form.watch("cols", 4));
+    const rows = useWatch({ control: form.control, name: "rows", defaultValue: 4 });
+    const cols = useWatch({ control: form.control, name: "cols", defaultValue: 4 });
 
     const rangeToRecord = useCallback((key: string, { min, max }: Range): Record<string, string> => {
         const record: Record<string, string> = {};
@@ -193,6 +193,18 @@ export default function PuzzleManage () {
         )
     };
 
+    const optionRecords = useMemo(() => {
+        let options: Record<string, Record<string, string>> = {};
+        Object.entries(FIELD_OPTIONS).map(([key, range]) => {
+            if (Array.isArray(range)) {
+                options[key] = Object.fromEntries(range.map(item => [item, t(`groupnames.${key}.${item}`)]));
+            } else {
+                options[key] = rangeToRecord(key, range as Range);
+            }
+        });
+        return options;
+    }, [dictionary, t, rangeToRecord]);
+
     return (
         <>
             {dictionary == undefined ?
@@ -291,12 +303,8 @@ export default function PuzzleManage () {
                                     <div className={`filter-list ${form.watch(`groups.${groupFormIndex}.categoryType`) == 'auto' ? 'show' : ''}`}>
                                         {Object.keys(FIELD_OPTIONS).map((key: string) => {
                                             const records: Record<string, unknown> = FIELD_OPTIONS;
-                                            let options: Record<string, string> = {};
-                                            if (Array.isArray(records[key])) {
-                                                options = Object.fromEntries(records[key].map((item: string) => [item, t(`groupnames.${key}.${item}`)]));
-                                            } else {
-                                                options = rangeToRecord(key, records[key] as Range);
-                                            }
+                                            console.log(optionRecords);
+                                            const options = optionRecords[key];
                                             return (
                                                 <Input key={key} type="multiselect"
                                                     max={MAX_SELECT[key as keyof typeof MAX_SELECT]}
