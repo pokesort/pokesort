@@ -22,10 +22,10 @@ export const FIELD_OPTIONS = {
 // Estrutura de desafios por nível com campos disponíveis
 export const CHALLENGE_FIELDS = {
   1: {
-    types: { min: 1, max: 18 },
-    color: ['red', 'blue', 'green', 'yellow', 'black', 'brown', 'gray', 'pink', 'purple', 'white'],
-    region: ['kanto', 'johto', 'hoenn', 'sinnoh', 'unova', 'kalos', 'alola', 'galar', 'hisui', 'paldea'],
-    generation: { min: 1, max: 9 },
+    // types: { min: 1, max: 18 },
+    // color: ['red', 'blue', 'green', 'yellow', 'black', 'brown', 'gray', 'pink', 'purple', 'white'],
+    // region: ['kanto', 'johto', 'hoenn', 'sinnoh', 'unova', 'kalos', 'alola', 'galar', 'hisui', 'paldea'],
+    // generation: { min: 1, max: 9 },
     form: ['first', 'middle', 'final'],
     dual: { min: 1, max: 2 }
   },
@@ -175,7 +175,7 @@ export function validateGenerateParams(params) {
 export function getGridSize(challenge, rows, cols) {
   const challengeConfigs = {
     1: [
-      { rows: 4, cols: 4 }
+      { rows: 2, cols: 3 }
     ],
     2: [
       { rows: 4, cols: 5 },
