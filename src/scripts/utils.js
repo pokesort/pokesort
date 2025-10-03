@@ -175,7 +175,7 @@ export function validateGenerateParams(params) {
 export function getGridSize(challenge, rows, cols) {
   const challengeConfigs = {
     1: [
-      { rows: 2, cols: 3 }
+      { rows: 4, cols: 4 }
     ],
     2: [
       { rows: 4, cols: 5 },
