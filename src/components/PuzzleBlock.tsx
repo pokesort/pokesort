@@ -50,6 +50,7 @@ export default React.memo(function PuzzleBlock({ pokemon, shinies, multiselect, 
     const gifRef = useRef<any>(null);
     const [shiny, setShiny] = useState<boolean>(shinies.includes(pokemon.dex_number));
     const [shinyReveal, setShinyReveal] = useState<boolean>(false);
+    const pressTimer = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
         setShiny(shinies.includes(pokemon.dex_number));
@@ -72,10 +73,23 @@ export default React.memo(function PuzzleBlock({ pokemon, shinies, multiselect, 
         onSelect(pokemon.id);
     }, [onSelect, pokemon.id, shinyReveal, shiny]);
 
-    const handleRightClick = useCallback((e: React.MouseEvent) => {
-        e.preventDefault();
+    const handleRightClick = useCallback(
+        (e: React.MouseEvent) => {
+            e.preventDefault();
+            onPress(pokemon.id);
+            },
+        [onPress, pokemon.id]
+    );
+
+    const handleTouchStart = useCallback(() => {
+        pressTimer.current = setTimeout(() => {
         onPress(pokemon.id);
+        }, 600);
     }, [onPress, pokemon.id]);
+
+    const handleTouchEnd = useCallback(() => {
+        if (pressTimer.current) clearTimeout(pressTimer.current);
+    }, []);
 
     let p_name = pokemon.species_name.replaceAll('-', ' ');
     let p_surname = getSurname(pokemon.name, pokemon.species_name);
@@ -101,6 +115,9 @@ export default React.memo(function PuzzleBlock({ pokemon, shinies, multiselect, 
             exit={{ opacity: 0, scale: 0.5 }}
             transition={{ duration: 0.5, type: 'spring' }}
             onContextMenu={handleRightClick}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+            onTouchCancel={handleTouchEnd}
         >
             <div className={blockClasses}>
                 <input
