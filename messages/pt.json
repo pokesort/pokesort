@@ -305,5 +305,22 @@
             "1": "Tipagem Única",
             "2": "Tipagem Dupla"
         }
+    },
+    "about": {
+        "about": {
+            "title": "Sobre o Pokesort",
+            "description": "Pokesort é um jogo de associação diário de Pokémon criado por fãs para fãs. Nós o desenvolvemos para exercitar nossas habilidades como desenvolvedores web e contribuir com a nossa tão querida comunidade."
+        },
+        "team": {
+            "title": "Equipe",
+            "description": "",
+
+            "backend": "Puzzles & Backend",
+            "frontend": "UX Design & Frontend"
+        },
+        "support": {
+            "title": "Nos Apoie",
+            "description": ""
+        }
     }
 }
