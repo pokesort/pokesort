@@ -5,11 +5,11 @@ import {
   getRandomFieldValue,
   pickRandomMult,
   generateTips,
-  removeFieldValue
 } from '@/src/scripts/utils.js';
 
 import { populate } from './_utils';
 import { FetchPokemonError, MaxAttemptsError } from '../../../scripts/erros';
+import {filterPokemons} from '../../../scripts/server_utils'
 let idsUsed = [];
 let fields = structuredClone(FIELD_OPTIONS);
 
@@ -30,12 +30,9 @@ export default async function handler(req, res) {
 
   fields = structuredClone(FIELD_OPTIONS);
 
-  const randomInRange = (min, max) => {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  };
-
   const puzzles = [];
 
+  console.time('Generate');
   for (let i = 0; i < amount; i++) {
     const rows = randomInRange(4, 5);
     const cols = randomInRange(4, 6);
@@ -73,11 +70,11 @@ export default async function handler(req, res) {
 
   //Validar Puzzle
   if (infinite) {
-    console.log(puzzles[0]);
     const dictionary = await populate(res, puzzles[0]);
     return res.status(200).json({ success: true, data: puzzles[0], dictionary: dictionary });
   }
 
+  console.timeEnd('Generate');
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/puzzle/batch`, {
     method: "POST",
     headers: {
@@ -92,10 +89,10 @@ export default async function handler(req, res) {
 
 export async function generateGroup(cols, generation, allFields, infinite) {
 
-  const max_attempt = 5;
+  const max_attempt = 50;
   let attempt = 0;
   
-  while (!infinite || infinite && attempt <= max_attempt) {
+  while (!infinite || attempt <= max_attempt) {
     
     let hasbreak = false;
     let numFields = 0;
@@ -112,14 +109,12 @@ export async function generateGroup(cols, generation, allFields, infinite) {
     if(hasbreak) continue;
 
     const query = '?' + queryParts.join('&');
-    const route = `/api/pokemon/get${query}${generation ? `&max_generation=${generation}` : ''}`
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}${route}`);
-
-    if (!response.ok) {
-      throw new FetchPokemonError(`Erro ao buscar pokémons: ${response.statusText}`);
-    }
     
-    const { pokemons } = await response.json();
+    const pokemons = await filterPokemons({
+      ...Object.fromEntries(queryParts.map(q => q.split('='))),
+      ...(generation ? { max_generation: generation } : 9)
+    });
+    
     const ids = pokemons.map(p => p.id);
 
     if (ids.length >= cols) {
@@ -131,7 +126,6 @@ export async function generateGroup(cols, generation, allFields, infinite) {
       idsUsed.push(...selected);
 
       const tips = generateTips(selected, query);
-      removeUsedQueries(query);
       
       return {
         query,
@@ -140,20 +134,8 @@ export async function generateGroup(cols, generation, allFields, infinite) {
       };
     }
 
-    // console.log("###### Tentativa " + attempt + " Falhou ######");
-
     attempt -= -1;
   }
 
   throw new MaxAttemptsError("Máximo de Tentativas alcançado")
-}
-
-function removeUsedQueries(query){
-  
-  // const queryObjects = query.slice(1).split('&');
-
-  // queryObjects.forEach(element => {
-  //   let elements = element.split('=');
-  //   removeFieldValue(fields, elements[0], elements[1])
-  // });
 }
