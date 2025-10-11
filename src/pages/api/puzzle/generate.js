@@ -9,6 +9,7 @@ export default async function handler(req, res) {
   try {
     const validatedParams = validateGenerateParams(req.query);
     if (validatedParams.error) {
+      
       return res.status(validatedParams.status).json({ error: validatedParams.error });
     }
     const { amount, rows, cols, challenge, generation } = validatedParams;
@@ -21,19 +22,12 @@ export default async function handler(req, res) {
     for (let i = 0; i < amount; i++) {
       const idsUsed = [];
       const puzzle = await generatePuzzle(rows, cols, challenge, fieldManager, generation, idsUsed);
+      
       puzzles.push(puzzle);
       fieldManager.reset();
     }
 
     return res.status(200).json({
-      message: 'Parâmetros validados com sucesso',
-      data: {
-        amount,
-        challenge,
-        rows,
-        cols,
-        generation
-      },
       puzzles: puzzles,
     });
 
@@ -87,7 +81,6 @@ export async function generateGroup(cols, fieldManager, generation, idsUsed) {
     const pokemons = await filterPokemons(queryObject);
     ids = pokemons.map(p => p.id);
     ids = ids.filter(id => !idsUsed.includes(id));
-    console.log(ids);
     attempts++;
   }
   fieldManager.markQueryAsUsed(query);
