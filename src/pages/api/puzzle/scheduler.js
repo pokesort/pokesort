@@ -13,8 +13,8 @@ export default async function handler(req, res) {
 
     const today = new Date().toISOString().split('T')[0];
     let existingPuzzle = await getTodayPuzzle(today, Puzzle);
-    
-    if(existingPuzzle) return res.status(200).json({message: "Puzzle(s) para hoje encontrado(s)"});
+
+    // if(existingPuzzle) return res.status(200).json({message: "Puzzle(s) para hoje encontrado(s)"});
 
     const puzzles = [];
     const { password } = req.body;
@@ -33,7 +33,8 @@ export default async function handler(req, res) {
     }
 
     const result = await batchPuzzles(puzzles);
-    // return res.status(200).json(result);
+    return res.status(200).json(result);
+
   } catch (error) {
     console.log(error);
     return res.status(500).json({ success: false, message: "Erro interno de Servidor" })
@@ -63,17 +64,23 @@ async function getTodayPuzzle(today, Puzzle) {
 
 async function batchPuzzles(puzzles) {
 
+  const Puzzle = getPuzzleModel(data);
+  
   try {
     for (const puzzle of puzzles) {
       if (!puzzle.groups || !Array.isArray(puzzle.groups)) {
         throw new Error('Puzzle inválido: grupos não encontrados');
       }
+      const instance = new Puzzle(puzzle);
+      await instance.validate();
     }
+
+    const savedPuzzles = await Puzzle.insertMany(puzzles);
 
     return {
       success: true,
-      message: `${puzzles.length} puzzles processados com sucesso`,
-      puzzles: puzzles
+      message: `${savedPuzzles.length} puzzles processados com sucesso`,
+      // puzzles: savedPuzzles
     };
   } catch (error) {
     console.error('Erro ao processar puzzles:', error);
