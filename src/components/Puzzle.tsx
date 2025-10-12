@@ -274,7 +274,7 @@ const GuessLogs = React.memo(({guesses, setGuesses, availableTips, setAvailableT
     const t = useTranslations('');
     const locale = useLocale();
 
-    const askForTip = () => {        
+    const askForTip = () => {
         if (availableTips <= 0 || viewedTips.current.length == allTips.current.length) return;
 
         const logs = document.querySelector('.puzzle-guess-logs');
@@ -288,13 +288,15 @@ const GuessLogs = React.memo(({guesses, setGuesses, availableTips, setAvailableT
         };
         let tip: PuzzleTip | null = null;
 
+        let index = 0;
         while (!tip) {
-            const index = Math.floor(Math.random() * allTips.current.length);
             const possibleTip: PuzzleTip = allTips.current[index];
             if (!viewedTips.current.includes(index) && !solvedGroupNames.includes(possibleTip.group)) {
                 tip = possibleTip;
                 guess.tip = index;
                 viewedTips.current.push(index);
+            } else {
+                index++;
             }
         }
 

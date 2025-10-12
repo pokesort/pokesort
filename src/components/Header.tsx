@@ -70,7 +70,7 @@ export default function Header ({ pathname }: HeaderProps) {
                     <Link href="">
                         <HeaderHelp />
                     </Link>
-                    <Link href="">
+                    <Link href="about">
                         <HeaderInfo />
                     </Link>
                     {/* <Link target="_blank" href="https://x.com/bunnysammy_">
