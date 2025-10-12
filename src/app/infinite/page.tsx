@@ -41,9 +41,10 @@ export default function InfinitePage() {
                 };
                 const body = {...formWatch};
                 if (body.excludeFields == false) body.excludeFields = [];
+                const queries = `amount=1&infinite=true&generation=${form.watch('generation')}&challenge=${form.watch('challenge')}`;
                 
                 const [puzzleResponse] = await Promise.all([
-                    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/puzzle/generate?infinite=true`, {
+                    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/puzzle/generate?${queries}`, {
                         method: 'POST', headers, body: JSON.stringify(body)
                     }),
                 ]);
@@ -90,7 +91,11 @@ export default function InfinitePage() {
 
     const gen_options: Record<string, string> = {};
     [1, 2, 3, 4, 5, 6, 7, 8, 9].forEach((gen: number) => {
-        gen_options[`${gen}`] = 'Geração '+t(`groupnames.generation.${gen}`);
+        gen_options[`${gen}`] = t(`groupnames.generation.long`)+t(`groupnames.generation.${gen}`);
+    });
+    const challenge_options: Record<string, string> = {};
+    [1, 2, 3, 4].forEach((challenge: number) => {
+        challenge_options[`${challenge}`] = t(`puzzle.challenge.${challenge}`);
     });
     const exclude_options: Record<string, string> = {};
     {Object.keys(FIELD_OPTIONS).forEach((option: string) => {
@@ -126,14 +131,17 @@ export default function InfinitePage() {
             <div className={`window-container cut-left ${!initial ? "floating": ""}`}>
                 <section className="window-info-row">
                     <GridIcon/>
-                    <p>{t('puzzle.infinite-generate')}</p>
+                    <p>{t('puzzle.infinite.generate')}</p>
                 </section>
                 <div style={{display: 'flex', flexDirection: 'column', maxWidth: '500px', gap: '0.5rem'}}>
-                    <Input type="select" label="Limite de Geração" name="generation" defaultValue="9" options={gen_options} form={form} />
-                    <Input type="cloud" label="Ignorar Categorias" name="excludeFields" options={exclude_options} form={form} />
+                    <div style={{display: 'flex', flexDirection: 'row', width: '100%', gap: '0.5rem', flex: "1"}}>
+                        <Input type="select" style={{width: "100%"}} label={t(`puzzle.infinite.generation`)} name="generation" defaultValue="9" options={gen_options} form={form} />
+                        <Input type="select" style={{width: "100%"}} label={t(`puzzle.challenge.label`)} name="challenge" defaultValue="1" options={challenge_options} form={form} />
+                    </div>
+                    <Input type="cloud" label={t('puzzle.infinite.exclude')} name="excludeFields" options={exclude_options} form={form} />
                 </div>
                 <button className="form-button" onClick={generatePuzzle}>
-                    Gerar
+                    {t('puzzle.infinite.button')}
                 </button>
             </div>
         </>
