@@ -14,7 +14,7 @@ export default async function handler(req, res) {
     const today = new Date().toISOString().split('T')[0];
     let existingPuzzle = await getTodayPuzzle(today, Puzzle);
 
-    // if(existingPuzzle) return res.status(200).json({message: "Puzzle(s) para hoje encontrado(s)"});
+    if(existingPuzzle) return res.status(200).json({message: "Puzzle(s) para hoje encontrado(s)"});
 
     const puzzles = [];
     const { password } = req.body;

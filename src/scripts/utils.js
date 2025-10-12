@@ -135,6 +135,7 @@ export const getRandomFieldValue = (field, fields) => {
 
 export function validateGenerateParams(params) {
   const { amount, password, rows, cols, challenge, generation, infinite } = params;
+  let challengeValue = parseInt(challenge);
   const errors = [];
 
   if (!amount || amount > 30 || amount < 1) {
@@ -150,13 +151,14 @@ export function validateGenerateParams(params) {
   }
 
   const validDifficulties = [1, 2, 3, 4];
-  if (!challenge || !validDifficulties.includes(challenge)) { 
+  if (!challenge || !validDifficulties.includes(challengeValue)) { 
     errors.push('Nível de desafio inválido para essa liga pokemon');
   }
 
   const { finalRows, finalCols } = getGridSize(challenge, rows, cols);
 
   if (errors.length > 0) {
+    console.log(errors);
     return {
       error: errors.join('; '),
       status: 400
