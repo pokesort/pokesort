@@ -128,7 +128,7 @@ const VictoryModal = React.memo(({type, guesses, shinies, dateOg, victoryOpen, s
     const shareButton = () => {
         const url = window.location.href;
         const emojis = getGuessEmojis();
-        let text = `Pokesort · ${type == 'daily' ? formatDate(dateOg, locale, false) : t('puzzle.infinite')}`
+        let text = `Pokesort · ${type == 'daily' ? formatDate(dateOg, locale, false) : t('puzzle.infinite.labe.')}`
         if (type == 'daily' && streak > 1) {
             text += ` · 🔥${streak}`
         }
@@ -757,7 +757,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
 
     const date = useMemo(() => {
         if (type == 'infinite') {
-            return t('infinite')
+            return t('infinite.label')
         } else {
             return puzzle?.date ? formatDate(puzzle.date, locale) : '';
         }
