@@ -2,7 +2,8 @@ import { connect, data } from "@/lib/mongodb";
 
 import { validateGenerateParams, pickRandomMult, generateTips } from "@/src/scripts/utils";
 import { createPuzzleFieldManager, generateUniqueQuery } from "@/src/scripts/puzzleManager";
-import { filterPokemons } from "../../../scripts/server_utils";
+import { filterPokemons } from "@/src/scripts/server_utils";
+import { populate } from "./_utils";
 
 export default async function handler(req, res) {
 
@@ -11,18 +12,24 @@ export default async function handler(req, res) {
     if (validatedParams.error) {
       return res.status(validatedParams.status).json({ error: validatedParams.error });
     }
-    const { amount, rows, cols, challenge, generation } = validatedParams;
+    const { amount, rows, cols, challenge, generation, infinite } = validatedParams;
 
     await connect();
 
     const puzzles = [];
     const fieldManager = createPuzzleFieldManager(challenge);
+    const { excludeFields } = req.body;
 
     for (let i = 0; i < amount; i++) {
       const idsUsed = [];
       const puzzle = await generatePuzzle(rows, cols, challenge, fieldManager, generation, idsUsed);
       puzzles.push(puzzle);
       fieldManager.reset();
+    }
+
+    if (infinite) {
+      const dictionary = await populate(res, puzzles[0]);
+      return res.status(200).json({ success: true, data: puzzles[0], dictionary: dictionary });
     }
 
     return res.status(200).json({
@@ -87,7 +94,6 @@ export async function generateGroup(cols, fieldManager, generation, idsUsed) {
     const pokemons = await filterPokemons(queryObject);
     ids = pokemons.map(p => p.id);
     ids = ids.filter(id => !idsUsed.includes(id));
-    console.log(ids);
     attempts++;
   }
   fieldManager.markQueryAsUsed(query);
