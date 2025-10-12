@@ -12,7 +12,6 @@ export default async function handler(req, res) {
     const Puzzle = getPuzzleModel(data);
 
     const puzzles = req.body;
-    console.log('Batch: ' + JSON.stringify(puzzles, null, 2));
 
     if (!Array.isArray(puzzles) || puzzles.length === 0) {
       return res.status(400).json({ success: false, error: 'Body must be a non-empty array of puzzles.' });

@@ -1,8 +1,10 @@
 import { connect, data } from '@/lib/mongodb';
 import { getPuzzleModel } from '@/src/models/Puzzle';
 import { generatePuzzle } from './generate';
+import { createPuzzleFieldManager } from "@/src/scripts/puzzleManager";
+import { validateGenerateParams } from "@/src/scripts/utils";
 
-export default async function handler(_, res) {
+export default async function handler(req, res) {
 
   try {
     await connect();
@@ -11,22 +13,27 @@ export default async function handler(_, res) {
 
     const today = new Date().toISOString().split('T')[0];
     let existingPuzzle = await getTodayPuzzle(today, Puzzle);
+    
+    if(existingPuzzle) return res.status(200).json({message: "Puzzle(s) para hoje encontrado(s)"});
+
     const puzzles = [];
+    const { password } = req.body;
 
     for (let i = 1; i <= 4; i++) {
-      // Gerar puzzle diretamente usando a função
-      const puzzle = await generatePuzzle(4, 4, i, null, null, []);
-      console.log('Puzzle: ' + JSON.stringify(puzzle, null, 2));
+      const validatedParams = validateGenerateParams({amount:1, challenge:i, password:password});
+      if (validatedParams.error) {
+        
+        return res.status(validatedParams.status).json({ error: validatedParams.error });
+      }
+      const { rows, cols, challenge } = validatedParams;
+      const fieldManager = createPuzzleFieldManager(i);
+
+      const puzzle = await generatePuzzle(rows, cols, challenge, fieldManager, null);
       puzzles.push(puzzle);
     }
-    console.log("Puzzle Array: " + JSON.stringify(puzzles, null, 2));
 
     const result = await batchPuzzles(puzzles);
-    return res.status(200).json(result);
-
-    // if (!existingPuzzle) return res.status(404).json({ success: false, message: "Nenhum puzzle disponível" });
-
-    // return res.status(200).json({ success: true })
+    // return res.status(200).json(result);
   } catch (error) {
     console.log(error);
     return res.status(500).json({ success: false, message: "Erro interno de Servidor" })
@@ -35,7 +42,6 @@ export default async function handler(_, res) {
 
 async function getTodayPuzzle(today, Puzzle) {
 
-  return null;
   let todayPuzzle = await Puzzle.findOne({ date: today });
 
   if (!todayPuzzle) {
@@ -56,18 +62,14 @@ async function getTodayPuzzle(today, Puzzle) {
 }
 
 async function batchPuzzles(puzzles) {
-  console.log("Scheduler: " + JSON.stringify(puzzles, null, 2));
 
   try {
-    // Validar os puzzles
     for (const puzzle of puzzles) {
-      // Aqui você pode adicionar validações específicas se necessário
       if (!puzzle.groups || !Array.isArray(puzzle.groups)) {
         throw new Error('Puzzle inválido: grupos não encontrados');
       }
     }
 
-    // Simular o que a API batch faria
     return {
       success: true,
       message: `${puzzles.length} puzzles processados com sucesso`,

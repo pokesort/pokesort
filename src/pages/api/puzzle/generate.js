@@ -20,8 +20,7 @@ export default async function handler(req, res) {
     const fieldManager = createPuzzleFieldManager(challenge);
 
     for (let i = 0; i < amount; i++) {
-      const idsUsed = [];
-      const puzzle = await generatePuzzle(rows, cols, challenge, fieldManager, generation, idsUsed);
+      const puzzle = await generatePuzzle(rows, cols, challenge, fieldManager, generation);
       
       puzzles.push(puzzle);
       fieldManager.reset();
@@ -37,8 +36,9 @@ export default async function handler(req, res) {
   }
 }
 
-export async function generatePuzzle(rows, cols, challenge, fieldManager, generation, idsUsed) {
+export async function generatePuzzle(rows, cols, challenge, fieldManager, generation) {
   const groups = [];
+  const idsUsed = [];
   for (let i = 0; i < rows; i++) {
     const group = await generateGroup(cols, fieldManager, generation, idsUsed);
     groups.push(group);

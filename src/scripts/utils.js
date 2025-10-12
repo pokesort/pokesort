@@ -142,8 +142,6 @@ export function validateGenerateParams(params) {
   }
 
   if (!password || password !== process.env.AUTHORIZATION_BATCH) {
-    console.log("Senha: " + password);
-    
     errors.push('Senha inválida');
   }
 
@@ -151,10 +149,8 @@ export function validateGenerateParams(params) {
     errors.push('Geração máxima inválida');
   }
 
-  const validDifficulties = ['1', '2', '3', '4'];
-  if (!challenge || !validDifficulties.includes(challenge)) {
-    console.log("Desafio: " + challenge);
-    
+  const validDifficulties = [1, 2, 3, 4];
+  if (!challenge || !validDifficulties.includes(challenge)) { 
     errors.push('Nível de desafio inválido para essa liga pokemon');
   }
 
