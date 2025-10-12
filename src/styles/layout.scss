@@ -3,7 +3,11 @@
 :root {
     scroll-behavior: smooth;
     max-width: 100vw;
-    // overflow: none;
+
+    --spacing: .5rem;
+    @media(max-width: 768px) {
+        --spacing: .35rem;
+    }
 }
 
 html {
@@ -94,9 +98,7 @@ input {
     caret-color: color(text2);
 }
 
-section#page {
-    --spacing: .5rem;
-
+section#page {   
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -108,10 +110,6 @@ section#page {
     padding: 0 var(--spacing);
   
     color: color(text1);
-
-    @media(max-width: 768px) {
-        --spacing: .35rem;
-    }
 }
 
 .disable-select {

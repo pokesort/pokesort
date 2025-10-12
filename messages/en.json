@@ -23,6 +23,12 @@
         "maintenance": "Pokesort is undergoing maintenance. Pleace hold for a bit!",
         "go-back": "Go back"
     },
+    "notices": {
+        "label": "Notices",
+        "previous": "Previous",
+        "next": "Next",
+        "empty": "There doesn't seem to be anything here..."
+    },
 
     "puzzle": {
         "infinite": "Infinite Mode",
