@@ -25,8 +25,13 @@
     },
 
     "puzzle": {
-        "infinite": "Modo Infinito",
-        "infinite-generate": "Gerar Puzzle",
+        "infinite": {
+            "label": "Modo Infinito",
+            "generate": "Gerar Puzzle",
+            "exclude": "Ignorar Categorias",
+            "generation": "Limite de Geração",
+            "button": "Gerar"
+        },
         "logs": "Logs",
         "puzzle": "Puzzle",
         "dex": "Dex",
@@ -37,6 +42,13 @@
         "help": {
             "logs": "A acurácia de cada uma de suas tentativas será exibida aqui.",
             "dex": "Pressione um bloco ou clique com o botão direito para pesquisar na Dex."
+        },
+        "challenge": {
+            "label": "Nível de Desafio",
+            "1": "Treinador",
+            "2": "Líder",
+            "3": "Elite",
+            "4": "Campeão"
         },
         "dex-tabs": {
             "traits": "Características",
@@ -304,6 +316,23 @@
 
             "1": "Tipagem Única",
             "2": "Tipagem Dupla"
+        }
+    },
+    "about": {
+        "about": {
+            "title": "Sobre o Pokesort",
+            "description": "Pokesort é um jogo de associação diário de Pokémon criado por fãs para fãs. Nós o desenvolvemos para exercitar nossas habilidades como desenvolvedores web e contribuir com a nossa tão querida comunidade."
+        },
+        "team": {
+            "title": "Equipe",
+            "description": "",
+
+            "backend": "Puzzles & Backend",
+            "frontend": "UX Design & Frontend"
+        },
+        "support": {
+            "title": "Nos Apoie",
+            "description": ""
         }
     }
 }

@@ -39,7 +39,7 @@ header {
         display: flex;
         align-items: center;
         justify-content: end;
-        gap: 5rem;
+        gap: 1.5rem;
 
         transition: opacity 0.15s ease-in-out;
     }
@@ -76,6 +76,17 @@ header {
         }
     }
 
+    ul.icons {
+        display: flex;
+        gap: 0.5rem;
+
+        color: color(text2);
+
+        a {
+            padding: 0.25rem;
+        }
+    }
+
     &[data-path="/"] {
         position: fixed;
         background-color: transparent;
@@ -87,6 +98,12 @@ header {
         nav {
             display: none;
         }
+    }
+}
+
+@media (max-width: 1200px) {
+    header {
+        padding: 0 2rem;
     }
 }
 
@@ -134,7 +151,8 @@ header {
             align-items: end;
             justify-content: start;
             width: 100%;
-            gap: 0.5rem;
+            gap: 0rem;
+            transform: unset;
             
             &:not(.open) {
                 opacity: 0;
@@ -163,6 +181,22 @@ header {
                 clip-path: unset;
                 font-size: text(small);
             }            
+        }
+
+        ul.icons {
+            width: 100%;
+            justify-content: center;
+            padding-bottom: .5rem;
+            background-color: color(background1);
+
+            a {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                background-color: color(section1);
+                aspect-ratio: 1;
+            }
         }
 
     }

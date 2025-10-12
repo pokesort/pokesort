@@ -20,6 +20,19 @@ const puzzleSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    created_at: {
+        type: String,
+        default: function () {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            return `${year}-${month}-${day} ${hours}:${minutes}`;
+        },
+        required: true,
+    },
     from: {
         type: String,
         enum: ['admin', 'system', 'user'],
@@ -38,6 +51,10 @@ const puzzleSchema = new mongoose.Schema({
             message: 'Date must be in format YYYY-MM-DD or null.',
         },
         default: null,
+    },
+    challenge: {
+        type: Number,
+        required: true,
     },
     rows: {
         type: Number,

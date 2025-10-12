@@ -51,7 +51,13 @@ label.block-container {
             font-weight: unset;
             z-index: 5;
             white-space: nowrap;
-            text-shadow: -2px -2px 0 color(section2), 2px -2px 0 color(section2), -2px 2px 0 color(section2), 2px 2px 0 color(section2);
+            color: unset;
+
+            text-shadow:
+                -2px -2px 1px color(section2),
+                2px -2px 1px color(section2),
+                -2px 2px 1px color(section2),
+                2px 2px 1px color(section2);
         }
         
         h3 {

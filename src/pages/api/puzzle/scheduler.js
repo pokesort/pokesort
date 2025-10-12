@@ -1,7 +1,7 @@
 import { connect, data } from '@/lib/mongodb';
 import { getPuzzleModel } from '@/src/models/Puzzle';
 
-export default async function handler(req, res) {
+export default async function handler(res) {
 
   try {
     await connect();

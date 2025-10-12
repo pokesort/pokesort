@@ -25,8 +25,13 @@
     },
 
     "puzzle": {
-        "infinite": "Infinite Mode",
-        "infinite-generate": "Gerar Puzzle",
+        "infinite": {
+            "label": "Infinite Mode",
+            "generate": "Generate a Puzzle",
+            "exclude": "Ignore Categories",
+            "generation": "Generation Limit",
+            "button": "Generate"
+        },
         "logs": "Logs",
         "puzzle": "Puzzle",
         "dex": "Dex",
@@ -37,6 +42,13 @@
         "help": {
             "logs": "Each of your attempts and its accuracy will be shown here.",
             "dex": "Press and hold a block or right-click it to search on the Dex."
+        },
+        "challenge": {
+            "label": "Challenge Level",
+            "1": "Trainer",
+            "2": "Leader",
+            "3": "Elite",
+            "4": "Champion"
         },
         "dex-tabs": {
             "traits": "Traits",
@@ -304,6 +316,23 @@
 
             "1": "Single-type",
             "2": "Dual-type"
+        }
+    },
+    "about": {
+        "about": {
+            "title": "About Pokesort",
+            "description": "Pokesort is a daily Pokémon associacion game created by fans to fans. We created it as a way to hone our abilities as web developers and contribute to our beloved community."
+        },
+        "team": {
+            "title": "Team",
+            "description": "",
+
+            "backend": "Puzzles & Backend",
+            "frontend": "UX Design & Frontend"
+        },
+        "support": {
+            "title": "Support Us",
+            "description": ""
         }
     }
 }
