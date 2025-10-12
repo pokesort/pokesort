@@ -18,10 +18,11 @@ interface InputProps {
     required?: boolean;
     max?: number;
     defaultValue?: string | string[];
+    style?: React.CSSProperties;
     onInput?: () => void;
 }
 
-export default React.memo(function Input({type, label, name, form=undefined, options={}, placeholder="", readonly=false, disabled=false, required=false, max=0, defaultValue="", onInput=undefined}: InputProps) {
+export default React.memo(function Input({type, label, name, form=undefined, options={}, placeholder="", readonly=false, disabled=false, required=false, max=0, defaultValue="", style={}, onInput=undefined}: InputProps) {
     
     if (form == undefined) {
         form = useForm();
@@ -37,7 +38,7 @@ export default React.memo(function Input({type, label, name, form=undefined, opt
         case 'number':
         case 'date':
             return (
-                <label className="form-label">
+                <label className="form-label" style={style}>
                     {label && <span>{label}</span>}
                     <input className="inner-input" type={type} defaultValue={defaultValue} autoComplete="off" onInput={onInput} placeholder={placeholder}
                         {...form.register(name, { required })} readOnly={readonly} disabled={disabled} />
@@ -98,7 +99,7 @@ export default React.memo(function Input({type, label, name, form=undefined, opt
             }, [defaultValue])
 
             return (
-                <div className="form-label" ref={selectWrapper} onFocus={() => setOpen(true)}>
+                <div className="form-label" ref={selectWrapper} onFocus={() => setOpen(true)} style={style}>
                     {label && <span>{label}</span>}
                     <input className="inner-input" type="text" defaultValue={selectValue} readOnly={true} autoComplete="off"/>
                     <SelectHandle />
@@ -115,7 +116,7 @@ export default React.memo(function Input({type, label, name, form=undefined, opt
             )
         case 'cloud':
             return (
-                <div className="form-label">
+                <div className="form-label" style={style}>
                     {label && <span>{label}</span>}
                     <ul className="checkbox-cloud">
                         {Object.keys(options).map((value: string) => (

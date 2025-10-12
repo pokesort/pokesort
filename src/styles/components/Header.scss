@@ -102,12 +102,8 @@ header {
 }
 
 @media (max-width: 1200px) {
-    header div.menu {
-        display: flex;
-        flex-direction: column;
-        gap: .5rem;
-        align-items: end;
-        transform: translateY(25%);
+    header {
+        padding: 0 2rem;
     }
 }
 

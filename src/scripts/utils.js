@@ -134,14 +134,14 @@ export const getRandomFieldValue = (field, fields) => {
 };
 
 export function validateGenerateParams(params) {
-  const { amount, password, rows, cols, challenge, generation } = params;
+  const { amount, password, rows, cols, challenge, generation, infinite } = params;
   const errors = [];
 
   if (!amount || amount > 30 || amount < 1) {
     errors.push('Quantidade máxima de puzzles deve ser um número entre 1 e 30');
   }
 
-  if (!password || password !== process.env.AUTHORIZATION_BATCH) {
+  if (!infinite && (!password || password !== process.env.AUTHORIZATION_BATCH)) {
     errors.push('Senha inválida');
   }
 
@@ -169,6 +169,7 @@ export function validateGenerateParams(params) {
     cols: finalCols,
     challenge,
     generation,
+    infinite
   };
 }
 
