@@ -1,0 +1,53 @@
+@use "../abstract" as *;
+
+ul.page-view {
+    width: 100%;    
+
+    & > li {
+        max-height: 50vh;
+        overflow-y: auto;
+
+        &.active {
+            animation: dex-fade-in 0.15s ease 0s 1;
+        }
+        &:not(.active) {
+            display: none;
+        }
+    }
+}
+
+nav.page-view-nav {
+    display: flex;
+    width: 100%;
+    gap: var(--spacing);
+
+    button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        width: 100%;
+        gap: 0.25rem;
+        background-color: color(section2);
+        padding: 0.5rem;
+
+        transition: opacity 0.3s ease;
+
+        &.disabled {
+            opacity: 0.6;
+            color: color(text3);
+            pointer-events: none;
+        }
+    }
+}
+
+@keyframes pageview-fade-in {
+    0% {
+        opacity: 0;
+        transform: scaleY(0.75);
+    }
+    100% {
+        opacity: 1;
+        transform: scaleY(1);
+    }
+}
