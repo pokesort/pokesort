@@ -120,3 +120,22 @@ export async function filterPokemons(query){
   let pokemons = await data.db.collection('pokemon').find(filter, { projection: { name: 1, id: 1, species_name: 1, dex_number: 1, sprite_default: 1, sprite_shiny: 1, cry: 1, _id: 0 } }).sort({ dex_number: 1, id: 1}).toArray();
   return pokemons;
 }
+
+export async function findPuzzlesOfSameDate (existingPuzzle, Puzzle) {
+  const puzzlesByChallenge = { 1: null, 2: null, 3: null, 4: null };
+
+  if (!existingPuzzle) return puzzlesByChallenge;
+
+  if (!existingPuzzle.date) {
+    puzzlesByChallenge[existingPuzzle.challenge] = existingPuzzle._id;
+    return puzzlesByChallenge;
+  }
+
+  const puzzles = await Puzzle.find({ date: existingPuzzle.date });
+
+  puzzles.forEach(puzzle => {
+    puzzlesByChallenge[puzzle.challenge] = puzzle._id;
+  });
+
+  return puzzlesByChallenge;
+}

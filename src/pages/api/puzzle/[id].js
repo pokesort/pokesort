@@ -2,6 +2,7 @@ import { connect, data } from '@/lib/mongodb';
 import { getPuzzleModel } from '@/src/models/Puzzle';
 import mongoose from 'mongoose';
 import { populate } from './_utils';
+import { findPuzzlesOfSameDate } from '@/src/scripts/server_utils';
 
 export default async function handler(req, res) {
   await connect();
@@ -30,8 +31,9 @@ export default async function handler(req, res) {
   }
   else if (req.method === 'GET'){
     existingPuzzle.daily = false;
+    const challenges = await findPuzzlesOfSameDate(existingPuzzle, Puzzle);
     const dictionary = await populate(res, existingPuzzle);
-    return res.status(200).json({success: true, data: existingPuzzle, dictionary: dictionary})
+    return res.status(200).json({success: true, data: existingPuzzle, dictionary: dictionary, challenges: challenges})
   }
 }
 
