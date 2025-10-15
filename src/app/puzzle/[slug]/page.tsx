@@ -17,6 +17,7 @@ export default function PuzzlePage() {
 
     const [puzzle, setPuzzle] = useState<PuzzleData>();
     const [dictionary, setDictionary] = useState<any>();
+    const [challenges, setChallenges] = useState<any>();
 
     useEffect(() => {
         setLoading(true);
@@ -49,6 +50,7 @@ export default function PuzzlePage() {
                 }
                 setPuzzle(puzzleData.data);
                 setDictionary(puzzleData.dictionary);
+                setChallenges(puzzleData.challenges);
             } catch (e) {
                 console.error(e);
                 setError('Não foi possível conectar ao servidor. Tente novamente.');
@@ -66,6 +68,7 @@ export default function PuzzlePage() {
             setPuzzle={setPuzzle}
             type="daily"
             dictionary={dictionary}
+            challenges={challenges}
             loading={loading}
             setLoading={setLoading}
             error={error}

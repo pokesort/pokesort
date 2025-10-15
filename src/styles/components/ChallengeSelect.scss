@@ -45,3 +45,44 @@
         height: 80px;
     }
 }
+
+.puzzle-challenge-select {
+    position: absolute;
+    top: 0;
+
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    gap: var(--spacing);
+    font-size: text(small);
+    color: color(text2);
+    cursor: pointer;
+
+    width: min(100%, calc(120px * var(--cols, 4)));
+    height: 36px;
+    overflow: hidden;
+    padding: var(--spacing);
+    z-index: 50;
+
+    img {
+        &[data-challenge="1"] {
+            --offset-x: -1rem;
+            --offset-y: 0;
+        }
+        &[data-challenge="2"] {
+            --offset-x: -0.85rem;
+            --offset-y: 1.75rem;
+        }
+        &[data-challenge="3"] {
+            --offset-x: -0.15rem;
+            --offset-y: 1rem;
+        }
+        &[data-challenge="4"] {
+            --offset-x: 0;
+            --offset-y: 2.5rem;
+        }
+
+        margin: 0 var(--offset-x);
+        margin-top: var(--offset-y);
+    }
+}

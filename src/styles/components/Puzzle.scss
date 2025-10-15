@@ -42,6 +42,8 @@ ul.puzzle-tabs-container {
     }
 
     li.puzzle-tab {
+        position: relative;
+
         display: flex;
         flex-direction: column;
         justify-content: center;

@@ -14,6 +14,7 @@ import ch1_sprite from "@/src/assets/images/challenge_1.png";
 import ch2_sprite from "@/src/assets/images/challenge_2.png";
 import ch3_sprite from "@/src/assets/images/challenge_3.png";
 import ch4_sprite from "@/src/assets/images/challenge_4.png";
+import ChallengeIcon from '../svg/ChallengeIcon';
 const challengeSprites: Record<string, StaticImageData> = {
   '1': ch1_sprite,
   '2': ch2_sprite,
@@ -57,13 +58,21 @@ export default React.memo(function Input({name="challenge", label="Challenge", m
     }, [watched]);
 
     return (
-        <>            
-            <div className="form-label challenge-select" style={style} onClick={() => setOpen(true)}>
-                {label && <span>{label}</span>}
-                <input className="inner-input" type="text" defaultValue={inputText} readOnly={true} autoComplete="off"/>
-                <SelectHandle />
-                <ul className="select-options"></ul>
-            </div>
+        <>
+            {minimal ?
+                <div className="form-label challenge-select" style={style} onClick={() => setOpen(true)}>
+                    {label && <span>{label}</span>}
+                    <input className="inner-input" type="text" defaultValue={inputText} readOnly={true} autoComplete="off"/>
+                    <SelectHandle />
+                    <ul className="select-options"></ul>
+                </div>
+            :
+                <div className="puzzle-challenge-select" onClick={() => setOpen(true)}>
+                    <ChallengeIcon />
+                    {inputText}
+                    <img data-challenge={watched ?? defaultValue} src={challengeSprites[watched ?? defaultValue].src} />
+                </div>
+            }
             <Modal id="challenge-select-modal" title={label} background={true} isOpen={open} canClose={true} setIsOpen={setOpen}>
                 {Object.keys(challenge_options).map((value: string) => (
                     <label className="challenge-label" key={value}>
