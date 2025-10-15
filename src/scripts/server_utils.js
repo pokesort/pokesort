@@ -127,14 +127,14 @@ export async function findPuzzlesOfSameDate (existingPuzzle, Puzzle) {
   if (!existingPuzzle) return puzzlesByChallenge;
 
   if (!existingPuzzle.date) {
-    puzzlesByChallenge[existingPuzzle.challenge] = existingPuzzle._id;
+    puzzlesByChallenge[existingPuzzle.challenge ?? '4'] = existingPuzzle._id;
     return puzzlesByChallenge;
   }
 
   const puzzles = await Puzzle.find({ date: existingPuzzle.date });
 
   puzzles.forEach(puzzle => {
-    puzzlesByChallenge[puzzle.challenge] = puzzle._id;
+    puzzlesByChallenge[puzzle.challenge ?? '4'] = puzzle._id;
   });
 
   return puzzlesByChallenge;
