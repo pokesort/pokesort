@@ -26,6 +26,8 @@ import DexIcon from '@/src/components/svg/DexIcon';
 import helpLogsImage from '@/src/assets/images/help_logs.png';
 import DexView from './DexView';
 import PokeSprite from './PokeSprite';
+import ChallengeSelect from './forms/ChallengeSelect';
+import { useForm } from 'react-hook-form';
 
 const streakKey = 'u_dailystreak';
 const infiniteCount = 'u_infinitecount';
@@ -605,6 +607,7 @@ interface PuzzleProps {
     setPuzzle: (puzzle: PuzzleData) => void;
     type: 'daily' | 'infinite';
     dictionary: any;
+    challenges?: any;
     loading: boolean;
     setLoading: (loading: boolean) => void;
     error: string | null;
@@ -612,10 +615,11 @@ interface PuzzleProps {
     refreshInfinite?: () => void;
 }
 
-export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, loading, setLoading, error, setError, refreshInfinite}: PuzzleProps) {
+export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, challenges=null, loading, setLoading, error, setError, refreshInfinite}: PuzzleProps) {
     const t = useTranslations('puzzle');
     const locale = useLocale();
     const maxAvailableTips = 2;
+    const form = useForm();
 
     const mainTabRef = useRef<HTMLDivElement>(null);
     const spritesMap = useRef<Record<number, string>>({});
@@ -677,6 +681,8 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
     const [pause, setPause] = useState<boolean>(false);
     const [pokemons, setPokemons] = useState<any>([]);
     const [shinies, setShinies] = useState<number[]>([]);
+    const [challengeOptions, setChallengeOptions] = useState<Record<string, string>>();
+
     const [victoryOpen, setVictoryOpen] = useState<boolean>(false);
     const [customGroupsOpen, setCustomGroupsOpen] = useState<boolean>(false);
     const [mountVictoryModal, setMountVictoryModal] = useState<boolean>(false);
@@ -693,6 +699,16 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
             })
         }
     }, [dictionary]);
+
+    useEffect(() => {
+        if (challenges != null) {
+            let newChallengeOptions: Record<string, string> = {};
+            Object.keys(challenges).map((key: string) => {
+                newChallengeOptions[key] = t(`challenge.${key}`);
+            })
+            setChallengeOptions(newChallengeOptions);
+        }
+    }, [challenges]);
 
     useEffect(() => {
         setMountVictoryModal(true);
@@ -827,6 +843,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
                     </div>
                 </PuzzleTab> : <div></div>}
                 <PuzzleTab setVisibleTab={setVisibleTab} tab={1}>
+                    {challenges != null && <ChallengeSelect minimal={false} label={t(`challenge.label`)} style={{width: "100%"}} defaultValue="1" options={challengeOptions} form={form} />}
                     <div className="window-container puzzle-window cut-left" ref={mainTabRef}>
                         <section className="window-info-row">
                             {!loading && <>

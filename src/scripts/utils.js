@@ -31,7 +31,7 @@ export const CHALLENGE_FIELDS = {
   },
   2: {
     types: { min: 1, max: 18 },
-    color: ['red', 'blue', 'green', 'yellow', 'black', 'brown', 'gray', 'pink', 'purple', 'white'],
+    // color: ['red', 'blue', 'green', 'yellow', 'black', 'brown', 'gray', 'pink', 'purple', 'white'],
     region: ['kanto', 'johto', 'hoenn', 'sinnoh', 'unova', 'kalos', 'alola', 'galar', 'hisui', 'paldea'],
     generation: { min: 1, max: 9 },
     form: ['first', 'middle', 'final'],
@@ -41,7 +41,7 @@ export const CHALLENGE_FIELDS = {
   },
   3: {
     types: { min: 1, max: 18 },
-    color: ['red', 'blue', 'green', 'yellow', 'black', 'brown', 'gray', 'pink', 'purple', 'white'],
+    // color: ['red', 'blue', 'green', 'yellow', 'black', 'brown', 'gray', 'pink', 'purple', 'white'],
     region: ['kanto', 'johto', 'hoenn', 'sinnoh', 'unova', 'kalos', 'alola', 'galar', 'hisui', 'paldea'],
     generation: { min: 1, max: 9 },
     form: ['first', 'middle', 'final'],
@@ -54,7 +54,7 @@ export const CHALLENGE_FIELDS = {
   },
   4: {
     types: { min: 1, max: 18 },
-    color: ['red', 'blue', 'green', 'yellow', 'black', 'brown', 'gray', 'pink', 'purple', 'white'],
+    // color: ['red', 'blue', 'green', 'yellow', 'black', 'brown', 'gray', 'pink', 'purple', 'white'],
     region: ['kanto', 'johto', 'hoenn', 'sinnoh', 'unova', 'kalos', 'alola', 'galar', 'hisui', 'paldea'],
     generation: { min: 1, max: 9 },
     form: ['first', 'middle', 'final'],

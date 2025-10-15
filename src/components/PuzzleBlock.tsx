@@ -48,12 +48,12 @@ export default React.memo(function PuzzleBlock({ pokemon, shinies, multiselect, 
     const default_url = !shinies.includes(pokemon.dex_number) ? pokemon.sprite_default : pokemon.sprite_shiny;
     
     const gifRef = useRef<any>(null);
-    const [shiny, setShiny] = useState<boolean>(shinies.includes(pokemon.dex_number));
+    const [shiny, setShiny] = useState<boolean>(false);
     const [shinyReveal, setShinyReveal] = useState<boolean>(false);
     const pressTimer = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
-        setShiny(shinies.includes(pokemon.dex_number));
+        setShiny(shinies.includes(pokemon.id));
     }, [shinies])
 
     useEffect(() => {
