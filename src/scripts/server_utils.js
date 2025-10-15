@@ -122,7 +122,7 @@ export async function filterPokemons(query){
 }
 
 export async function findPuzzlesOfSameDate (existingPuzzle, Puzzle) {
-  const puzzlesByChallenge = { 1: null, 2: null, 3: null, 4: null };
+  const puzzlesByChallenge = {};
 
   if (!existingPuzzle) return puzzlesByChallenge;
 

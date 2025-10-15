@@ -44,6 +44,12 @@
         width: 80px;
         height: 80px;
     }
+
+    &.disabled {
+        opacity: 0.6;
+        color: color(text3);
+        pointer-events: none;
+    }
 }
 
 .puzzle-challenge-select {
@@ -53,16 +59,32 @@
     display: flex;
     justify-content: end;
     align-items: center;
-    gap: var(--spacing);
     font-size: text(small);
     color: color(text2);
-    cursor: pointer;
+    pointer-events: none;
 
     width: min(100%, calc(120px * var(--cols, 4)));
     height: 36px;
     overflow: hidden;
-    padding: var(--spacing);
     z-index: 50;
+
+    label {
+        display: flex;
+        justify-content: end;
+        align-items: center;
+        cursor: pointer;
+        height: 100%;
+        gap: var(--spacing);
+        pointer-events: all;
+
+        p {
+            margin-top: 0.2rem;
+        }
+
+        &.disabled {
+            pointer-events: none;
+        }
+    }
 
     img {
         &[data-challenge="1"] {
@@ -79,10 +101,12 @@
         }
         &[data-challenge="4"] {
             --offset-x: 0;
-            --offset-y: 2.5rem;
+            --offset-y: 2.6rem;
         }
 
         margin: 0 var(--offset-x);
         margin-top: var(--offset-y);
-    }
+        width: 80px;
+        height: 80px;
+    }    
 }

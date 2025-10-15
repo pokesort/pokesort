@@ -21,11 +21,13 @@ const challengeSprites: Record<string, StaticImageData> = {
   '3': ch3_sprite,
   '4': ch4_sprite
 };
+const challengeKey = 'u_challenge';
 
 interface InputProps {
     name?: string;
     label?: string;
     minimal?: boolean;
+    infinite?: boolean;
     form?: UseFormReturn<FieldValues, any, FieldValues>
     options?: Record<string, string>;
     defaultValue?: string;
@@ -33,7 +35,7 @@ interface InputProps {
     onInput?: () => void;
 }
 
-export default React.memo(function Input({name="challenge", label="Challenge", minimal=true, form=undefined, options={}, defaultValue="", style={}, onInput=undefined}: InputProps) {
+export default React.memo(function Input({name="challenge", label="Challenge", minimal=true, infinite=false, form=undefined, options={}, defaultValue="", style={}, onInput=undefined}: InputProps) {
     const t = useTranslations();
     const challenge_options: Record<string, string> = {};
     ['1', '2', '3', '4'].forEach((challenge: string) => {
@@ -48,12 +50,17 @@ export default React.memo(function Input({name="challenge", label="Challenge", m
     const [open, setOpen] = useState(false);
     const [inputText, setInputText] = useState('');
 
+    const updatePreferredChallenge = (challenge: string) => {
+        localStorage.setItem(challengeKey, challenge);
+        setOpen(false);
+    };
+
     useEffect(() => {
         form.setValue(name, defaultValue);
     }, [])
 
     useEffect(() => {
-        setOpen(false);
+        updatePreferredChallenge(watched);
         setInputText(options[watched]);
     }, [watched]);
 
@@ -67,15 +74,18 @@ export default React.memo(function Input({name="challenge", label="Challenge", m
                     <ul className="select-options"></ul>
                 </div>
             :
-                <div className="puzzle-challenge-select" onClick={() => setOpen(true)}>
-                    <ChallengeIcon />
-                    {inputText}
-                    <img data-challenge={watched ?? defaultValue} src={challengeSprites[watched ?? defaultValue].src} />
+                <div className={`puzzle-challenge-select`}>
+                    <label className={`${infinite && 'disabled'}`} onClick={() => setOpen(true)}>
+                        <ChallengeIcon />
+                        <p>{inputText}</p>
+                        <img data-challenge={watched ?? defaultValue} src={challengeSprites[watched ?? defaultValue].src} />
+                    </label>
                 </div>
             }
             <Modal id="challenge-select-modal" title={label} background={true} isOpen={open} canClose={true} setIsOpen={setOpen}>
                 {Object.keys(challenge_options).map((value: string) => (
-                    <label className="challenge-label" key={value}>
+                    <label className={`challenge-label ${Object.keys(options).includes(value) ? "" : "disabled"}`} key={value}
+                        onClick={() => setOpen(false)}>
                         <input type="radio" {...form.register(name)} value={value} />     
                         <img src={challengeSprites[value].src} />
                         <div>

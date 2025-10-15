@@ -32,6 +32,7 @@ export interface PuzzleData {
   rows: number;
   cols: number;
   groups: PuzzleGroup[];
+  challenge: string;
   __v: number;
 }
 

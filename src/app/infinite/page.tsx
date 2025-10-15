@@ -26,6 +26,7 @@ export default function InfinitePage() {
 
     const [puzzle, setPuzzle] = useState<PuzzleData | undefined>(undefined);
     const [dictionary, setDictionary] = useState<any>();
+    const [challenges, setChallenges] = useState<any>();
 
     useEffect(() => {
         if (initial) return;
@@ -68,6 +69,7 @@ export default function InfinitePage() {
                 }
                 setPuzzle(puzzleData.data);
                 setDictionary(puzzleData.dictionary);
+                setChallenges(puzzleData.challenges);
             } catch (e) {
                 console.error(e);
                 setError('Não foi possível conectar ao servidor. Tente novamente.');
@@ -79,14 +81,14 @@ export default function InfinitePage() {
         fetchPageData();
     }, [refresh])
 
-    const refreshInfinite = () => {
+    const refreshPuzzle = () => {
         setRefresh(prev => !prev);
     }
 
     const generatePuzzle = useCallback(() => {
         if(!loading) {
             setInitial(false);
-            refreshInfinite();
+            refreshPuzzle();
         }
     }, [loading])
 
@@ -121,11 +123,12 @@ export default function InfinitePage() {
                         setPuzzle={setPuzzle}
                         type="infinite"
                         dictionary={dictionary}
+                        challenges={challenges}
                         loading={loading}
                         setLoading={setLoading}
                         error={error}
                         setError={setError}
-                        refreshInfinite={refreshInfinite}
+                        refreshPuzzle={refreshPuzzle}
                     />
                 )
             }            
