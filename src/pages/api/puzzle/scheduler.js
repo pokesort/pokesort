@@ -28,12 +28,13 @@ export default async function handler(req, res) {
       const { rows, cols, challenge } = validatedParams;
       const fieldManager = createPuzzleFieldManager(i);
 
-      const puzzle = await generatePuzzle(rows, cols, challenge, fieldManager, null);
+      let puzzle = await generatePuzzle(rows, cols, challenge, fieldManager, null);
+      puzzle.date = today ;
       puzzles.push(puzzle);
     }
 
     const result = await batchPuzzles(puzzles);
-    return res.status(200).json(result);
+    return res.status(200).json(puzzles);
 
   } catch (error) {
     console.log(error);
@@ -43,6 +44,7 @@ export default async function handler(req, res) {
 
 async function getTodayPuzzle(today, Puzzle) {
 
+  return null;
   let todayPuzzle = await Puzzle.findOne({ date: today });
 
   if (!todayPuzzle) {
