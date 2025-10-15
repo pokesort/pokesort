@@ -4,8 +4,6 @@ import { populate } from './_utils';
 
 export default async function handler(req, res) {
   await connect();
-
-  const Puzzle = getPuzzleModel(data);
   
   const today = new Date().toISOString().split('T')[0];
   let existingPuzzle = await getTodayPuzzle(today);

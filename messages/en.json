@@ -23,10 +23,21 @@
         "maintenance": "Pokesort is undergoing maintenance. Pleace hold for a bit!",
         "go-back": "Go back"
     },
+    "notices": {
+        "label": "Notices",
+        "previous": "Previous",
+        "next": "Next",
+        "empty": "There doesn't seem to be anything here..."
+    },
 
     "puzzle": {
-        "infinite": "Infinite Mode",
-        "infinite-generate": "Gerar Puzzle",
+        "infinite": {
+            "label": "Infinite Mode",
+            "generate": "Generate a Puzzle",
+            "exclude": "Ignore Categories",
+            "generation": "Generation Limit",
+            "button": "Generate"
+        },
         "logs": "Logs",
         "puzzle": "Puzzle",
         "dex": "Dex",
@@ -311,6 +322,23 @@
 
             "1": "Single-type",
             "2": "Dual-type"
+        }
+    },
+    "about": {
+        "about": {
+            "title": "About Pokesort",
+            "description": "Pokesort is a daily Pokémon associacion game created by fans to fans. We created it as a way to hone our abilities as web developers and contribute to our beloved community."
+        },
+        "team": {
+            "title": "Team",
+            "description": "",
+
+            "backend": "Puzzles & Backend",
+            "frontend": "UX Design & Frontend"
+        },
+        "support": {
+            "title": "Support Us",
+            "description": ""
         }
     }
 }

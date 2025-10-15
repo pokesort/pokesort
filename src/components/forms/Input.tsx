@@ -18,6 +18,7 @@ interface InputProps {
     required?: boolean;
     max?: number;
     defaultValue?: string | string[];
+    style?: React.CSSProperties;
     onInput?: () => void;
 }
 
@@ -52,7 +53,7 @@ export default React.memo(function Input({
         case 'number':
         case 'date':
             return (
-                <label className="form-label">
+                <label className="form-label" style={style}>
                     {label && <span>{label}</span>}
                     <input
                         className="inner-input"
@@ -107,7 +108,7 @@ export default React.memo(function Input({
             }, [field.value, options]);
 
             return (
-                <div className="form-label" ref={selectWrapper} onFocus={() => setOpen(true)}>
+                <div className="form-label" ref={selectWrapper} onFocus={() => setOpen(true)} style={style}>
                     {label && <span>{label}</span>}
                     <input
                         className="inner-input"
@@ -154,7 +155,7 @@ export default React.memo(function Input({
 
         case 'cloud':
             return (
-                <div className="form-label">
+                <div className="form-label" style={style}>
                     {label && <span>{label}</span>}
                     <ul className="checkbox-cloud">
                         {Object.keys(options).map((value: string) => (

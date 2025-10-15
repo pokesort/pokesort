@@ -3,7 +3,11 @@
 :root {
     scroll-behavior: smooth;
     max-width: 100vw;
-    // overflow: none;
+
+    --spacing: .5rem;
+    @media(max-width: 768px) {
+        --spacing: .35rem;
+    }
 }
 
 html {
@@ -94,9 +98,7 @@ input {
     caret-color: color(text2);
 }
 
-section#page {
-    --spacing: .5rem;
-
+section#page {   
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -108,10 +110,6 @@ section#page {
     padding: 0 var(--spacing);
   
     color: color(text1);
-
-    @media(max-width: 768px) {
-        --spacing: .35rem;
-    }
 }
 
 .disable-select {
@@ -125,7 +123,7 @@ section#page {
 .window-container {
     display: flex;
     flex-direction: column;
-    width: min(100%, 400px);
+    min-width: min(100%, 400px);
     background-color: color(section1);
 
     gap: var(--spacing);
@@ -137,6 +135,9 @@ section#page {
         height 0.3s ease
         width 0.3s ease;
 
+    &:not(.free-size) {
+        width: min(100%, 400px);
+    }
     &:not(:has(section.puzzle)) {
         height: 100%;
     }

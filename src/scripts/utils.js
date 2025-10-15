@@ -1,6 +1,6 @@
 export const FIELD_OPTIONS = {
-  types: { min: 1, max: 18 }, 
-  color: ['red', 'blue', 'green', 'yellow', 'black', 'brown', 'gray', 'pink', 'purple', 'white'],
+  types: { min: 1, max: 18 },
+  // color: ['red', 'blue', 'green', 'yellow', 'black', 'brown', 'gray', 'pink', 'purple', 'white'],
   region: ['kanto', 'johto', 'hoenn', 'sinnoh', 'unova', 'kalos', 'alola', 'galar', 'hisui', 'paldea'],
   shape: ['armor', 'wings', 'quadruped', 'ball', 'squiggle', 'fish', 'arms', 'blob', 'upright', 'legs', 'heads', 'bug-wings', 'humanoid', 'tentacles'],
   egg_groups: ['monster', 'dragon', 'field', 'water1', 'bug', 'flying', 'ground', 'fairy', 'plant', 'humanshape', 'water3', 'mineral', 'indeterminate', 'water2', 'ditto', 'dragon', 'no-eggs'],
@@ -19,8 +19,61 @@ export const FIELD_OPTIONS = {
   dual: { min: 1, max: 2 },
 };
 
+// Estrutura de desafios por nível com campos disponíveis
+export const CHALLENGE_FIELDS = {
+  1: {
+    types: { min: 1, max: 18 },
+    // color: ['red', 'blue', 'green', 'yellow', 'black', 'brown', 'gray', 'pink', 'purple', 'white'],
+    region: ['kanto', 'johto', 'hoenn', 'sinnoh', 'unova', 'kalos', 'alola', 'galar', 'hisui', 'paldea'],
+    generation: { min: 1, max: 9 },
+    form: ['first', 'middle', 'final'],
+    dual: { min: 1, max: 2 }
+  },
+  2: {
+    types: { min: 1, max: 18 },
+    color: ['red', 'blue', 'green', 'yellow', 'black', 'brown', 'gray', 'pink', 'purple', 'white'],
+    region: ['kanto', 'johto', 'hoenn', 'sinnoh', 'unova', 'kalos', 'alola', 'galar', 'hisui', 'paldea'],
+    generation: { min: 1, max: 9 },
+    form: ['first', 'middle', 'final'],
+    dual: { min: 1, max: 2 },
+    others: { min: 1, max: 2 },
+    step: ['no_line', 'has_split', 'is_split'],
+  },
+  3: {
+    types: { min: 1, max: 18 },
+    color: ['red', 'blue', 'green', 'yellow', 'black', 'brown', 'gray', 'pink', 'purple', 'white'],
+    region: ['kanto', 'johto', 'hoenn', 'sinnoh', 'unova', 'kalos', 'alola', 'galar', 'hisui', 'paldea'],
+    generation: { min: 1, max: 9 },
+    form: ['first', 'middle', 'final'],
+    dual: {min: 1, max: 2},
+    others: { min: 1, max: 2 },
+    step: ['no_line', 'has_split', 'is_split'],
+    weak: { min: 1, max: 18 },
+    strong: { min: 1, max: 18 },
+    methods: { min: 1, max: 11 },
+  },
+  4: {
+    types: { min: 1, max: 18 },
+    color: ['red', 'blue', 'green', 'yellow', 'black', 'brown', 'gray', 'pink', 'purple', 'white'],
+    region: ['kanto', 'johto', 'hoenn', 'sinnoh', 'unova', 'kalos', 'alola', 'galar', 'hisui', 'paldea'],
+    generation: { min: 1, max: 9 },
+    form: ['first', 'middle', 'final'],
+    dual: { min: 1, max: 2 },
+    others: { min: 1, max: 2 },
+    step: ['no_line', 'has_split', 'is_split'],
+    weak: { min: 1, max: 18 },
+    strong: { min: 1, max: 18 },
+    methods: { min: 1, max: 11 },
+    abilities: { min: 1, max: 307 },
+    moves: { min: 1, max: 919 },
+    categories: { min: 1, max: 17 },
+    shape: ['armor', 'wings', 'quadruped', 'ball', 'squiggle', 'fish', 'arms', 'blob', 'upright', 'legs', 'heads', 'bug-wings', 'humanoid', 'tentacles'],
+    egg_groups: ['monster', 'dragon', 'field', 'water1', 'bug', 'flying', 'ground', 'fairy', 'plant', 'humanshape', 'water3', 'mineral', 'indeterminate', 'water2', 'ditto', 'dragon', 'no-eggs'],
+  }
+};
+
 export const MAX_SELECT = {
-  types: 2, 
+  types: 2,
   color: 1,
   region: 1,
   shape: 1,
@@ -64,16 +117,6 @@ export const pickRandom = (array, count = 1) => {
   return result;
 };
 
-export const removeFieldValue = (obj, key, valueToRemove) => {
-
-  const target = obj[key];
-  obj[key] = target.filter(v => v !== valueToRemove);
-
-  if (obj[key].length === 0) {
-    delete obj[key];
-  }
-}
-
 export function pickRandomMult(array, count = 1) {
   const shuffled = array.sort(() => 0.5 - Math.random());
   return shuffled.slice(0, count);
@@ -90,33 +133,110 @@ export const getRandomFieldValue = (field, fields) => {
   }
 };
 
+export function validateGenerateParams(params) {
+  const { amount, password, rows, cols, challenge, generation, infinite } = params;
+  const errors = [];
+
+  if (!amount || amount > 30 || amount < 1) {
+    errors.push('Quantidade máxima de puzzles deve ser um número entre 1 e 30');
+  }
+
+  if (!infinite && (!password || password !== process.env.AUTHORIZATION_BATCH)) {
+    errors.push('Senha inválida');
+  }
+
+  if (generation && (generation < 1 || generation > 9)) {
+    errors.push('Geração máxima inválida');
+  }
+
+  const validDifficulties = ['1', '2', '3', '4'];
+  if (!challenge || !validDifficulties.includes(challenge)) {
+    errors.push('Nível de desafio inválido para essa liga pokemon');
+  }
+
+  const { finalRows, finalCols } = getGridSize(challenge, rows, cols);
+
+  if (errors.length > 0) {
+    return {
+      error: errors.join('; '),
+      status: 400
+    };
+  }
+
+  return {
+    amount,
+    rows: finalRows,
+    cols: finalCols,
+    challenge,
+    generation,
+    infinite
+  };
+}
+
+export function getGridSize(challenge, rows, cols) {
+  const challengeConfigs = {
+    1: [
+      { rows: 4, cols: 4 }
+    ],
+    2: [
+      { rows: 4, cols: 5 },
+      { rows: 5, cols: 4 }
+    ],
+    3: [
+      { rows: 4, cols: 6 },
+      { rows: 5, cols: 5 }
+    ],
+    4: [
+      { rows: 5, cols: 6 }
+    ]
+  };
+
+  let finalRows = rows;
+  let finalCols = cols;
+
+  if (!rows || !cols) {
+    const availableConfigs = challengeConfigs[challenge];
+    if (availableConfigs && availableConfigs.length > 0) {
+
+      const randomConfig = availableConfigs[Math.floor(Math.random() * availableConfigs.length)];
+      finalRows = randomConfig.rows;
+      finalCols = randomConfig.cols;
+    } else {
+      finalRows = 4;
+      finalCols = 4;
+    }
+  }
+
+  return { finalRows, finalCols };
+}
+
 export const toTitleCase = (str) => {
   if (!str || typeof str !== 'string') {
     return "";
   }
 
   str = str.replaceAll('-', ' ');
-  
+
   return str.toLowerCase().split(' ')
-    .map(word => {      
+    .map(word => {
       return word.charAt(0).toUpperCase() + word.slice(1);
     }).join(' ');
 }
 
-export function formatDate(inputDate, locale, full=true) {
-    const date = new Date(`${inputDate}T00:00:00`);
-    if (full) {
-      return date.toLocaleDateString(locale, {
-          day: '2-digit',
-          month: 'long',
-          year: 'numeric'
-      });
-    } else {
-      return date.toLocaleDateString(locale, {
-          day: '2-digit',
-          month: 'long'
-      });
-    }
+export function formatDate(inputDate, locale, full = true) {
+  const date = new Date(`${inputDate}T00:00:00`);
+  if (full) {
+    return date.toLocaleDateString(locale, {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    });
+  } else {
+    return date.toLocaleDateString(locale, {
+      day: '2-digit',
+      month: 'long'
+    });
+  }
 }
 
 export function isYesterday(inputStr, todayStr) {
@@ -134,15 +254,15 @@ export function includesAnySubstring(mainString, substrings) {
 }
 
 export function shuffleArray(array) {
-    return [...array].sort(() => Math.random() - 0.5);
+  return [...array].sort(() => Math.random() - 0.5);
 }
 
 export function generateTips(ids, queries) {
   const pokemons = pickRandomMult(ids, Math.floor(ids.length / 2));
-  
+
   queries = queries.slice(1);
   queries = queries.split('&');
-  
+
   const text = pickRandom(queries)[0];
   const values = pokemons;
 
@@ -164,12 +284,12 @@ export function decodeTips(tip) {
   }
 }
 
-export function compareArrays (a, b) {
-  if (a.length !== b.length) return false;
-  return a.slice().sort().every((val, i) => val === b.slice().sort()[i]);
-}
-
-export function isMobile () {
+export function isMobile() {
   const userAgent = navigator.userAgent || navigator.vendor || window.opera;
   return /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
 };
+
+export function compareArrays(a, b) {
+  if (a.length !== b.length) return false;
+  return a.slice().sort().every((val, i) => val === b.slice().sort()[i]);
+}

@@ -1,0 +1,27 @@
+@use "../abstract" as *;
+
+li.notice-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.25rem 0;
+
+    h4 {
+        font-size: text(large);
+        text-align: center;
+
+        span {
+            font-size: text(base);
+            font-weight: 600;
+            color: color(text2);
+            text-align: center;
+        }
+    }
+}
+
+p.notices-empty {
+    color: color(text2);
+    width: 100%;
+    text-align: center;
+    padding: 5rem 0;
+}
