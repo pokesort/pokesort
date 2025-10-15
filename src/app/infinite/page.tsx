@@ -11,6 +11,7 @@ import Input from '@/src/components/forms/Input';
 import GridIcon from '@/src/components/svg/GridIcon';
 import Loading from '@/src/components/Loading';
 import { useForm } from 'react-hook-form';
+import ChallengeSelect from '@/src/components/forms/ChallengeSelect';
 
 export default function InfinitePage() {
     const t = useTranslations();
@@ -136,7 +137,8 @@ export default function InfinitePage() {
                 <div style={{display: 'flex', flexDirection: 'column', maxWidth: '500px', gap: '0.5rem'}}>
                     <div style={{display: 'flex', flexDirection: 'row', width: '100%', gap: '0.5rem', flex: "1"}}>
                         <Input type="select" style={{width: "100%"}} label={t(`puzzle.infinite.generation`)} name="generation" defaultValue="9" options={gen_options} form={form} />
-                        <Input type="select" style={{width: "100%"}} label={t(`puzzle.challenge.label`)} name="challenge" defaultValue="1" options={challenge_options} form={form} />
+                        {/* <Input type="select" style={{width: "100%"}} label={t(`puzzle.challenge.label`)} name="challenge" defaultValue="1" options={challenge_options} form={form} /> */}
+                        <ChallengeSelect minimal={true} label={t(`puzzle.challenge.label`)} style={{width: "100%"}} defaultValue="1" options={challenge_options} form={form} />
                     </div>
                     <Input type="cloud" label={t('puzzle.infinite.exclude')} name="excludeFields" options={exclude_options} form={form} />
                 </div>
