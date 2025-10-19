@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import "@/src/styles/components/Modal.scss";
 import CloseIcon from './svg/CloseIcon';
+import { createPortal } from 'react-dom';
 
 interface ModalProps {
     id: string;
@@ -21,8 +22,14 @@ export default function Modal({ id, title=undefined, background=true, isOpen, se
     const handleModalClick = (event: React.MouseEvent) => {
         event.stopPropagation();
     }
+
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+    if (!mounted) return null;
     
-    return (
+    return createPortal(
         <div className={`modal-background ${background ? 'filter': ''}`} onClick={closeModal}>
             <section id={id} className={`modal ${isOpen ? 'open' : ''}`} onClick={handleModalClick}>
                 <div className="modal-header">
@@ -42,5 +49,5 @@ export default function Modal({ id, title=undefined, background=true, isOpen, se
                 </div>
             </section>
         </div>
-    );
+    , document.body);
 }

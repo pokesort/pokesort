@@ -10,6 +10,7 @@ export default async function handler(req, res) {
   try {
     const validatedParams = validateGenerateParams(req.query);
     if (validatedParams.error) {
+      
       return res.status(validatedParams.status).json({ error: validatedParams.error });
     }
     const { amount, rows, cols, challenge, generation, infinite } = validatedParams;
@@ -21,26 +22,20 @@ export default async function handler(req, res) {
     const { excludeFields } = req.body;
 
     for (let i = 0; i < amount; i++) {
-      const idsUsed = [];
-      const puzzle = await generatePuzzle(rows, cols, challenge, fieldManager, generation, idsUsed);
+      const puzzle = await generatePuzzle(rows, cols, challenge, fieldManager, generation);
+      
       puzzles.push(puzzle);
       fieldManager.reset();
     }
 
     if (infinite) {
       const dictionary = await populate(res, puzzles[0]);
-      return res.status(200).json({ success: true, data: puzzles[0], dictionary: dictionary });
+      const challenges = {};
+      challenges[puzzles[0].challenge] = "true";
+      return res.status(200).json({ success: true, data: puzzles[0], dictionary: dictionary, challenges: challenges });
     }
 
     return res.status(200).json({
-      message: 'Parâmetros validados com sucesso',
-      data: {
-        amount,
-        challenge,
-        rows,
-        cols,
-        generation
-      },
       puzzles: puzzles,
     });
 
@@ -50,8 +45,9 @@ export default async function handler(req, res) {
   }
 }
 
-export async function generatePuzzle(rows, cols, challenge, fieldManager, generation, idsUsed) {
+export async function generatePuzzle(rows, cols, challenge, fieldManager, generation) {
   const groups = [];
+  const idsUsed = [];
   for (let i = 0; i < rows; i++) {
     const group = await generateGroup(cols, fieldManager, generation, idsUsed);
     groups.push(group);

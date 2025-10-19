@@ -53,10 +53,7 @@ export default React.memo(function Notices({noticesOpen, setNoticesOpen}: Notice
                 const [noticesData] = await Promise.all([
                     noticesResponse.json(),
                 ]);
-
-                if (process.env.NODE_ENV === "development") {
-                    console.log(noticesData.notices);
-                }
+                
                 setNotices(noticesData.notices);
                 updateLatestSeen(noticesData.notices[0] ?? null);
             } catch (e) {
