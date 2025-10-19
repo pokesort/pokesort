@@ -56,7 +56,6 @@ export default function PuzzlePage() {
                 if (process.env.NODE_ENV === "development") {
                     console.log(puzzleData.data);
                     console.log(puzzleData.dictionary);
-                    console.log(puzzleData.challenges);
                 }
                 setPuzzle(puzzleData.data);
                 setDictionary(puzzleData.dictionary);

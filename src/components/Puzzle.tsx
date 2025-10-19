@@ -688,8 +688,6 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
         if (puzzle && challengeWatch && challengeWatch != puzzle?.challenge && challenges && setSlug != undefined) {
             setSlug(challenges[challengeWatch]);
             refreshPuzzle();
-            console.log("Click reload");
-            console.log(challengeWatch);
         }
     }, [challengeWatch])
     
@@ -740,25 +738,25 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
     useEffect(() => {
         if (puzzle && type != 'infinite') {
             loaded.current = loadState(puzzle._id || '');
-            console.log("Loaded state");
         } else {
             loaded.current = false;
+            return;
         }
-        // setTimeout(() => {
-        //     scrollToTab(1, 'instant');
-        //     setLoading(false);
-        //     setRefresh(prev => !prev);
-        // }, 0);
-    }, [puzzle])    
+
+        const timer = setTimeout(() => {
+            scrollToTab(1, 'instant');
+        }, 0);
+
+        return () => clearTimeout(timer);
+
+    }, [puzzle])
 
     useEffect(() => {
         const handleResize = () => {
             scrollToTab(1, 'instant');
-            setRefresh(prev => !prev);
         };
 
         window.addEventListener("resize", handleResize);
-        handleResize();
 
         return () => {
             window.removeEventListener("resize", handleResize);
@@ -781,12 +779,12 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
             randomShinies();
     }, [pokemons])
 
-    const scrollToTab = (target: number, behavior: ('smooth' | 'instant') = 'smooth') => {
-        if (target !== visibleTab) {
+    const scrollToTab = useCallback((target: number, behavior: ('smooth' | 'instant') = 'smooth') => {
+        if (target !== visibleTab || behavior == 'instant') {
             const tab = document.querySelector(`.puzzle-tab[data-tab="${target}"]`) as HTMLElement;
             if (tab) tab.scrollIntoView({ behavior: behavior, block: 'center' });
         }
-    }
+    }, [visibleTab])
 
     const tabsHeight = useMemo(() => {
        return mainTabRef.current?.offsetHeight;

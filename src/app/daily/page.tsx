@@ -68,7 +68,6 @@ export default function Daily() {
     }, [refresh])
 
     const refreshPuzzle = () => {
-        console.log("Reload by page");
         setRefresh(prev => !prev);
     }
 
