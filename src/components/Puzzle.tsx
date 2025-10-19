@@ -685,7 +685,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
     }
 
     useEffect(() => {
-        if (puzzle && challengeWatch != puzzle?.challenge && challenges && setSlug != undefined) {
+        if (puzzle && challengeWatch && challengeWatch != puzzle?.challenge && challenges && setSlug != undefined) {
             setSlug(challenges[challengeWatch]);
             refreshPuzzle();
             console.log("Click reload");
