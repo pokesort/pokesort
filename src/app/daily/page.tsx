@@ -37,7 +37,6 @@ export default function Daily() {
                     throw new Error('Não conseguimos encontrar este puzzle...');
                 }
                 const query = slugState ?? `${slug}?challenge=${getPreferredChallenge() ?? "1"}`;
-                console.log(query);
                 const [puzzleResponse] = await Promise.all([
                     fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/puzzle/${query}`, {
                         method: 'GET', headers
@@ -69,6 +68,7 @@ export default function Daily() {
     }, [refresh])
 
     const refreshPuzzle = () => {
+        console.log("Reload by page");
         setRefresh(prev => !prev);
     }
 
