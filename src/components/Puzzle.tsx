@@ -738,14 +738,16 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
     useEffect(() => {
         if (puzzle && type != 'infinite') {
             loaded.current = loadState(puzzle._id || '');
+            console.log("Should be loaded here");
         } else {
             loaded.current = false;
         }
         setTimeout(() => {
             scrollToTab(1, 'instant');
             setLoading(false);
+            setRefresh(prev => !prev);
         }, 0);
-    }, [puzzle])
+    }, [puzzle])    
 
     useEffect(() => {
         const handleResize = () => {
