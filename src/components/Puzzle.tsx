@@ -688,6 +688,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
         if (puzzle && challengeWatch != puzzle?.challenge && challenges && setSlug != undefined) {
             setSlug(challenges[challengeWatch]);
             refreshPuzzle();
+            console.log("Click reload");
         }
     }, [challengeWatch])
     
@@ -738,15 +739,15 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
     useEffect(() => {
         if (puzzle && type != 'infinite') {
             loaded.current = loadState(puzzle._id || '');
-            console.log("Should be loaded here");
+            console.log("Loaded state");
         } else {
             loaded.current = false;
         }
-        setTimeout(() => {
-            scrollToTab(1, 'instant');
-            setLoading(false);
-            setRefresh(prev => !prev);
-        }, 0);
+        // setTimeout(() => {
+        //     scrollToTab(1, 'instant');
+        //     setLoading(false);
+        //     setRefresh(prev => !prev);
+        // }, 0);
     }, [puzzle])    
 
     useEffect(() => {
@@ -756,6 +757,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
         };
 
         window.addEventListener("resize", handleResize);
+        handleResize();
 
         return () => {
             window.removeEventListener("resize", handleResize);
