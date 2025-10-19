@@ -26,6 +26,8 @@ import DexIcon from '@/src/components/svg/DexIcon';
 import helpLogsImage from '@/src/assets/images/help_logs.png';
 import DexView from './DexView';
 import PokeSprite from './PokeSprite';
+import ChallengeSelect from './forms/ChallengeSelect';
+import { useForm } from 'react-hook-form';
 
 const streakKey = 'u_dailystreak';
 const infiniteCount = 'u_infinitecount';
@@ -82,14 +84,15 @@ const SolvedGroupsGrid = ({groups, dictionary}: SolvedGroupsGridProps) => {
 interface VictoryModalProps {
     type: 'daily' | 'infinite',
     guesses: PuzzleGuess[],
+    challenge?: string | null;
     shinies: number[];
     dateOg: string | undefined,
     victoryOpen: boolean,
     setVictoryOpen: React.Dispatch<React.SetStateAction<boolean>>
-    refreshInfinite?: () => void;
+    refreshPuzzle?: () => void;
 }
 
-const VictoryModal = React.memo(({type, guesses, shinies, dateOg, victoryOpen, setVictoryOpen, refreshInfinite}: VictoryModalProps) => {
+const VictoryModal = React.memo(({type, challenge=null, guesses, shinies, dateOg, victoryOpen, setVictoryOpen, refreshPuzzle}: VictoryModalProps) => {
     const t = useTranslations('puzzle');
     const locale = useLocale();
     const date = formatDate(dateOg, locale, false);
@@ -128,7 +131,10 @@ const VictoryModal = React.memo(({type, guesses, shinies, dateOg, victoryOpen, s
     const shareButton = () => {
         const url = window.location.href;
         const emojis = getGuessEmojis();
-        let text = `Pokesort · ${type == 'daily' ? formatDate(dateOg, locale, false) : t('puzzle.infinite.labe.')}`
+        let text = `Pokesort · ${type == 'daily' ? formatDate(dateOg, locale, false) : t('infinite.label')}`
+        if (challenge !+ null) {
+            text += ` · ⭐${t(`challenge.${challenge}`)}`
+        }
         if (type == 'daily' && streak > 1) {
             text += ` · 🔥${streak}`
         }
@@ -210,8 +216,8 @@ const VictoryModal = React.memo(({type, guesses, shinies, dateOg, victoryOpen, s
                 </>
             ) : (
                 <>
-                    {refreshInfinite &&
-                        <button className="modal-content-div" onClick={ () => {refreshInfinite(); setVictoryOpen(false)} }>
+                    {refreshPuzzle &&
+                        <button className="modal-content-div" onClick={ () => {refreshPuzzle(); setVictoryOpen(false)} }>
                             <p>{t(`victory.generate`)}</p>
                         </button>
                     }
@@ -605,23 +611,27 @@ interface PuzzleProps {
     setPuzzle: (puzzle: PuzzleData) => void;
     type: 'daily' | 'infinite';
     dictionary: any;
+    challenges?: any;
     loading: boolean;
     setLoading: (loading: boolean) => void;
     error: string | null;
     setError: (error: string | null) => void;
-    refreshInfinite?: () => void;
+    refreshPuzzle: () => void;
+    setSlug?: (slug: string) => void;
 }
 
-export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, loading, setLoading, error, setError, refreshInfinite}: PuzzleProps) {
+export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, challenges=null, loading, setLoading, error, setError, refreshPuzzle, setSlug}: PuzzleProps) {
     const t = useTranslations('puzzle');
     const locale = useLocale();
     const maxAvailableTips = 2;
+    const form = useForm();
 
     const mainTabRef = useRef<HTMLDivElement>(null);
     const spritesMap = useRef<Record<number, string>>({});
     const allTips = useRef<PuzzleTip[]>([]);
     const viewedTips = useRef<number[]>([]);
     const loaded = useRef<boolean | null>(null);
+    const challengeWatch = form.watch("challenge");
 
     const saveState = (id: string) => {
         if (id == '') return;
@@ -634,6 +644,10 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
             tips: {uses: availableTips, seen: viewedTips.current},
             shiny: shinies
         };
+        
+        if (process.env.NODE_ENV === "development") {
+            console.log(`Estado salvo para puzzle ${id}`);
+        }
 
         localStorage.setItem(`s_${id}`, JSON.stringify(state));
     }
@@ -669,6 +683,13 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
         return true;
 
     }
+
+    useEffect(() => {
+        if (puzzle && challengeWatch != puzzle?.challenge && challenges && setSlug != undefined) {
+            setSlug(challenges[challengeWatch]);
+            refreshPuzzle();
+        }
+    }, [challengeWatch])
     
     const [guesses, setGuesses] = useState<PuzzleGuess[]>([]);
     const [forcedGuesses, setForcedGuesses] = useState<PuzzleGuess[]>([]);
@@ -677,6 +698,8 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
     const [pause, setPause] = useState<boolean>(false);
     const [pokemons, setPokemons] = useState<any>([]);
     const [shinies, setShinies] = useState<number[]>([]);
+    const [challengeOptions, setChallengeOptions] = useState<Record<string, string>>();
+
     const [victoryOpen, setVictoryOpen] = useState<boolean>(false);
     const [customGroupsOpen, setCustomGroupsOpen] = useState<boolean>(false);
     const [mountVictoryModal, setMountVictoryModal] = useState<boolean>(false);
@@ -695,6 +718,16 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
     }, [dictionary]);
 
     useEffect(() => {
+        if (challenges != null) {
+            let newChallengeOptions: Record<string, string> = {};
+            Object.keys(challenges).map((key: string) => {
+                newChallengeOptions[key] = t(`challenge.${key}`);
+            })
+            setChallengeOptions(newChallengeOptions);
+        }
+    }, [challenges]);
+
+    useEffect(() => {
         setMountVictoryModal(true);
     }, [victoryOpen]);
 
@@ -705,6 +738,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
     useEffect(() => {
         if (puzzle && type != 'infinite') {
             loaded.current = loadState(puzzle._id || '');
+            console.log("Should be loaded here");
         } else {
             loaded.current = false;
         }
@@ -796,12 +830,13 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
             {mountVictoryModal &&
                 <VictoryModal
                     type={type}
+                    challenge={puzzle ? puzzle.challenge : null}
                     guesses={guesses}
                     shinies={shinies}
                     dateOg={puzzle?.date}
                     victoryOpen={victoryOpen}
                     setVictoryOpen={setVictoryOpen}
-                    refreshInfinite={refreshInfinite}
+                    refreshPuzzle={refreshPuzzle}
                 />
             }
             <ul className="puzzle-tabs-container" style={{'--height': `${tabsHeight}px`, '--cols': puzzle ? puzzle.cols : 4, '--rows': puzzle ? puzzle.rows : 4} as React.CSSProperties}>
@@ -827,6 +862,9 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
                     </div>
                 </PuzzleTab> : <div></div>}
                 <PuzzleTab setVisibleTab={setVisibleTab} tab={1}>
+                    {challenges != null &&
+                        <ChallengeSelect minimal={false} infinite={type == 'infinite'} label={t(`challenge.label`)} style={{width: "100%"}} defaultValue={puzzle ? puzzle.challenge : "1"} options={challengeOptions} form={form} />
+                    }
                     <div className="window-container puzzle-window cut-left" ref={mainTabRef}>
                         <section className="window-info-row">
                             {!loading && <>

@@ -4,9 +4,12 @@ import Puzzle from '@/src/components/Puzzle';
 import type { PuzzleData } from '@/src/assets/types/PuzzleApiResponse';
 import { useEffect, useState } from 'react';
 import { notFound, redirect, useParams } from 'next/navigation';
+import Loading from '@/src/components/Loading';
+
+const challengeKey = 'u_challenge';
 
 export default function PuzzlePage() {
-    const params = useParams();
+    const params = useParams();    
     const slug = params?.slug as string;
 
     if (slug === 'daily')
@@ -14,9 +17,16 @@ export default function PuzzlePage() {
 
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [refresh, setRefresh] = useState<boolean>(false);
 
     const [puzzle, setPuzzle] = useState<PuzzleData>();
     const [dictionary, setDictionary] = useState<any>();
+    const [challenges, setChallenges] = useState<any>();
+    const [slugState, setSlugState] = useState<string>();
+
+    const getPreferredChallenge = () => {
+        return localStorage.getItem(challengeKey);
+    }
 
     useEffect(() => {
         setLoading(true);
@@ -30,8 +40,9 @@ export default function PuzzlePage() {
                 if (['get', '', null].includes(slug)) {
                     throw new Error('Não conseguimos encontrar este puzzle...');
                 }
+                const query = slugState ?? `${slug}?challenge=${getPreferredChallenge() ?? "1"}`;
                 const [puzzleResponse] = await Promise.all([
-                    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/puzzle/${slug}`, {
+                    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/puzzle/${query}`, {
                         method: 'GET', headers
                     }),
                 ]);
@@ -45,30 +56,50 @@ export default function PuzzlePage() {
                 if (process.env.NODE_ENV === "development") {
                     console.log(puzzleData.data);
                     console.log(puzzleData.dictionary);
+                    console.log(puzzleData.challenges);
                 }
                 setPuzzle(puzzleData.data);
                 setDictionary(puzzleData.dictionary);
+                setChallenges(puzzleData.challenges);
             } catch (e) {
                 console.error(e);
                 setError('Não foi possível conectar ao servidor. Tente novamente.');
             } finally {                
-                // setLoading(false);
+                setLoading(false);
             }
         };
 
         fetchPageData();
-    }, [slug])
+    }, [refresh])
+
+    const refreshPuzzle = () => {
+        setRefresh(prev => !prev);
+    }
 
     return (
-        <Puzzle
-            puzzle={puzzle}
-            setPuzzle={setPuzzle}
-            type="daily"
-            dictionary={dictionary}
-            loading={loading}
-            setLoading={setLoading}
-            error={error}
-            setError={setError}
-        />
+        <>
+            {loading ?
+                <div className={`window-container cut-left`}>
+                    <section className="window-info-row">
+                        <p></p>
+                    </section>
+                    <Loading expand={true} />
+                </div>
+            :
+                <Puzzle
+                    puzzle={puzzle}
+                    setPuzzle={setPuzzle}
+                    type="daily"
+                    dictionary={dictionary}
+                    challenges={challenges}
+                    loading={loading}
+                    setLoading={setLoading}
+                    error={error}
+                    setError={setError}
+                    setSlug={setSlugState}
+                    refreshPuzzle={refreshPuzzle}
+                />
+            }
+        </>
     )
 }

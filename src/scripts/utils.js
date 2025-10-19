@@ -31,7 +31,7 @@ export const CHALLENGE_FIELDS = {
   },
   2: {
     types: { min: 1, max: 18 },
-    color: ['red', 'blue', 'green', 'yellow', 'black', 'brown', 'gray', 'pink', 'purple', 'white'],
+    // color: ['red', 'blue', 'green', 'yellow', 'black', 'brown', 'gray', 'pink', 'purple', 'white'],
     region: ['kanto', 'johto', 'hoenn', 'sinnoh', 'unova', 'kalos', 'alola', 'galar', 'hisui', 'paldea'],
     generation: { min: 1, max: 9 },
     form: ['first', 'middle', 'final'],
@@ -41,7 +41,7 @@ export const CHALLENGE_FIELDS = {
   },
   3: {
     types: { min: 1, max: 18 },
-    color: ['red', 'blue', 'green', 'yellow', 'black', 'brown', 'gray', 'pink', 'purple', 'white'],
+    // color: ['red', 'blue', 'green', 'yellow', 'black', 'brown', 'gray', 'pink', 'purple', 'white'],
     region: ['kanto', 'johto', 'hoenn', 'sinnoh', 'unova', 'kalos', 'alola', 'galar', 'hisui', 'paldea'],
     generation: { min: 1, max: 9 },
     form: ['first', 'middle', 'final'],
@@ -54,7 +54,7 @@ export const CHALLENGE_FIELDS = {
   },
   4: {
     types: { min: 1, max: 18 },
-    color: ['red', 'blue', 'green', 'yellow', 'black', 'brown', 'gray', 'pink', 'purple', 'white'],
+    // color: ['red', 'blue', 'green', 'yellow', 'black', 'brown', 'gray', 'pink', 'purple', 'white'],
     region: ['kanto', 'johto', 'hoenn', 'sinnoh', 'unova', 'kalos', 'alola', 'galar', 'hisui', 'paldea'],
     generation: { min: 1, max: 9 },
     form: ['first', 'middle', 'final'],
@@ -135,6 +135,7 @@ export const getRandomFieldValue = (field, fields) => {
 
 export function validateGenerateParams(params) {
   const { amount, password, rows, cols, challenge, generation, infinite } = params;
+  let challengeValue = parseInt(challenge);
   const errors = [];
 
   if (!amount || amount > 30 || amount < 1) {
@@ -149,14 +150,15 @@ export function validateGenerateParams(params) {
     errors.push('Geração máxima inválida');
   }
 
-  const validDifficulties = ['1', '2', '3', '4'];
-  if (!challenge || !validDifficulties.includes(challenge)) {
+  const validDifficulties = [1, 2, 3, 4];
+  if (!challenge || !validDifficulties.includes(challengeValue)) { 
     errors.push('Nível de desafio inválido para essa liga pokemon');
   }
 
   const { finalRows, finalCols } = getGridSize(challenge, rows, cols);
 
   if (errors.length > 0) {
+    console.log(errors);
     return {
       error: errors.join('; '),
       status: 400
