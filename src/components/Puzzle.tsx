@@ -689,6 +689,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
             setSlug(challenges[challengeWatch]);
             refreshPuzzle();
             console.log("Click reload");
+            console.log(challengeWatch);
         }
     }, [challengeWatch])
     
@@ -762,7 +763,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
         return () => {
             window.removeEventListener("resize", handleResize);
         };
-    }, [puzzle]);
+    }, []);
 
     useEffect(() => {
         const randomShinies = () => {
