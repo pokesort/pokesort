@@ -75,14 +75,21 @@
         cursor: pointer;
         height: 100%;
         gap: var(--spacing);
-        pointer-events: all;
-
-        p {
-            margin-top: 0.2rem;
-        }
+        pointer-events: all;        
 
         &.disabled {
             pointer-events: none;
+        }
+
+        @media (min-width: 768px) {
+            p {
+                margin-top: 0.2rem;
+            }
+        }
+        @media (max-width: 380px) {
+            svg, p {
+                display: none;
+            }
         }
     }
 

@@ -754,6 +754,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
     useEffect(() => {
         const handleResize = () => {
             scrollToTab(1, 'instant');
+            setRefresh(prev => !prev);
         };
 
         window.addEventListener("resize", handleResize);
