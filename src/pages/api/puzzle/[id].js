@@ -11,6 +11,7 @@ export default async function handler(req, res) {
   const Puzzle = getPuzzleModel(data);
 
   let existingPuzzle;
+  const today = new Date().toISOString().split('T')[0];
   const date = new Date(`${id}T00:00:00`);
   
   if (!isNaN(date) && date <= Date.now()) {
@@ -38,10 +39,11 @@ export default async function handler(req, res) {
     await remove(res, existingPuzzle);
   }
   else if (req.method === 'GET'){
-    existingPuzzle.daily = daily == true;
+    const puzzleObject = existingPuzzle.toObject();
+    puzzleObject.daily = daily == "true" || puzzleObject.date == today;
     const challenges = await findPuzzlesOfSameDate(existingPuzzle, Puzzle);
     const dictionary = await populate(res, existingPuzzle);
-    return res.status(200).json({success: true, data: existingPuzzle, dictionary: dictionary, challenges: challenges})
+    return res.status(200).json({success: true, data: puzzleObject, dictionary: dictionary, challenges: challenges})
   }
 }
 
