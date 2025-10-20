@@ -36,7 +36,7 @@ export default function Daily() {
                 if (['get', '', null].includes(slug)) {
                     throw new Error('Não conseguimos encontrar este puzzle...');
                 }
-                const query = slugState ?? `${slug}?challenge=${getPreferredChallenge() ?? "1"}`;
+                const query = slugState ? `${slugState}?daily=true` : `${slug}?challenge=${getPreferredChallenge() ?? "1"}`;
                 const [puzzleResponse] = await Promise.all([
                     fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/puzzle/${query}`, {
                         method: 'GET', headers
