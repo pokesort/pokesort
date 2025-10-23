@@ -48,7 +48,7 @@ const recordStreak = (today: string) => {
     let streakObj = streak != '' ? JSON.parse(streak) : {latest: '', streak: 0};
     if (isYesterday(streakObj.latest, today)) {
         streakObj.streak += 1;
-    } else {
+    } else if (streakObj.latest != today) {
         streakObj.streak = 1;
     }
     streakObj.latest = today;
