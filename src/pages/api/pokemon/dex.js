@@ -1,11 +1,8 @@
 import { connect, getDb } from "@/lib/mongodb";
-import { pipe } from "framer-motion";
-import { pipeline } from "stream";
 
 export default async function handler(req, res) {
   try {
     await connect();
-    const db = getDb();
 
     const { id } = req.query;
 
@@ -283,7 +280,7 @@ export default async function handler(req, res) {
     ];
   }
 
-  async function hasEvolutionStep(id_dex) {
+  async function hasEvolutionStep(id_dex, db) {
     const poke = await db.db.collection("pokemon").findOne(
       { $or: [{ id: Number(id_dex) }, { name: id_dex }] },
       { projection: { evolution_step: 1 } }
@@ -291,7 +288,7 @@ export default async function handler(req, res) {
     return poke?.evolution_step != null;
   }
 
-  async function getTypeMachups(result_object) {
+  async function getTypeMachups(result_object, db) {
     let matchups = {};
     let typeIds = result_object.types;
 
@@ -319,7 +316,8 @@ export default async function handler(req, res) {
   // Função principal
   async function getDexData(id_dex) {
 
-    const hasEvo = await hasEvolutionStep(id_dex);
+    const db = getDb();
+    const hasEvo = await hasEvolutionStep(id_dex, db);
 
     const pipeline = [
       ...matchPokemonStage(id_dex),
@@ -336,7 +334,7 @@ export default async function handler(req, res) {
       .aggregate(pipeline)
       .toArray();
 
-    const object = await getTypeMachups(result[0]);
+    const object = await getTypeMachups(result[0], db);
 
     return object;
   }
