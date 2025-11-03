@@ -20,7 +20,16 @@ export default async function handler(req, res) {
 
     const puzzles = [];
     const fieldManager = createPuzzleFieldManager(challenge);
-    const { excludeFields } = req.body;
+    const { excludeFields } = req.body || {};
+    if (excludeFields) {
+      const list = Array.isArray(excludeFields) ? excludeFields : [excludeFields];
+      for (const f of list) {
+        if (f in fieldManager.availableFields) {
+          delete fieldManager.availableFields[f];
+        }
+        fieldManager.markFieldAsUsed(f);
+      }
+    }
 
     for (let i = 0; i < amount; i++) {
       const puzzle = await generatePuzzle(rows, cols, challenge, fieldManager, generation);
