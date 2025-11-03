@@ -211,64 +211,70 @@ export async function handlerOtherForms(others, filter) {
   filter.is_default = others == 1 ? true : false;
 }
 
-export async function handlerRelationTo(typeId, expression) {
+export async function handlerRelationTo(typeIdsOrSingle, expression) {
   const db = getDb();
 
-  const pipeline = [
-    {
-      $lookup: {
-        from: "types",
-        localField: "types",
-        foreignField: "id",
-        as: "type_data"
-      }
-    },
-    {
-      $project: {
-        id: 1,
-        name: 1,
-        species_name: 1,
-        types: 1,
-        multipliers: {
-          $map: {
-            input: "$type_data",
-            as: "type",
-            in: {
-              $ifNull: [`$$type.matchups.${typeId}`, 1] // fallback para 1 se não existir
+  const toArray = (v) => (Array.isArray(v) ? v : [v]);
+  const typeIds = toArray(typeIdsOrSingle);
+
+  async function getIdsForType(typeId) {
+    const pipeline = [
+      {
+        $lookup: {
+          from: "types",
+          localField: "types",
+          foreignField: "id",
+          as: "type_data"
+        }
+      },
+      {
+        $project: {
+          id: 1,
+          name: 1,
+          species_name: 1,
+          types: 1,
+          multipliers: {
+            $map: {
+              input: "$type_data",
+              as: "type",
+              in: {
+                $ifNull: [`$$type.matchups.${typeId}`, 1]
+              }
             }
           }
         }
-      }
-    },
-    {
-      $addFields: {
-        total_multiplier: {
-          $reduce: {
-            input: "$multipliers",
-            initialValue: 1,
-            in: { $multiply: ["$$value", "$$this"] }
+      },
+      {
+        $addFields: {
+          total_multiplier: {
+            $reduce: {
+              input: "$multipliers",
+              initialValue: 1,
+              in: { $multiply: ["$$value", "$$this"] }
+            }
           }
         }
+      },
+      {
+        $match: {
+          total_multiplier: expression
+        }
+      },
+      {
+        $project: { _id: 0, id: 1 }
       }
-    },
-    {
-      $match: {
-        total_multiplier: expression
-      }
-    },
-    {
-      $project: {
-        _id: 0,
-        id: 1
-      }
-    }
-  ];
+    ];
 
-  const results = await db.db.collection("pokemon").aggregate(pipeline).toArray();
+    const results = await db.db.collection("pokemon").aggregate(pipeline).toArray();
+    return results.map((p) => p.id);
+  }
 
-  const ids = results.map(p => p.id);
+  const lists = await Promise.all(typeIds.map((t) => getIdsForType(t)));
+  if (lists.length === 0) return [];
+  if (lists.length === 1) return lists[0];
 
-  return ids;
+  // Intersect across all provided types (weak/strong/immune to ALL of them)
+  return lists.reduce((acc, curr) => acc.filter((id) => curr.includes(id)));
 }
 
 export async function handlerEvolutionChain(form) {
