@@ -1,11 +1,11 @@
-import { data } from "@/lib/mongodb";
+import { getDb } from "@/lib/mongodb";
 
 export async function handlerEvolutionStep(step, filter) {
-  
+
   if (step === "no_line") return await handlerNoLine();
-  
+
   else if (step === "is_split") return await handlerIsSplit();
-    
+
   else if (step === "has_split") return await handlerHasSplit();
 
   filter.evolution_step = { $regex: `-${step}$` };
@@ -13,7 +13,8 @@ export async function handlerEvolutionStep(step, filter) {
 }
 
 export async function handlerNoLine() {
-  const basePokemons = await data.db.collection('pokemon').aggregate([
+  const db = getDb();
+  const basePokemons = await db.db.collection('pokemon').aggregate([
     {
       $lookup: {
         from: "evolution_steps",
@@ -85,7 +86,7 @@ export async function handlerNoLine() {
 
   const speciesNames = basePokemons.map(p => p.species_name);
 
-  const extraForms = await data.db.collection("pokemon").find({
+  const extraForms = await db.db.collection("pokemon").find({
     name: { $regex: /-(mega|gmax)$/ },
     species_name: { $in: speciesNames }
   }).project({ id: 1, _id: 0 }).toArray();
@@ -96,7 +97,8 @@ export async function handlerNoLine() {
 }
 
 export async function handlerEvolutionMethod(methods) {
-  const pokemonsWithMethod = await data.db.collection('pokemon').aggregate([
+  const db = getDb();
+  const pokemonsWithMethod = await db.db.collection('pokemon').aggregate([
     {
       $lookup: {
         from: "evolution_steps",
@@ -130,7 +132,8 @@ export async function handlerEvolutionMethod(methods) {
 }
 
 export async function handlerIsSplit() {
-  const splitPokemons = await data.db.collection('pokemon').aggregate([
+  const db = getDb();
+  const splitPokemons = await db.db.collection('pokemon').aggregate([
     {
       $lookup: {
         from: "evolution_steps",
@@ -167,7 +170,8 @@ export async function handlerIsSplit() {
 }
 
 export async function handlerHasSplit() {
-  const splitPokemons = await data.db.collection('pokemon').aggregate([
+  const db = getDb();
+  const splitPokemons = await db.db.collection('pokemon').aggregate([
     {
       $lookup: {
         from: "evolution_steps",
@@ -208,7 +212,8 @@ export async function handlerOtherForms(others, filter) {
 }
 
 export async function handlerRelationTo(typeId, expression) {
-  
+  const db = getDb();
+
   const pipeline = [
     {
       $lookup: {
@@ -259,23 +264,24 @@ export async function handlerRelationTo(typeId, expression) {
     }
   ];
 
-  const results = await data.db.collection("pokemon").aggregate(pipeline).toArray();
+  const results = await db.db.collection("pokemon").aggregate(pipeline).toArray();
 
   const ids = results.map(p => p.id);
-  
+
   return ids;
 }
 
 export async function handlerEvolutionChain(form) {
-  
+
   if (form == "first") return await handlerFirstInChain();
 
-  else if(form == "middle") return await handlerMiddleInChain();
+  else if (form == "middle") return await handlerMiddleInChain();
 
-  else if(form == "final") return await handlerFinalInChain();
+  else if (form == "final") return await handlerFinalInChain();
 }
 
 export async function handlerFirstInChain() {
+  const db = getDb();
   const pipeline = [
     {
       $match: {
@@ -337,12 +343,13 @@ export async function handlerFirstInChain() {
     }
   ];
 
-  const result = await data.db.collection("pokemon").aggregate(pipeline).toArray();
+  const result = await db.db.collection("pokemon").aggregate(pipeline).toArray();
 
   return result.map(p => p.id);
 }
 
 export async function handlerMiddleInChain() {
+  const db = getDb();
   const pipeline = [
     {
       $match: {
@@ -405,11 +412,12 @@ export async function handlerMiddleInChain() {
     }
   ];
 
-  const result = await data.db.collection("pokemon").aggregate(pipeline).toArray();
+  const result = await db.db.collection("pokemon").aggregate(pipeline).toArray();
   return result.map(p => p.id);
 }
 
 export async function handlerFinalInChain() {
+  const db = getDb();
   const pipeline = [
     {
       $match: {
@@ -476,7 +484,7 @@ export async function handlerFinalInChain() {
     }
   ];
 
-  const result = await data.db.collection("pokemon").aggregate(pipeline).toArray();
+  const result = await db.db.collection("pokemon").aggregate(pipeline).toArray();
   return result.map(p => p.id);
 }
 

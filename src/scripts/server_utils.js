@@ -1,10 +1,11 @@
-import { connect, data } from "@/lib/mongodb";
+import { connect, getDb } from "@/lib/mongodb";
 import * as handlers from "../scripts/handlersPokemon";
 
-export async function filterPokemons(query){
-  
+export async function filterPokemons(query) {
+
   await connect();
-  
+  const db = getDb();
+
   let filter = {}
   let pokemonIdsUsed = false;
   const arrayFields = ["types", "abilities", "moves", "egg_groups", "categories", "other_forms"];
@@ -31,35 +32,35 @@ export async function filterPokemons(query){
   let pokemonIds = [];
 
   // console.log(JSON.stringify(filter, null, 2)); //printar filtro
-  
+
   if (step !== undefined) {
     const steps = Array.isArray(step) ? step : [step];
-  
+
     const results = await Promise.all(steps.map(step => handlers.handlerEvolutionStep(step, filter)));
     pokemonIds = results.flat();
     pokemonIdsUsed = true;
     delete query.step;
   }
-  
+
   if (methods !== undefined) {
     const methodsIds = await handlers.handlerEvolutionMethod(parseInt(methods));
     pokemonIds = pokemonIds.length > 0 || pokemonIdsUsed ? methodsIds.filter(value => pokemonIds.includes(value)) : methodsIds;
     pokemonIdsUsed = true;
     delete query.methods;
   }
-  
+
   if (others != undefined) {
     await handlers.handlerOtherForms(parseInt(others), filter);
     delete query.others;
   }
-  
+
   if (weak != undefined) {
     const weakIds = await handlers.handlerRelationTo(weak, relations_query["weak"]);
     pokemonIds = pokemonIds.length > 0 || pokemonIdsUsed ? weakIds.filter(value => pokemonIds.includes(value)) : weakIds;
     pokemonIdsUsed = true;
     delete query.weak;
   }
-  
+
   if (strong != undefined) {
 
     const strongIds = await handlers.handlerRelationTo(strong, relations_query["strong"]);
@@ -67,7 +68,7 @@ export async function filterPokemons(query){
     pokemonIdsUsed = true;
     delete query.strong;
   }
-  
+
   if (immune != undefined) {
 
     const immuneIds = await handlers.handlerRelationTo(immune, relations_query["immune"]);
@@ -76,7 +77,7 @@ export async function filterPokemons(query){
     delete query.immune;
 
   }
-  if (form != undefined){
+  if (form != undefined) {
 
     const evoIds = await handlers.handlerEvolutionChain(form);
     pokemonIds = pokemonIds.length > 0 || pokemonIdsUsed ? evoIds.filter(value => pokemonIds.includes(value)) : evoIds;
@@ -87,15 +88,15 @@ export async function filterPokemons(query){
   if (dual != undefined) delete query.dual;
   if (max_generation != undefined) delete query.max_generation;
   if (search != undefined) delete query.search;
-  
-  if (pokemonIds.length > 0){
+
+  if (pokemonIds.length > 0) {
     pokemonIds = pokemonIds.filter((item, index) => pokemonIds.indexOf(item) === index);
-    filter.id =  {$in: pokemonIds};
+    filter.id = { $in: pokemonIds };
   }
-  else if(pokemonIdsUsed) {
-    filter.id = {$in: [0]}
+  else if (pokemonIdsUsed) {
+    filter.id = { $in: [0] }
   }
-  
+
   for (const [key, value] of Object.entries(query)) {
     if (arrayFields.includes(key)) {
       filter[key] = { $all: Array.isArray(value) ? value : [value] };
@@ -108,20 +109,20 @@ export async function filterPokemons(query){
     }
   }
 
-  if (dual != undefined){
+  if (dual != undefined) {
     filter = await handlers.handlerDualTypes(parseInt(dual), filter);
   }
-  if (max_generation != undefined){
+  if (max_generation != undefined) {
     filter = await handlers.handleMaxGeneration(parseInt(max_generation), filter);
   }
-  if (search != undefined){
+  if (search != undefined) {
     filter = await handlers.handleSearch(search, filter);
   }
-  let pokemons = await data.db.collection('pokemon').find(filter, { projection: { name: 1, id: 1, species_name: 1, dex_number: 1, sprite_default: 1, sprite_shiny: 1, cry: 1, _id: 0 } }).sort({ dex_number: 1, id: 1}).toArray();
+  let pokemons = await db.db.collection('pokemon').find(filter, { projection: { name: 1, id: 1, species_name: 1, dex_number: 1, sprite_default: 1, sprite_shiny: 1, cry: 1, _id: 0 } }).sort({ dex_number: 1, id: 1 }).toArray();
   return pokemons;
 }
 
-export async function findPuzzlesOfSameDate (existingPuzzle, Puzzle) {
+export async function findPuzzlesOfSameDate(existingPuzzle, Puzzle) {
   const puzzlesByChallenge = {};
 
   if (!existingPuzzle) return puzzlesByChallenge;

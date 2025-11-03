@@ -1,4 +1,4 @@
-import { connect, data } from "@/lib/mongodb";
+import { connect, getDb } from "@/lib/mongodb";
 
 import { validateGenerateParams, pickRandomMult, generateTips } from "@/src/scripts/utils";
 import { createPuzzleFieldManager, generateUniqueQuery } from "@/src/scripts/puzzleManager";
@@ -10,12 +10,13 @@ export default async function handler(req, res) {
   try {
     const validatedParams = validateGenerateParams(req.query);
     if (validatedParams.error) {
-      
+
       return res.status(validatedParams.status).json({ error: validatedParams.error });
     }
     const { amount, rows, cols, challenge, generation, infinite } = validatedParams;
 
     await connect();
+    getDb();
 
     const puzzles = [];
     const fieldManager = createPuzzleFieldManager(challenge);
@@ -23,7 +24,7 @@ export default async function handler(req, res) {
 
     for (let i = 0; i < amount; i++) {
       const puzzle = await generatePuzzle(rows, cols, challenge, fieldManager, generation);
-      
+
       puzzles.push(puzzle);
       fieldManager.reset();
     }

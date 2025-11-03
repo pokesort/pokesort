@@ -1,10 +1,11 @@
-import { connect, data } from "@/lib/mongodb";
+import { connect, getDb } from "@/lib/mongodb";
 import { pipe } from "framer-motion";
 import { pipeline } from "stream";
 
 export default async function handler(req, res) {
   try {
     await connect();
+    const db = getDb();
 
     const { id } = req.query;
 
@@ -101,7 +102,7 @@ export default async function handler(req, res) {
                 species_name: "$$cd.species_name",
                 dex_number: "$$cd.dex_number",
                 evolution_step: "$$cd.evolution_step",
-                step_override: { $ifNull: ["$$cd.step_override", null] },                
+                step_override: { $ifNull: ["$$cd.step_override", null] },
                 sprite_default: "$$cd.sprite_default",
                 sprite_shiny: "$$cd.sprite_shiny"
               },
@@ -283,7 +284,7 @@ export default async function handler(req, res) {
   }
 
   async function hasEvolutionStep(id_dex) {
-    const poke = await data.db.collection("pokemon").findOne(
+    const poke = await db.db.collection("pokemon").findOne(
       { $or: [{ id: Number(id_dex) }, { name: id_dex }] },
       { projection: { evolution_step: 1 } }
     );
@@ -296,7 +297,7 @@ export default async function handler(req, res) {
 
     let types = await Promise.all(
       typeIds.map(type =>
-        data.db.collection("types").findOne({ id: type })
+        db.db.collection("types").findOne({ id: type })
       )
     );
 
@@ -330,7 +331,7 @@ export default async function handler(req, res) {
       ...cleanupFields(),
     ];
 
-    const result = await data.db
+    const result = await db.db
       .collection("pokemon")
       .aggregate(pipeline)
       .toArray();
