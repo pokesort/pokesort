@@ -36,6 +36,8 @@
             "generate": "Gerar Puzzle",
             "exclude": "Ignorar Categorias",
             "generation": "Limite de Geração",
+            "rows": "Linhas",
+            "cols": "Colunas",
             "button": "Gerar"
         },
         "logs": "Logs",
@@ -58,8 +60,8 @@
             "help": {
                 "1": "Dê início à sua jornada. Puzzles 4x4 incluindo grupos de tipos, região, geração, passo evolutivo e número de tipos.",
                 "2": "Teste suas habilidades em um ginásio. Puzzles 4x5 ou 5x4 adicionando grupos de formas alternativas e cadeia evolutiva.",
-                "3": "Encare desafios ainda mais árduos. Puzzles 5x5 ou 6x4 adicionando grupos de fraquezas, resistências e métodos evolutivos.",
-                "4": "Mostre que você é um verdadeiro mestre. Puzzles 6x5 adicionando grupos de habilidades, movimentos, formato, grupo de reprodução e outros."
+                "3": "Mostre que sua habilidade está entre as melhores. Puzzles 5x5 ou 6x4 adicionando grupos de fraquezas, resistências e métodos evolutivos.",
+                "4": "Mostre que sua habilidade é a melhor das melhores. Puzzles 6x5 adicionando grupos de habilidades, movimentos, formato, grupo de reprodução e outros."
             }
         },
         "dex-tabs": {

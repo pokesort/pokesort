@@ -43,7 +43,7 @@ export default function InfinitePage() {
                 };
                 const body = {...formWatch};
                 if (body.excludeFields == false) body.excludeFields = [];
-                const queries = `amount=1&infinite=true&generation=${form.watch('generation')}&challenge=${form.watch('challenge')}`;
+                const queries = `amount=1&infinite=true&generation=${form.watch('generation')}&challenge=${form.watch('challenge')}&rows=${form.watch('rows') ?? ''}&cols=${form.watch('cols') ?? ''}`;
                 
                 const [puzzleResponse] = await Promise.all([
                     fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/puzzle/generate?${queries}`, {
@@ -141,6 +141,10 @@ export default function InfinitePage() {
                     <div style={{display: 'flex', flexDirection: 'row', width: '100%', gap: '0.5rem', flex: "1"}}>
                         <Input type="select" style={{width: "100%"}} label={t(`puzzle.infinite.generation`)} name="generation" defaultValue="9" options={gen_options} form={form} />
                         <ChallengeSelect minimal={true} label={t(`puzzle.challenge.label`)} style={{width: "100%"}} defaultValue="1" options={challenge_options} form={form} />
+                    </div>
+                    <div style={{display: 'flex', flexDirection: 'row', width: '100%', gap: '0.5rem', flex: "1"}}>
+                        <Input type="number" style={{width: "100%"}} label={t('puzzle.infinite.rows')} name="rows" placeholder="4-5" form={form} />
+                        <Input type="number" style={{width: "100%"}} label={t('puzzle.infinite.cols')} name="cols" placeholder="4-6" form={form} />
                     </div>
                     <Input type="cloud" label={t('puzzle.infinite.exclude')} name="excludeFields" options={exclude_options} form={form} />
                 </div>
