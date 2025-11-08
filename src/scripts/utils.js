@@ -19,6 +19,13 @@ export const FIELD_OPTIONS = {
   dual: { min: 1, max: 2 },
 };
 
+// Níveis de categorias (agrupamentos) — podem ser combinados
+// Ex.: categories: [...easy, ...medium] ou categories: mergeCategories(easy, medium)
+export const easy = [1, 2, 3, 11];
+export const medium = [4, 5, 12, 17];
+export const hard = [6, 13, 14, 15];
+export const expert = [7, 8, 9, 10];
+
 // Estrutura de desafios por nível com campos disponíveis
 export const CHALLENGE_FIELDS = {
   1: {
@@ -27,7 +34,8 @@ export const CHALLENGE_FIELDS = {
     region: ['kanto', 'johto', 'hoenn', 'sinnoh', 'unova', 'kalos', 'alola', 'galar', 'hisui', 'paldea'],
     generation: { min: 1, max: 9 },
     form: ['first', 'middle', 'final'],
-    dual: { min: 1, max: 2 }
+    dual: { min: 1, max: 2 },
+    categories: [...easy],
   },
   2: {
     types: { min: 1, max: 18 },
@@ -38,6 +46,7 @@ export const CHALLENGE_FIELDS = {
     dual: { min: 1, max: 2 },
     others: { min: 1, max: 2 },
     step: ['no_line', 'has_split', 'is_split'],
+    categories: [...easy, ...medium],
   },
   3: {
     types: { min: 1, max: 18 },
@@ -45,12 +54,13 @@ export const CHALLENGE_FIELDS = {
     region: ['kanto', 'johto', 'hoenn', 'sinnoh', 'unova', 'kalos', 'alola', 'galar', 'hisui', 'paldea'],
     generation: { min: 1, max: 9 },
     form: ['first', 'middle', 'final'],
-    dual: {min: 1, max: 2},
+    dual: { min: 1, max: 2 },
     others: { min: 1, max: 2 },
     step: ['no_line', 'has_split', 'is_split'],
     weak: { min: 1, max: 18 },
     strong: { min: 1, max: 18 },
     methods: { min: 1, max: 11 },
+    categories: [...easy, ...medium, ...hard],
   },
   4: {
     types: { min: 1, max: 18 },
@@ -66,7 +76,7 @@ export const CHALLENGE_FIELDS = {
     methods: { min: 1, max: 11 },
     abilities: { min: 1, max: 307 },
     moves: { min: 1, max: 919 },
-    categories: { min: 1, max: 17 },
+    categories: [...easy, ...medium, ...hard, ...expert],
     shape: ['armor', 'wings', 'quadruped', 'ball', 'squiggle', 'fish', 'arms', 'blob', 'upright', 'legs', 'heads', 'bug-wings', 'humanoid', 'tentacles'],
     egg_groups: ['monster', 'dragon', 'field', 'water1', 'bug', 'flying', 'ground', 'fairy', 'plant', 'humanshape', 'water3', 'mineral', 'indeterminate', 'water2', 'ditto', 'dragon', 'no-eggs'],
   }
@@ -151,7 +161,7 @@ export function validateGenerateParams(params) {
   }
 
   const validDifficulties = [1, 2, 3, 4];
-  if (!challenge || !validDifficulties.includes(challengeValue)) { 
+  if (!challenge || !validDifficulties.includes(challengeValue)) {
     errors.push('Nível de desafio inválido para essa liga pokemon');
   }
 
