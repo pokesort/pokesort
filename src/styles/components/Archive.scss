@@ -3,16 +3,12 @@
 .window-container.calendar {
     height: auto;
     min-height: unset;
+    clip-path: polygon(0% 0%, calc(100% - 37px) 0%, 100% 37px, 100% 37px, 100% 100%, 0% 100%);
 
     .window-info-row {
-        width: 45%;
         justify-content: space-between;
-        padding: 0.22rem var(--spacing);
-
-        @media(max-width: 768px) {
-            width: calc(100% - 30px);
-            padding: var(--spacing);
-        }
+        width: calc(100% - 30px);
+        padding: var(--spacing);
     }
 }
 

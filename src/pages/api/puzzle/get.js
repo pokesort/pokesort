@@ -13,7 +13,8 @@ export default async function handler(req, res) {
       case 'date':
         const puzzlesByDate = puzzles.reduce((acc, puzzle) => {
           if (puzzle.date) {
-            acc[puzzle.date] = puzzle._id;
+            acc[puzzle.date] = acc[puzzle.date] || [];
+            acc[puzzle.date].push(puzzle._id);
           }
           return acc;
         }, {});
