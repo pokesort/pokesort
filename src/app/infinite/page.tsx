@@ -53,6 +53,12 @@ export default function InfinitePage() {
                 ]);
                 if (!puzzleResponse.ok) {
                     const errorData = await puzzleResponse.json();
+
+                    if (errorData.error.name == "MaxAttemptsError") {
+                        await fetchPageData();
+                        return;
+                    }
+
                     setError(errorData.message);
                     setPuzzle(undefined);
                     setLoading(false);
@@ -144,8 +150,8 @@ export default function InfinitePage() {
                         <ChallengeSelect minimal={true} label={t(`puzzle.challenge.label`)} style={{width: "100%"}} defaultValue="1" options={challenge_options} form={form} />
                     </div>
                     <div style={{display: 'flex', flexDirection: 'row', width: '100%', gap: '0.5rem', flex: "1"}}>
-                        <Input type="number" style={{width: "100%"}} label={t('puzzle.infinite.rows')} name="rows" placeholder="4-5" form={form} />
-                        <Input type="number" style={{width: "100%"}} label={t('puzzle.infinite.cols')} name="cols" placeholder="4-6" form={form} />
+                        <Input type="select" style={{width: "100%"}} label={t('puzzle.infinite.rows')} name="rows" options={{4: '4', 5: '5'}} defaultValue="4" form={form} />
+                        <Input type="select" style={{width: "100%"}} label={t('puzzle.infinite.cols')} name="cols" options={{4: '4', 5: '5', 6: '6'}} defaultValue="4" form={form} />
                     </div>
                     <Input type="cloud" label={t('puzzle.infinite.exclude')} name="excludeFields" options={exclude_options} form={form} />
                 </div>

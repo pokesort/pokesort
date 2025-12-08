@@ -5,6 +5,7 @@ import type { PuzzleData } from '@/src/assets/types/PuzzleApiResponse';
 import { useEffect, useState } from 'react';
 import { notFound, redirect, useParams } from 'next/navigation';
 import Loading from '@/src/components/Loading';
+import ErrorToast from '@/src/components/ToastError';
 
 const challengeKey = 'u_challenge';
 
@@ -38,7 +39,8 @@ export default function PuzzlePage() {
                     'Content-Type': 'application/json'
                 };
                 if (['get', '', null].includes(slug)) {
-                    throw new Error('Não conseguimos encontrar este puzzle...');
+                    setError('Não conseguimos encontrar este puzzle...');
+                    return;
                 }
                 const query = slugState ?? `${slug}?challenge=${getPreferredChallenge() ?? "1"}`;
                 const [puzzleResponse] = await Promise.all([
@@ -47,7 +49,8 @@ export default function PuzzlePage() {
                     }),
                 ]);
                 if (!puzzleResponse.ok) {
-                    throw new Error('Erro ao obter informações do puzzle.');
+                    setError('Não conseguimos encontrar este puzzle...');
+                    return;
                 }
                 const [puzzleData] = await Promise.all([
                     puzzleResponse.json(),
@@ -77,6 +80,7 @@ export default function PuzzlePage() {
 
     return (
         <>
+            <ErrorToast error={error} />
             {loading ?
                 <div className={`window-container cut-left`}>
                     <section className="window-info-row">
