@@ -12,6 +12,7 @@ import GridIcon from '@/src/components/svg/GridIcon';
 import Loading from '@/src/components/Loading';
 import { useForm } from 'react-hook-form';
 import ChallengeSelect from '@/src/components/forms/ChallengeSelect';
+import ErrorToast from '@/src/components/ToastError';
 
 export default function InfinitePage() {
     const t = useTranslations();
@@ -52,12 +53,11 @@ export default function InfinitePage() {
                 ]);
                 if (!puzzleResponse.ok) {
                     const errorData = await puzzleResponse.json();
-
-                    if (errorData.code === 'MAX_ATTEMPTS') {
-                        await fetchPageData();
-                    } else {
-                        throw new Error('Erro ao obter informações do puzzle.');
-                    }                    
+                    setError(errorData.message);
+                    setPuzzle(undefined);
+                    setLoading(false);
+                    setInitial(true);
+                    return;
                 }
                 const [puzzleData] = await Promise.all([
                     puzzleResponse.json(),
@@ -107,6 +107,7 @@ export default function InfinitePage() {
 
     return (
         <>
+            <ErrorToast error={error} />
             {!initial &&
                 (loading ?
                     <>
