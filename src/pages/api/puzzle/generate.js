@@ -4,6 +4,7 @@ import { validateGenerateParams, pickRandomMult, generateTips } from "@/src/scri
 import { createPuzzleFieldManager, generateUniqueQuery } from "@/src/scripts/puzzleManager";
 import { filterPokemons } from "@/src/scripts/server_utils";
 import { populate } from "./_utils";
+import { NotEnoughFieldsError } from "../../../scripts/erros";
 
 export default async function handler(req, res) {
 
@@ -51,26 +52,31 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('Erro ao gerar puzzle:', error);
-    return res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error, message: error.message });
   }
 }
 
 export async function generatePuzzle(rows, cols, challenge, fieldManager, generation) {
-  const groups = [];
-  const idsUsed = [];
-  for (let i = 0; i < rows; i++) {
-    const group = await generateGroup(cols, fieldManager, generation, idsUsed);
-    groups.push(group);
+
+  try {
+    const groups = [];
+    const idsUsed = [];
+    for (let i = 0; i < rows; i++) {
+      const group = await generateGroup(cols, fieldManager, generation, idsUsed);
+      groups.push(group);
+    }
+    const puzzle = {
+      author: 'admin',
+      from: 'system',
+      challenge,
+      groups,
+      rows,
+      cols,
+    };
+    return puzzle;
+  } catch(error){
+    throw error;
   }
-  const puzzle = {
-    author: 'admin',
-    from: 'system',
-    challenge,
-    groups,
-    rows,
-    cols,
-  };
-  return puzzle;
 }
 
 export async function generateGroup(cols, fieldManager, generation, idsUsed) {
@@ -87,7 +93,7 @@ export async function generateGroup(cols, fieldManager, generation, idsUsed) {
         attempts++;
         continue;
       } else {
-        throw new Error('Não há mais campos disponíveis para gerar o puzzle');
+        throw new NotEnoughFieldsError('Campos Insuficientes para gerar o puzzle');
       }
     }
 
