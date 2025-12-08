@@ -59,7 +59,6 @@ export async function generatePuzzle(rows, cols, challenge, fieldManager, genera
 
   try {
     const totalCombinations = countCombinations(fieldManager.getAvailableFields(), generation);
-    console.log(totalCombinations);
     if (totalCombinations < rows) throw new NotEnoughFieldsError('Não existem campos suficientes para gerar o puzzle.');
     
     const groups = [];
