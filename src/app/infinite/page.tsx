@@ -12,6 +12,7 @@ import GridIcon from '@/src/components/svg/GridIcon';
 import Loading from '@/src/components/Loading';
 import { useForm } from 'react-hook-form';
 import ChallengeSelect from '@/src/components/forms/ChallengeSelect';
+import ErrorToast from '@/src/components/ToastError';
 
 export default function InfinitePage() {
     const t = useTranslations();
@@ -43,7 +44,7 @@ export default function InfinitePage() {
                 };
                 const body = {...formWatch};
                 if (body.excludeFields == false) body.excludeFields = [];
-                const queries = `amount=1&infinite=true&generation=${form.watch('generation')}&challenge=${form.watch('challenge')}`;
+                const queries = `amount=1&infinite=true&generation=${form.watch('generation')}&challenge=${form.watch('challenge')}&rows=${form.watch('rows') ?? ''}&cols=${form.watch('cols') ?? ''}`;
                 
                 const [puzzleResponse] = await Promise.all([
                     fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/puzzle/generate?${queries}`, {
@@ -53,11 +54,16 @@ export default function InfinitePage() {
                 if (!puzzleResponse.ok) {
                     const errorData = await puzzleResponse.json();
 
-                    if (errorData.code === 'MAX_ATTEMPTS') {
+                    if (errorData.error.name == "MaxAttemptsError") {
                         await fetchPageData();
-                    } else {
-                        throw new Error('Erro ao obter informações do puzzle.');
-                    }                    
+                        return;
+                    }
+
+                    setError(errorData.message);
+                    setPuzzle(undefined);
+                    setLoading(false);
+                    setInitial(true);
+                    return;
                 }
                 const [puzzleData] = await Promise.all([
                     puzzleResponse.json(),
@@ -107,6 +113,7 @@ export default function InfinitePage() {
 
     return (
         <>
+            <ErrorToast error={error} />
             {!initial &&
                 (loading ?
                     <>
@@ -141,6 +148,10 @@ export default function InfinitePage() {
                     <div style={{display: 'flex', flexDirection: 'row', width: '100%', gap: '0.5rem', flex: "1"}}>
                         <Input type="select" style={{width: "100%"}} label={t(`puzzle.infinite.generation`)} name="generation" defaultValue="9" options={gen_options} form={form} />
                         <ChallengeSelect minimal={true} label={t(`puzzle.challenge.label`)} style={{width: "100%"}} defaultValue="1" options={challenge_options} form={form} />
+                    </div>
+                    <div style={{display: 'flex', flexDirection: 'row', width: '100%', gap: '0.5rem', flex: "1"}}>
+                        <Input type="select" style={{width: "100%"}} label={t('puzzle.infinite.rows')} name="rows" options={{4: '4', 5: '5'}} defaultValue="4" form={form} />
+                        <Input type="select" style={{width: "100%"}} label={t('puzzle.infinite.cols')} name="cols" options={{4: '4', 5: '5', 6: '6'}} defaultValue="4" form={form} />
                     </div>
                     <Input type="cloud" label={t('puzzle.infinite.exclude')} name="excludeFields" options={exclude_options} form={form} />
                 </div>

@@ -1,4 +1,4 @@
-import { connect, data } from '@/lib/mongodb';
+import { connect, getDb } from '@/lib/mongodb';
 import { getPuzzleModel } from '@/src/models/Puzzle';
 import mongoose from 'mongoose';
 import { populate } from './_utils';
@@ -8,7 +8,8 @@ export default async function handler(req, res) {
   await connect();
   
   const { id, daily, challenge } = req.query;
-  const Puzzle = getPuzzleModel(data);
+  const db = getDb();
+  const Puzzle = getPuzzleModel(db);
 
   let existingPuzzle;
   const today = new Date().toISOString().split('T')[0];
