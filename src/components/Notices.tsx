@@ -48,7 +48,7 @@ export default React.memo(function Notices({noticesOpen, setNoticesOpen}: Notice
                     }),
                 ]);
                 if (!noticesResponse.ok) {
-                    throw new Error('Erro ao obter informações do puzzle.');
+                    throw new Error('Erro ao obter avisos.');
                 }
                 const [noticesData] = await Promise.all([
                     noticesResponse.json(),

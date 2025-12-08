@@ -1,10 +1,11 @@
 import cron from 'node-cron';
-import { connect, data } from './lib/mongodb.js';
+import { connect, getDb } from './lib/mongodb.js';
 
 async function atualizarPuzzleDiario() {
 
   const today = new Date().toISOString().split('T')[0];
-  const puzzles = data.collection('puzzles');
+  const db = getDb();
+  const puzzles = db.db.collection('puzzles');
 
   try {
     let existingPuzzle = await puzzles.findOne({ date: today });

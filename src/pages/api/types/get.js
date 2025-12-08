@@ -1,10 +1,11 @@
-import { connect, data } from "@/lib/mongodb";
+import { connect, getDb } from "@/lib/mongodb";
 
 export default async function handler(req, res) {
   try {
     await connect();
-    
-    const types = await data.db.collection("types").find({}).toArray();
+    const db = getDb();
+
+    const types = await db.db.collection("types").find({}).toArray();
 
     res.status(200).json({ success: true, types: types.map((col) => col.name) });
   } catch (error) {

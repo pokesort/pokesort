@@ -1,4 +1,4 @@
-import { connect, data } from '@/lib/mongodb';
+import { connect, getDb } from "@/lib/mongodb";
 import { getPuzzleModel } from '@/src/models/Puzzle';
 import { populate } from './_utils';
 import { findPuzzlesOfSameDate } from '@/src/scripts/server_utils';
@@ -9,7 +9,8 @@ export default async function handler(req, res) {
   const { challenge } = req.query;
   
   const today = new Date().toISOString().split('T')[0];
-  const Puzzle = getPuzzleModel(data);
+  const conn = getDb();
+  const Puzzle = getPuzzleModel(conn);
   let existingPuzzle = await getTodayPuzzle(today, Number(challenge) ?? null);
   
   if (!existingPuzzle) {
@@ -28,13 +29,15 @@ export default async function handler(req, res) {
 
 async function getTodayPuzzle(today, challenge=null){
 
+  const db = getDb();
+  const puzzles = db.db.collection('puzzles');
   const findPuzzle = async (date, challenge) => {
       let loop;    
       const query = {date: date};
       if (challenge != null) query["challenge"] = challenge;
-      loop = await data.db.collection('puzzles').findOne(query);
+      loop = await puzzles.findOne(query);
       if (!loop) {
-        loop = await data.db.collection('puzzles').findOne({date: date});
+        loop = await puzzles.findOne({date: date});
       }
       return loop;
   }

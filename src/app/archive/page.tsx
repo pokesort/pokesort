@@ -11,6 +11,7 @@ import Loading from '@/src/components/Loading';
 import ArrowLeft from '@/src/components/svg/ArrowLeft';
 import ArrowRight from '@/src/components/svg/ArrowRight';
 import Shiny from '@/src/components/svg/Shiny';
+import ErrorToast from '@/src/components/ToastError';
 
 interface CalendarProps {
     puzzles: Record<string, string[]> | undefined;
@@ -150,7 +151,8 @@ export default function Archive() {
                     }),
                 ]);
                 if (!puzzleResponse.ok) {
-                    throw new Error('Erro ao obter informações do puzzle.');
+                    setError('Erro ao obter informações do arquivo.');
+                    return;
                 }
                 const [puzzleData] = await Promise.all([
                     puzzleResponse.json(),
@@ -172,6 +174,9 @@ export default function Archive() {
     }, [])
 
     return (
-        <Calendar puzzles={puzzles} loading={loading} />
+        <>
+            <ErrorToast error={error} />
+            <Calendar puzzles={puzzles} loading={loading} />
+        </>
     )
 }

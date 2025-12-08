@@ -1,12 +1,12 @@
-import { connect, data } from "../../lib/mongodb.js";
+import { connect, getDb } from "../../lib/mongodb.js";
 import mongoose from "mongoose";
 
 const createIndexes = async () => {
   await connect();
-
-  const pokemon = data.collection("pokemon");
-  const evolutionSteps = data.collection("evolution_steps");
-  const types = data.collection("types");
+  const db = getDb();
+  const pokemon = db.db.collection("pokemon");
+  const evolutionSteps = db.db.collection("evolution_steps");
+  const types = db.db.collection("types");
 
   try {
     await pokemon.createIndex({ id: 1 }, { unique: true });

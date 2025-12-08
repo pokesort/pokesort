@@ -11,3 +11,10 @@ export class MaxAttemptsError extends Error {
     this.name = "MaxAttemptsError";
   }
 }
+
+export class NotEnoughFieldsError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "NotEnoughFieldsError";
+  }
+}
