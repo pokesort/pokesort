@@ -3,7 +3,9 @@ import { CHALLENGE_FIELDS, pickRandom, randomInRange } from "../scripts/utils"
 export class PuzzleFieldManager {
   constructor(challenge) {
     this.challenge = challenge;
-    this.availableFields = this.getAvailableFieldsForChallenge(challenge);
+    this.availableFields = JSON.parse(JSON.stringify(
+                            this.getAvailableFieldsForChallenge(challenge)
+                          ));
     this.usedFields = new Set(); // Armazena campos já utilizados no puzzle
     this.usedValues = new Map(); // Armazena valores específicos já utilizados por campo
   }

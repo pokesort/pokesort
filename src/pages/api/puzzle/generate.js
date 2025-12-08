@@ -20,15 +20,14 @@ export default async function handler(req, res) {
     getDb();
 
     const puzzles = [];
-    const fieldManager = createPuzzleFieldManager(challenge);
-    const { excludeFields } = req.body || {};
+    let fieldManager = createPuzzleFieldManager(challenge);
+    let { excludeFields } = req.body || {};
     if (excludeFields) {
       const list = Array.isArray(excludeFields) ? excludeFields : [excludeFields];
       for (const f of list) {
         if (f in fieldManager.availableFields) {
-          delete fieldManager.availableFields[f];
+          fieldManager.markFieldAsUsed(f);
         }
-        fieldManager.markFieldAsUsed(f);
       }
     }
 
