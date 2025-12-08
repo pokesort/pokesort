@@ -1,4 +1,4 @@
-import { connect, data } from '@/lib/mongodb';
+import { connect, getDb } from "@/lib/mongodb";
 import { getPuzzleModel } from '@/src/models/Puzzle';
 import { generatePuzzle } from './generate';
 import { createPuzzleFieldManager } from "@/src/scripts/puzzleManager";
@@ -9,7 +9,8 @@ export default async function handler(req, res) {
   try {
     await connect();
 
-    const Puzzle = getPuzzleModel(data);
+    const conn = getDb();
+    const Puzzle = getPuzzleModel(conn);
 
     const today = new Date().toISOString().split('T')[0];
     let existingPuzzle = await getTodayPuzzle(today, Puzzle);
@@ -66,7 +67,7 @@ async function getTodayPuzzle(today, Puzzle) {
 
 async function batchPuzzles(puzzles) {
 
-  const Puzzle = getPuzzleModel(data);
+  const Puzzle = getPuzzleModel(conn);
   
   try {
     for (const puzzle of puzzles) {
