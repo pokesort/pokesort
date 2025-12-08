@@ -4,7 +4,7 @@ import { validateGenerateParams, pickRandomMult, generateTips } from "@/src/scri
 import { createPuzzleFieldManager, generateUniqueQuery } from "@/src/scripts/puzzleManager";
 import { filterPokemons } from "@/src/scripts/server_utils";
 import { populate } from "./_utils";
-import { NotEnoughFieldsError } from "../../../scripts/erros";
+import { NotEnoughFieldsError, MaxAttemptsError } from "../../../scripts/erros";
 
 export default async function handler(req, res) {
 
@@ -59,6 +59,10 @@ export default async function handler(req, res) {
 export async function generatePuzzle(rows, cols, challenge, fieldManager, generation) {
 
   try {
+    const totalCombinations = countCombinations(fieldManager.getAvailableFields(), generation);
+    console.log(`Total: ${totalCombinations}`);
+    if (totalCombinations < rows) throw new NotEnoughFieldsError('Campos insuficentes');
+    
     const groups = [];
     const idsUsed = [];
     for (let i = 0; i < rows; i++) {
@@ -93,7 +97,7 @@ export async function generateGroup(cols, fieldManager, generation, idsUsed) {
         attempts++;
         continue;
       } else {
-        throw new NotEnoughFieldsError('Campos Insuficientes para gerar o puzzle');
+        throw new MaxAttemptsError('Máximo de tentativas alcançado, tente de novo');
       }
     }
 
@@ -120,4 +124,27 @@ export async function generateGroup(cols, fieldManager, generation, idsUsed) {
   };
 
   return group;
+}
+
+function countCombinations(challengeFields, generation) {
+  let total = 1;
+
+  for (const [key, value] of Object.entries(challengeFields)) {
+    
+    if (key === "generation")
+    {
+      total *= generation;
+      continue;
+    } 
+
+    if (value && typeof value === "object" && "min" in value && "max" in value) {
+      total *= (value.max - value.min + 1);
+    }
+
+    else if (Array.isArray(value)) {
+      total *= value.length;
+    }
+  }
+
+  return total;
 }
