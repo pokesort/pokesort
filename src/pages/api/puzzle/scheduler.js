@@ -2,10 +2,9 @@ import { connect, getDb } from "@/lib/mongodb";
 import { getPuzzleModel } from '@/src/models/Puzzle';
 import { generatePuzzle } from './generate';
 import { createPuzzleFieldManager } from "@/src/scripts/puzzleManager";
-import { validateGenerateParams } from "@/src/scripts/utils";
+import { validateGenerateParams, FIELD_OPTIONS } from "@/src/scripts/utils";
 
 export default async function handler(req, res) {
-
   try {
     await connect();
 
@@ -29,12 +28,13 @@ export default async function handler(req, res) {
       const { rows, cols, challenge } = validatedParams;
       const fieldManager = createPuzzleFieldManager(i);
 
-      let puzzle = await generatePuzzle(rows, cols, challenge, fieldManager, null);
+      const generation = FIELD_OPTIONS.generation.max;
+      let puzzle = await generatePuzzle(rows, cols, challenge, fieldManager, generation);
       puzzle.date = today ;
       puzzles.push(puzzle);
     }
 
-    const result = await batchPuzzles(puzzles);
+    const result = await batchPuzzles(puzzles, Puzzle);
     return res.status(200).json(puzzles);
 
   } catch (error) {
@@ -65,9 +65,7 @@ async function getTodayPuzzle(today, Puzzle) {
   return todayPuzzle;
 }
 
-async function batchPuzzles(puzzles) {
-
-  const Puzzle = getPuzzleModel(conn);
+async function batchPuzzles(puzzles, Puzzle) {
   
   try {
     for (const puzzle of puzzles) {

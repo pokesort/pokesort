@@ -1,5 +1,4 @@
 import { connect, getDb } from "@/lib/mongodb";
-
 import { validateGenerateParams, pickRandomMult, generateTips } from "@/src/scripts/utils";
 import { createPuzzleFieldManager, generateUniqueQuery } from "@/src/scripts/puzzleManager";
 import { filterPokemons } from "@/src/scripts/server_utils";
@@ -11,7 +10,6 @@ export default async function handler(req, res) {
   try {
     const validatedParams = validateGenerateParams(req.query);
     if (validatedParams.error) {
-
       return res.status(validatedParams.status).json({ error: validatedParams.error });
     }
     const { amount, rows, cols, challenge, generation, infinite } = validatedParams;
