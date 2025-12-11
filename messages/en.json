@@ -56,10 +56,10 @@
             "3": "Elite",
             "4": "Campeão",
             "help": {
-                "1": "Dê início à sua jornada. Puzzles 4x4 incluindo grupos de tipos, região, geração, passo evolutivo e número de tipos.",
-                "2": "Teste suas habilidades em um ginásio. Puzzles 4x5 ou 5x4 adicionando grupos de formas alternativas e cadeia evolutiva.",
-                "3": "Mostre que sua habilidade está entre as melhores. Puzzles 5x5 ou 6x4 adicionando grupos de fraquezas, resistências e métodos evolutivos.",
-                "4": "Mostre que sua habilidade é a melhor das melhores. Puzzles 6x5 adicionando grupos de habilidades, movimentos, formato, grupo de reprodução e outros."
+                "1": "Dê início à sua jornada. Puzzles 4x4 incluindo grupos de tipos, região, geração, passo evolutivo, número de tipos e categorias como bebês, míticos, lendários e iniciais.",
+                "2": "Teste suas habilidades em um ginásio. Puzzles 4x5 ou 5x4 adicionando grupos de formas alternativas, cadeia evolutiva e categorias como Mega Evoluções, Ultra Beasts e fósseis.",
+                "3": "Mostre que sua habilidade está entre as melhores. Puzzles 5x5 ou 6x4 adicionando grupos de fraquezas, resistências, métodos evolutivos e categorias como Gigantamax, paradoxos e formas regionais",
+                "4": "Mostre que sua habilidade é a melhor das melhores. Puzzles 6x5 adicionando grupos de habilidades, movimentos, formato, grupo de reprodução e categorias como Z-Moves exclusivos, habilidade de trocar de formas e diferenças de gênero."
             }
         },
         "dex-tabs": {
