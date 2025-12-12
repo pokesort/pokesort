@@ -1,0 +1,23 @@
+@use "../abstract" as *;
+
+.infinite-window {
+    height: 400px !important;
+}
+
+.infinite-menu {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+
+    max-width: 500px;
+    gap: 0.5rem;
+    height: 100%;
+
+    & > div {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        height: auto;
+        gap: 0.5rem;
+    }
+}
