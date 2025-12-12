@@ -101,9 +101,9 @@ section.modal {
     &.open {
         animation: modal-fade-in 0.5s ease 1;
 
-        div.modal-content {
-            animation: modal-content-fade-in 1s ease-out 1;
-        }
+        // div.modal-content {
+        //     animation: modal-content-fade-in 1s ease-out 1;
+        // }
     }
 }
 
@@ -115,24 +115,6 @@ section.modal {
     100% {
         transform: scale(1);
         opacity: 1;
-    }
-}
-
-@keyframes modal-content-fade-in {
-    0% {
-        overflow: hidden;
-        max-height: 40px;
-        min-height: 0px;
-    }
-    20% {
-        overflow: hidden;
-        max-height: 40px;
-        min-height: 0px;
-    }
-    100% {
-        overflow: hidden;
-        max-height: 80vh;
-        min-height: 0px;
     }
 }
 

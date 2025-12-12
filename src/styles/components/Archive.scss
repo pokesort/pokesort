@@ -4,6 +4,7 @@
     height: auto;
     min-height: unset;
     clip-path: polygon(0% 0%, calc(100% - 37px) 0%, 100% 37px, 100% 37px, 100% 100%, 0% 100%);
+    animation: modal-fade-in 0.5s ease 1;
 
     .window-info-row {
         justify-content: space-between;

@@ -103,6 +103,7 @@ section#page {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    overflow-x: hidden;
   
     width: 100vw;
     flex-grow: 1;
