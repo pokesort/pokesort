@@ -110,9 +110,6 @@ export default React.memo(function PuzzleBlock({ pokemon, shinies, multiselect, 
             key={pokemon.id}
             layoutId={`pokemon-block-${pokemon.id}`}
             variants={itemVariants}
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.5 }}
             transition={{ duration: 0.5, type: 'spring' }}
             onContextMenu={handleRightClick}
             onTouchStart={handleTouchStart}

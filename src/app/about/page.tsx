@@ -8,7 +8,7 @@ export default function AboutPage() {
     const t = useTranslations("about");
 
     return (
-        <>
+        <section id="about">
             <div className={`window-container free-size`}>
                 <section className="window-info-row">
                     <p>{t(`about.title`)}</p>
@@ -46,6 +46,6 @@ export default function AboutPage() {
                     {t(`support.description`)}
                 </p>
             </div> */}
-        </>
+        </section>
     )
 }

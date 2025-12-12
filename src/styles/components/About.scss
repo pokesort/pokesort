@@ -1,5 +1,9 @@
 @use "../abstract" as *;
 
+section#about {    
+    animation: modal-fade-in 0.5s ease 1;
+}
+
 .window-container.free-size:not(:first-child) {
     margin-top: 1rem;
 }

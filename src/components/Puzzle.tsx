@@ -35,10 +35,7 @@ const infiniteCount = 'u_infinitecount';
 const containerVariants: Variants = {
   hidden: { opacity: 1 },
   visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.05
-    }
+    opacity: 1
   }
 };
 
@@ -71,7 +68,6 @@ interface SolvedGroupsGridProps {
 const SolvedGroupsGrid = ({groups, dictionary}: SolvedGroupsGridProps) => {
     return (
         <section className="solved-groups-grid">
-            
             {groups.map((group: string, index: number)=> (
                 <div key={group} className="solved-group">
                     <GroupName query={group} dictionary={dictionary}/>
@@ -109,7 +105,7 @@ const VictoryModal = React.memo(({type, challenge=null, guesses, shinies, dateOg
             const streakData = localStorage.getItem(infiniteCount);
             if (streakData != null) setStreak(parseInt(streakData));
         }
-    }, [victoryOpen])
+    }, [victoryOpen, type])
 
     const getGuessEmojis = (): string => {
         let output: string = '';
@@ -132,7 +128,7 @@ const VictoryModal = React.memo(({type, challenge=null, guesses, shinies, dateOg
         const url = window.location.href;
         const emojis = getGuessEmojis();
         let text = `Pokesort · ${type == 'daily' ? formatDate(dateOg, locale, false) : t('infinite.label')}`
-        if (challenge !+ null) {
+        if (challenge != null) {
             text += ` · ⭐${t(`challenge.${challenge}`)}`
         }
         if (type == 'daily' && streak > 1) {
@@ -143,7 +139,7 @@ const VictoryModal = React.memo(({type, challenge=null, guesses, shinies, dateOg
             text: `${text}\n${emojis}\n${url}`,
         };
         try {
-            if (isMobile()) {
+            if (isMobile() && navigator.share) {
                 navigator.share(shareData);
             } else {
                 setIsCopied('done');
@@ -306,15 +302,18 @@ const GuessLogs = React.memo(({guesses, setGuesses, availableTips, setAvailableT
             }
         }
 
-        logs?.scrollBy({
-            top: logs.scrollHeight,
-            behavior: "smooth",
-        });
+        if (logs) {
+            logs.scrollBy({
+                top: logs.scrollHeight,
+                behavior: "smooth",
+            });
+        }
         setAvailableTips(prev => prev-1);
         setGuesses((prev: PuzzleGuess[]) => [...prev, guess]);
     }
 
     const renderTip = (allTips: React.RefObject<PuzzleTip[]>, tipIndex: number, locale: string) => {
+        if (!allTips.current) return null;
         const tip: any = decodeTips(allTips.current[tipIndex].tip);
 
         if (tip.type == 'pair') {
@@ -347,8 +346,7 @@ const GuessLogs = React.memo(({guesses, setGuesses, availableTips, setAvailableT
 
     return (
         <>
-            {isSolved}
-            {guesses.length > 0 && allTips.current.length > 0 && !isSolved &&
+            {guesses.length > 0 && allTips.current && allTips.current.length > 0 && !isSolved &&
                 <button className="ask-tip" onClick={askForTip} data-tips={availableTips}>{t(`puzzle.tips.ask`)} <span>x{availableTips}</span></button>
             }
             <section className="puzzle-guess-logs">
@@ -363,7 +361,7 @@ const GuessLogs = React.memo(({guesses, setGuesses, availableTips, setAvailableT
                                         <>{renderTip(allTips, guess.tip, locale)}</>
                                     }
                                     {guess.pokemons.map((pokemon: number) => (
-                                        <PokeSprite key={pokemon} slug={spritesMap.current[pokemon]}/>
+                                        spritesMap.current ? <PokeSprite key={pokemon} slug={spritesMap.current[pokemon]}/> : null
                                     ) )}
                                 </div>
                             </div>
@@ -401,21 +399,19 @@ interface PuzzleGridProps {
 const PuzzleGrid = React.memo(({puzzle, type, pause, setPause, pokemons, shinies, dictionary, setGuesses, forcedGuesses=[], victoryOpen, setVictoryOpen, setCurrentDexView, scrollToTab, solvedGroupNames, resetAvailableTips}: PuzzleGridProps) => {
     const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
 
-    const [groupSets, setGroupSets] = useState<Set<number>[]>([]);
+    const groupSets = useMemo(() => {
+        if (!puzzle || !puzzle.groups) return [];
+        let groupArray: Set<number>[] = [];
+        for (let i = 0; i < puzzle.groups.length; i++) {
+            groupArray[i] = new Set(puzzle.groups[i].pokemons);
+        }
+        return groupArray;
+    }, [puzzle]);
+
     const [incorrectGuessIds, setIncorrectGuessIds] = useState<Set<number>>(new Set());
     const [correctGuessIds, setCorrectGuessIds] = useState<Set<number>>(new Set());
     const [solvedGroupIds, setSolvedGroupIds] = useState<Set<number>>(new Set());
     const [solvedInOrder, setSolvedInOrder] = useState<any[]>([]);
-
-    useEffect(() => {
-        let groupArray: Set<number>[] = [];
-
-        for (let i = 0; i < puzzle.groups.length; i++) {
-            groupArray[i] = new Set(puzzle.groups[i].pokemons);
-        }
-
-        setGroupSets(groupArray);
-    }, [puzzle]);
 
     useEffect(() => {
         if (forcedGuesses.length > 0 && solvedGroupNames.length == 0) {
@@ -526,10 +522,12 @@ const PuzzleGrid = React.memo(({puzzle, type, pause, setPause, pokemons, shinies
                             setVictoryOpen(true);
                         }, 1600);
                     }
-                    logs?.scrollBy({
-                        top: logs.scrollHeight,
-                        behavior: "smooth",
-                    });
+                    if (logs) {
+                        logs.scrollBy({
+                            top: logs.scrollHeight,
+                            behavior: "smooth",
+                        });
+                    }
                     setPause(false);
                 }, 800);
             } else {
@@ -537,10 +535,12 @@ const PuzzleGrid = React.memo(({puzzle, type, pause, setPause, pokemons, shinies
                 setTimeout(() => {
                     setSelectedIds(new Set());
                     setIncorrectGuessIds(new Set());
-                    logs?.scrollBy({
-                        top: logs.scrollHeight,
-                        behavior: "smooth",
-                    });
+                    if (logs) {
+                        logs.scrollBy({
+                            top: logs.scrollHeight,
+                            behavior: "smooth",
+                        });
+                    }
                     setPause(false);
                 }, 800);
             }
@@ -633,6 +633,26 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
     const loaded = useRef<boolean | null>(null);
     const challengeWatch = form.watch("challenge");
 
+    const { pokemons, sprites } = useMemo(() => {
+        if (!dictionary) return { pokemons: [], sprites: {} };
+        
+        const processedMons = shuffleArray(dictionary.pokemons);
+        const processedSprites: Record<number, string> = {};
+        
+        dictionary.pokemons.forEach((p: any) => {
+            processedSprites[p.id] = p.sprite_default;
+        });
+
+        return { pokemons: processedMons, sprites: processedSprites };
+    }, [dictionary]);
+
+    useEffect(() => {
+        if (dictionary) {
+            allTips.current = dictionary.tips;
+            spritesMap.current = sprites;
+        }
+    }, [dictionary, sprites]);
+
     const saveState = (id: string) => {
         if (id == '') return;
         let status = 0;
@@ -696,7 +716,6 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
     const [availableTips, setAvailableTips] = useState<number>(maxAvailableTips);
     const [refresh, setRefresh] = useState<boolean>(false);
     const [pause, setPause] = useState<boolean>(false);
-    const [pokemons, setPokemons] = useState<any>([]);
     const [shinies, setShinies] = useState<number[]>([]);
     const [challengeOptions, setChallengeOptions] = useState<Record<string, string>>();
 
@@ -706,16 +725,6 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
     const [visibleTab, setVisibleTab] = useState<number>(1);
     const [currentDexView, setCurrentDexView] = useState<number>();
     const [solvedGroupNames, setSolvedGroupNames] = useState<string[]>([]);
-
-    useEffect(() => {
-        if (dictionary) {
-            allTips.current = dictionary.tips;
-            setPokemons(shuffleArray(dictionary.pokemons));
-            dictionary.pokemons.forEach((p: any) => {
-                spritesMap.current[p.id] = p.sprite_default;
-            })
-        }
-    }, [dictionary]);
 
     useEffect(() => {
         if (challenges != null) {
@@ -776,7 +785,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
             }
         }
 
-        if (loaded.current == false)
+        if (loaded.current == false && pokemons.length > 0)
             randomShinies();
     }, [pokemons])
 
