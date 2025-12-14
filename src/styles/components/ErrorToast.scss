@@ -1,0 +1,43 @@
+@use "../abstract" as *;
+
+.error-toast {
+    position: fixed;
+    top: 4rem;
+    z-index: 50;
+
+    background-color: color(background1);
+    padding: 0.5rem 1rem;
+    border: 2px solid color(selection2);
+    font-size: text(small);
+    text-align: center;
+    animation: toast-in 0.15s ease-in 0s 1;
+
+    &::after {
+        display: block;
+        content: '';
+        background-color: color(selection2);
+        height: 35%;
+        aspect-ratio: 1;
+
+        position: absolute;
+        right: 0;
+        top: -1px;
+
+        clip-path: polygon(0% 0%, 100% 100%, 100% 0%);
+    }
+
+    @media (max-width: 768px) {
+        width: calc(100% - var(--spacing) * 2);
+    }
+}
+
+@keyframes toast-in {
+    0% {
+        opacity: 0;
+        transform: translateY(-100%);
+    }
+    100%{
+        opacity: 1;
+        transform: translateY(0);
+    };
+}

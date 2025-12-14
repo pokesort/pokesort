@@ -1,19 +1,21 @@
-import { connect, data } from "@/lib/mongodb";
+import { connect, getDb } from "@/lib/mongodb";
 
 export default async function handler(req, res) {
   try {
     await connect();
+    const db = getDb();
 
     const objectKey = req.query.by;
 
     let query = objectKey == 'date' ? { date: { $ne: null } } : {};
-    let puzzles = await data.db.collection('puzzles').find(query).sort({ date: 1 }).toArray();
+    let puzzles = await db.db.collection('puzzles').find(query).sort({ date: 1 }).toArray();
 
     switch (objectKey) {
       case 'date':
         const puzzlesByDate = puzzles.reduce((acc, puzzle) => {
           if (puzzle.date) {
-            acc[puzzle.date] = puzzle._id;
+            acc[puzzle.date] = acc[puzzle.date] || [];
+            acc[puzzle.date].push(puzzle._id);
           }
           return acc;
         }, {});

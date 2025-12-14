@@ -11,9 +11,10 @@ import Loading from '@/src/components/Loading';
 import ArrowLeft from '@/src/components/svg/ArrowLeft';
 import ArrowRight from '@/src/components/svg/ArrowRight';
 import Shiny from '@/src/components/svg/Shiny';
+import ErrorToast from '@/src/components/ToastError';
 
 interface CalendarProps {
-    puzzles: Record<string, string> | undefined;
+    puzzles: Record<string, string[]> | undefined;
     loading: boolean;
 }
 
@@ -24,6 +25,27 @@ function Calendar({puzzles, loading}: CalendarProps) {
     let dates: string[] = [format(today, "yyyy-MM-dd")];
     if (puzzles) {
         dates = Object.keys(puzzles);
+    }
+
+    const getPuzzleStatus = (ids: string[]) => {
+        let data: any = null;
+
+        ids.forEach(id => {
+            const userData: any = localStorage.getItem(`s_${id}`);
+            if (!userData) return;
+
+            if (!data) data = {status: 0};
+            
+            const parsed = JSON.parse(userData);
+            if (parsed.shiny != undefined && parsed.shiny.length > 0) {
+                data["shiny"] = parsed.shiny;
+            }
+            if (parsed.status > data.status) {
+                data["status"] = parsed.status;
+            }
+        })
+
+        return data;
     }
 
     const renderHeader = () => (
@@ -62,8 +84,7 @@ function Calendar({puzzles, loading}: CalendarProps) {
             for (let i = 0; i < 7; i++) {
                 const isCurrentMonth = isSameMonth(day, monthStart);
                 const dayString = format(day, "yyyy-MM-dd");
-                const userData: any = dates.includes(dayString) ? localStorage.getItem(`s_${puzzles[dayString]}`) : null
-                const shinies = JSON.parse(userData)?.shiny;
+                const userData: any = dates.includes(dayString) ? getPuzzleStatus(puzzles[dayString]) : null
 
                 const blockClasses = clsx(
                     'calendar-cell',
@@ -71,7 +92,7 @@ function Calendar({puzzles, loading}: CalendarProps) {
                         'hidden': !isCurrentMonth,
                         'disabled': !dates.includes(dayString) || foundToday,
                         'attempted': userData != null,
-                        'complete': userData && JSON.parse(userData).status == 1
+                        'complete': userData && userData.status >= 1
                     }
                 );
                 if (!foundToday && isSameDay(day, today)) foundToday = true;
@@ -79,7 +100,7 @@ function Calendar({puzzles, loading}: CalendarProps) {
                 days.push(
                     <Link href={`puzzle/${dayString}`} key={dayString} className={blockClasses}>
                         {format(day, "dd")}
-                        {shinies != undefined && shinies.length > 0 && 
+                        {userData && userData.shiny != undefined && userData.shiny.length > 0 && 
                             <div className="shiny"><Shiny /></div>
                         }
                     </Link>
@@ -113,7 +134,7 @@ export default function Archive() {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
-    const [puzzles, setPuzzles] = useState<Record<string, string>>();
+    const [puzzles, setPuzzles] = useState<Record<string, string[]>>();
 
     useEffect(() => {
         setLoading(true);
@@ -130,7 +151,8 @@ export default function Archive() {
                     }),
                 ]);
                 if (!puzzleResponse.ok) {
-                    throw new Error('Erro ao obter informações do puzzle.');
+                    setError('Erro ao obter informações do arquivo.');
+                    return;
                 }
                 const [puzzleData] = await Promise.all([
                     puzzleResponse.json(),
@@ -152,6 +174,9 @@ export default function Archive() {
     }, [])
 
     return (
-        <Calendar puzzles={puzzles} loading={loading} />
+        <>
+            <ErrorToast error={error} />
+            <Calendar puzzles={puzzles} loading={loading} />
+        </>
     )
 }

@@ -48,12 +48,12 @@ export default React.memo(function PuzzleBlock({ pokemon, shinies, multiselect, 
     const default_url = !shinies.includes(pokemon.dex_number) ? pokemon.sprite_default : pokemon.sprite_shiny;
     
     const gifRef = useRef<any>(null);
-    const [shiny, setShiny] = useState<boolean>(shinies.includes(pokemon.dex_number));
+    const [shiny, setShiny] = useState<boolean>(false);
     const [shinyReveal, setShinyReveal] = useState<boolean>(false);
     const pressTimer = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
-        setShiny(shinies.includes(pokemon.dex_number));
+        setShiny(shinies.includes(pokemon.id));
     }, [shinies])
 
     useEffect(() => {
@@ -110,9 +110,6 @@ export default React.memo(function PuzzleBlock({ pokemon, shinies, multiselect, 
             key={pokemon.id}
             layoutId={`pokemon-block-${pokemon.id}`}
             variants={itemVariants}
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.5 }}
             transition={{ duration: 0.5, type: 'spring' }}
             onContextMenu={handleRightClick}
             onTouchStart={handleTouchStart}

@@ -103,6 +103,7 @@ section#page {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    overflow-x: hidden;
   
     width: 100vw;
     flex-grow: 1;
@@ -143,6 +144,7 @@ section#page {
     }
     &.puzzle-window {
         width: min(100%, calc(120px * var(--cols, 4)));
+        clip-path: polygon(0% 0%, calc(100% - 37px) 0%, 100% 37px, 100% 37px, 100% 100%, 0% 100%);
     }
 }
 @media (max-width: 768px) {
@@ -185,7 +187,7 @@ section#page {
     animation: become-floating 0.15s ease-in 0s 1;
 
     &:hover {
-        top: calc(100% - 343px);
+        top: calc(100% - 400px);
     }
 }
 

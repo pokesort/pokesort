@@ -1,10 +1,10 @@
-import { connect, data } from "@/lib/mongodb";
+import { connect, getDb } from "@/lib/mongodb";
 import { getPuzzleModel } from '@/src/models/Puzzle';
 
 export default async function handler(req, res) {
-  
+
   await connect();
-  
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
@@ -15,8 +15,8 @@ export default async function handler(req, res) {
 
   try {
     await connect();
-
-    const Puzzle = getPuzzleModel(data);
+    const conn = getDb();
+    const Puzzle = getPuzzleModel(conn);
 
     const new_puzzle = new Puzzle(puzzle);
 

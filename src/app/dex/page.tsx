@@ -13,6 +13,7 @@ import Input from '@/src/components/forms/Input';
 import SearchIcon from '@/src/components/svg/SearchIcon';
 import FilterIcon from '@/src/components/svg/FilterIcon';
 import { FIELD_OPTIONS, MAX_SELECT, toTitleCase } from '@/src/scripts/utils';
+import ErrorToast from '@/src/components/ToastError';
 
 interface DexFiltersProps {
   queries: string | undefined;
@@ -143,6 +144,7 @@ export default React.memo(function Dex() {
   const [dictionary, setDictionary] = useState<Record<string, string[]>>();
   
   const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
   const [firstFetch, setFirstFetch] = useState<boolean>(true);
 
   useEffect(() => {
@@ -181,9 +183,9 @@ export default React.memo(function Dex() {
                     method: 'GET', headers
                 }),
             ]);
-            // if (!abilitiesResponse.ok || !movesResponse.ok) {
-            //     throw new Error('Erro ao obter informações.');
-            // }
+            if (!abilitiesResponse.ok || !movesResponse.ok) {
+                setError('Erro ao obter informações.');
+            }
             const [abilitiesData, movesData] = await Promise.all([
                 abilitiesResponse.json(),
                 movesResponse.json(),
@@ -195,6 +197,7 @@ export default React.memo(function Dex() {
             });
         } catch (e) {
             console.error(e);
+            setError('Não foi possível conectar ao servidor. Tente novamente.');
         } finally {                
             // setLoading(false);
         }
@@ -209,7 +212,8 @@ export default React.memo(function Dex() {
   }, [])
 
   return (
-    <>
+    <>    
+      <ErrorToast error={error} />
       <Modal id="dex-modal" background={true} isOpen={dexModalOpen} setIsOpen={setDexModalOpen} canClose={true}>
         <DexView pokemonId={selected} />
       </Modal>

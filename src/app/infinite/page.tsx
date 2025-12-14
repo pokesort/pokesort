@@ -2,15 +2,20 @@
 
 import { useTranslations } from 'next-intl';
 import Puzzle from '@/src/components/Puzzle';
+import "@/src/styles/components/Infinite.scss";
 import type { PuzzleData } from '@/src/assets/types/PuzzleApiResponse';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { FIELD_OPTIONS } from '@/src/scripts/utils';
+import { FIELD_OPTIONS, CHALLENGE_FIELDS } from '@/src/scripts/utils';
 
 import Modal from '@/src/components/Modal';
 import Input from '@/src/components/forms/Input';
 import GridIcon from '@/src/components/svg/GridIcon';
 import Loading from '@/src/components/Loading';
 import { useForm } from 'react-hook-form';
+import ChallengeSelect from '@/src/components/forms/ChallengeSelect';
+import ErrorToast from '@/src/components/ToastError';
+
+const challengeKey = 'u_challenge';
 
 export default function InfinitePage() {
     const t = useTranslations();
@@ -25,6 +30,20 @@ export default function InfinitePage() {
 
     const [puzzle, setPuzzle] = useState<PuzzleData | undefined>(undefined);
     const [dictionary, setDictionary] = useState<any>();
+    const [challenges, setChallenges] = useState<any>();
+    const [excludeOptions, setExcludeOptions] = useState<Record<string, string>>({});
+    const [preferredChallenge, setPreferredChallenge] = useState<string>();
+
+    const getPreferredChallenge = () => {
+        return localStorage.getItem(challengeKey);
+    }
+
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            const value = localStorage.getItem(challengeKey);
+            setPreferredChallenge(value ?? "4");
+        }
+    })
 
     useEffect(() => {
         if (initial) return;
@@ -41,7 +60,7 @@ export default function InfinitePage() {
                 };
                 const body = {...formWatch};
                 if (body.excludeFields == false) body.excludeFields = [];
-                const queries = `amount=1&infinite=true&generation=${form.watch('generation')}&challenge=${form.watch('challenge')}`;
+                const queries = `amount=1&infinite=true&generation=${form.watch('generation')}&challenge=${form.watch('challenge')}&rows=${form.watch('rows') ?? ''}&cols=${form.watch('cols') ?? ''}`;
                 
                 const [puzzleResponse] = await Promise.all([
                     fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/puzzle/generate?${queries}`, {
@@ -51,11 +70,16 @@ export default function InfinitePage() {
                 if (!puzzleResponse.ok) {
                     const errorData = await puzzleResponse.json();
 
-                    if (errorData.code === 'MAX_ATTEMPTS') {
+                    if (errorData.error.name == "MaxAttemptsError") {
                         await fetchPageData();
-                    } else {
-                        throw new Error('Erro ao obter informações do puzzle.');
-                    }                    
+                        return;
+                    }
+                    
+                    setError(errorData.message);
+                    setPuzzle(undefined);
+                    setLoading(false);
+                    setInitial(true);
+                    return;
                 }
                 const [puzzleData] = await Promise.all([
                     puzzleResponse.json(),
@@ -67,6 +91,7 @@ export default function InfinitePage() {
                 }
                 setPuzzle(puzzleData.data);
                 setDictionary(puzzleData.dictionary);
+                setChallenges(puzzleData.challenges);
             } catch (e) {
                 console.error(e);
                 setError('Não foi possível conectar ao servidor. Tente novamente.');
@@ -78,14 +103,14 @@ export default function InfinitePage() {
         fetchPageData();
     }, [refresh])
 
-    const refreshInfinite = () => {
+    const refreshPuzzle = () => {
         setRefresh(prev => !prev);
     }
 
     const generatePuzzle = useCallback(() => {
         if(!loading) {
             setInitial(false);
-            refreshInfinite();
+            refreshPuzzle();
         }
     }, [loading])
 
@@ -97,13 +122,20 @@ export default function InfinitePage() {
     [1, 2, 3, 4].forEach((challenge: number) => {
         challenge_options[`${challenge}`] = t(`puzzle.challenge.${challenge}`);
     });
-    const exclude_options: Record<string, string> = {};
-    {Object.keys(FIELD_OPTIONS).forEach((option: string) => {
-        exclude_options[option] = t(`groupnames.${option}.short`);
-    });
+    
+    useEffect(() => {
+        if (!form.watch('challenge')) return;
+        const exclude_options: Record<string, string> = {};
+        const groups = CHALLENGE_FIELDS[form.watch('challenge') as 1 | 2 | 3 | 4];
+        Object.keys(groups).forEach((option: string) => {
+            exclude_options[option] = t(`groupnames.${option}.short`);
+        });
+        setExcludeOptions(exclude_options);
+    }, [form.watch('challenge')]);
 
     return (
         <>
+            <ErrorToast error={error} />
             {!initial &&
                 (loading ?
                     <>
@@ -120,30 +152,41 @@ export default function InfinitePage() {
                         setPuzzle={setPuzzle}
                         type="infinite"
                         dictionary={dictionary}
+                        challenges={challenges}
                         loading={loading}
                         setLoading={setLoading}
                         error={error}
                         setError={setError}
-                        refreshInfinite={refreshInfinite}
+                        refreshPuzzle={refreshPuzzle}
                     />
                 )
-            }            
-            <div className={`window-container cut-left ${!initial ? "floating": ""}`}>
-                <section className="window-info-row">
-                    <GridIcon/>
-                    <p>{t('puzzle.infinite.generate')}</p>
-                </section>
-                <div style={{display: 'flex', flexDirection: 'column', maxWidth: '500px', gap: '0.5rem'}}>
-                    <div style={{display: 'flex', flexDirection: 'row', width: '100%', gap: '0.5rem', flex: "1"}}>
-                        <Input type="select" style={{width: "100%"}} label={t(`puzzle.infinite.generation`)} name="generation" defaultValue="9" options={gen_options} form={form} />
-                        <Input type="select" style={{width: "100%"}} label={t(`puzzle.challenge.label`)} name="challenge" defaultValue="1" options={challenge_options} form={form} />
+            }
+            {!preferredChallenge ?
+                <Loading expand={false} />
+            :
+                <div className={`infinite-window window-container cut-left ${!initial ? "floating": ""}`}>
+                    <section className="window-info-row">
+                        <GridIcon/>
+                        <p>{t('puzzle.infinite.generate')}</p>
+                    </section>
+                    <div className="infinite-menu">
+                        <div>
+                            <Input type="select" style={{width: "100%"}} label={t(`puzzle.infinite.generation`)} name="generation" defaultValue="9" options={gen_options} form={form} />
+                            <ChallengeSelect minimal={true} label={t(`puzzle.challenge.label`)} style={{width: "100%"}} defaultValue={preferredChallenge} options={challenge_options} form={form} />
+                        </div>
+                        <div>
+                            <Input type="select" style={{width: "100%"}} label={t('puzzle.infinite.rows')} name="rows" options={{4: '4', 5: '5'}} defaultValue="4" form={form} />
+                            <Input type="select" style={{width: "100%"}} label={t('puzzle.infinite.cols')} name="cols" options={{4: '4', 5: '5', 6: '6'}} defaultValue="4" form={form} />
+                        </div>
+                        <div>
+                            <Input type="cloud" label={t('puzzle.infinite.exclude')} name="excludeFields" options={excludeOptions} form={form} />
+                        </div>
                     </div>
-                    <Input type="cloud" label={t('puzzle.infinite.exclude')} name="excludeFields" options={exclude_options} form={form} />
+                    <button className="form-button" onClick={generatePuzzle}>
+                        {t('puzzle.infinite.button')}
+                    </button>
                 </div>
-                <button className="form-button" onClick={generatePuzzle}>
-                    {t('puzzle.infinite.button')}
-                </button>
-            </div>
+            }
         </>
     )
-}}
+}

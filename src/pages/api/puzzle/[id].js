@@ -1,18 +1,29 @@
-import { connect, data } from '@/lib/mongodb';
+import { connect, getDb } from '@/lib/mongodb';
 import { getPuzzleModel } from '@/src/models/Puzzle';
 import mongoose from 'mongoose';
 import { populate } from './_utils';
+import { findPuzzlesOfSameDate } from '@/src/scripts/server_utils';
 
 export default async function handler(req, res) {
   await connect();
   
-  const { id } = req.query;
-  const Puzzle = getPuzzleModel(data);
+  const { id, daily, challenge } = req.query;
+  const db = getDb();
+  const Puzzle = getPuzzleModel(db);
+
   let existingPuzzle;
+  const today = new Date().toISOString().split('T')[0];
   const date = new Date(`${id}T00:00:00`);
   
   if (!isNaN(date) && date <= Date.now()) {
-    existingPuzzle = await Puzzle.findOne({'date': id});
+    const query = {'date': id};
+    if (challenge) query['challenge'] = challenge;
+
+    existingPuzzle = await Puzzle.findOne(query);
+
+    if (!existingPuzzle) {
+        existingPuzzle = await Puzzle.findOne({ date: id });
+    }
   } else if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).json({ success: false, error: 'Invalid ID format' });
   }
@@ -29,9 +40,11 @@ export default async function handler(req, res) {
     await remove(res, existingPuzzle);
   }
   else if (req.method === 'GET'){
-    existingPuzzle.daily = false;
+    const puzzleObject = existingPuzzle.toObject();
+    puzzleObject.daily = daily == "true" || puzzleObject.date == today;
+    const challenges = await findPuzzlesOfSameDate(existingPuzzle, Puzzle);
     const dictionary = await populate(res, existingPuzzle);
-    return res.status(200).json({success: true, data: existingPuzzle, dictionary: dictionary})
+    return res.status(200).json({success: true, data: puzzleObject, dictionary: dictionary, challenges: challenges})
   }
 }
 

@@ -1,9 +1,9 @@
-import { connect, data } from "@/lib/mongodb";
-
+import { connect, getDb } from "@/lib/mongodb";
 import { validateGenerateParams, pickRandomMult, generateTips } from "@/src/scripts/utils";
 import { createPuzzleFieldManager, generateUniqueQuery } from "@/src/scripts/puzzleManager";
 import { filterPokemons } from "@/src/scripts/server_utils";
 import { populate } from "./_utils";
+import { NotEnoughFieldsError, MaxAttemptsError } from "../../../scripts/erros";
 
 export default async function handler(req, res) {
 
@@ -15,56 +15,68 @@ export default async function handler(req, res) {
     const { amount, rows, cols, challenge, generation, infinite } = validatedParams;
 
     await connect();
+    getDb();
 
     const puzzles = [];
-    const fieldManager = createPuzzleFieldManager(challenge);
-    const { excludeFields } = req.body;
+    let fieldManager = createPuzzleFieldManager(challenge);
+    let { excludeFields } = req.body || {};
+    if (excludeFields) {
+      const list = Array.isArray(excludeFields) ? excludeFields : [excludeFields];
+      for (const f of list) {
+        if (f in fieldManager.availableFields) {
+          fieldManager.markFieldAsUsed(f);
+        }
+      }
+    }
 
     for (let i = 0; i < amount; i++) {
-      const idsUsed = [];
-      const puzzle = await generatePuzzle(rows, cols, challenge, fieldManager, generation, idsUsed);
+      const puzzle = await generatePuzzle(rows, cols, challenge, fieldManager, generation);
+
       puzzles.push(puzzle);
       fieldManager.reset();
     }
 
     if (infinite) {
       const dictionary = await populate(res, puzzles[0]);
-      return res.status(200).json({ success: true, data: puzzles[0], dictionary: dictionary });
+      const challenges = {};
+      challenges[puzzles[0].challenge] = "true";
+      return res.status(200).json({ success: true, data: puzzles[0], dictionary: dictionary, challenges: challenges });
     }
 
     return res.status(200).json({
-      message: 'Parâmetros validados com sucesso',
-      data: {
-        amount,
-        challenge,
-        rows,
-        cols,
-        generation
-      },
       puzzles: puzzles,
     });
 
   } catch (error) {
     console.error('Erro ao gerar puzzle:', error);
-    return res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error, message: error.message });
   }
 }
 
-export async function generatePuzzle(rows, cols, challenge, fieldManager, generation, idsUsed) {
-  const groups = [];
-  for (let i = 0; i < rows; i++) {
-    const group = await generateGroup(cols, fieldManager, generation, idsUsed);
-    groups.push(group);
+export async function generatePuzzle(rows, cols, challenge, fieldManager, generation) {
+
+  try {
+    const totalCombinations = countCombinations(fieldManager.getAvailableFields(), generation);
+    if (totalCombinations < rows) throw new NotEnoughFieldsError('Não existem campos suficientes para gerar o puzzle.');
+    
+    const groups = [];
+    const idsUsed = [];
+    for (let i = 0; i < rows; i++) {
+      const group = await generateGroup(cols, fieldManager, generation, idsUsed);
+      groups.push(group);
+    }
+    const puzzle = {
+      author: 'admin',
+      from: 'system',
+      challenge,
+      groups,
+      rows,
+      cols,
+    };
+    return puzzle;
+  } catch(error){
+    throw error;
   }
-  const puzzle = {
-    author: 'admin',
-    from: 'system',
-    challenge,
-    groups,
-    rows,
-    cols,
-  };
-  return puzzle;
 }
 
 export async function generateGroup(cols, fieldManager, generation, idsUsed) {
@@ -81,7 +93,7 @@ export async function generateGroup(cols, fieldManager, generation, idsUsed) {
         attempts++;
         continue;
       } else {
-        throw new Error('Não há mais campos disponíveis para gerar o puzzle');
+        throw new MaxAttemptsError('Máximo de tentativas alcançado, tente de novo');
       }
     }
 
@@ -108,4 +120,27 @@ export async function generateGroup(cols, fieldManager, generation, idsUsed) {
   };
 
   return group;
+}
+
+function countCombinations(challengeFields, generation) {
+  let total = 1;
+
+  for (const [key, value] of Object.entries(challengeFields)) {
+    
+    if (key === "generation")
+    {
+      total *= generation;
+      continue;
+    } 
+
+    if (value && typeof value === "object" && "min" in value && "max" in value) {
+      total *= (value.max - value.min + 1);
+    }
+
+    else if (Array.isArray(value)) {
+      total *= value.length;
+    }
+  }
+
+  return total;
 }

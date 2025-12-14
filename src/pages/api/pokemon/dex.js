@@ -1,6 +1,4 @@
-import { connect, data } from "@/lib/mongodb";
-import { pipe } from "framer-motion";
-import { pipeline } from "stream";
+import { connect, getDb } from "@/lib/mongodb";
 
 export default async function handler(req, res) {
   try {
@@ -101,7 +99,7 @@ export default async function handler(req, res) {
                 species_name: "$$cd.species_name",
                 dex_number: "$$cd.dex_number",
                 evolution_step: "$$cd.evolution_step",
-                step_override: { $ifNull: ["$$cd.step_override", null] },                
+                step_override: { $ifNull: ["$$cd.step_override", null] },
                 sprite_default: "$$cd.sprite_default",
                 sprite_shiny: "$$cd.sprite_shiny"
               },
@@ -282,21 +280,21 @@ export default async function handler(req, res) {
     ];
   }
 
-  async function hasEvolutionStep(id_dex) {
-    const poke = await data.db.collection("pokemon").findOne(
+  async function hasEvolutionStep(id_dex, db) {
+    const poke = await db.db.collection("pokemon").findOne(
       { $or: [{ id: Number(id_dex) }, { name: id_dex }] },
       { projection: { evolution_step: 1 } }
     );
     return poke?.evolution_step != null;
   }
 
-  async function getTypeMachups(result_object) {
+  async function getTypeMachups(result_object, db) {
     let matchups = {};
     let typeIds = result_object.types;
 
     let types = await Promise.all(
       typeIds.map(type =>
-        data.db.collection("types").findOne({ id: type })
+        db.db.collection("types").findOne({ id: type })
       )
     );
 
@@ -318,7 +316,8 @@ export default async function handler(req, res) {
   // Função principal
   async function getDexData(id_dex) {
 
-    const hasEvo = await hasEvolutionStep(id_dex);
+    const db = getDb();
+    const hasEvo = await hasEvolutionStep(id_dex, db);
 
     const pipeline = [
       ...matchPokemonStage(id_dex),
@@ -330,12 +329,12 @@ export default async function handler(req, res) {
       ...cleanupFields(),
     ];
 
-    const result = await data.db
+    const result = await db.db
       .collection("pokemon")
       .aggregate(pipeline)
       .toArray();
 
-    const object = await getTypeMachups(result[0]);
+    const object = await getTypeMachups(result[0], db);
 
     return object;
   }

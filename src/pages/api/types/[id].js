@@ -1,14 +1,15 @@
-import { connect, data } from "@/lib/mongodb";
+import { connect, getDb } from "@/lib/mongodb";
 
 export default async function handler(req, res) {
   try {
     await connect();
+    const db = getDb();
 
-    const {id} = req.query
-    const type = await data.db.collection("types").findOne({$or: [{"id": id}, {"name": id}]});
+    const { id } = req.query
+    const type = await db.db.collection("types").findOne({ $or: [{ "id": id }, { "name": id }] });
 
-    if (!type){
-        res.status(404).json({success: false, error: "Tipo não encontrado"})
+    if (!type) {
+      res.status(404).json({ success: false, error: "Tipo não encontrado" })
     }
     res.status(200).json({ success: true, type: type.name, id: type.id });
 
