@@ -43,7 +43,7 @@ const puzzleSchema = new mongoose.Schema({
                     /^\d{4}-\d{2}-\d{2}$/.test(v)
                 );
             },
-            message: 'Date must be in format YYYY-MM-DD or null.',
+            message: 'O formato da data deve ser YYYY-MM-DD',
         },
         default: null,
     },
@@ -71,7 +71,7 @@ const puzzleSchema = new mongoose.Schema({
 
                 return groups.every(group => group.pokemons.length === this.cols);
             },
-            message: 'Groups length must match "rows" and each "pokemons" array must match "cols".',
+            message: 'Os grupos devem respeitar o número de linhs e colunas escolhido',
         },
     },
 });

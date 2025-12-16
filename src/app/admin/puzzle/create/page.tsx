@@ -4,6 +4,7 @@ import PuzzleManage from '@/src/components/PuzzleManage';
 import type { PuzzleData } from '@/src/assets/types/PuzzleApiResponse';
 import { useEffect, useState } from 'react';
 import { notFound, redirect, useParams } from 'next/navigation';
+import ErrorToast from '@/src/components/ToastError';
 
 export default function PuzzleCreatePage() {
     const params = useParams();
@@ -15,7 +16,12 @@ export default function PuzzleCreatePage() {
     const [dictionary, setDictionary] = useState<any>();
 
     return (
-        <PuzzleManage
-        />
+        <>
+            <ErrorToast error={error} />
+            <PuzzleManage
+                error={error}
+                setError={setError}
+            />
+        </>
     )
 }

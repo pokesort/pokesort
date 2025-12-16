@@ -19,6 +19,8 @@ export const FIELD_OPTIONS = {
   dual: { min: 1, max: 2 },
 };
 
+export const modifiers = ['dual', 'shape']
+
 // Níveis de categorias (agrupamentos) — podem ser combinados
 // Ex.: categories: [...easy, ...medium] ou categories: mergeCategories(easy, medium)
 export const easy = [1, 2, 3, 11];
@@ -152,7 +154,7 @@ export function validateGenerateParams(params) {
     errors.push('Quantidade máxima de puzzles deve ser um número entre 1 e 30');
   }
 
-  if (!infinite && (!password || password !== process.env.AUTHORIZATION_BATCH)) {
+  if (!infinite && (!password || password !== process.env.NEXT_PUBLIC_API_AUTHORIZATION_BATCH)) {
     errors.push('Senha inválida');
   }
 
@@ -279,8 +281,8 @@ export function generateTips(ids, queries) {
   const values = pokemons;
 
   return [
-    `text?${text}`,
-    `pair?${values}`
+    `pair?${values}`,
+    `text?${text}`
   ];
 }
 

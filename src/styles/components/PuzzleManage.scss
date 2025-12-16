@@ -10,11 +10,17 @@ section#group-list {
     transition:
         width 0.3s ease,
         filter 0.3s ease,
-        transform 0.3s ease;
+        transform 0.3s ease,
+        opacity 0.3s ease;
     animation: group-list-appear 0.3s ease 0s 1;
 
     &.group-open {
         transform: translateX(calc(-250% / var(--cols)));
+    }
+
+    &.loading-state {
+        opacity: 0.75;
+        pointer-events: none;
     }
 
     @media (max-width: 1500px) {
@@ -129,6 +135,28 @@ section#group-form {
     
     padding: calc(var(--spacing) + 0.25rem) var(--spacing);
     background-color: color(section1);
+
+    .puzzle-header *:nth-child(3) {
+        margin-top: 1rem;
+    }
+
+    button.submit {
+        padding: 0.5rem;
+        background-color: color(section2);
+        font-size: text(small);
+        font-weight: 700;
+        transition:
+            transform 0.15s ease,
+            box-shadow 0.15s ease;
+
+        &:hover {
+            box-shadow: 0px 0 70px color(darker);
+            z-index: 60;
+        }
+        &:active {
+            transform: scale(0.85);
+        }
+    }
 }
 
 div.group-card {

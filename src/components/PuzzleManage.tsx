@@ -16,21 +16,31 @@ import { useForm, useWatch } from 'react-hook-form';
 import Input from './forms/Input';
 import GridIcon from './svg/GridIcon';
 import SearchIcon from './svg/SearchIcon';
+import Modal from './Modal';
 
 type Range = { min: number; max: number };
 
-export default function PuzzleManage () {
+interface PuzzleManageProps {
+    error: string | null;
+    setError: React.Dispatch<React.SetStateAction<string | null>>
+}
+
+export default function PuzzleManage ({error, setError}: PuzzleManageProps) {
     const t = useTranslations('');
     const locale = useLocale();
 
     const form = useForm();
+    const formWatch = form.watch();
 
+    const [loading, setLoading] = useState<boolean>(false);
     const [dictionary, setDictionary] = useState<Record<string, any>>();
     const [groups, setGroups] = useState<PuzzleGroup[]>([]);
     const [groupFormOpen, setGroupFormOpen] = useState<boolean>(false);
     const [groupFormTab, setGroupFormTab] = useState<number>(0);
     const [groupFormIndex, setGroupFormIndex] = useState<number>(0);
     const [groupPokemonPool, setGroupPokemonPool] = useState<Record<number, any[]>>({});
+    const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false);
+    const [latestId, setLatestId] = useState<string>("daily");
 
     const rows = useWatch({ control: form.control, name: "rows", defaultValue: 4 });
     const cols = useWatch({ control: form.control, name: "cols", defaultValue: 4 });
@@ -95,6 +105,52 @@ export default function PuzzleManage () {
             );
         }
     }
+
+    const submitPuzzle = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            const body = {
+                password: process.env.NEXT_PUBLIC_API_AUTHORIZATION_BATCH,
+                puzzle: {                    
+                    from: 'admin',
+                    author: 'admin',
+                    rows: formWatch.rows,
+                    cols: formWatch.cols,
+                    challenge: formWatch.challenge,
+                    date: formWatch.date == "" ? null : formWatch.date,
+                    groups: groups
+                }
+            }
+            const queries = ``;
+            
+            const [response] = await Promise.all([
+                fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/puzzle/create`, {
+                    method: 'POST', headers, body: JSON.stringify(body)
+                }),
+            ]);
+            if (!response.ok) {
+                const data = await response.json();
+                const error = data.message ? data.message.split(':') : ["Um erro inesperado ocorreu"];
+                setError(error[error.length - 1]);
+                setLoading(false);
+                return;
+            }
+            const [data] = await Promise.all([
+                response.json(),
+            ]);
+            setLoading(false);
+            setLatestId(data.data._id);
+            setShowSuccessModal(true);
+        } catch (e) {
+            console.error(e);
+            setError('Não foi possível conectar ao servidor. Tente novamente.');
+            setLoading(false);
+        }
+    };
     
     const fetchPokemonPool = async (target: number, filters: any, queries: string) => {
         if (filters.categoryType == "auto") {
@@ -121,7 +177,8 @@ export default function PuzzleManage () {
                     fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/pokemon/get`, { method: 'GET', headers }),
                 ]);
                 if (!abilitiesResponse.ok || !movesResponse.ok || !pokemonResponse.ok) {
-                    throw new Error('Erro ao obter informações.');
+                    setError('Erro ao obter informações.');
+                    return;
                 }
                 const [abilitiesData, movesData, pokemonData] = await Promise.all([
                     abilitiesResponse.json(),
@@ -207,17 +264,29 @@ export default function PuzzleManage () {
 
     return (
         <>
+            <Modal id={"puzzle-success"} isOpen={showSuccessModal} setIsOpen={setShowSuccessModal} canClose={true} background={true}>
+                <div className="modal-content-div">
+                    <p>
+                        Puzzle criado com sucesso!
+                    </p>
+                </div>
+                <button className="modal-content-div" onClick={ () => window.open(`/puzzle/${latestId}`, '_blank') }>
+                    <p>Visualizar</p>
+                </button>
+                <button className="modal-content-div" onClick={ () => redirect('/admin/puzzle') }>
+                    <p>Voltar ao Painel</p>
+                </button>
+            </Modal>
             {dictionary == undefined ?
                 <Loading expand={false} />
                 :
                 <>
                     <div id="click-catcher" onClick={() => setGroupFormOpen(false)}></div>
-                    <section id="group-list" className={`cut-in ${groupFormOpen ? 'group-open' : ''}`}
+                    <section id="group-list" className={`cut-in ${groupFormOpen ? 'group-open' : ''} ${loading ? "loading-state" : ""}`}
                         style={{'--rows': rows, '--cols': cols} as React.CSSProperties}>
                         <div className="puzzle-header">
-                            <p className="group-name edit-hover">
+                            <p className="group-name">
                                 Novo Puzzle
-                                <TickIcon />
                             </p>
                             <div className="form-flex">
                                 <Input type="select" label="Linhas" name="rows" defaultValue={'4'} options={{'4': '4', '5': '5'}} form={form} />
@@ -230,6 +299,9 @@ export default function PuzzleManage () {
                                 }} form={form} />
                                 <Input type="date" label="Data" name="date" form={form} />
                             </div>
+                            <button className="submit" onClick={submitPuzzle}>
+                                Enviar
+                            </button>
                         </div>
 
                         {rowCounter.map((rowIndex) => {
@@ -303,7 +375,6 @@ export default function PuzzleManage () {
                                     <div className={`filter-list ${form.watch(`groups.${groupFormIndex}.categoryType`) == 'auto' ? 'show' : ''}`}>
                                         {Object.keys(FIELD_OPTIONS).map((key: string) => {
                                             const records: Record<string, unknown> = FIELD_OPTIONS;
-                                            console.log(optionRecords);
                                             const options = optionRecords[key];
                                             return (
                                                 <Input key={key} type="multiselect"

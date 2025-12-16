@@ -34,6 +34,7 @@ export default React.memo(function Input({
     required = false,
     max = 0,
     defaultValue = "",
+    style = {},
     onInput
 }: InputProps) {
 

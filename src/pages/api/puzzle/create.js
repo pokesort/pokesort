@@ -10,7 +10,7 @@ export default async function handler(req, res) {
   }
 
   const { password, puzzle } = req.body;
-  if (password != process.env.AUTHORIZATION_BATCH)
+  if (password != process.env.NEXT_PUBLIC_API_AUTHORIZATION_BATCH)
     return res.status(403).json({ success: false, message: "Usuário não permitido" });
 
   try {
@@ -19,6 +19,10 @@ export default async function handler(req, res) {
     const Puzzle = getPuzzleModel(conn);
 
     const new_puzzle = new Puzzle(puzzle);
+    new_puzzle.groups.map(g => {
+      g.pokemons = g.pokemons.slice(0, new_puzzle.cols);
+      return g;
+    });
 
     await new_puzzle.validate();
 
@@ -33,10 +37,10 @@ export default async function handler(req, res) {
     return res.status(201).json({ success: true, data: savedPuzzle });
   } catch (error) {
     if (error.name === 'ValidationError') {
-      return res.status(400).json({ success: false, error: error.message });
+      return res.status(400).json({ success: false, message: error.message });
     }
 
     console.error('Internal error:', error);
-    return res.status(500).json({ success: false, error: 'Internal Server Error' });
+    return res.status(500).json({ success: false, message: 'Ocorreu um erro interno do servidor' });
   }
 }
