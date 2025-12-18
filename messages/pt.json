@@ -40,6 +40,11 @@
             "cols": "Colunas",
             "button": "Gerar"
         },
+        "from": {
+            "admin": "Personalizado",
+            "system": "Automático",
+            "user": "Usuário"
+        },
         "logs": "Logs",
         "puzzle": "Puzzle",
         "dex": "Dex",

@@ -38,6 +38,11 @@
             "generation": "Generation Limit",
             "button": "Generate"
         },
+        "from": {
+            "admin": "Custom",
+            "system": "Auto",
+            "user": "User"
+        },
         "logs": "Logs",
         "puzzle": "Puzzle",
         "dex": "Dex",

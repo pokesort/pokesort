@@ -61,11 +61,11 @@ async function update(req, res, existingPuzzle) {
   }
   catch (error) {
     if (error.name === 'ValidationError') {
-      return res.status(400).json({ success: false, error: error.message });
+      return res.status(400).json({ success: false, message: error.message });
     }
 
     console.error('Update error:', error);
-    return res.status(500).json({ success: false, error: 'Internal Server Error' });
+    return res.status(500).json({ success: false, message: 'Internal Server Error' });
   }
 }
 
@@ -76,6 +76,6 @@ async function remove(res, existingPuzzle) {
     return res.status(200).json({ success: true, message: 'Puzzle deleted successfully' });
   } catch (error) {
     console.error('Delete error:', error);
-    return res.status(500).json({ success: false, error: 'Internal Server Error' });
+    return res.status(500).json({ success: false, message: 'Internal Server Error' });
   }
 }

@@ -270,12 +270,14 @@ export default function PuzzleManage ({error, setError}: PuzzleManageProps) {
                         Puzzle criado com sucesso!
                     </p>
                 </div>
-                <button className="modal-content-div" onClick={ () => window.open(`/puzzle/${latestId}`, '_blank') }>
-                    <p>Visualizar</p>
-                </button>
-                <button className="modal-content-div" onClick={ () => redirect('/admin/puzzle') }>
-                    <p>Voltar ao Painel</p>
-                </button>
+                <div className="button-row">
+                    <button className="modal-content-div" onClick={ () => window.open(`/puzzle/${latestId}`, '_blank') }>
+                        <p>Visualizar</p>
+                    </button>
+                    <button className="modal-content-div" onClick={ () => redirect('/admin/puzzle') }>
+                        <p>Voltar ao Painel</p>
+                    </button>
+                </div>
             </Modal>
             {dictionary == undefined ?
                 <Loading expand={false} />
