@@ -279,8 +279,8 @@ export function generateTips(ids, queries) {
   const values = pokemons;
 
   return [
-    `text?${text}`,
-    `pair?${values}`
+    `pair?${values}`,
+    `text?${text}`
   ];
 }
 
