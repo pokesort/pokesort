@@ -14,15 +14,55 @@ export default function PuzzleCreatePage() {
     const [error, setError] = useState<string | null>(null);
 
     const [puzzle, setPuzzle] = useState<PuzzleData>();
-    const [dictionary, setDictionary] = useState<any>();
+
+    useEffect(() => {
+        setLoading(true);
+        setError(null);
+
+        const fetchPageData = async () => {
+            try {
+                const headers = {
+                    'Content-Type': 'application/json'
+                };
+                if (['get', '', null].includes(slug)) {
+                    setError('Não conseguimos encontrar este puzzle...');
+                    return;
+                }
+                const [puzzleResponse] = await Promise.all([
+                    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/puzzle/${slug}`, {
+                        method: 'GET', headers
+                    }),
+                ]);
+                if (!puzzleResponse.ok) {
+                    setError('Não conseguimos encontrar este puzzle...');
+                    return;
+                }
+                const [puzzleData] = await Promise.all([
+                    puzzleResponse.json(),
+                ]);
+              
+                if (process.env.NODE_ENV === "development") {
+                    console.log(puzzleData.data);
+                }
+                setPuzzle(puzzleData.data);
+            } catch (e) {
+                console.error(e);
+                setError('Não foi possível conectar ao servidor. Tente novamente.');
+            } finally {                
+                setLoading(false);
+            }
+        };
+
+        fetchPageData();
+    }, [])
 
     return (
         <>
-            {slug}
             <ErrorToast error={error} />
             <PuzzleManage
                 error={error}
                 setError={setError}
+                puzzle={puzzle}
             />
         </>
     )

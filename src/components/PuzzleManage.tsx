@@ -1,8 +1,8 @@
 "use client"
 
-import type { PuzzleGroup } from '@/src/assets/types/PuzzleApiResponse';
+import type { PuzzleData, PuzzleGroup } from '@/src/assets/types/PuzzleApiResponse';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { notFound, useRouter, useParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { FIELD_OPTIONS, MAX_SELECT, toTitleCase } from '@/src/scripts/utils';
 
 import "@/src/styles/components/PuzzleManage.scss";
@@ -11,7 +11,6 @@ import { useLocale, useTranslations } from 'next-intl';
 import ListBlock from './ListBlock';
 import Loading from './Loading';
 import EditIcon from '@/src/components/svg/EditIcon';
-import TickIcon from '@/src/components/svg/TickIcon';
 import { useForm, useWatch } from 'react-hook-form';
 import Input from './forms/Input';
 import GridIcon from './svg/GridIcon';
@@ -23,15 +22,17 @@ type Range = { min: number; max: number };
 interface PuzzleManageProps {
     error: string | null;
     setError: React.Dispatch<React.SetStateAction<string | null>>
+    puzzle?: PuzzleData;
 }
 
-export default function PuzzleManage ({error, setError}: PuzzleManageProps) {
+export default function PuzzleManage ({error, setError, puzzle=undefined}: PuzzleManageProps) {
     const t = useTranslations('');
     const locale = useLocale();    
     const router = useRouter();
 
     const form = useForm();
     const formWatch = form.watch();
+    const { reset } = form;
 
     const [loading, setLoading] = useState<boolean>(false);
     const [dictionary, setDictionary] = useState<Record<string, any>>();
@@ -45,6 +46,23 @@ export default function PuzzleManage ({error, setError}: PuzzleManageProps) {
 
     const rows = useWatch({ control: form.control, name: "rows", defaultValue: 4 });
     const cols = useWatch({ control: form.control, name: "cols", defaultValue: 4 });
+
+    useEffect(() => {
+      console.log(formWatch)
+    }, [formWatch])    
+
+    useEffect(() => {
+        if (!puzzle) return;
+        
+        reset({
+            cols: `${puzzle.cols}`,
+            rows: `${puzzle.rows}`,
+            challenge: `${puzzle.challenge}`,
+            date: puzzle.date
+        });
+        setGroups(puzzle.groups);
+        setLatestId(puzzle._id);
+    }, [puzzle, reset])
 
     const rangeToRecord = useCallback((key: string, { min, max }: Range): Record<string, string> => {
         const record: Record<string, string> = {};
@@ -129,9 +147,14 @@ export default function PuzzleManage ({error, setError}: PuzzleManageProps) {
             const queries = ``;
             
             const [response] = await Promise.all([
-                fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/puzzle/create`, {
-                    method: 'POST', headers, body: JSON.stringify(body)
-                }),
+                !puzzle ?
+                    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/puzzle/create`, {
+                        method: 'POST', headers, body: JSON.stringify(body)
+                    })
+                :
+                    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/puzzle/${puzzle._id}`, {
+                        method: 'PUT', headers, body: JSON.stringify(body)
+                    }),
             ]);
             if (!response.ok) {
                 const data = await response.json();
@@ -268,7 +291,11 @@ export default function PuzzleManage ({error, setError}: PuzzleManageProps) {
             <Modal id={"puzzle-success"} isOpen={showSuccessModal} setIsOpen={setShowSuccessModal} canClose={true} background={true}>
                 <div className="modal-content-div">
                     <p>
-                        Puzzle criado com sucesso!
+                        {!puzzle ?                        
+                            "Puzzle criado com sucesso!"
+                        :
+                            "Puzzle atualizado com sucesso!"
+                        }
                     </p>
                 </div>
                 <div className="button-row">
@@ -289,7 +316,7 @@ export default function PuzzleManage ({error, setError}: PuzzleManageProps) {
                         style={{'--rows': rows, '--cols': cols} as React.CSSProperties}>
                         <div className="puzzle-header">
                             <p className="group-name">
-                                Novo Puzzle
+                                {puzzle ? "Editar Puzzle" : "Novo Puzzle"}
                             </p>
                             <div className="form-flex">
                                 <Input type="select" label="Linhas" name="rows" defaultValue={'4'} options={{'4': '4', '5': '5'}} form={form} />

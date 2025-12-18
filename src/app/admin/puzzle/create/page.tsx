@@ -13,7 +13,6 @@ export default function PuzzleCreatePage() {
     const [error, setError] = useState<string | null>(null);
 
     const [puzzle, setPuzzle] = useState<PuzzleData>();
-    const [dictionary, setDictionary] = useState<any>();
 
     return (
         <>

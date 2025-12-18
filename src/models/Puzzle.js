@@ -71,7 +71,7 @@ const puzzleSchema = new mongoose.Schema({
 
                 return groups.every(group => group.pokemons.length === this.cols);
             },
-            message: 'Os grupos devem respeitar o número de linhs e colunas escolhido',
+            message: 'Os grupos devem respeitar o número de linhas e colunas escolhido',
         },
     },
 });

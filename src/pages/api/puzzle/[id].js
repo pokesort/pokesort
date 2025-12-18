@@ -57,7 +57,12 @@ async function update(req, res, existingPuzzle) {
   try {
     await connect();
 
-    Object.assign(existingPuzzle, req.body);
+    const { password, puzzle } = req.body;
+    puzzle.groups.map(g => {
+      g.pokemons = g.pokemons.slice(0, puzzle.cols);
+      return g;
+    });
+    Object.assign(existingPuzzle, puzzle);
 
     await existingPuzzle.validate();
     const updatedPuzzle = await existingPuzzle.save();
