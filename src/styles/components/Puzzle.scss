@@ -245,7 +245,7 @@ section.solved-groups-grid {
             .guess-group {
                 justify-self: center;
                 max-width: 90%;
-                height: 48px;
+                min-height: 48px;
 
                 .tip {
                     margin: auto 0;
