@@ -34,6 +34,7 @@ export interface PuzzleData {
   cols: number;
   groups: PuzzleGroup[];
   challenge: string;
+  testing?: boolean;
   __v: number;
 }
 

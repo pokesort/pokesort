@@ -45,6 +45,11 @@
             "system": "Automático",
             "user": "Usuário"
         },
+        "status": {
+            "0": "Aguardando",
+            "1": "Ativo",
+            "2": "Planejado"
+        },
         "logs": "Logs",
         "puzzle": "Puzzle",
         "dex": "Dex",

@@ -2,7 +2,7 @@
 
 import type { PuzzleGroup } from '@/src/assets/types/PuzzleApiResponse';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { notFound, redirect, useParams } from 'next/navigation';
+import { notFound, useRouter, useParams } from 'next/navigation';
 import { FIELD_OPTIONS, MAX_SELECT, toTitleCase } from '@/src/scripts/utils';
 
 import "@/src/styles/components/PuzzleManage.scss";
@@ -27,7 +27,8 @@ interface PuzzleManageProps {
 
 export default function PuzzleManage ({error, setError}: PuzzleManageProps) {
     const t = useTranslations('');
-    const locale = useLocale();
+    const locale = useLocale();    
+    const router = useRouter();
 
     const form = useForm();
     const formWatch = form.watch();
@@ -274,7 +275,7 @@ export default function PuzzleManage ({error, setError}: PuzzleManageProps) {
                     <button className="modal-content-div" onClick={ () => window.open(`/puzzle/${latestId}`, '_blank') }>
                         <p>Visualizar</p>
                     </button>
-                    <button className="modal-content-div" onClick={ () => redirect('/admin/puzzle') }>
+                    <button className="modal-content-div" onClick={ () => router.push('/admin/puzzle') }>
                         <p>Voltar ao Painel</p>
                     </button>
                 </div>

@@ -43,6 +43,11 @@
             "system": "Auto",
             "user": "User"
         },
+        "status": {
+            "0": "Standby",
+            "1": "Online",
+            "2": "Planned"
+        },
         "logs": "Logs",
         "puzzle": "Puzzle",
         "dex": "Dex",
@@ -55,11 +60,11 @@
             "dex": "Press and hold a block or right-click it to search on the Dex."
         },
         "challenge": {
-            "label": "Nível de Desafio",
-            "1": "Treinador",
-            "2": "Líder",
+            "label": "Challenge Level",
+            "1": "Trainer",
+            "2": "Leader",
             "3": "Elite",
-            "4": "Campeão",
+            "4": "Champion",
             "help": {
                 "1": "Dê início à sua jornada. Puzzles 4x4 incluindo grupos de tipos, região, geração, passo evolutivo, número de tipos e categorias como bebês, míticos, lendários e iniciais.",
                 "2": "Teste suas habilidades em um ginásio. Puzzles 4x5 ou 5x4 adicionando grupos de formas alternativas, cadeia evolutiva e categorias como Mega Evoluções, Ultra Beasts e fósseis.",

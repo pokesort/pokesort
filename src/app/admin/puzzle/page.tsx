@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { PuzzleData } from '@/src/assets/types/PuzzleApiResponse';
 import { isBefore, isToday } from 'date-fns';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import ErrorToast from '@/src/components/ToastError';
 
 import "@/src/styles/components/PuzzleList.scss";
@@ -17,6 +17,8 @@ import UserIcon from '@/src/components/svg/UserIcon';
 import EditIcon from '@/src/components/svg/EditIcon';
 import CloseIcon from '@/src/components/svg/CloseIcon';
 import Modal from '@/src/components/Modal';
+import ViewIcon from '@/src/components/svg/ViewIcon';
+import ChallengeIcon from '@/src/components/svg/ChallengeIcon';
 
 interface PuzzleCardProps {
     puzzle: PuzzleData;
@@ -26,30 +28,22 @@ interface PuzzleCardProps {
 const PuzzleCard = React.memo(({puzzle, deletePuzzle}: PuzzleCardProps) => {
     const t = useTranslations();
     const locale = useLocale();
+    const router = useRouter();
 
     const date = formatDate(puzzle.date, locale);
     const [deleteModal, setDeleteModal] = useState<boolean>(false);
 
-    const statusSwitch = useMemo(() => {
+    const status = useMemo(() => {
         const date = puzzle.date == null ? null : new Date(puzzle.date);
 
         if (date == null) {
-            return <>
-                <div className="dot" data-status="0"></div>
-                Aguardando
-            </>
+            return 0
         } else if (isBefore(date, new Date()) || isToday(date)) {
-            return <>
-                <div className="dot" data-status="1"></div>
-                Ativo
-            </>
+            return 1
         } else {
-            return <>
-                <div className="dot" data-status="2"></div>
-                Planejado
-            </>
+            return 2
         }
-    }, [puzzle])    
+    }, [puzzle.date])
 
     return (
         <>
@@ -73,11 +67,16 @@ const PuzzleCard = React.memo(({puzzle, deletePuzzle}: PuzzleCardProps) => {
             </Modal>
             <tr className="puzzle-card-title">
                 <td>
-                    {statusSwitch}
+                    <div className="dot" data-status={status}></div>
+                    {t(`puzzle.status.${status}`)}
                 </td>
                 <td>
                     <CalendarIcon />
                     {date != "Invalid Date" ? date : "Sem data"}
+                </td>
+                <td>
+                    <ChallengeIcon />
+                    {t(`puzzle.challenge.${puzzle.challenge}`)}
                 </td>
                 <td>
                     <GridIcon />
@@ -89,7 +88,10 @@ const PuzzleCard = React.memo(({puzzle, deletePuzzle}: PuzzleCardProps) => {
                 </td>
 
                 <td className="buttons">
-                    <button onClick={() => redirect(`/admin/puzzle/${puzzle._id}`)}>
+                    <button onClick={() => router.push(`/puzzle/${puzzle._id}`)}>
+                        <ViewIcon />
+                    </button>
+                    <button onClick={() => router.push(`/admin/puzzle/${puzzle._id}`)}>
                         <EditIcon />
                     </button>
                     <button onClick={() => setDeleteModal(true)}>
@@ -102,6 +104,8 @@ const PuzzleCard = React.memo(({puzzle, deletePuzzle}: PuzzleCardProps) => {
 })
 
 export default function PuzzleListPage() {
+    const router = useRouter();
+
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -179,18 +183,27 @@ export default function PuzzleListPage() {
 
     return (
         <>
-            <ErrorToast error={error} />
-            
+            <ErrorToast error={error} />            
             {!puzzles || loading ?
                 <Loading expand={false} />
             :
-                <table className="puzzle-card-table">
-                    <tbody>
-                        {puzzles.map((puzzle: PuzzleData, index: number) => (
-                            <PuzzleCard key={puzzle._id} puzzle={puzzle} deletePuzzle={deletePuzzle} />
-                        ))}
-                    </tbody>
-                </table>
+                <>
+                    <div className="page-title">
+                        <h1>Puzzles</h1>
+                        <button onClick={() => router.push(`/admin/puzzle/create`)}>
+                            Novo Puzzle
+                        </button>
+                    </div>
+                    <div className="table-container">
+                        <table className="puzzle-card-table">
+                            <tbody>
+                                {puzzles.map((puzzle: PuzzleData, index: number) => (
+                                    <PuzzleCard key={puzzle._id} puzzle={puzzle} deletePuzzle={deletePuzzle} />
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </>
             }
         </>
     )

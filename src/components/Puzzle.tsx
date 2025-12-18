@@ -6,7 +6,7 @@ import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { useLocale } from 'next-intl';
 import { formatDate, isYesterday, shuffleArray, getNextRefresh, toTitleCase, decodeTips, randomInRange, isMobile } from '@/src/scripts/utils';
 import { useInView } from 'react-intersection-observer';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 import type { PuzzleData } from '@/src/assets/types/PuzzleApiResponse';
 import "@/src/styles/components/Puzzle.scss";
@@ -90,7 +90,8 @@ interface VictoryModalProps {
 
 const VictoryModal = React.memo(({type, challenge=null, guesses, shinies, dateOg, victoryOpen, setVictoryOpen, refreshPuzzle}: VictoryModalProps) => {
     const t = useTranslations('puzzle');
-    const locale = useLocale();
+    const locale = useLocale();    
+    const router = useRouter();
     const date = formatDate(dateOg, locale, false);
     const realGUesses = guesses.filter((g: PuzzleGuess) => g.type != 1);
 
@@ -206,7 +207,7 @@ const VictoryModal = React.memo(({type, challenge=null, guesses, shinies, dateOg
                     <p>{t(`victory.next-daily`)}:</p>
                     <h1><Countdown targetDate={getNextRefresh()} active={victoryOpen} /></h1>
                 </div>
-                <button className="modal-content-div" onClick={ () => redirect('/') }>
+                <button className="modal-content-div" onClick={ () => router.push('/') }>
                     <p>{t(`victory.back`)}</p>
                 </button>
                 </>
@@ -741,11 +742,11 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
     }, [victoryOpen]);
 
     useEffect(() => {
-        if (puzzle && guesses.length > 0) saveState(puzzle._id || '');
+        if (puzzle && !puzzle.testing && guesses.length > 0) saveState(puzzle._id || '');
     }, [guesses])
 
     useEffect(() => {
-        if (puzzle && type != 'infinite') {
+        if (puzzle && !puzzle.testing && type != 'infinite') {
             loaded.current = loadState(puzzle._id || '');
         } else {
             loaded.current = false;

@@ -50,7 +50,7 @@ ul#dex-list {
 
 #dex-filters {
   position: sticky;
-  top: 59px;
+  // top: 59px;
   z-index: 15;
 
   display: flex;
@@ -105,10 +105,6 @@ ul#dex-list {
       background-color: #1C4E69;
     }
   }
-
-  @media(max-width: 768px) {
-    top: 45px;
-  }
 }
 
 .filter-form { 
@@ -144,6 +140,12 @@ ul#dex-list {
 
     .window-container {
       display: none;
+    }
+
+    .filter-grid {
+      padding: 0.5rem;
+      padding-top: 1rem;
+      margin: 0 var(--spacing);
     }
   }
 }
