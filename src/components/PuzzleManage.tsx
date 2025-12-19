@@ -19,6 +19,46 @@ import Modal from './Modal';
 
 type Range = { min: number; max: number };
 
+interface Checks {
+    success: boolean;
+    error?: string;
+    errorCases?: number[];
+}
+
+const confirmIntegrity = async (puzzle: PuzzleData, fetchPokemonPool: (target: number | null, filters: string | any, queries?: string) => Promise<any>): Promise<Checks> => {  
+    //Checar se existem mons repetidos
+    const mons = puzzle.groups.flatMap(group => group.pokemons);
+    const duplicates = mons.filter((id, index, arr) => arr.indexOf(id) !== index);
+    if (duplicates.length > 0) {
+        return {
+            success: false,
+            error: "Um puzzle não pode conter Pokémon repetidos",
+            errorCases: duplicates
+        }
+    }
+
+    //Checar se há mons que não pertencem ao seu grupo
+    const results = await Promise.all(
+        puzzle.groups.map(async (group: PuzzleGroup) => {
+            let groupPool = await fetchPokemonPool(null, group.query);
+            groupPool = groupPool.flatMap((mon: any) => mon.id);
+
+            return group.pokemons.filter(
+            (mon: number) => !groupPool.includes(mon)
+            );
+        })
+    );
+    if (results.flat().length > 0) {
+        return {
+            success: false,
+            error: "Alguns Pokémon estão em um grupo inadequado",
+            errorCases: results.flat()
+        }
+    }
+
+    return {success: true};
+}
+
 interface PuzzleManageProps {
     error: string | null;
     setError: React.Dispatch<React.SetStateAction<string | null>>
@@ -43,15 +83,12 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
     const [groupPokemonPool, setGroupPokemonPool] = useState<Record<number, any[]>>({});
     const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false);
     const [latestId, setLatestId] = useState<string>("daily");
+    const [errorCases, setErrorCases] = useState<number[]>([]);
 
     const rows = useWatch({ control: form.control, name: "rows", defaultValue: 4 });
     const cols = useWatch({ control: form.control, name: "cols", defaultValue: 4 });
     const filters = useWatch({ control: form.control, name: "groups"});
     const categoryType = useWatch({ control: form.control, name: "groups.categoryType" });
-
-    useEffect(() => {
-      console.log(formWatch)
-    }, [formWatch])
 
     useEffect(() => {
         if (!puzzle) return;
@@ -67,7 +104,7 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
             });
         })
         setGroups(puzzle.groups);
-        setLatestId(puzzle._id);
+        setLatestId(puzzle._id ?? "");
     }, [puzzle])
 
     const rangeToRecord = useCallback((key: string, { min, max }: Range): Record<string, string> => {
@@ -134,13 +171,15 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
     const submitPuzzle = async () => {
         setLoading(true);
         setError(null);
+        setErrorCases([]);
+
         try {
             const headers = {
                 'Content-Type': 'application/json'
             };
-            const body = {
+            const body: {password?: string, puzzle: PuzzleData} = {
                 password: process.env.NEXT_PUBLIC_API_AUTHORIZATION_BATCH,
-                puzzle: {                    
+                puzzle: {
                     from: 'admin',
                     author: 'admin',
                     rows: formWatch.rows,
@@ -150,7 +189,14 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
                     groups: groups
                 }
             }
-            const queries = ``;
+
+            const checks = await confirmIntegrity(body.puzzle, fetchPokemonPool);
+            if (!checks.success) {
+                setError(checks.error ?? "Verifique se o puzzle foi preenchido corretamente");
+                setErrorCases(checks.errorCases ?? []);
+                setLoading(false);
+                return;
+            }
             
             const [response] = await Promise.all([
                 !puzzle ?
@@ -158,7 +204,7 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
                         method: 'POST', headers, body: JSON.stringify(body)
                     })
                 :
-                    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/puzzle/${puzzle._id}`, {
+                    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/puzzle/${puzzle?._id}`, {
                         method: 'PUT', headers, body: JSON.stringify(body)
                     }),
             ]);
@@ -182,14 +228,18 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
         }
     };
     
-    const fetchPokemonPool = useCallback(async (target: number, filters: any, queries: string) => {
-        if (filters.categoryType == "auto") {
+    const fetchPokemonPool = useCallback(async (target: number | null, filters: string | any, queries: string = "") => {
+        if (typeof filters == "string" && filters[0] == "?") {
+            queries = filters;
+        } else if (filters.categoryType == "auto") {
             queries = getQueries(filters);
         }
 
         const headers = { 'Content-Type': 'application/json' };
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/pokemon/get${queries}`, { method: 'GET', headers });
         const data = await response.json();
+
+        if (!target) return data.pokemons;
 
         setGroupPokemonPool(prev => ({
             ...prev,
@@ -236,7 +286,7 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
 
         setGroupQuery(groupFormIndex, filters);
         if (groupFormTab == 1) {
-            fetchPokemonPool(groupFormIndex, filters, "");
+            fetchPokemonPool(groupFormIndex, filters);
         }
     }, [filters, groupFormOpen, groupFormIndex, groupFormTab]);
 
@@ -294,7 +344,6 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
                     "en": groups[1]
                 }
             };
-            console.log("output", output);
 
             requestAnimationFrame(() => {
                 setValue("groups", output, {
@@ -422,6 +471,7 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
                                                         pokemon={dictionary.pokemons[group.pokemons[colIndex]]}
                                                         multiselect={false}
                                                         isSelected={false}
+                                                        hasError={errorCases.includes(group.pokemons[colIndex])}
                                                         onSelect={()=> openGroupForm(rowIndex, 1)}
                                                         onPress={()=>{}}
                                                     />
@@ -474,7 +524,7 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
                             </div>
                             <div className={`tab-content ${groupFormTab == 1 ? 'active' : ''}`}>
                                 <label className="search-container">
-                                    <Input type="text" name="search" form={form} placeholder={"Buscar"} />
+                                    <Input type="text" name="groups.search" form={form} placeholder={"Buscar"} />
                                     <SearchIcon />
                                 </label>
                                 {groupPokemonPool[groupFormIndex] && groupPokemonPool[groupFormIndex].map((pokemon: any) => (

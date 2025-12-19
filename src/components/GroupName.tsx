@@ -19,6 +19,7 @@ export function getGroupList (queries: string) {
 
     for (const query of queryList) {
         let newGroup = query.split('=');
+        if (['search'].includes(newGroup[0])) continue;
         groupList.push({
             key: newGroup[0].replaceAll('_', '-'),
             value: newGroup[1]

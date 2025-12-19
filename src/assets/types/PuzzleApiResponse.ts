@@ -25,17 +25,17 @@ export interface PuzzleGroup {
  * Represents the core data for a specific day's puzzle.
  */
 export interface PuzzleData {
-  _id: string;
+  _id?: string;
   author: string;
   from: string;
-  daily: boolean;
+  daily?: boolean;
   date: string;
   rows: number;
   cols: number;
   groups: PuzzleGroup[];
   challenge: string;
   testing?: boolean;
-  __v: number;
+  __v?: number;
 }
 
 /**

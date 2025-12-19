@@ -86,7 +86,7 @@ label.block-container {
             display: none;
         }     
     
-        &:has(input:checked) {
+        &:has(input:checked), &.has-error {
             border: 2px solid var(--selection);
 
             &.correct, &.incorrect {
@@ -95,7 +95,7 @@ label.block-container {
                 animation: make-guess 0.5s ease 1;
             }
 
-            &.incorrect {
+            &.incorrect, &.has-error {
                 --selection: #{color(selection2)};
             }
             &.correct {
