@@ -8,12 +8,12 @@ interface GroupNameProps {
     dictionary: any;
 }
 
-interface Group {
+export interface Group {
     key: string;
     value: string;
 }
 
-function getGroupList (queries: string) {
+export function getGroupList (queries: string) {
     let queryList = queries.slice(1).split('&');
     let groupList: Group[] = [];
 

@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { FIELD_OPTIONS, MAX_SELECT, toTitleCase } from '@/src/scripts/utils';
 
 import "@/src/styles/components/PuzzleManage.scss";
-import { getGroupnameFromQuery } from './GroupName';
+import { Group, getGroupList, getGroupnameFromQuery } from './GroupName';
 import { useLocale, useTranslations } from 'next-intl';
 import ListBlock from './ListBlock';
 import Loading from './Loading';
@@ -30,9 +30,9 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
     const locale = useLocale();    
     const router = useRouter();
 
-    const form = useForm();
+    const form = useForm({ shouldUnregister: true });
     const formWatch = form.watch();
-    const { reset } = form;
+    const { setValue } = form;
 
     const [loading, setLoading] = useState<boolean>(false);
     const [dictionary, setDictionary] = useState<Record<string, any>>();
@@ -47,23 +47,28 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
     const rows = useWatch({ control: form.control, name: "rows", defaultValue: 4 });
     const cols = useWatch({ control: form.control, name: "cols", defaultValue: 4 });
     const filters = useWatch({ control: form.control, name: "groups"});
+    const categoryType = useWatch({ control: form.control, name: "groups.categoryType" });
 
     useEffect(() => {
       console.log(formWatch)
-    }, [formWatch])    
+    }, [formWatch])
 
     useEffect(() => {
         if (!puzzle) return;
         
-        reset({
-            cols: `${puzzle.cols}`,
-            rows: `${puzzle.rows}`,
-            challenge: `${puzzle.challenge}`,
-            date: puzzle.date
-        });
+        requestAnimationFrame(() => {
+            form.reset({
+                cols: `${puzzle.cols}`,
+                rows: `${puzzle.rows}`,
+                challenge: `${puzzle.challenge}`,
+                date: puzzle.date
+            }, {
+                keepTouched: true
+            });
+        })
         setGroups(puzzle.groups);
         setLatestId(puzzle._id);
-    }, [puzzle, reset])
+    }, [puzzle])
 
     const rangeToRecord = useCallback((key: string, { min, max }: Range): Record<string, string> => {
         const record: Record<string, string> = {};
@@ -115,7 +120,7 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
                     : group
                 )
             );
-        } else {
+        } else if (filters.categoryType == "custom" && filters.custom_groupname != undefined) {
             setGroups(prevGroups => 
                 prevGroups.map((group, index) =>
                     index === target
@@ -251,10 +256,55 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
     }, [cols]);
 
     const openGroupForm = (index: number, tab: number) => {
-        setGroupFormOpen(true);
         setGroupFormIndex(index);
         setGroupFormTab(tab);
+        setGroupFormOpen(true);
+        applyGroupsFromQuery(groups[index].query);
     };
+
+    const applyGroupsFromQuery = (query: string) => {
+        form.reset({
+            ...form.getValues(),
+            groups: {}
+        })
+
+        if (query[0] == '?') {
+            const groups = getGroupList(query);
+            const output: Record<string, string> = {
+                "categoryType": "auto"
+            };
+
+            groups.forEach((g: Group) => {
+                output[g.key] = g.value;
+            });
+                     
+            requestAnimationFrame(() => {
+                setValue("groups", output, {
+                    shouldDirty: true,
+                    shouldTouch: true,
+                    shouldValidate: true,
+                });
+            });
+        } else if (query.includes('|')) {
+            const groups = query.split('|');
+            const output: Record<string, string | Record<string, string>> = {
+                "categoryType": "custom",
+                "custom_groupname": {
+                    "pt": groups[0],
+                    "en": groups[1]
+                }
+            };
+            console.log("output", output);
+
+            requestAnimationFrame(() => {
+                setValue("groups", output, {
+                    shouldDirty: true,
+                    shouldTouch: true,
+                    shouldValidate: true,
+                });
+            });
+        }
+    }
 
     const selectPokemon = (pokemon: any, target: number) => {
         setGroups(prevGroups => 
@@ -319,9 +369,9 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
                                 {puzzle ? "Editar Puzzle" : "Novo Puzzle"}
                             </p>
                             <div className="form-flex">
-                                <Input type="select" label="Linhas" name="rows" defaultValue={'4'} options={{'4': '4', '5': '5'}} form={form} />
-                                <Input type="select" label="Colunas" name="cols" defaultValue={'4'} options={{'4': '4', '5': '5', '6': '6'}} form={form} />
-                                <Input type="select" label={t(`puzzle.challenge.label`)} name="challenge" defaultValue={'1'} options={{
+                                <Input type="select" label="Linhas" name="rows" defaultValue="4" options={{'4': '4', '5': '5'}} form={form} />
+                                <Input type="select" label="Colunas" name="cols" defaultValue="4" options={{'4': '4', '5': '5', '6': '6'}} form={form} />
+                                <Input type="select" label={t(`puzzle.challenge.label`)} defaultValue="1" name="challenge" options={{
                                     '1': t(`puzzle.challenge.1`),
                                     '2': t(`puzzle.challenge.2`),
                                     '3': t(`puzzle.challenge.3`),
@@ -395,14 +445,14 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
                             </ul>
                         </div>
                         <div className="group-form-content">
-                            <div className={`tab-content ${groupFormTab == 0 ? 'active' : ''}`}>
+                            <div className={`tab-content ${groupFormTab == 0 ? 'active' : ''}`} key={`groups-${groupFormIndex}`}>
                                 <Input type="select" label="Tipo de Grupo" name={`groups.categoryType`} form={form} options={{
                                     'auto': 'Filtrado',
                                     'custom': 'Customizado'
                                 }} />
 
                                 {dictionary &&
-                                    <div className={`filter-list ${form.watch(`groups.categoryType`) == 'auto' ? 'show' : ''}`}>
+                                    <div className={`filter-list ${categoryType == 'auto' ? 'show' : ''}`}>
                                         {Object.keys(FIELD_OPTIONS).map((key: string) => {
                                             const records: Record<string, unknown> = FIELD_OPTIONS;
                                             const options = optionRecords[key];
@@ -417,7 +467,7 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
                                     </div>
                                 }
 
-                                <div className={`filter-list one-col ${form.watch(`groups.categoryType`) == 'custom' ? 'show' : ''}`}>
+                                <div className={`filter-list one-col ${categoryType == 'custom' ? 'show' : ''}`}>
                                     <Input type="text" label={`Nome do Grupo (Português)`} name={`groups.custom_groupname.pt`} form={form}/>
                                     <Input type="text" label={`Nome do Grupo (Inglês)`} name={`groups.custom_groupname.en`} form={form}/>
                                 </div>
