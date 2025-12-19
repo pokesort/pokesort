@@ -46,6 +46,7 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
 
     const rows = useWatch({ control: form.control, name: "rows", defaultValue: 4 });
     const cols = useWatch({ control: form.control, name: "cols", defaultValue: 4 });
+    const filters = useWatch({ control: form.control, name: "groups"});
 
     useEffect(() => {
       console.log(formWatch)
@@ -102,8 +103,8 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
         return "?"+newQueries.toString();
     }
 
-    const setGroupQuery = (target: number, queries: string) => {
-        const filters = form.watch(`groups.${target}`);
+    const setGroupQuery = useCallback((target: number, queries: string) => {
+        if (!filters) return;
 
         if (filters.categoryType == "auto") {
             queries = getQueries(filters);
@@ -123,7 +124,7 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
                 )
             );
         }
-    }
+    }, [filters])
 
     const submitPuzzle = async () => {
         setLoading(true);
@@ -176,7 +177,7 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
         }
     };
     
-    const fetchPokemonPool = async (target: number, filters: any, queries: string) => {
+    const fetchPokemonPool = useCallback(async (target: number, filters: any, queries: string) => {
         if (filters.categoryType == "auto") {
             queries = getQueries(filters);
         }
@@ -189,7 +190,7 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
             ...prev,
             [target]: data.pokemons,
         }));
-    }
+    }, [filters]);
 
     useEffect(() => {
         const fetchDictionary = async () => {
@@ -226,14 +227,13 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
     }, []);
 
     useEffect(() => {
-        const filters = form.watch(`groups.${groupFormIndex}`);
         if (!filters) return;
 
         setGroupQuery(groupFormIndex, filters);
         if (groupFormTab == 1) {
             fetchPokemonPool(groupFormIndex, filters, "");
         }
-    }, [groupFormOpen, groupFormIndex, groupFormTab]);
+    }, [filters, groupFormOpen, groupFormIndex, groupFormTab]);
 
     const rowCounter = useMemo(() => {
         const array: number[] = [];
@@ -339,7 +339,7 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
                             return (
                                 <div className="group-card cut-in" key={rowIndex}>
                                     <p className="group-name edit-hover" onClick={() => openGroupForm(rowIndex, 0)}>
-                                        {group.query && group.query != "|" ?
+                                        {group.query && !["|", "?"].includes(group.query) ?
                                             getGroupnameFromQuery(group.query, dictionary, t, locale, true)
                                         :
                                             <>Novo Grupo</>
@@ -396,13 +396,13 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
                         </div>
                         <div className="group-form-content">
                             <div className={`tab-content ${groupFormTab == 0 ? 'active' : ''}`}>
-                                <Input type="select" label="Tipo de Grupo" name={`groups.${groupFormIndex}.categoryType`} form={form} options={{
+                                <Input type="select" label="Tipo de Grupo" name={`groups.categoryType`} form={form} options={{
                                     'auto': 'Filtrado',
                                     'custom': 'Customizado'
                                 }} />
 
                                 {dictionary &&
-                                    <div className={`filter-list ${form.watch(`groups.${groupFormIndex}.categoryType`) == 'auto' ? 'show' : ''}`}>
+                                    <div className={`filter-list ${form.watch(`groups.categoryType`) == 'auto' ? 'show' : ''}`}>
                                         {Object.keys(FIELD_OPTIONS).map((key: string) => {
                                             const records: Record<string, unknown> = FIELD_OPTIONS;
                                             const options = optionRecords[key];
@@ -410,16 +410,16 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
                                                 <Input key={key} type="multiselect"
                                                     max={MAX_SELECT[key as keyof typeof MAX_SELECT]}
                                                     label={t(`groupnames.${key}.short`)}
-                                                    name={`groups.${groupFormIndex}.${key}`} form={form} options={options}
+                                                    name={`groups.${key}`} form={form} options={options}
                                                 />
                                             )
                                         })}
                                     </div>
                                 }
 
-                                <div className={`filter-list one-col ${form.watch(`groups.${groupFormIndex}.categoryType`) == 'custom' ? 'show' : ''}`}>
-                                    <Input type="text" label={`Nome do Grupo (Português)`} name={`groups.${groupFormIndex}.custom_groupname.pt`} form={form}/>
-                                    <Input type="text" label={`Nome do Grupo (Inglês)`} name={`groups.${groupFormIndex}.custom_groupname.en`} form={form}/>
+                                <div className={`filter-list one-col ${form.watch(`groups.categoryType`) == 'custom' ? 'show' : ''}`}>
+                                    <Input type="text" label={`Nome do Grupo (Português)`} name={`groups.custom_groupname.pt`} form={form}/>
+                                    <Input type="text" label={`Nome do Grupo (Inglês)`} name={`groups.custom_groupname.en`} form={form}/>
                                 </div>
                             </div>
                             <div className={`tab-content ${groupFormTab == 1 ? 'active' : ''}`}>
