@@ -238,7 +238,7 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/pokemon/get${queries}`, { method: 'GET', headers });
         const data = await response.json();
 
-        if (!target) return data.pokemons;
+        if (target == null) return data.pokemons;
 
         setGroupPokemonPool(prev => ({
             ...prev,
