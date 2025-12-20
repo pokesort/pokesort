@@ -666,10 +666,6 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
             shiny: shinies
         };
         
-        if (process.env.NODE_ENV === "development") {
-            console.log(`Estado salvo para puzzle ${id}`);
-        }
-
         localStorage.setItem(`s_${id}`, JSON.stringify(state));
     }
 
@@ -681,9 +677,6 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
         }
 
         const state = JSON.parse(data);
-        if (process.env.NODE_ENV === "development") {
-            console.log(`Estado carregado para puzzle ${id}`);
-        }
         if (state.guesses != undefined) {
             setGuesses(state.guesses);
             setForcedGuesses(state.guesses.filter((g: PuzzleGuess) => g.accuracy >= 100));

@@ -133,9 +133,6 @@ export default function PuzzleListPage() {
                     puzzleResponse.json(),
                 ]);
 
-                if (process.env.NODE_ENV === "development") {
-                    console.log(puzzleData.puzzles);
-                }
                 setPuzzles(puzzleData.puzzles);
             } catch (e) {
                 console.error(e);

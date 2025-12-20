@@ -41,9 +41,6 @@ export default function PuzzleCreatePage() {
                     puzzleResponse.json(),
                 ]);
               
-                if (process.env.NODE_ENV === "development") {
-                    console.log(puzzleData.data);
-                }
                 setPuzzle(puzzleData.data);
             } catch (e) {
                 console.error(e);

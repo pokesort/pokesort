@@ -84,10 +84,6 @@ const processVarieties = (pokemon: any) => {
         return mon;
     })
 
-    if (process.env.NODE_ENV === "development") {
-        console.log(pokemon);
-    }
-
     return pokemon;
 }
 

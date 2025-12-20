@@ -93,16 +93,14 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
     useEffect(() => {
         if (!puzzle) return;
         
-        requestAnimationFrame(() => {
-            form.reset({
-                cols: `${puzzle.cols}`,
-                rows: `${puzzle.rows}`,
-                challenge: `${puzzle.challenge}`,
-                date: puzzle.date
-            }, {
-                keepTouched: true
-            });
-        })
+        form.reset({
+            cols: `${puzzle.cols}`,
+            rows: `${puzzle.rows}`,
+            challenge: `${puzzle.challenge}`,
+            date: puzzle.date
+        }, {
+            keepTouched: true
+        });
         setGroups(puzzle.groups);
         setLatestId(puzzle._id ?? "");
     }, [puzzle])
@@ -169,6 +167,7 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
     }, [filters])
 
     const submitPuzzle = async () => {
+        setGroupFormOpen(false);
         setLoading(true);
         setError(null);
         setErrorCases([]);
