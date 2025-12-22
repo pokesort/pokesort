@@ -34,7 +34,7 @@
     "eslint": "^9",
     "eslint-config-next": "^16.0.7",
     "prettier": "3.6.2",
-    "react-scan": "^0.3.4",
+    "react-scan": "^0.3.6",
     "typescript": "^5"
   }
 }

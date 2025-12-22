@@ -10,13 +10,17 @@ export default async function handler(req, res) {
 
     const conn = getDb();
     const Puzzle = getPuzzleModel(conn);
-
-    const today = new Date().toISOString().split('T')[0];
-    let existingPuzzle = await getTodayPuzzle(today, Puzzle);
-
-    if(existingPuzzle) return res.status(200).json({message: "Puzzle(s) para hoje encontrado(s)"});
-
     const puzzles = [];
+    const existingPuzzles = [];
+
+    let today = new Date().toISOString().split('T')[0];
+
+    await getTodayPuzzle(today, Puzzle, existingPuzzles);
+    if(existingPuzzles.filter(puzzle => puzzle !== null).length > 0) return res.status(200).json({message: "Puzzle(s) para hoje encontrado(s)"});
+
+    await getPuzzleNoDate(today, Puzzle, existingPuzzles);
+    if(existingPuzzles.filter(puzzle => puzzle !== null).length > 0) return res.status(200).json({message: "Puzzle(s) para hoje encontrado(s)"});
+
     const { password } = req.body;
 
     for (let i = 1; i <= 4; i++) {
@@ -30,39 +34,35 @@ export default async function handler(req, res) {
 
       const generation = FIELD_OPTIONS.generation.max;
       let puzzle = await generatePuzzle(rows, cols, challenge, fieldManager, generation);
-      puzzle.date = today ;
+      puzzle.date = today;
       puzzles.push(puzzle);
     }
 
     const result = await batchPuzzles(puzzles, Puzzle);
-    return res.status(200).json(puzzles);
+    return res.status(200).json(puzzles, result);
 
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ success: false, message: "Erro interno de Servidor" })
+    return res.status(500).json({ result });
   }
 }
 
-async function getTodayPuzzle(today, Puzzle) {
-
-  return null;
-  let todayPuzzle = await Puzzle.findOne({ date: today });
-
-  if (!todayPuzzle) {
-
-    const puzzleNoDate = await Puzzle.findOne({ date: null });
-
-    if (puzzleNoDate) {
-      await Puzzle.updateOne(
-        { _id: puzzleNoDate._id },
-        { $set: { date: today } }
-      );
-
-      todayPuzzle = { ...puzzleNoDate, date: today };
-    }
+async function getTodayPuzzle(today, Puzzle, puzzles) {
+  
+  for (let i = 1; i <= 4; i++) {
+    let todayPuzzle = await Puzzle.findOne({ date: today, challenge: i });
+    if(todayPuzzle) puzzles.push(todayPuzzle);
   }
+}
 
-  return todayPuzzle;
+async function getPuzzleNoDate(today, Puzzle, puzzles) {
+  for (let i = 1; i <= 4; i++) {
+    let puzzleNoDate = await Puzzle.findOne({ date: null, challenge: i });
+    if(puzzleNoDate){
+      await Puzzle.updateOne({ _id: puzzleNoDate._id }, { $set: { date: today } });
+      puzzles.push(puzzleNoDate);
+    } 
+  }
 }
 
 async function batchPuzzles(puzzles, Puzzle) {

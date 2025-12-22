@@ -20,7 +20,7 @@ interface DexFiltersProps {
   setQueries: React.Dispatch<React.SetStateAction<string | undefined>>;
   openFilter: boolean;
   setOpenFilter: React.Dispatch<React.SetStateAction<boolean>>;
-  dictionary: React.RefObject<Record<string, string[]>>;
+  dictionary: Record<string, string[]> | undefined;
 }
 
 type Range = {
@@ -35,7 +35,7 @@ function DexFilters ({queries, setQueries, openFilter, setOpenFilter, dictionary
 
   const [unlock, setUnlock] = useState<boolean>(false);
 
-  function rangeToRecord(key: string, { min, max }: Range): Record<string, string> {
+  const rangeToRecord = useCallback((key: string, { min, max }: Range): Record<string, string> => {
     const record: Record<string, string> = {};
 
     if (['weak', 'strong'].includes(key)) {
@@ -47,13 +47,17 @@ function DexFilters ({queries, setQueries, openFilter, setOpenFilter, dictionary
         continue;
 
       if (['abilities', 'moves'].includes(key)) {
-        record[`${i}`] = `${toTitleCase(dictionary.current[key][i-1])}`;
+        if (dictionary && dictionary[key]) {
+          record[`${i}`] = `${toTitleCase(dictionary[key][i-1])}`;
+        } else {
+          record[`${i}`] = `${i-1}`;  
+        }
       } else {
-        record[`${i}`] = `${t(`groupnames.${key}.${i}`)}`;
+        record[`${i}`] = `${toTitleCase(t(`groupnames.${key}.${i}`))}`;
       }
     }
     return record;
-  };
+  }, [dictionary]);
 
   useEffect(() => {
     const formTimeout = setTimeout(() => {
@@ -85,7 +89,7 @@ function DexFilters ({queries, setQueries, openFilter, setOpenFilter, dictionary
 
   return (
     <>
-      <section id="dex-filters">
+      <section id="dex-filters">          
           <label className="search-container">
             <Input type="text" name="search" form={form} placeholder={"Buscar"} onInput={unlockFetch}/>
             <SearchIcon />
@@ -95,41 +99,50 @@ function DexFilters ({queries, setQueries, openFilter, setOpenFilter, dictionary
             Filtros
           </button>
       </section>
-      <div className={`filter-form ${openFilter ? 'open' : ''}`}>
-        {Object.keys(FIELD_OPTIONS).map((key: string, index: number) => {
-          const records: Record<string, unknown> = FIELD_OPTIONS;
+      {dictionary != undefined &&
+        <div className={`filter-form ${openFilter ? 'open' : ''}`}>
+          <div className="window-container">
+              <section className="window-info-row">
+                  <FilterIcon />
+                  <p>Filtros</p>
+              </section>
+          </div>
+          <div className="filter-grid">
+            {Object.keys(FIELD_OPTIONS).map((key: string, index: number) => {
+              const records: Record<string, unknown> = FIELD_OPTIONS;
 
-          let options: Record<string, string> = {};
-          if (Array.isArray(records[key])) {
-            options = Object.fromEntries(records[key].map((item: string) => [item, t(`groupnames.${key}.${item}`)])) as Record<string, string>;
-          } else {
-            options = rangeToRecord(key, records[key] as Range);
-          }
+              let options: Record<string, string> = {};
+              if (Array.isArray(records[key])) {
+                options = Object.fromEntries(records[key].map((item: string) => [item, t(`groupnames.${key}.${item}`)])) as Record<string, string>;
+              } else {
+                options = rangeToRecord(key, records[key] as Range);
+              }
 
-          return (
-            <Input key={key} type="multiselect"
-              max={MAX_SELECT[key as keyof typeof MAX_SELECT]}
-              label={t(`groupnames.${key}.short`)}
-              name={key} form={form} options={options}
-            />
-          )
-        })}
-      </div>
+              return (
+                <Input key={key} type="multiselect"
+                  max={MAX_SELECT[key as keyof typeof MAX_SELECT]}
+                  label={t(`groupnames.${key}.short`)}
+                  name={key} form={form} options={options}
+                />
+              )
+            })}
+          </div>
+        </div>
+      }
     </>
   )
 }
 
-export default React.memo(function Home() {
+export default React.memo(function Dex() {
   const t = useTranslations();
-
-  const dictionary = useRef<Record<string, string[]>>({});
 
   const [pokemons, setPokemons] = useState<any[]>([]);
   const [queries, setQueries] = useState<string | undefined>(undefined);
   const [selected, setSelected] = useState<number>();
   const [dexModalOpen, setDexModalOpen] = useState<boolean>(false);
   const [openFilter, setOpenFilter] = useState<boolean>(false);
-
+  const [dictionary, setDictionary] = useState<Record<string, string[]>>();
+  
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [firstFetch, setFirstFetch] = useState<boolean>(true);
@@ -140,7 +153,7 @@ export default React.memo(function Home() {
   }, []);
 
   useEffect(() => {
-    if (queries == undefined) return;
+    if (queries == undefined || !dictionary) return;
 
     setLoading(true);
     fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/pokemon/get?${queries}`, {
@@ -154,10 +167,10 @@ export default React.memo(function Home() {
           setLoading(false);
           setPokemons(result.pokemons);
       })
-  }, [queries])
+  }, [queries, dictionary]);
 
   useEffect(() => {
-    const fetchDisctionary = async () => {
+    const fetchDictionary = async () => {
         try {
             const headers = {
                 'Content-Type': 'application/json'
@@ -177,9 +190,11 @@ export default React.memo(function Home() {
                 abilitiesResponse.json(),
                 movesResponse.json(),
             ]);
-          
-            dictionary.current['abilities'] = abilitiesData.abilities;
-            dictionary.current['moves'] = movesData.moves;
+
+            setDictionary({
+              'abilities': abilitiesData.abilities,
+              'moves': movesData.moves
+            });
         } catch (e) {
             console.error(e);
             setError('Não foi possível conectar ao servidor. Tente novamente.');
@@ -188,7 +203,7 @@ export default React.memo(function Home() {
         }
     };
 
-    fetchDisctionary();
+    fetchDictionary();
   }, [])
 
   const handleSelect = useCallback((id: number) => {

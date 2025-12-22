@@ -40,6 +40,7 @@ export default async function handler(req, res) {
       const dictionary = await populate(res, puzzles[0]);
       const challenges = {};
       challenges[puzzles[0].challenge] = "true";
+      puzzles[0].testing = false;
       return res.status(200).json({ success: true, data: puzzles[0], dictionary: dictionary, challenges: challenges });
     }
 

@@ -7,8 +7,7 @@ export default async function handler(req, res) {
 
     const objectKey = req.query.by;
 
-    let query = objectKey == 'date' ? { date: { $ne: null } } : {};
-    let puzzles = await db.db.collection('puzzles').find(query).sort({ date: 1 }).toArray();
+    let puzzles = await orderPuzzles(db, objectKey);
 
     switch (objectKey) {
       case 'date':
@@ -27,4 +26,27 @@ export default async function handler(req, res) {
     console.error("Connection failed:", error);
     res.status(500).json({ success: false, error: error.message });
   }
+}
+
+const orderPuzzles = async (db, objectKey) => {
+  switch (objectKey) {
+    case 'date':
+      return await db.db.collection('puzzles').find({date: {$ne: null}}).sort({ date: 1 }).toArray();
+    default:
+      return await db.db.collection('puzzles')
+      .aggregate([
+        {
+          $addFields: {
+            hasDate: { $cond: [{ $ifNull: ['$date', false] }, 1, 0] }
+          }
+        },
+        {
+          $sort: {
+            hasDate: 1,
+            date: -1
+          }
+        }
+      ])
+      .toArray();
+  }  
 }

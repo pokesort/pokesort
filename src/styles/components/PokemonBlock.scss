@@ -7,7 +7,6 @@ label.block-container {
     container-type: inline-size;
     cursor: pointer;
 
-    // border-radius: 10px;
     aspect-ratio: 1;
     flex: 0 0 calc(
         (100% - (var(--spacing) * (var(--cols, 4) - 1))) / var(--cols, 4)
@@ -87,7 +86,7 @@ label.block-container {
             display: none;
         }     
     
-        &:has(input:checked) {
+        &:has(input:checked), &.has-error {
             border: 2px solid var(--selection);
 
             &.correct, &.incorrect {
@@ -96,7 +95,7 @@ label.block-container {
                 animation: make-guess 0.5s ease 1;
             }
 
-            &.incorrect {
+            &.incorrect, &.has-error {
                 --selection: #{color(selection2)};
             }
             &.correct {
@@ -187,13 +186,14 @@ label.block-container {
 
 label.block-container:has(.list-view) {
     width: 100%;
+    height: fit-content;
     aspect-ratio: unset;
-    flex: 1 0 auto;
+    flex: 0 0 auto;
     overflow: hidden;
 
     div.pokemon-block {
         width: 100%;
-        height: 100%;
+        // height: 100%;
 
         display: flex;
         flex-direction: row;
@@ -201,6 +201,7 @@ label.block-container:has(.list-view) {
         align-items: center;
         position: relative;
         gap: 0.25rem;
+        aspect-ratio: unset;
     
         z-index: 0;
         padding: 1rem;

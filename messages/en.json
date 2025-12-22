@@ -38,6 +38,16 @@
             "generation": "Generation Limit",
             "button": "Generate"
         },
+        "from": {
+            "admin": "Custom",
+            "system": "Auto",
+            "user": "User"
+        },
+        "status": {
+            "0": "Standby",
+            "1": "Online",
+            "2": "Planned"
+        },
         "logs": "Logs",
         "puzzle": "Puzzle",
         "dex": "Dex",
@@ -50,11 +60,11 @@
             "dex": "Press and hold a block or right-click it to search on the Dex."
         },
         "challenge": {
-            "label": "Nível de Desafio",
-            "1": "Treinador",
-            "2": "Líder",
+            "label": "Challenge Level",
+            "1": "Trainer",
+            "2": "Leader",
             "3": "Elite",
-            "4": "Campeão",
+            "4": "Champion",
             "help": {
                 "1": "Dê início à sua jornada. Puzzles 4x4 incluindo grupos de tipos, região, geração, passo evolutivo, número de tipos e categorias como bebês, míticos, lendários e iniciais.",
                 "2": "Teste suas habilidades em um ginásio. Puzzles 4x5 ou 5x4 adicionando grupos de formas alternativas, cadeia evolutiva e categorias como Mega Evoluções, Ultra Beasts e fósseis.",
@@ -204,26 +214,26 @@
         },
         "categories": {
             "long": "",
-            "short": "Category",
-            "plural": "Categories",
+            "short": "Categoria",
+            "plural": "Categorias",
 
-            "1": "Bebê",
+            "1": "Forma Bebê",
             "2": "Mítico",
             "3": "Lendário",
             "4": "Possui Mega Evolução",
             "5": "Mega Evolução",
             "6": "Possui Gigantamax",
-            "7": "Possui Z-Move exclusivo",
-            "8": "Possui forma regional",
-            "9": "Pode trocar de forma",
-            "10": "Possui diferenças de gênero",
+            "7": "Possui Z-Move Exclusivo",
+            "8": "Possui Forma Regional",
+            "9": "Forma Não é Permanente",
+            "10": "Possui Diferenças de Gênero",
             "11": "Inicial",
             "12": "Ultra Beast",
             "13": "Paradoxo",
             "14": "Gigantamax",
-            "15": "Forma regional",
+            "15": "Forma Regional",
             "16": "Vivillon",
-            "17": "Fossil"
+            "17": "Fóssil"
         },
         "others": {
             "long": "Possui outras formas ",
