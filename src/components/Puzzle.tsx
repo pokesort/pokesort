@@ -333,7 +333,7 @@ const GuessLogs = React.memo(({guesses, setGuesses, availableTips, setAvailableT
         } else {
             return (
                 <p className="tip">
-                    {t(`puzzle.tips.${tip.type}`)} <b>{getNaturalGroupnames(tip.values, dictionary, t, locale).join('  ·  ')}</b>
+                    {t(`puzzle.tips.${tip.type}`)} <b>{getNaturalGroupnames(tip.values, dictionary, t, locale, true)}</b>
                 </p>
             )
         }        
