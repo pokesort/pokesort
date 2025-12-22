@@ -57,7 +57,7 @@ const PuzzleCard = React.memo(({puzzle, deletePuzzle}: PuzzleCardProps) => {
                     <p>Visualizar Puzzle</p>
                 </button>
                 <div className="button-row">
-                    <button className="modal-content-div" onClick={() => deletePuzzle(puzzle._id)}>
+                    <button className="modal-content-div" onClick={() => deletePuzzle(puzzle._id ?? "")}>
                         <p>Sim</p>
                     </button>
                     <button className="modal-content-div" onClick={() => setDeleteModal(false)}>
