@@ -39,7 +39,6 @@ const puzzleSchema = new mongoose.Schema({
             validator: function (v) {
                 return (
                     v === null ||
-                    v === '' ||
                     /^\d{4}-\d{2}-\d{2}$/.test(v)
                 );
             },

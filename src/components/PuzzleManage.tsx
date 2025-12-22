@@ -16,6 +16,7 @@ import Input from './forms/Input';
 import GridIcon from './svg/GridIcon';
 import SearchIcon from './svg/SearchIcon';
 import Modal from './Modal';
+import { get } from 'http';
 
 type Range = { min: number; max: number };
 
@@ -85,9 +86,10 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
     const [latestId, setLatestId] = useState<string>("daily");
     const [errorCases, setErrorCases] = useState<number[]>([]);
 
-    const rows = useWatch({ control: form.control, name: "rows", defaultValue: 4 });
-    const cols = useWatch({ control: form.control, name: "cols", defaultValue: 4 });
+    const rows = useWatch({ control: form.control, name: "rows", defaultValue: puzzle ? puzzle.rows : "4"});
+    const cols = useWatch({ control: form.control, name: "cols", defaultValue: puzzle ? puzzle.cols : "4"});
     const filters = useWatch({ control: form.control, name: "groups"});
+    const search = useWatch({ control: form.control, name: "groups.search"});
     const categoryType = useWatch({ control: form.control, name: "groups.categoryType" });
 
     useEffect(() => {
@@ -99,10 +101,14 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
             challenge: `${puzzle.challenge}`,
             date: puzzle.date
         }, {
-            keepTouched: true
+            keepDirty: true,
+            keepTouched: true,
         });
-        setGroups(puzzle.groups);
-        setLatestId(puzzle._id ?? "");
+
+        requestAnimationFrame(() => {
+            setGroups(puzzle.groups);
+            setLatestId(puzzle._id ?? "");
+        })
     }, [puzzle])
 
     const rangeToRecord = useCallback((key: string, { min, max }: Range): Record<string, string> => {
@@ -146,8 +152,11 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
     const setGroupQuery = useCallback((target: number, queries: string) => {
         if (!filters) return;
 
-        if (filters.categoryType == "auto") {
-            queries = getQueries(filters);
+        const groups = {...filters};
+        delete groups.search;
+
+        if (groups.categoryType == "auto") {
+            queries = getQueries(groups);
             setGroups(prevGroups => 
                 prevGroups.map((group, index) =>
                     index === target
@@ -155,11 +164,11 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
                     : group
                 )
             );
-        } else if (filters.categoryType == "custom" && filters.custom_groupname != undefined) {
+        } else if (groups.categoryType == "custom" && groups.custom_groupname != undefined) {
             setGroups(prevGroups => 
                 prevGroups.map((group, index) =>
                     index === target
-                    ? { ...group, query: `${filters.custom_groupname.pt}|${filters.custom_groupname.en}` }
+                    ? { ...group, query: `${groups.custom_groupname.pt}|${groups.custom_groupname.en}` }
                     : group
                 )
             );
@@ -227,11 +236,15 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
         }
     };
     
-    const fetchPokemonPool = useCallback(async (target: number | null, filters: string | any, queries: string = "") => {
-        if (typeof filters == "string" && filters[0] == "?") {
-            queries = filters;
-        } else if (filters.categoryType == "auto") {
-            queries = getQueries(filters);
+    const fetchPokemonPool = async (target: number | null, body: string | any, queries: string = "") => {
+        if (Object.keys(body).length < 1 || (Object.keys(body).length == 1 && body.search == "")) return;
+        
+        if (typeof body == "string" && body[0] == "?") {
+            queries = body;
+        } else if (body.categoryType == "auto") {
+            queries = getQueries(body);
+        } else if (body.categoryType == "custom") {
+            queries = getQueries({search: body.search});
         }
 
         const headers = { 'Content-Type': 'application/json' };
@@ -244,7 +257,7 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
             ...prev,
             [target]: data.pokemons,
         }));
-    }, [filters]);
+    };
 
     useEffect(() => {
         const fetchDictionary = async () => {
@@ -417,8 +430,8 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
                                 {puzzle ? "Editar Puzzle" : "Novo Puzzle"}
                             </p>
                             <div className="form-flex">
-                                <Input type="select" label="Linhas" name="rows" defaultValue="4" options={{'4': '4', '5': '5'}} form={form} />
-                                <Input type="select" label="Colunas" name="cols" defaultValue="4" options={{'4': '4', '5': '5', '6': '6'}} form={form} />
+                                <Input type="select" label="Linhas" name="rows" defaultValue={rows} options={{'4': '4', '5': '5'}} form={form} />
+                                <Input type="select" label="Colunas" name="cols" defaultValue={cols} options={{'4': '4', '5': '5', '6': '6'}} form={form} />
                                 <Input type="select" label={t(`puzzle.challenge.label`)} defaultValue="1" name="challenge" options={{
                                     '1': t(`puzzle.challenge.1`),
                                     '2': t(`puzzle.challenge.2`),
@@ -434,6 +447,7 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
 
                         {rowCounter.map((rowIndex) => {
                             const group = groups[rowIndex];
+
                             return (
                                 <div className="group-card cut-in" key={rowIndex}>
                                     <p className="group-name edit-hover" onClick={() => openGroupForm(rowIndex, 0)}>

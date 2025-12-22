@@ -43,6 +43,8 @@ export function getNaturalGroupnames (groups: Group[], dictionary: any, t: any, 
     const from_dict = ['abilities', 'moves'];
     const types = ['types', 'weak', 'strong', 'immune'];
 
+    if (groups.length < 1) return undefined;
+
     if (groups[0].key.includes('|')) {
         return [getCustomGroupName(groups[0].key, locale)];
     }
