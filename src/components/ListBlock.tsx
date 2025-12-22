@@ -11,8 +11,9 @@ import PokeSprite from './PokeSprite';
 interface BlockProps {
     pokemon: any;
     multiselect: boolean;
-    aspect: 'square' | 'list';
+    aspect?: 'square' | 'list';
     isSelected: boolean;
+    hasError?: boolean;
     onSelect: (id: number) => void;
     onPress: (id: number) => void;
 }
@@ -30,7 +31,7 @@ function getSurname(name: string, species_name: string) {
     return surname;
 }
 
-export default React.memo(function ListBlock({ pokemon, multiselect, aspect, isSelected, onSelect, onPress }: BlockProps) {
+export default React.memo(function ListBlock({ pokemon, multiselect, aspect="square", isSelected, hasError=false, onSelect, onPress }: BlockProps) {
     const default_url = pokemon.sprite_default;
     const shiny_url = pokemon.sprite_shiny;
 
@@ -50,6 +51,7 @@ export default React.memo(function ListBlock({ pokemon, multiselect, aspect, isS
         'pokemon-block',
         {
             'selected': isSelected,
+            'has-error': hasError,
             'list-view': aspect == 'list'
         }
     );    

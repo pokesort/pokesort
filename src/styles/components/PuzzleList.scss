@@ -1,0 +1,60 @@
+@use "../abstract" as *;
+
+.table-container {
+    max-width: 100vw;
+    overflow-x: scroll;
+}
+
+.puzzle-card-table {
+    min-width: 60vw;
+    max-width: calc(100vw - var(--spacing) * 2);
+    margin: 0 var(--spacing);
+
+    border-spacing: 0 0.85rem;
+}
+
+.puzzle-card-title {
+    background-color: color(section1);
+
+    .dot {        
+        &[data-status="0"] {
+            background-color: color(selection1);
+        }
+        &[data-status="1"] {
+            background-color: color(selection3);
+        }
+        &[data-status="2"] {
+            background-color: color(selection4);
+        }
+
+        display: inline-block;
+        height: 16px;
+        aspect-ratio: 1;
+        clip-path: circle(50%);
+    }
+
+    td {
+        padding: 0.75rem 1rem;
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+
+    svg, .dot {
+        color: color(text2);
+        margin-right: 0.5rem;
+        transform: translateY(2px);
+    }
+
+    .buttons {
+        display: flex;
+        justify-content: end;
+        width: 100%;
+        gap: 0.5rem;
+    }
+
+    button {
+        svg {
+            color: color(text1) !important;
+        }
+    }
+}

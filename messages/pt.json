@@ -1,6 +1,6 @@
 {
     "home": {
-        "subtitle": "Um puzzle de associação diário de Pokémon",
+        "subtitle": "Um puzzle diário de associação de Pokémon",
 
         "daily": "Resolva nosso puzzle de hoje",
         "infinite": "Gere um puzzle personalizado",
@@ -40,6 +40,16 @@
             "cols": "Colunas",
             "button": "Gerar"
         },
+        "from": {
+            "admin": "Personalizado",
+            "system": "Automático",
+            "user": "Usuário"
+        },
+        "status": {
+            "0": "Aguardando",
+            "1": "Ativo",
+            "2": "Planejado"
+        },
         "logs": "Logs",
         "puzzle": "Puzzle",
         "dex": "Dex",
@@ -48,7 +58,7 @@
         "custom-groups-2": "Tente pensar fora da caixa!",
         "okay": "Okay!",
         "help": {
-            "logs": "A acurácia de cada uma de suas tentativas será exibida aqui.",
+            "logs": "A precisão de cada uma de suas tentativas será exibida aqui.",
             "dex": "Pressione um bloco ou clique com o botão direito para pesquisar na Dex."
         },
         "challenge": {
@@ -217,7 +227,7 @@
             "6": "Possui Gigantamax",
             "7": "Possui Z-Move Exclusivo",
             "8": "Possui Forma Regional",
-            "9": "Pode Trocar de Forma",
+            "9": "Forma Não é Permanente",
             "10": "Possui Diferenças de Gênero",
             "11": "Inicial",
             "12": "Ultra Beast",

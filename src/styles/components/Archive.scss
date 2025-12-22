@@ -66,10 +66,10 @@ button.disabled {
         color: color(text3);
         pointer-events: none;
     }
-    &.attempted {
+    &.attempted:not(.disabled) {
         --selection: #{color(selection4)};
     }
-    &.complete {
+    &.complete:not(.disabled) {
         --selection: #{color(selection3)};
     }
 

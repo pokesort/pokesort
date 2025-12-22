@@ -76,12 +76,12 @@ export default function Header ({ pathname }: HeaderProps) {
                         <Link href="about">
                             <HeaderInfo />
                         </Link>
-                        {/* <Link target="_blank" href="https://x.com/bunnysammy_">
+                        <Link target="_blank" href="https://x.com/Pokesort131645">
                             <HeaderTwitter />
                         </Link>
-                        <Link target="_blank" href="https://github.com/bunny-sammy/pokesort">
+                        <Link target="_blank" href="https://github.com/pokesort">
                             <HeaderGit />
-                        </Link> */}
+                        </Link>
                     </ul>
                 </div>
                 <button id="menu-icon" onClick={() => setMenuOpen(prev => !prev)}>

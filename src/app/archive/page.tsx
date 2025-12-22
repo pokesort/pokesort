@@ -157,10 +157,7 @@ export default function Archive() {
                 const [puzzleData] = await Promise.all([
                     puzzleResponse.json(),
                 ]);
-
-                if (process.env.NODE_ENV === "development") {
-                    console.log(puzzleData.puzzles);
-                }
+                
                 setPuzzles(puzzleData.puzzles);
             } catch (e) {
                 console.error(e);

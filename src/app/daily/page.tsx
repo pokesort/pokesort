@@ -52,10 +52,6 @@ export default function Daily() {
                     puzzleResponse.json(),
                 ]);
 
-                if (process.env.NODE_ENV === "development") {
-                    console.log(puzzleData.data);
-                    console.log(puzzleData.dictionary);
-                }
                 setPuzzle(puzzleData.data);
                 setDictionary(puzzleData.dictionary);
                 setChallenges(puzzleData.challenges);
