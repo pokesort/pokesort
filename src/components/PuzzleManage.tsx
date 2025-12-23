@@ -41,11 +41,12 @@ const confirmIntegrity = async (puzzle: PuzzleData, fetchPokemonPool: (target: n
     //Checar se há mons que não pertencem ao seu grupo
     const results = await Promise.all(
         puzzle.groups.map(async (group: PuzzleGroup) => {
-            let groupPool = await fetchPokemonPool(null, group.query);
-            groupPool = groupPool.flatMap((mon: any) => mon.id);
+            const groupPool = await fetchPokemonPool(null, group.query);
+            console.log(groupPool);
+            let poolIds = groupPool.flatMap((mon: any) => mon.id);
 
             return group.pokemons.filter(
-            (mon: number) => !groupPool.includes(mon)
+                (mon: number) => !poolIds.includes(mon)
             );
         })
     );

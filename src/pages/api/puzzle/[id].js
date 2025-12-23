@@ -14,7 +14,6 @@ export default async function handler(req, res) {
   let existingPuzzle;
   const today = new Date().toISOString().split('T')[0];
   const date = new Date(`${id}T00:00:00`);
-  let isTesting = false;
   
   if (!isNaN(date) && date <= Date.now()) {
     const query = {'date': id};
@@ -31,7 +30,6 @@ export default async function handler(req, res) {
 
   if (!existingPuzzle) {
     existingPuzzle = await Puzzle.findById(id);
-    isTesting = true;
   }
   if (!existingPuzzle) {
     return res.status(404).json({ success: false, error: 'Puzzle not found' });
@@ -46,7 +44,6 @@ export default async function handler(req, res) {
   else if (req.method === 'GET'){
     const puzzleObject = existingPuzzle.toObject();
     puzzleObject.daily = daily == "true" || puzzleObject.date == today;
-    puzzleObject.testing = isTesting;
     const challenges = await findPuzzlesOfSameDate(existingPuzzle, Puzzle);
     const dictionary = await populate(res, existingPuzzle);
     return res.status(200).json({success: true, data: puzzleObject, dictionary: dictionary, challenges: challenges})
