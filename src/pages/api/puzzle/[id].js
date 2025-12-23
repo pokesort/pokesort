@@ -56,6 +56,7 @@ async function update(req, res, existingPuzzle) {
     await connect();
 
     const { password, puzzle } = req.body;
+    puzzle.groups = puzzle.groups.slice(0, puzzle.rows);
     puzzle.groups.map(g => {
       g.pokemons = g.pokemons.slice(0, puzzle.cols);
       g.tips = generateTips(g.pokemons, g.query);
