@@ -735,11 +735,11 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
     }, [victoryOpen]);
 
     useEffect(() => {
-        if (puzzle && !puzzle.testing && guesses.length > 0) saveState(puzzle._id || '');
+        if (puzzle && guesses.length > 0) saveState(puzzle._id || '');
     }, [guesses])
 
     useEffect(() => {
-        if (puzzle && !puzzle.testing && type != 'infinite') {
+        if (puzzle && type != 'infinite') {
             loaded.current = loadState(puzzle._id || '');
         } else {
             loaded.current = false;
