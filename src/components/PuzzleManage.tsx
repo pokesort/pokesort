@@ -42,7 +42,6 @@ const confirmIntegrity = async (puzzle: PuzzleData, fetchPokemonPool: (target: n
     const results = await Promise.all(
         puzzle.groups.map(async (group: PuzzleGroup) => {
             const groupPool = await fetchPokemonPool(null, group.query);
-            console.log(groupPool);
             let poolIds = groupPool.flatMap((mon: any) => mon.id);
 
             return group.pokemons.filter(
@@ -121,9 +120,9 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
 
             if (['abilities', 'moves'].includes(key)) {
                 if (dictionary && dictionary[key]) {
-                    record[`${i}`] = `${toTitleCase(dictionary[key][i-1])}`;
+                    record[`${i}`] = `${toTitleCase(dictionary[key][i])}`;
                 } else {
-                    record[`${i}`] = `${i-1}`;
+                    record[`${i}`] = `${i}`;
                 }
             } else {
                 record[`${i}`] = `${toTitleCase(t(`groupnames.${key}.${i}`))}`;
@@ -280,8 +279,8 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
                 ]);
 
                 setDictionary({
-                    abilities: abilitiesData.abilities,
-                    moves: movesData.moves,
+                    abilities: [null, ...abilitiesData.abilities],
+                    moves: [null, ...movesData.moves],
                     pokemons: pokemonData.pokemons.reduce((acc: any, poke: any) => {
                         acc[poke.id] = poke;
                         return acc;

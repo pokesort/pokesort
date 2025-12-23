@@ -1,5 +1,6 @@
 import { connect, getDb } from "@/lib/mongodb";
 import { getPuzzleModel } from '@/src/models/Puzzle';
+import { generateTips } from '../../../scripts/utils';
 
 export default async function handler(req, res) {
 
@@ -19,8 +20,10 @@ export default async function handler(req, res) {
     const Puzzle = getPuzzleModel(conn);
 
     const new_puzzle = new Puzzle(puzzle);
+    new_puzzle.groups = new_puzzle.groups.slice(0, new_puzzle.rows);
     new_puzzle.groups.map(g => {
       g.pokemons = g.pokemons.slice(0, new_puzzle.cols);
+      g.tips = generateTips(g.pokemons, g.query);
       return g;
     });
 

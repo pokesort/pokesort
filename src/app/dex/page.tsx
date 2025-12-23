@@ -48,9 +48,9 @@ function DexFilters ({queries, setQueries, openFilter, setOpenFilter, dictionary
 
       if (['abilities', 'moves'].includes(key)) {
         if (dictionary && dictionary[key]) {
-          record[`${i}`] = `${toTitleCase(dictionary[key][i-1])}`;
+            record[`${i}`] = `${toTitleCase(dictionary[key][i])}`;
         } else {
-          record[`${i}`] = `${i-1}`;  
+            record[`${i}`] = `${i}`;
         }
       } else {
         record[`${i}`] = `${toTitleCase(t(`groupnames.${key}.${i}`))}`;
@@ -192,8 +192,8 @@ export default React.memo(function Dex() {
             ]);
 
             setDictionary({
-              'abilities': abilitiesData.abilities,
-              'moves': movesData.moves
+              abilities: [null, ...abilitiesData.abilities],
+              moves: [null, ...movesData.moves],
             });
         } catch (e) {
             console.error(e);

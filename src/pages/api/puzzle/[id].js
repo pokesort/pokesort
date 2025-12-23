@@ -1,5 +1,6 @@
 import { connect, getDb } from '@/lib/mongodb';
 import { getPuzzleModel } from '@/src/models/Puzzle';
+import { generateTips } from '../../../scripts/utils';
 import mongoose from 'mongoose';
 import { populate } from './_utils';
 import { findPuzzlesOfSameDate } from '@/src/scripts/server_utils';
@@ -55,8 +56,10 @@ async function update(req, res, existingPuzzle) {
     await connect();
 
     const { password, puzzle } = req.body;
+    puzzle.groups = puzzle.groups.slice(0, puzzle.rows);
     puzzle.groups.map(g => {
       g.pokemons = g.pokemons.slice(0, puzzle.cols);
+      g.tips = generateTips(g.pokemons, g.query);
       return g;
     });
     Object.assign(existingPuzzle, puzzle);
