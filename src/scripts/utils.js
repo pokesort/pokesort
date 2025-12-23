@@ -21,8 +21,6 @@ export const FIELD_OPTIONS = {
 
 export const modifiers = ['dual', 'shape']
 
-// Níveis de categorias (agrupamentos) — podem ser combinados
-// Ex.: categories: [...easy, ...medium] ou categories: mergeCategories(easy, medium)
 export const easy = [1, 2, 3, 11];
 export const medium = [4, 5, 12, 17];
 export const hard = [6, 13, 14, 15];
@@ -92,7 +90,7 @@ export const MAX_SELECT = {
   egg_groups: 2,
   categories: 0,
   others: 1,
-  methods: 1,
+  methods: 3,
   moves: 0,
   generation: 1,
   abilities: 3,
@@ -102,6 +100,27 @@ export const MAX_SELECT = {
   strong: 0,
   // immune: 0,
   form: 1,
+  dual: 1,
+};
+
+export const WEIGHT_VALUES = {
+  types: 3,
+  //color: 1,
+  region: 3,
+  shape: 5,
+  egg_groups: 5,
+  categories: 3,
+  others: 3,
+  methods: 5,
+  moves: 4,
+  generation: 3,
+  abilities: 4,
+  // habitat: 1,
+  step: 2,
+  weak: 3,
+  strong: 3,
+  // immune: 1,
+  form: 2,
   dual: 1,
 };
 

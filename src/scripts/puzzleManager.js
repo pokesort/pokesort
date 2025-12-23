@@ -1,11 +1,11 @@
-import { CHALLENGE_FIELDS, pickRandom, randomInRange } from "../scripts/utils"
+import { CHALLENGE_FIELDS, pickRandom, randomInRange, WEIGHT_VALUES } from "../scripts/utils"
 // Classe para controlar campos disponíveis e evitar repetições
 export class PuzzleFieldManager {
   constructor(challenge) {
     this.challenge = challenge;
     this.availableFields = JSON.parse(JSON.stringify(
-                            this.getAvailableFieldsForChallenge(challenge)
-                          ));
+      this.getAvailableFieldsForChallenge(challenge)
+    ));
     this.usedFields = new Set(); // Armazena campos já utilizados no puzzle
     this.usedValues = new Map(); // Armazena valores específicos já utilizados por campo
   }
@@ -120,26 +120,73 @@ export class PuzzleFieldManager {
     return null;
   }
 
-  // Gera uma query aleatória com campos disponíveis
+  // Gera uma query aleatória com campos disponíveis, usando pesos de WEIGHT_VALUES
   generateRandomQuery() {
     const availableFields = this.getAvailableFields();
-    const fieldNames = Object.keys(availableFields);
+    let fieldNames = Object.keys(availableFields);
 
     if (fieldNames.length === 0) return null;
 
-    const numFields = randomInRange(1, Math.min(3, fieldNames.length));
-    const selectedFields = pickRandom(fieldNames, numFields);
+    const getValidFields = () => {
+      return fieldNames.filter(field => {
+        const availableValues = this.getAvailableValuesForField(field);
+        const weight = WEIGHT_VALUES[field];
+        return availableValues !== null &&
+          availableValues !== undefined &&
+          (Array.isArray(availableValues) ? availableValues.length > 0 : true) &&
+          weight !== undefined;
+      });
+    };
 
-    const queryParts = [];
-    for (const field of selectedFields) {
-      const value = this.generateRandomValueForField(field);
-      if (value !== null) {
-        queryParts.push(`${field}=${value}`);
-        this.markValueAsUsed(field, value);
+    let validFields = getValidFields();
+    if (validFields.length === 0) return null;
+
+    const maxAttempts = 1;
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+
+      validFields = getValidFields();
+      if (validFields.length === 0) return null;
+
+      const numFields = randomInRange(1, Math.min(3, validFields.length));
+
+      const shuffledFields = pickRandom(validFields, validFields.length);
+
+      const selectedFields = [];
+      let totalWeight = 0;
+
+      for (const field of shuffledFields) {
+        const weight = WEIGHT_VALUES[field];
+
+        const availableValues = this.getAvailableValuesForField(field);
+        if (availableValues === null || availableValues === undefined) {
+          continue;
+        }
+
+        selectedFields.push(field);
+        totalWeight += weight;
+
+        if (selectedFields.length === numFields) {
+          break;
+        }
+      }
+      
+      if (totalWeight >= 5 && selectedFields.length === numFields) {
+        
+        const queryParts = [];
+        for (const field of selectedFields) {
+          const value = this.generateRandomValueForField(field);
+          if (value !== null) {
+            queryParts.push(`${field}=${value}`);
+            this.markValueAsUsed(field, value);
+          }
+        }
+        console.log(queryParts);
+        
+        return queryParts.length > 0 ? queryParts.join('&') : null;
       }
     }
 
-    return queryParts.length > 0 ? queryParts.join('&') : null;
+    return null;
   }
 
   // Reset para um novo puzzle
