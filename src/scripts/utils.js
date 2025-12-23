@@ -274,9 +274,10 @@ export function shuffleArray(array) {
 export function generateTips(ids, queries) {
   const pokemons = pickRandomMult(ids, Math.floor(ids.length / 2));
 
-  queries = queries.slice(1);
+  if (queries[0] == "?") {    
+    queries = queries.slice(1);
+  }
   queries = queries.split('&');
-
   const text = pickRandom(queries)[0];
   const values = pokemons;
 
