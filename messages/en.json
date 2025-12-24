@@ -30,7 +30,7 @@
         "empty": "There doesn't seem to be anything here..."
     },
     "tutorial": {
-        "label": "How to Playr",
+        "label": "How to Play",
         "text": {
             "1": "All Pokémon on the grid belong to groups according to their common traits. You must find out what those groups are in the least attempts possible.",
             "2": "You can check the accuracy of incorrect guesses to try and deduce which Pokémon belong to the same group.",
