@@ -12,6 +12,7 @@ import HeaderTwitter from './svg/HeaderTwitter';
 import HeaderGit from './svg/HeaderGit';
 import HeaderNotice from './svg/HeaderNotice';
 import Notices from './Notices';
+import Tutorial from './Tutorial';
 
 type Page = {
     route: string;
@@ -28,6 +29,7 @@ export default function Header ({ pathname }: HeaderProps) {
 
     const [menuOpen, setMenuOpen] = useState<boolean>(false);
     const [noticesOpen, setNoticesOpen] = useState<boolean>(false);
+    const [tutorialOpen, setTutorialOpen] = useState<boolean>(false);
 
     const pages = [
         {route: '/daily', label: t('daily'), beta: false},
@@ -70,10 +72,10 @@ export default function Header ({ pathname }: HeaderProps) {
                         <Link href="" onClick={() => setNoticesOpen(true)}>
                             <HeaderNotice />
                         </Link>                    
-                        <Link href="">
+                        <Link href="" onClick={() => setTutorialOpen(true)}>
                             <HeaderHelp />
                         </Link>
-                        <Link href="about">
+                        <Link href="/about">
                             <HeaderInfo />
                         </Link>
                         <Link target="_blank" href="https://x.com/Pokesort131645">
@@ -89,6 +91,7 @@ export default function Header ({ pathname }: HeaderProps) {
                 </button>
             </header>
             <Notices noticesOpen={noticesOpen} setNoticesOpen={setNoticesOpen} />
+            <Tutorial tutorialOpen={tutorialOpen} setTutorialOpen={setTutorialOpen} pathname={pathname} />
         </>
     )
 }
