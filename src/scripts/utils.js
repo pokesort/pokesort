@@ -104,24 +104,24 @@ export const MAX_SELECT = {
 };
 
 export const WEIGHT_VALUES = {
-  types: 3,
-  //color: 1,
-  region: 3,
   shape: 5,
   egg_groups: 5,
+  methods: 5,
+  abilities: 4,
+  moves: 4,
   categories: 3,
   others: 3,
-  methods: 5,
-  moves: 4,
-  generation: 3,
-  abilities: 4,
-  // habitat: 1,
+  types: 3,
+  weak: 2,
+  strong: 2,
+  region: 2,
+  generation: 2,
   step: 2,
-  weak: 3,
-  strong: 3,
-  // immune: 1,
   form: 2,
+  color: 1,
   dual: 1,
+  // immune: 1,
+  // habitat: 1,
 };
 
 export const REGIONALS = ['-alola', '-galar', '-hisui', '-paldea'];
@@ -297,7 +297,14 @@ export function generateTips(ids, queries) {
     queries = queries.slice(1);
   }
   queries = queries.split('&');
-  const text = pickRandom(queries)[0];
+  console.log(queries);
+  
+  const text = queries.reduce((best, cur) => {
+    return (WEIGHT_VALUES[cur.split("=")[0]] ?? 0) >
+          (WEIGHT_VALUES[best.split("=")[0]] ?? 0)
+      ? cur
+      : best;
+  });
   const values = pokemons;
 
   return [
