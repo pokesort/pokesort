@@ -173,7 +173,7 @@ export function validateGenerateParams(params) {
     errors.push('Quantidade máxima de puzzles deve ser um número entre 1 e 30');
   }
 
-  if (!infinite && (!password || password !== process.env.NEXT_PUBLIC_API_AUTHORIZATION_BATCH)) {
+  if (!infinite && (!password || password !== process.env.AUTHORIZATION_BATCH)) {
     errors.push('Senha inválida');
   }
 
