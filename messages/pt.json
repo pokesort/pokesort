@@ -29,6 +29,16 @@
         "next": "Próximo",
         "empty": "Parece que não tem nada aqui..."
     },
+    "tutorial": {
+        "label": "Como Jogar",
+        "text": {
+            "1": "Os Pokémon presentes na grade pertencem a grupos de acordo com suas características em comum. Você deve descobrir quais são esses grupos no mínimo de tentativas possível.",
+            "2": "Você pode verificar a precisão de palpites incorretos para tentar deduzir quais Pokémon pertencem ao mesmo grupo.",
+            "3": "Também é possível pedir dicas, como quais Pokémon devem ser agrupados ou a característica que define o seu grupo.",
+            "4": "Ao pressioar ou clicar com o botão direito em um Pokémon, você pode verificar todas as suas informações relevantes.",
+            "5": "Você vence se conseguir agrupar corretamente todos os Pokémon da grade. O número de linhas ditas quantos grupos há no puzzle."
+        }
+    },
 
     "puzzle": {
         "infinite": {
