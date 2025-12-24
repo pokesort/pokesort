@@ -180,7 +180,6 @@ export class PuzzleFieldManager {
             this.markValueAsUsed(field, value);
           }
         }
-        console.log(queryParts);
         
         return queryParts.length > 0 ? queryParts.join('&') : null;
       }
