@@ -29,7 +29,6 @@ export default React.memo(function Notices({noticesOpen, setNoticesOpen}: Notice
         const this_id = notice._id;
         const latest_id = localStorage.getItem(latestNoticeKey);
         const seenTutorial = localStorage.getItem(tutorialKey);
-        console.log(seenTutorial);
 
         if (seenTutorial && (latest_id == null || latest_id != this_id)) {
             localStorage.setItem(latestNoticeKey, this_id);

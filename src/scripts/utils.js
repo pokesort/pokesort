@@ -297,7 +297,6 @@ export function generateTips(ids, queries) {
     queries = queries.slice(1);
   }
   queries = queries.split('&');
-  console.log(queries);
   
   const text = queries.reduce((best, cur) => {
     return (WEIGHT_VALUES[cur.split("=")[0]] ?? 0) >

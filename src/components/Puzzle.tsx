@@ -159,7 +159,7 @@ const VictoryModal = React.memo(({type, challenge=null, guesses, shinies, dateOg
             <>
             {type == 'daily' ?
                 <div style={{display: 'flex', gap: 'inherit'}}>
-                    {date &&
+                    {dateOg != null && date &&
                         <div className="modal-content-div">
                             <p style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
                                 <CalendarIcon/>{date}

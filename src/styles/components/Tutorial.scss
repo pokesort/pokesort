@@ -1,5 +1,9 @@
 @use "../abstract" as *;
 
+div.modal-background:has(.tutorial-item) {
+    z-index: 60;
+}
+
 section.modal:has(.tutorial-item) {
     min-width: 400px;
     max-width: min(100%, 400px);
