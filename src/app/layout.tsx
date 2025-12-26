@@ -6,6 +6,7 @@ import { headers } from "next/headers";
 import "@/src/styles/layout.scss";
 import { Montserrat } from 'next/font/google'
 import HeaderClient from "../components/HeaderClient";
+import Analytics from "../components/Analytics";
 
 const montserrat = Montserrat({
   subsets: ['latin'],
@@ -37,6 +38,7 @@ export default async function RootLayout({children,}: Readonly<{children: React.
   return (
     <html lang={locale}>
       <head>
+        <Analytics />
         <link
             rel="preload"
             href="/AnimatedLoading.json"
