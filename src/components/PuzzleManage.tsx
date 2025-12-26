@@ -337,7 +337,7 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
             };
 
             groups.forEach((g: Group) => {
-                output[g.key] = g.value;
+                output[g.key.replaceAll("-", "_")] = g.value;
             });
                      
             requestAnimationFrame(() => {

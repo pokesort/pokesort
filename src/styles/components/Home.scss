@@ -1,17 +1,15 @@
 @use "../abstract" as *;
 
 section#home {
-    --initial-height: 100px;
-
     display: flex;
     flex-direction: column;
     align-items: center;
 
     gap: 3rem;
 
-    animation: home-fade-in 0.75s ease-in 1;
+    animation: home-fade-in 0.5s ease-in 1;
 
-    hgroup {
+    hgroup:has(> .logo) {
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -123,7 +121,12 @@ section#home {
     }
 
     @media(max-width: 768px) {
-        --initial-height: 85px;
+        gap: 2rem;
+
+        hgroup:has(> .logo) {
+            font-size: text(small);
+            gap: 0.5rem;
+        }
 
         div.logo {
             gap: 1rem;
@@ -141,7 +144,20 @@ section#home {
             display: flex;
             gap: 1.25rem;
             flex-direction: column;
+
+            a {
+                padding: 1.25rem 1.75rem;
+
+                h3 {
+                    font-size: text(base);
+                }
+
+                hgroup.card-title div {
+                    font-size: text(small);
+                }
+            }
         }
+
 
         p#disclaimer {
             font-size: text(xsmall);
@@ -152,25 +168,12 @@ section#home {
 
 @keyframes home-fade-in {
     0% {
-        overflow: hidden;
-        max-height: var(--initial-height);
-        min-height: 0px;
-
-        transform: scale(200%);
+        transform: scale(1.5);
         opacity: 0;
     }
-    20% {
-        overflow: hidden;
-        max-height: var(--initial-height);
-        min-height: 0px;
-
+    100% {
         transform: scale(1);
         opacity: 1;
-    }
-    100% {
-        overflow: hidden;
-        max-height: 100vh;
-        min-height: 0px;
     }
 }
 
