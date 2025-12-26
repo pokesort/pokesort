@@ -13,6 +13,7 @@ import HeaderGit from './svg/HeaderGit';
 import HeaderNotice from './svg/HeaderNotice';
 import Notices from './Notices';
 import Tutorial from './Tutorial';
+import HeaderInstagram from './svg/HeaderInstagram';
 
 type Page = {
     route: string;
@@ -75,14 +76,17 @@ export default function Header ({ pathname }: HeaderProps) {
                         <Link href="" onClick={() => setTutorialOpen(true)}>
                             <HeaderHelp />
                         </Link>
-                        <Link href="/about">
-                            <HeaderInfo />
+                        <Link target="_blank" href="https://instagram.com/pokesortgame">
+                            <HeaderInstagram />
                         </Link>
-                        <Link target="_blank" href="https://x.com/Pokesort131645">
+                        <Link target="_blank" href="https://x.com/pokesortgame">
                             <HeaderTwitter />
                         </Link>
                         <Link target="_blank" href="https://github.com/pokesort">
                             <HeaderGit />
+                        </Link>
+                        <Link href="/about">
+                            <HeaderInfo />
                         </Link>
                     </ul>
                 </div>
