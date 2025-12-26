@@ -29,6 +29,16 @@
         "next": "Next",
         "empty": "There doesn't seem to be anything here..."
     },
+    "tutorial": {
+        "label": "How to Play",
+        "text": {
+            "1": "All Pokémon on the grid belong to groups according to their common traits. You must find out what those groups are in the least attempts possible.",
+            "2": "You can check the accuracy of incorrect guesses to try and deduce which Pokémon belong to the same group.",
+            "3": "It's also possible to ask for hints, such as which Pokémon should be grouped or what trait defines that group.",
+            "4": "By pressing or right-clicking a Pokémon, you may check all its relevant information.",
+            "5": "You win by correctly sorting all Pokémon on the grid into their groups. Theere are as many groups as there are rows in the puzzle grid."
+        }
+    },
 
     "puzzle": {
         "infinite": {

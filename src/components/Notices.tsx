@@ -11,6 +11,7 @@ import PageView from './PageView';
 import { formatDate } from '../scripts/utils';
 
 const latestNoticeKey = 'u_latestnotice';
+const tutorialKey = 'u_tutorial';
 
 interface NoticesProps {
     noticesOpen: boolean,
@@ -27,8 +28,9 @@ export default React.memo(function Notices({noticesOpen, setNoticesOpen}: Notice
 
         const this_id = notice._id;
         const latest_id = localStorage.getItem(latestNoticeKey);
+        const seenTutorial = localStorage.getItem(tutorialKey);
 
-        if (latest_id == null || latest_id != this_id) {
+        if (seenTutorial && (latest_id == null || latest_id != this_id)) {
             localStorage.setItem(latestNoticeKey, this_id);
             setNoticesOpen(true);
         }

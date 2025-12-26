@@ -1,0 +1,24 @@
+@use "../abstract" as *;
+
+div.modal-background:has(.tutorial-item) {
+    z-index: 60;
+}
+
+section.modal:has(.tutorial-item) {
+    min-width: 400px;
+    max-width: min(100%, 400px);
+}
+
+ul.page-view > li.tutorial-item {
+    height: fit-content;
+    max-height: unset;
+
+    img {
+        width: 100%;
+    }
+
+    p {
+        text-align: center;
+        font-size: text(sm);
+    }
+}

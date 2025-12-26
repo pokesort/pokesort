@@ -148,7 +148,7 @@ export class PuzzleFieldManager {
       if (validFields.length === 0) return null;
 
       const numFields = randomInRange(1, Math.min(3, validFields.length));
-
+      const limitWeight = 2 + numFields;
       const shuffledFields = pickRandom(validFields, validFields.length);
 
       const selectedFields = [];
@@ -170,7 +170,7 @@ export class PuzzleFieldManager {
         }
       }
       
-      if (totalWeight >= 5 && selectedFields.length === numFields) {
+      if (totalWeight >= limitWeight && selectedFields.length === numFields) {
         
         const queryParts = [];
         for (const field of selectedFields) {
@@ -180,7 +180,6 @@ export class PuzzleFieldManager {
             this.markValueAsUsed(field, value);
           }
         }
-        console.log(queryParts);
         
         return queryParts.length > 0 ? queryParts.join('&') : null;
       }
