@@ -37,7 +37,13 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'PUT') {
-    await update(req, res, existingPuzzle);
+    const { password, puzzle } = req.body;
+    if (password != process.env.NEXT_PUBLIC_API_AUTHORIZATION_BATCH) return res.status(403).json({ success: false, message: "Usuário não permitido" });
+    
+    const samePuzzle = await Puzzle.findOne({ date: puzzle.date, challenge: puzzle.challenge, _id: { $ne: existingPuzzle._id } });
+    if (samePuzzle) return res.status(403).json({ success: false, message: "Já existe um puzzle com essa data e nível de desafio" });
+    
+    await update(puzzle, res, existingPuzzle);
   }
   else if (req.method === 'DELETE') {
     await remove(res, existingPuzzle);
@@ -51,11 +57,10 @@ export default async function handler(req, res) {
   }
 }
 
-async function update(req, res, existingPuzzle) {
+async function update(puzzle, res, existingPuzzle) {
   try {
     await connect();
 
-    const { password, puzzle } = req.body;
     puzzle.groups = puzzle.groups.slice(0, puzzle.rows);
     puzzle.groups.map(g => {
       g.pokemons = g.pokemons.slice(0, puzzle.cols);

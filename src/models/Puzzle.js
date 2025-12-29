@@ -78,3 +78,24 @@ const puzzleSchema = new mongoose.Schema({
 export const getPuzzleModel = (conn) => {
     return conn.models.Puzzle || conn.model('Puzzle', puzzleSchema);
 };
+
+puzzleSchema.methods.toString = function () {
+    return `
+Puzzle:
+  Autor: ${this.author}
+  Data de criação: ${this.created_at?.toISOString()}
+  Origem: ${this.from}
+  Data: ${this.date ?? 'null'}
+  Dificuldade: ${this.challenge}
+  Tamanho: ${this.rows}x${this.cols}
+  Grupos:
+${this.groups
+    .map(
+        (g, i) => `    Grupo ${i + 1}:
+      Query: ${g.query}
+      Pokémons: [${g.pokemons.join(', ')}]
+      Dicas: [${g.tips.join(', ')}]`
+    )
+    .join('\n')}
+    `.trim();
+};
