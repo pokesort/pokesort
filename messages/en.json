@@ -13,7 +13,8 @@
         "daily": "Daily",
         "archive": "Archive",
         "dex": "Dex",
-        "infinite": "Infinite"
+        "infinite": "Infinite",
+        "about": "About"
     },
     "error": {
         "oops": "Uh-oh...",
@@ -39,6 +40,9 @@
             "5": "You win by correctly sorting all Pokémon on the grid into their groups. Theere are as many groups as there are rows in the puzzle grid."
         }
     },
+    "metadata": {
+        "description": "Challenge your knowledge on Pokesort, a daily Pokémon association puzzle. Sort the Pokémon on the grid according to their common traits."
+    },
 
     "puzzle": {
         "infinite": {
@@ -46,6 +50,8 @@
             "generate": "Generate a Puzzle",
             "exclude": "Ignore Categories",
             "generation": "Generation Limit",
+            "rows": "Rows",
+            "cols": "Columns",
             "button": "Generate"
         },
         "from": {

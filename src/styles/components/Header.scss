@@ -13,7 +13,7 @@ header {
     
     position: sticky;
     top: 0;
-    z-index: 30;    
+    z-index: 100;    
 
     a#home {
         display: flex;
@@ -154,7 +154,7 @@ header {
             width: 100%;
             gap: 0rem;
             transform: unset;
-            padding: 0 var(--spacing);
+            // padding: 0 var(--spacing);
             
             &:not(.open) {
                 opacity: 0;
