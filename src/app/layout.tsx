@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from 'next-intl';
-import { getLocale } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 import { headers } from "next/headers";
 
 import "@/src/styles/layout.scss";
@@ -14,16 +14,22 @@ const montserrat = Montserrat({
   variable: '--montserrat',
 });
 
-export const metadata: Metadata = {
-  title: "Pokesort",
-  description: "A daily Pokémon association puzzle",
-
-  keywords: "",
-};
-
 export const viewport: Viewport = {
   themeColor: "#12121B",
-  colorScheme: "dark",  
+  colorScheme: "dark",
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  const t = await getTranslations({ locale });
+
+  return {
+    title: {
+      template: "Pokesort | %s",
+      default: "Pokesort",
+    },
+    description: t('metadata.description'),
+  };
 }
 
 export default async function RootLayout({children,}: Readonly<{children: React.ReactNode;}>) {

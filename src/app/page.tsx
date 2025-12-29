@@ -25,8 +25,6 @@ type Page = {
     countType?: 'streak' | 'count';
 }
 
-
-
 export default function Home() {
   const t = useTranslations();
   const [counts, setCounts] = useState<number[]>([]);
