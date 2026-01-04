@@ -13,7 +13,8 @@
         "daily": "Daily",
         "archive": "Archive",
         "dex": "Dex",
-        "infinite": "Infinite"
+        "infinite": "Infinite",
+        "about": "About"
     },
     "error": {
         "oops": "Uh-oh...",
@@ -39,6 +40,9 @@
             "5": "You win by correctly sorting all Pokémon on the grid into their groups. Theere are as many groups as there are rows in the puzzle grid."
         }
     },
+    "metadata": {
+        "description": "Challenge your knowledge on Pokesort, a daily Pokémon association puzzle. Sort the Pokémon on the grid according to their common traits."
+    },
 
     "puzzle": {
         "infinite": {
@@ -46,6 +50,8 @@
             "generate": "Generate a Puzzle",
             "exclude": "Ignore Categories",
             "generation": "Generation Limit",
+            "rows": "Rows",
+            "cols": "Columns",
             "button": "Generate"
         },
         "from": {
@@ -61,7 +67,7 @@
         "logs": "Logs",
         "puzzle": "Puzzle",
         "dex": "Dex",
-        "correct": "correto",
+        "correct": "correct",
         "custom-groups-1": "This puzzle includes custom categories.",
         "custom-groups-2": "Try thinking outside the box!",
         "okay": "Got it!",
@@ -76,10 +82,10 @@
             "3": "Elite",
             "4": "Champion",
             "help": {
-                "1": "Dê início à sua jornada. Puzzles 4x4 incluindo grupos de tipos, região, geração, passo evolutivo, número de tipos e categorias como bebês, míticos, lendários e iniciais.",
-                "2": "Teste suas habilidades em um ginásio. Puzzles 4x5 ou 5x4 adicionando grupos de formas alternativas, cadeia evolutiva e categorias como Mega Evoluções, Ultra Beasts e fósseis.",
-                "3": "Mostre que sua habilidade está entre as melhores. Puzzles 5x5 ou 6x4 adicionando grupos de fraquezas, resistências, métodos evolutivos e categorias como Gigantamax, paradoxos e formas regionais",
-                "4": "Mostre que sua habilidade é a melhor das melhores. Puzzles 6x5 adicionando grupos de habilidades, movimentos, formato, grupo de reprodução e categorias como Z-Moves exclusivos, habilidade de trocar de formas e diferenças de gênero."
+                "1": "Start your journey here. 4x4 puzzles including groups of type, region, generation, evolution step, number of types and categories such as babies, mythicals, legendaries and starters.",
+                "2": "Test your skills in a gym challenge. 4x5 or 5x4 puzzles adding groups of alternate forms, evolution chains and categories such as Mega Evolutions, Ultra Beasts and fossils.",
+                "3": "Show that your skills are among the best. 5x5 or 6x4 puzzles adding groups of weaknesses, resistances, evolution methods and categories such as Gigantamax, paradoxes and regional variants.",
+                "4": "Show that your skill is the very best. 6x5 puzzles adding groups of abilities, known moves, shape, egg group and categories such as exclusive Z-Moves, ability to switch forms and gender differences."
             }
         },
         "dex-tabs": {
@@ -97,7 +103,7 @@
                 "original": "Original Form",
                 "mega": "Mega Evolution",
                 "gmax": "Gigantamax",
-                "regional": "Regional Form",
+                "regional": "Regional Variant",
                 "alternate": "Alternate Form"
             }
         },
@@ -115,7 +121,7 @@
         },
         "tips": {
             "ask": "Need a Hint?",
-            "and": "e",
+            "and": "and",
             "text": "A group includes the category",
             "pair": "are in the same group"
         }
@@ -175,12 +181,12 @@
             "paldea": "Paldea"
         },
         "moves": {
-            "long": "Pode Aprender ",
-            "short": "Movimento"
+            "long": "Learns ",
+            "short": "Move"
         },
         "abilities": {
-            "long": "Tem a Habilidade ",
-            "short": "Habilidade"
+            "long": "Has the Ability ",
+            "short": "Ability"
         },
         "shape": {
             "long": "",
@@ -202,91 +208,91 @@
             "tentacles": "Tentacles-shaped"
         },
         "egg_groups": {
-            "long": "In the egg group ",
+            "long": "In the Egg Group ",
             "short": "Egg Group",
 
-            "monster": "Monstro",
-            "dragon": "Dragão",
-            "water1": "Água 1",
-            "bug": "Inseto",
-            "flying": "Voador",
-            "ground": "Campo",
-            "field": "Campo",
-            "fairy": "Fada",
-            "plant": "Planta",
-            "humanshape": "Humanóide",
-            "water3": "Água 3",
+            "monster": "Monster",
+            "dragon": "Dragon",
+            "water1": "Water 1",
+            "bug": "Bug",
+            "flying": "Flying",
+            "ground": "Field",
+            "field": "Field",
+            "fairy": "Fairy",
+            "plant": "Plant",
+            "humanshape": "Humanshape",
+            "water3": "Water 3",
             "mineral": "Mineral",
-            "indeterminate": "Indeterminado",
-            "water2": "Água 2",
+            "indeterminate": "Indeterminate",
+            "water2": "Water 2",
             "ditto": "Ditto",
-            "no-eggs": "Sem Ovos"
+            "no-eggs": "No Eggs"
         },
         "categories": {
             "long": "",
-            "short": "Categoria",
-            "plural": "Categorias",
+            "short": "Category",
+            "plural": "Categories",
 
-            "1": "Forma Bebê",
-            "2": "Mítico",
-            "3": "Lendário",
-            "4": "Possui Mega Evolução",
-            "5": "Mega Evolução",
-            "6": "Possui Gigantamax",
-            "7": "Possui Z-Move Exclusivo",
-            "8": "Possui Forma Regional",
-            "9": "Forma Não é Permanente",
-            "10": "Possui Diferenças de Gênero",
-            "11": "Inicial",
+            "1": "Baby Form",
+            "2": "Mythical",
+            "3": "Legendary",
+            "4": "Can Mega Evolve",
+            "5": "Mega Evolution",
+            "6": "Can Gigantamax",
+            "7": "Has Exclusive Z-Move",
+            "8": "Has Regional Variant",
+            "9": "May Switch Forms",
+            "10": "Has Gender Differences",
+            "11": "Starter",
             "12": "Ultra Beast",
-            "13": "Paradoxo",
+            "13": "Paradox",
             "14": "Gigantamax",
-            "15": "Forma Regional",
+            "15": "Regional Variant",
             "16": "Vivillon",
-            "17": "Fóssil"
+            "17": "Fossil"
         },
         "others": {
-            "long": "Possui outras formas ",
-            "short": "Outras Formas",
+            "long": "",
+            "short": "Other Forms",
 
-            "1": "e é a original",
-            "2": "e é alternativa"
+            "1": "Has Other Forms",
+            "2": "Alternate Form"
         },
         "methods": {
-            "long": "Evolui ",
-            "short": "Método Evolutivo",
+            "long": "Evolves ",
+            "short": "Evolution Method",
 
-            "1": "subindo de nível",
-            "2": "por troca",
-            "3": "apenas em região específica",
-            "4": "usando item",
-            "5": "por gênero específico",
-            "6": "de forma exclusiva",
-            "7": "segurando item",
-            "8": "ao aprender um movimento",
-            "9": "por felicidade",
-            "10": "apenas de dia",
-            "11": "apenas de noite"
+            "1": "by Level Up",
+            "2": "by Trading",
+            "3": "Only in Specific Region",
+            "4": "by Using an Item",
+            "5": "based on Gender",
+            "6": "in a Unique Manner",
+            "7": "by Holding an Item",
+            "8": "by Learning a Move",
+            "9": "by Happiness",
+            "10": "Only During the Day",
+            "11": "Only at Night"
         },
         "short_methods": {
-            "long": "Evolui ",
+            "long": "Evolves ",
             "short": "Methods",
 
-            "1": "Nível",
-            "2": "Troca",
-            "3": "Região Específica",
-            "4": "Usar Item",
-            "5": "Gênero",
-            "6": "Exclusivo",
-            "7": "Segurar Item",
-            "8": "Saber Movimento",
-            "9": "Felicidade",
-            "10": "Dia",
-            "11": "Noite"
+            "1": "Level Up",
+            "2": "Trading",
+            "3": "Specific Region",
+            "4": "Using Item",
+            "5": "Gender",
+            "6": "Unique",
+            "7": "Holding item",
+            "8": "Learning Move",
+            "9": "Happiness",
+            "10": "Day",
+            "11": "Night"
         },
         "generation": {
-            "long": "Geração ",
-            "short": "Geração",
+            "long": "Generation ",
+            "short": "Generation",
 
             "1": "I",
             "2": "II",
@@ -300,47 +306,47 @@
             "10": "X"
         },
         "habitat": {
-            "long": "Vive em ",
+            "long": "Lives in ",
             "short": "Habitat",
 
-            "cave": "cavernas",
-            "forest": "florestas",
-            "grassland": "campos",
-            "mountain": "montanhas",
-            "rare": "lugares incomuns",
-            "rough-terrain": "relevo irregular",
-            "sea": "mares",
-            "urban": "cidades",
-            "waters-edge": "margens de água"
+            "cave": "Caves",
+            "forest": "Forests",
+            "grassland": "Grasslands",
+            "mountain": "Mountains",
+            "rare": "Uncommon Places",
+            "rough-terrain": "Rough Terrain",
+            "sea": "Seas",
+            "urban": "Cities",
+            "waters-edge": "Water Margins"
         },
         "step": {
             "long": "",
-            "short": "Cadeia Evolutiva",
+            "short": "Evolution Chain",
 
-            "no_line": "Não possui cadeia evolutiva",
-            "has_split": "Possui evolução ramificada",
-            "is_split": "É uma evolução ramificada"
+            "no_line": "Has No Evolution Chain",
+            "has_split": "Has a Split Evolution",
+            "is_split": "Is a Split Evolution"
         },
         "weak": {
-            "long": "Fraco ao Tipo ",
-            "short": "Fraqueza"
+            "long": "Weak to ",
+            "short": "Weakness"
         },
         "strong": {
-            "long": "Resiste ao Tipo ",
-            "short": "Resistência"
+            "long": "Resists ",
+            "short": "Resistance"
         },
         "immune": {
-            "long": "Imune ao Tipo ",
-            "short": "Imune"
+            "long": "Immune to ",
+            "short": "Immunity"
         },
         "form": {
             "long": "",
             "short": "Evolution Step",
 
-            "first": "Base form",
-            "middle": "Middle form",
-            "final": "Final form",
-            "no_line": "No evolutions"
+            "first": "Base Form",
+            "middle": "Middle Form",
+            "final": "Final Form",
+            "no_line": "No Evolutions"
         },
         "dual": {
             "long": "",
