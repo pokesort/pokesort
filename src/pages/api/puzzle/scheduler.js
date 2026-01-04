@@ -14,6 +14,8 @@ export default async function handler(req, res) {
     const existingPuzzles = [];
 
     let today = new Date().toISOString().split('T')[0];
+    console.log(`Hora da requisição ${new Date().toISOString().split('T')[1]}`);
+    
 
     await getTodayPuzzle(today, Puzzle, existingPuzzles);
     if(existingPuzzles.filter(puzzle => puzzle !== null).length > 0) return res.status(200).json({message: "Puzzle(s) para hoje encontrado(s)"});
