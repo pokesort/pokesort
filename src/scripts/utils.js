@@ -333,3 +333,12 @@ export function compareArrays(a, b) {
   if (a.length !== b.length) return false;
   return a.slice().sort().every((val, i) => val === b.slice().sort()[i]);
 }
+
+export function adjustDateTime(date) {
+  const offset = process.env.TIME_OFFSET_HOURS || 0;
+
+  const offsetInMiliseconds = offset * 60 * 60 * 1000;
+  date.setTime(date.getTime() + offsetInMiliseconds);
+
+  return date;
+}

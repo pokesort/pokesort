@@ -2,14 +2,14 @@ import { connect, getDb } from "@/lib/mongodb";
 import { getPuzzleModel } from '@/src/models/Puzzle';
 import { populate } from './_utils';
 import { findPuzzlesOfSameDate } from '@/src/scripts/server_utils';
+import { adjustDateTime } from "../../../scripts/utils";
 
 export default async function handler(req, res) {
   await connect();
 
   const { challenge } = req.query;
-  
-  const today = new Date().toISOString().split('T')[0];
-  console.log(new Date());
+
+  const today = adjustDateTime(new Date()).toISOString().split('T')[0];
   const conn = getDb();
   const Puzzle = getPuzzleModel(conn);
   let existingPuzzle = await getTodayPuzzle(today, Number(challenge) ?? null);
