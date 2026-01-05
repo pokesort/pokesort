@@ -9,6 +9,7 @@ export default async function handler(req, res) {
   const { challenge } = req.query;
   
   const today = new Date().toISOString().split('T')[0];
+  console.log(new Date());
   const conn = getDb();
   const Puzzle = getPuzzleModel(conn);
   let existingPuzzle = await getTodayPuzzle(today, Number(challenge) ?? null);
