@@ -2,7 +2,7 @@ import { connect, getDb } from "@/lib/mongodb";
 import { getPuzzleModel } from '@/src/models/Puzzle';
 import { generatePuzzle } from './generate';
 import { createPuzzleFieldManager } from "@/src/scripts/puzzleManager";
-import { validateGenerateParams, FIELD_OPTIONS } from "@/src/scripts/utils";
+import { validateGenerateParams, adjustDateTime, FIELD_OPTIONS } from "@/src/scripts/utils";
 
 export default async function handler(req, res) {
   try {

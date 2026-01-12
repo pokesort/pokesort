@@ -2,7 +2,7 @@ import { connect, getDb } from "@/lib/mongodb";
 import { getPuzzleModel } from '@/src/models/Puzzle';
 import { populate } from './_utils';
 import { findPuzzlesOfSameDate } from '@/src/scripts/server_utils';
-import { adjustDateTime } from "../../../scripts/utils";
+import { adjustDateTime } from "@/src/scripts/utils";
 
 export default async function handler(req, res) {
   await connect();

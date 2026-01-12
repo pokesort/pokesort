@@ -52,6 +52,14 @@ export default async function RootLayout({children,}: Readonly<{children: React.
             type="application/json"
             crossOrigin="anonymous"
           />
+        <meta
+          name="google-site-verification"
+          content="3fxG3rWo7kt_S7p9eF8EuFPozHRH_1h298NsfriqrOk"
+        />
+        <link
+          rel="canonical"
+          href={process.env.NEXT_PUBLIC_API_BASE_URL}
+        />
       </head>
       <NextIntlClientProvider>
         <body>
