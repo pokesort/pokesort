@@ -486,7 +486,12 @@ const PuzzleGrid = React.memo(({puzzle, type, pause, setPause, pokemons, shinies
     }, []);
 
     const markGroupAsSolved = useCallback((newlySolvedIds: Set<number>) => {
-        const newSolvedGroup = pokemons.filter((p:any) => newlySolvedIds.has(p.id));
+        console.log(newlySolvedIds);
+        let newSolvedGroup: any[] = [];
+        newlySolvedIds.forEach(id => {
+            const newPokemon: any[] = pokemons.filter((p:any) => p.id == id);
+            newSolvedGroup = newSolvedGroup.concat(newPokemon);
+        })
 
         setSolvedInOrder(prevOrder => [...prevOrder, ...newSolvedGroup]);
         setSolvedGroupIds(prevIds => new Set([...prevIds, ...newlySolvedIds]));
@@ -743,7 +748,6 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
             loaded.current = loadState(puzzle._id || '');
         } else {
             loaded.current = false;
-            // return;
         }
 
         const timer = setTimeout(() => {
