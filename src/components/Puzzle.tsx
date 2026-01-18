@@ -743,7 +743,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
             loaded.current = loadState(puzzle._id || '');
         } else {
             loaded.current = false;
-            return;
+            // return;
         }
 
         const timer = setTimeout(() => {
