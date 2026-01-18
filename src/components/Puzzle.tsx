@@ -486,7 +486,6 @@ const PuzzleGrid = React.memo(({puzzle, type, pause, setPause, pokemons, shinies
     }, []);
 
     const markGroupAsSolved = useCallback((newlySolvedIds: Set<number>) => {
-        console.log(newlySolvedIds);
         let newSolvedGroup: any[] = [];
         newlySolvedIds.forEach(id => {
             const newPokemon: any[] = pokemons.filter((p:any) => p.id == id);
