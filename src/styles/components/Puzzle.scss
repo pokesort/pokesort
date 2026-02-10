@@ -148,8 +148,7 @@ section.solved-groups-grid {
         justify-content: end;
         align-items: center;
         background-color: color(section2);
-        padding: var(--spacing);
-        border: 2px solid #{color(selection3)};
+        padding: var(--spacing);        
 
         animation: solved-group-appear 1.0s ease 1;
 
@@ -162,21 +161,25 @@ section.solved-groups-grid {
             @media (max-width: 640px) {
                 font-size: text(small);
             }
-        }
+        }        
 
-        &::after {
-            display: block;
-            content: '';
-            background-color: color(selection3);
-            height: 15%;
-            aspect-ratio: 1;
+        &.correct {
+            border: 2px solid #{color(selection3)};
 
-            position: absolute;
-            right: 0;
-            top: -1px;
+            &::after {
+                display: block;
+                content: '';
+                background-color: color(selection3);
+                height: 15%;
+                aspect-ratio: 1;
 
-            clip-path: polygon(0% 0%, 100% 100%, 100% 0%);
-            animation: solved-text 1.0s ease 1;
+                position: absolute;
+                right: 0;
+                top: -1px;
+
+                clip-path: polygon(0% 0%, 100% 100%, 100% 0%);
+                animation: solved-text 1.0s ease 1;
+            }
         }
     }
 }

@@ -8,7 +8,7 @@ import { formatDate, isYesterday, shuffleArray, getNextRefresh, toTitleCase, dec
 import { useInView } from 'react-intersection-observer';
 import { useRouter } from 'next/navigation';
 
-import type { PuzzleData } from '@/src/assets/types/PuzzleApiResponse';
+import type { PuzzleData, PuzzleGroup } from '@/src/assets/types/PuzzleApiResponse';
 import "@/src/styles/components/Puzzle.scss";
 import PokemonBlock from '@/src/components/PuzzleBlock';
 import { GroupName, getNaturalGroupnames } from '@/src/components/GroupName';
@@ -63,16 +63,27 @@ const recordInfiniteCount = () => {
 interface SolvedGroupsGridProps {
     groups: string[];
     dictionary: any;
+    puzzleGroups: PuzzleGroup[];
+    abandoned: Record<string, boolean>;
 }
 
-const SolvedGroupsGrid = ({groups, dictionary}: SolvedGroupsGridProps) => {
+const SolvedGroupsGrid = ({groups, dictionary, puzzleGroups, abandoned}: SolvedGroupsGridProps) => {
+    useEffect(() => {
+        console.log(groups);
+        console.log(abandoned);
+    }, [abandoned])
+    
     return (
         <section className="solved-groups-grid">
-            {groups.map((group: string, index: number)=> (
-                <div key={group} className="solved-group">
-                    <GroupName query={group} dictionary={dictionary}/>
-                </div>
-            ))}
+            {groups.map((group: string)=> {
+                const abandonedGroup = abandoned[group];
+
+                return (
+                    <div key={group} className={`solved-group ${abandonedGroup ? "" : "correct"}`}>
+                        <GroupName query={group} dictionary={dictionary}/>
+                    </div>
+                )
+            })}
         </section>
     )
 }
@@ -271,9 +282,11 @@ interface GuessLogsInterface {
     puzzleRows: number;
     dictionary: any;
     viewedTips: React.RefObject<number[]>;
+    abandoned: boolean;
+    setAbandoned: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const GuessLogs = React.memo(({guesses, setGuesses, availableTips, setAvailableTips, spritesMap, allTips, solvedGroupNames, puzzleRows, dictionary, viewedTips}: GuessLogsInterface) => {
+const GuessLogs = React.memo(({guesses, setGuesses, availableTips, setAvailableTips, spritesMap, allTips, solvedGroupNames, puzzleRows, dictionary, viewedTips, abandoned, setAbandoned}: GuessLogsInterface) => {
     const t = useTranslations('');
     const locale = useLocale();
 
@@ -336,7 +349,7 @@ const GuessLogs = React.memo(({guesses, setGuesses, availableTips, setAvailableT
                     {t(`puzzle.tips.${tip.type}`)} <b>{getNaturalGroupnames(tip.values, dictionary, t, locale, true)}</b>
                 </p>
             )
-        }        
+        }
     }
 
     const isSolved = useMemo(() => {
@@ -350,6 +363,7 @@ const GuessLogs = React.memo(({guesses, setGuesses, availableTips, setAvailableT
             {guesses.length > 0 && allTips.current && allTips.current.length > 0 && !isSolved &&
                 <button className="ask-tip" onClick={askForTip} data-tips={availableTips}>{t(`puzzle.tips.ask`)} <span>x{availableTips}</span></button>
             }
+            <button className="ask-tip" onClick={() => setAbandoned(true)} >Desistir</button>
             <section className="puzzle-guess-logs">
                 {guesses.length > 0 ?
                     <>                    
@@ -395,24 +409,29 @@ interface PuzzleGridProps {
     scrollToTab: (target: number, behavior?: "instant" | "smooth") => void;
     solvedGroupNames: string[];
     resetAvailableTips: () => void;
+    abandoned: boolean;
 }
 
-const PuzzleGrid = React.memo(({puzzle, type, pause, setPause, pokemons, shinies, dictionary, setGuesses, forcedGuesses=[], victoryOpen, setVictoryOpen, setCurrentDexView, scrollToTab, solvedGroupNames, resetAvailableTips}: PuzzleGridProps) => {
+const PuzzleGrid = React.memo(({puzzle, type, pause, setPause, pokemons, shinies, dictionary, setGuesses, forcedGuesses=[], victoryOpen, setVictoryOpen, setCurrentDexView, scrollToTab, solvedGroupNames, resetAvailableTips, abandoned}: PuzzleGridProps) => {
     const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+
+    const [incorrectGuessIds, setIncorrectGuessIds] = useState<Set<number>>(new Set());
+    const [correctGuessIds, setCorrectGuessIds] = useState<Set<number>>(new Set());
+    const [solvedGroupIds, setSolvedGroupIds] = useState<Set<number>>(new Set());
+    const [solvedInOrder, setSolvedInOrder] = useState<any[]>([]);
+    const [abandonedGroups, setAbandonedGroups] = useState<Record<string, boolean>>({});
 
     const groupSets = useMemo(() => {
         if (!puzzle || !puzzle.groups) return [];
         let groupArray: Set<number>[] = [];
         for (let i = 0; i < puzzle.groups.length; i++) {
             groupArray[i] = new Set(puzzle.groups[i].pokemons);
+            setAbandonedGroups((prev) => ({
+                ...prev, [puzzle.groups[i].query]: false
+            }));
         }
         return groupArray;
     }, [puzzle]);
-
-    const [incorrectGuessIds, setIncorrectGuessIds] = useState<Set<number>>(new Set());
-    const [correctGuessIds, setCorrectGuessIds] = useState<Set<number>>(new Set());
-    const [solvedGroupIds, setSolvedGroupIds] = useState<Set<number>>(new Set());
-    const [solvedInOrder, setSolvedInOrder] = useState<any[]>([]);
 
     useEffect(() => {
         if (forcedGuesses.length > 0 && solvedGroupNames.length == 0) {
@@ -496,6 +515,25 @@ const PuzzleGrid = React.memo(({puzzle, type, pause, setPause, pokemons, shinies
         setSolvedGroupIds(prevIds => new Set([...prevIds, ...newlySolvedIds]));
     }, [pokemons]);
 
+    const abandonPuzzle = useCallback(() => {
+        puzzle.groups.forEach((group: PuzzleGroup, index: number) => {
+            if (solvedGroupNames.includes(group.query))
+                return;
+                        
+            solvedGroupNames.push(group.query);
+            setAbandonedGroups((prev) => ({
+                ...prev, [group.query]: true
+            }));
+            markGroupAsSolved(new Set(group.pokemons));
+        })
+    }, [solvedGroupIds, solvedGroupNames, abandonedGroups]);
+
+    useEffect(() => {
+        if (!puzzle || !abandoned) return;        
+
+        abandonPuzzle();
+    }, [abandoned])
+
     useEffect(() => {
         if (!puzzle?.cols || selectedIds.size < puzzle.cols) {
             return;
@@ -563,7 +601,12 @@ const PuzzleGrid = React.memo(({puzzle, type, pause, setPause, pokemons, shinies
             initial="hidden"
             animate="visible"
         >
-            <SolvedGroupsGrid groups={solvedGroupNames} dictionary={dictionary}/>
+            <SolvedGroupsGrid
+                groups={solvedGroupNames}
+                dictionary={dictionary}
+                puzzleGroups={puzzle.groups}
+                abandoned={abandonedGroups}
+            />
             <AnimatePresence>
 
                 {solvedInOrder.map((p: any, index: number) => {
@@ -661,8 +704,11 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
     const saveState = (id: string) => {
         if (id == '') return;
         let status = 0;
-        if (guesses.filter((g: PuzzleGuess) => g.accuracy >= 100).length == puzzle?.rows)
+        if (guesses.filter((g: PuzzleGuess) => g.accuracy >= 100).length == puzzle?.rows) {
             status = 1;
+        } else if (abandoned) {
+            status = 2;
+        }
         const state = {
             status,
             guesses,
@@ -691,6 +737,9 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
         }
         if (state.shiny != undefined) {
             setShinies(state.shiny);
+        }
+        if (state.status == 2) {
+            setAbandoned(true);
         }
         if (state.status > 0) {
             setTimeout(() => {
@@ -723,6 +772,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
     const [visibleTab, setVisibleTab] = useState<number>(1);
     const [currentDexView, setCurrentDexView] = useState<number>();
     const [solvedGroupNames, setSolvedGroupNames] = useState<string[]>([]);
+    const [abandoned, setAbandoned] = useState<boolean>(false);
 
     useEffect(() => {
         if (challenges != null) {
@@ -821,7 +871,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
     }
 
     const customGroupsMessage = useMemo(() => {
-        if (!puzzle) return <></>
+        if (!puzzle || !puzzle.opening) return <></>
 
         const opening = puzzle.opening[locale as "pt" | "en"];
         if (opening != "") {
@@ -883,6 +933,8 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
                             puzzleRows={puzzle ? puzzle.rows : 4}
                             dictionary={dictionary}
                             viewedTips={viewedTips}
+                            abandoned={abandoned}
+                            setAbandoned={setAbandoned}
                         />
                     </div>
                 </PuzzleTab> : <div></div>}
@@ -916,6 +968,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
                                 scrollToTab={scrollToTab}
                                 solvedGroupNames={solvedGroupNames}
                                 resetAvailableTips={resetAvailableAttempts}
+                                abandoned={abandoned}
                             />
                         )}
                     </div>
