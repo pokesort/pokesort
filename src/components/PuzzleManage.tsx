@@ -99,7 +99,8 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
             cols: `${puzzle.cols}`,
             rows: `${puzzle.rows}`,
             challenge: `${puzzle.challenge}`,
-            date: puzzle.date
+            date: puzzle.date,
+            opening: puzzle.opening
         }, {
             keepDirty: true,
             keepTouched: true,
@@ -193,6 +194,7 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
                     rows: formWatch.rows,
                     cols: formWatch.cols,
                     challenge: formWatch.challenge,
+                    opening: formWatch.opening,
                     date: formWatch.date == "" ? null : formWatch.date,
                     groups: groups
                 }
@@ -385,6 +387,11 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
         )
     };
 
+    const hasCustomGroups = useMemo(() => {
+        const customGroups = groups.filter((group: PuzzleGroup) => group.query.includes("|"));
+        return customGroups.length > 0;
+    }, [groups])
+
     const optionRecords = useMemo(() => {
         let options: Record<string, Record<string, string>> = {};
         Object.entries(FIELD_OPTIONS).map(([key, range]) => {
@@ -444,6 +451,16 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
                                 Enviar
                             </button>
                         </div>
+
+                        {hasCustomGroups && <div className="group-card cut-in">
+                            <p className="group-name">
+                                Mensagem de Abertura
+                            </p>
+                            <div className="form-flex col">
+                                <Input type="text" label="Português" name="opening.pt" defaultValue="" form={form} />
+                                <Input type="text" label="Inglês" name="opening.en" defaultValue="" form={form} />
+                            </div>
+                        </div>}
 
                         {rowCounter.map((rowIndex) => {
                             const group = groups[rowIndex];
