@@ -820,14 +820,31 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
         setAvailableTips(maxAvailableTips);
     }
 
+    const customGroupsMessage = useMemo(() => {
+        if (!puzzle) return <></>
+
+        const opening = puzzle.opening[locale as "pt" | "en"];
+        if (opening != "") {
+            return (
+                <p>{opening}</p>
+            )
+        } else {
+            return (
+                <>
+                    <p>{t(`custom-groups-1`)}</p>
+                    <p>{t(`custom-groups-2`)}</p>
+                </>
+            )
+        }
+    }, [puzzle, locale])
+
     return (
         <>
             {hasCustomGroups &&
                 <Modal id="custom-groups-modal" isOpen={customGroupsOpen} canClose={false} setIsOpen={setCustomGroupsOpen}>
                     <>
                         <div className="modal-content-div">
-                            <p>{t(`custom-groups-1`)}</p>
-                            <p>{t(`custom-groups-2`)}</p>
+                            {customGroupsMessage}
                         </div>
                         <button className="modal-content-div" onClick={() => setCustomGroupsOpen(false)}>
                             <p>{t(`okay`)}</p>
