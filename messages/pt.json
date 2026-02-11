@@ -108,10 +108,14 @@
             }
         },
         "victory": {
+            "win": "Gotcha!",
+            "lose": "Você fugiu.",
+
             "streak": "Sequência",
             "streak-desc": "Jogue o Pokesort diariamente para aumentar sua sequência",
             "infinite-count": "Puzzles infinitos resolvidos",
             "attempts-1": "Resolvido em ",
+            "attempts-1-l": "Fugiu após ",
             "attempts-2": " tentativas",
             "next-daily": "Próximo puzzle diário em",
             "back": "Voltar ao Início",

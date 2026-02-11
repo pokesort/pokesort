@@ -63,26 +63,24 @@ const recordInfiniteCount = () => {
 interface SolvedGroupsGridProps {
     groups: string[];
     dictionary: any;
-    puzzleGroups: PuzzleGroup[];
     abandoned: Record<string, boolean>;
 }
 
-const SolvedGroupsGrid = ({groups, dictionary, puzzleGroups, abandoned}: SolvedGroupsGridProps) => {
-    useEffect(() => {
-        console.log(groups);
-        console.log(abandoned);
+const SolvedGroupsGrid = ({groups, dictionary, abandoned}: SolvedGroupsGridProps) => {
+    const abandonedGroup = useCallback((group: string) => {
+        const abandonedGroup = abandoned[group];
+
+        return (
+            <div key={group} className={`solved-group ${abandonedGroup ? "" : "correct"}`}>
+                <GroupName query={group} dictionary={dictionary}/>
+            </div>
+        )
     }, [abandoned])
     
     return (
         <section className="solved-groups-grid">
-            {groups.map((group: string)=> {
-                const abandonedGroup = abandoned[group];
-
-                return (
-                    <div key={group} className={`solved-group ${abandonedGroup ? "" : "correct"}`}>
-                        <GroupName query={group} dictionary={dictionary}/>
-                    </div>
-                )
+            {groups.map((group: string) => {
+                return abandonedGroup(group)
             })}
         </section>
     )
@@ -97,9 +95,10 @@ interface VictoryModalProps {
     victoryOpen: boolean,
     setVictoryOpen: React.Dispatch<React.SetStateAction<boolean>>
     refreshPuzzle?: () => void;
+    abandoned: boolean;
 }
 
-const VictoryModal = React.memo(({type, challenge=null, guesses, shinies, dateOg, victoryOpen, setVictoryOpen, refreshPuzzle}: VictoryModalProps) => {
+const VictoryModal = React.memo(({type, challenge=null, guesses, shinies, dateOg, victoryOpen, setVictoryOpen, refreshPuzzle, abandoned}: VictoryModalProps) => {
     const t = useTranslations('puzzle');
     const locale = useLocale();    
     const router = useRouter();
@@ -166,7 +165,11 @@ const VictoryModal = React.memo(({type, challenge=null, guesses, shinies, dateOg
     }
     
     return (
-        <Modal id="victory-modal" title="Gotcha!" isOpen={victoryOpen} setIsOpen={setVictoryOpen}>
+        <Modal
+            id="victory-modal"
+            title={!abandoned ? t(`victory.win`) : t(`victory.lose`)}
+            isOpen={victoryOpen} setIsOpen={setVictoryOpen}
+        >
             <>
             {type == 'daily' ?
                 <div style={{display: 'flex', gap: 'inherit'}}>
@@ -206,10 +209,16 @@ const VictoryModal = React.memo(({type, challenge=null, guesses, shinies, dateOg
                     ))}
                 </div>
                 <div className="guesses-container">
-                    <p>{t(`victory.attempts-1`)}<b>{realGUesses.length}</b>{t(`victory.attempts-2`)}</p>
-                    <button onClick={shareButton} title={t(`victory.share`)}>
-                        <ShareIcon mode={isCopied}/>
-                    </button>
+                    <p>
+                        {!abandoned ? t(`victory.attempts-1`) : t(`victory.attempts-1-l`)}
+                        <b>{realGUesses.length}</b>
+                        {t(`victory.attempts-2`)}
+                    </p>
+                    {!abandoned &&
+                        <button onClick={shareButton} title={t(`victory.share`)}>
+                            <ShareIcon mode={isCopied}/>
+                        </button>
+                    }
                 </div>
             </div>
             {type == 'daily' ? (
@@ -604,7 +613,6 @@ const PuzzleGrid = React.memo(({puzzle, type, pause, setPause, pokemons, shinies
             <SolvedGroupsGrid
                 groups={solvedGroupNames}
                 dictionary={dictionary}
-                puzzleGroups={puzzle.groups}
                 abandoned={abandonedGroups}
             />
             <AnimatePresence>
@@ -624,6 +632,7 @@ const PuzzleGrid = React.memo(({puzzle, type, pause, setPause, pokemons, shinies
                             isSolved={true}
                             isCorrect={isCorrect}
                             isIncorrect={isIncorrect}
+                            isAbandoned={abandoned}
                             onSelect={handleSelect}
                             onPress={handlePress}
                         />
@@ -707,7 +716,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
         if (guesses.filter((g: PuzzleGuess) => g.accuracy >= 100).length == puzzle?.rows) {
             status = 1;
         } else if (abandoned) {
-            status = 2;
+            status = -1;
         }
         const state = {
             status,
@@ -738,10 +747,10 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
         if (state.shiny != undefined) {
             setShinies(state.shiny);
         }
-        if (state.status == 2) {
+        if (state.status == -1) {
             setAbandoned(true);
         }
-        if (state.status > 0) {
+        if (state.status != 0) {
             setTimeout(() => {
                 setVictoryOpen(true);
             }, 1000);
@@ -787,6 +796,16 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
     useEffect(() => {
         setMountVictoryModal(true);
     }, [victoryOpen]);
+
+    useEffect(() => {
+        if (puzzle && abandoned) {
+            scrollToTab(1);
+            setTimeout(() => {
+                setVictoryOpen(true);
+                saveState(puzzle._id || '');
+            }, 1600);
+        }
+    }, [abandoned]);
 
     useEffect(() => {
         if (puzzle && guesses.length > 0) saveState(puzzle._id || '');
@@ -912,6 +931,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
                     victoryOpen={victoryOpen}
                     setVictoryOpen={setVictoryOpen}
                     refreshPuzzle={refreshPuzzle}
+                    abandoned={abandoned}
                 />
             }
             <ul className="puzzle-tabs-container" style={{'--height': `${tabsHeight}px`, '--cols': puzzle ? puzzle.cols : 4, '--rows': puzzle ? puzzle.rows : 4} as React.CSSProperties}>

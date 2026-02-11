@@ -34,7 +34,7 @@ function Calendar({puzzles, loading}: CalendarProps) {
             const userData: any = localStorage.getItem(`s_${id}`);
             if (!userData) return;
 
-            if (!data) data = {status: 0};
+            if (!data) data = {status: -1};
             
             const parsed = JSON.parse(userData);
             if (parsed.shiny != undefined && parsed.shiny.length > 0) {
@@ -92,7 +92,8 @@ function Calendar({puzzles, loading}: CalendarProps) {
                         'hidden': !isCurrentMonth,
                         'disabled': !dates.includes(dayString) || foundToday,
                         'attempted': userData != null,
-                        'complete': userData && userData.status >= 1
+                        'complete': userData && userData.status == 1,
+                        'abandoned': userData && userData.status == -1
                     }
                 );
                 if (!foundToday && isSameDay(day, today)) foundToday = true;
