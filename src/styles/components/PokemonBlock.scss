@@ -95,11 +95,11 @@ label.block-container {
                 animation: make-guess 0.5s ease 1;
             }
 
-            &.incorrect, &.has-error {
-                --selection: #{color(selection2)};
-            }
             &.correct {
                 --selection: #{color(selection3)};
+            }
+            &.incorrect, &.has-error {
+                --selection: #{color(selection2)};
             }
     
             &::after {
@@ -118,6 +118,12 @@ label.block-container {
         }
 
         &.solved {
+            --border-color: #{color(selection3)};
+
+            &.abandoned {
+                --border-color: transparent;
+            }
+
             background-color: unset;
             animation: solved-background 1.0s ease 1;
             border: 2px solid;
@@ -134,7 +140,7 @@ label.block-container {
                 animation: solved-image 1.25s ease 1;
             }
 
-            &::after {
+            &:not(.abandoned)::after {
                 opacity: 0;
                 visibility: none;
 
@@ -358,11 +364,11 @@ label.block-container:has(.list-view) {
 @keyframes solved-background {
     0% {
         background-color: color(section2);
-        border-color: #{color(selection3)};
+        border-color: var(--border-color);
     }
     60% {
         background-color: color(section2);
-        border-color: #{color(selection3)};
+        border-color: var(--border-color);
     }
     100% {
         background-color: transparent;

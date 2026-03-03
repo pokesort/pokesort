@@ -148,8 +148,7 @@ section.solved-groups-grid {
         justify-content: end;
         align-items: center;
         background-color: color(section2);
-        padding: var(--spacing);
-        border: 2px solid #{color(selection3)};
+        padding: var(--spacing);        
 
         animation: solved-group-appear 1.0s ease 1;
 
@@ -164,19 +163,30 @@ section.solved-groups-grid {
             }
         }
 
-        &::after {
-            display: block;
-            content: '';
-            background-color: color(selection3);
-            height: 15%;
-            aspect-ratio: 1;
+        &.abandoned {
+            --selection: #{color(selection2)};
+        }
+        &.correct {
+            --selection: #{color(selection3)};
+        }
 
-            position: absolute;
-            right: 0;
-            top: -1px;
+        &.correct, &.abandoned {
+            border: 2px solid var(--selection);
 
-            clip-path: polygon(0% 0%, 100% 100%, 100% 0%);
-            animation: solved-text 1.0s ease 1;
+            &::after {
+                display: block;
+                content: '';
+                background-color: var(--selection);
+                height: 15%;
+                aspect-ratio: 1;
+
+                position: absolute;
+                right: 0;
+                top: -1px;
+
+                clip-path: polygon(0% 0%, 100% 100%, 100% 0%);
+                animation: solved-text 1.0s ease 1;
+            }
         }
     }
 }
@@ -277,9 +287,22 @@ section.solved-groups-grid {
     }
 }
 
-button.ask-tip {
+.guess-buttons-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    justify-content: stretch;
+    gap: var(--spacing);
+}
+
+button.guess-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: .25rem;
+
     background-color: color(section2);
-    min-height: 68px;
+    padding: 1rem;
+    font-size: .85rem;
     flex: 0 0;
     z-index: 10;
 
@@ -297,6 +320,11 @@ button.ask-tip {
     }
     &:active {
         transform: scale(0.85);
+    }
+    &:disabled {
+        opacity: 0.6;
+        color: color(text3);
+        pointer-events: none;
     }
 }
 

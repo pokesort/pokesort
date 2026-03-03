@@ -9,6 +9,7 @@
     padding: var(--spacing);
     gap: var(--spacing);
     cursor: pointer;
+    position: relative;
 
     transition:
         transform 0.15s ease,
@@ -49,6 +50,34 @@
         opacity: 0.6;
         color: color(text3);
         pointer-events: none;
+    }
+
+    &[data-status="0"] {
+        --selection: #{color(selection4)};
+    }
+    &[data-status="-1"] {
+        --selection: #{color(selection2)};
+    }
+    &[data-status="1"] {
+        --selection: #{color(selection3)};
+    }
+
+    &[data-status*="1"], &[data-status*="0"] {
+        border: 2px solid var(--selection);
+        
+        &::after {
+            display: block;
+            content: '';
+            background-color: var(--selection);
+            width: 15px;
+            aspect-ratio: 1;
+
+            position: absolute;
+            right: -1px;
+            top: 0px;
+
+            clip-path: polygon(0% 0%, 100% 100%, 100% 0%);
+        }
     }
 }
 
