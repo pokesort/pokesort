@@ -71,6 +71,7 @@ interface SolvedGroupsGridProps {
 const SolvedGroupsGrid = ({groups, dictionary, abandoned}: SolvedGroupsGridProps) => {
     const abandonedGroup = useCallback((group: string) => {
         const abandonedGroup = abandoned[group];
+        console.log(abandoned);
 
         return (
             <div key={group} className={`solved-group ${abandonedGroup ? "" : "correct"}`}>
@@ -466,9 +467,6 @@ const PuzzleGrid = React.memo(({puzzle, type, pause, setPause, pokemons, shinies
         let groupArray: Set<number>[] = [];
         for (let i = 0; i < puzzle.groups.length; i++) {
             groupArray[i] = new Set(puzzle.groups[i].pokemons);
-            setAbandonedGroups((prev) => ({
-                ...prev, [puzzle.groups[i].query]: false
-            }));
         }
         return groupArray;
     }, [puzzle]);
