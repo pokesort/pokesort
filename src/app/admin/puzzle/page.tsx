@@ -34,11 +34,12 @@ const PuzzleCard = React.memo(({puzzle, deletePuzzle}: PuzzleCardProps) => {
     const [deleteModal, setDeleteModal] = useState<boolean>(false);
 
     const status = useMemo(() => {
-        const date = puzzle.date == null ? null : new Date(puzzle.date);
+        const date = puzzle.date == null ? null : new Date(`${puzzle.date}T00:00:00`);
+        const today = new Date(new Date().setHours(0, 0, 0, 0));
 
         if (date == null) {
             return 0
-        } else if (isBefore(date, new Date()) || isToday(date)) {
+        } else if (isBefore(date, today) || isToday(date)) {
             return 1
         } else {
             return 2
