@@ -62,6 +62,10 @@ const puzzleSchema = new mongoose.Schema({
         max: 6,
         required: true,
     },
+    opening: {
+        pt: { type: String, default: '' },
+        en: { type: String, default: '' }
+    },
     groups: {
         type: [groupSchema],
         validate: {

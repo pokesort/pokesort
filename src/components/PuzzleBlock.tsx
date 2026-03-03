@@ -17,6 +17,7 @@ interface BlockProps {
     isSolved?: boolean;
     isCorrect?: boolean;
     isIncorrect?: boolean;
+    isAbandoned?: boolean;
     onSelect: (id: number) => void;
     onPress: (id: number) => void;
 }
@@ -44,7 +45,7 @@ function getSurname(name: string, species_name: string) {
     return surname;
 }
 
-export default React.memo(function PuzzleBlock({ pokemon, shinies, multiselect, isSelected, isSolved=false, isCorrect=false, isIncorrect=false, onSelect, onPress }: BlockProps) {
+export default React.memo(function PuzzleBlock({ pokemon, shinies, multiselect, isSelected, isSolved=false, isCorrect=false, isIncorrect=false, isAbandoned=false, onSelect, onPress }: BlockProps) {
     const default_url = !shinies.includes(pokemon.dex_number) ? pokemon.sprite_default : pokemon.sprite_shiny;
     
     const gifRef = useRef<any>(null);
@@ -101,6 +102,7 @@ export default React.memo(function PuzzleBlock({ pokemon, shinies, multiselect, 
             'solved': isSolved,
             'correct': isCorrect,
             'incorrect': isIncorrect,
+            'abandoned': isAbandoned,
             'selected': isSelected,
         }
     );    

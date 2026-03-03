@@ -69,6 +69,9 @@ button.disabled {
     &.attempted:not(.disabled) {
         --selection: #{color(selection4)};
     }
+    &.abandoned:not(.disabled) {
+        --selection: #{color(selection2)};
+    }
     &.complete:not(.disabled) {
         --selection: #{color(selection3)};
     }

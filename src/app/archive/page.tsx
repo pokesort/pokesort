@@ -12,6 +12,7 @@ import ArrowLeft from '@/src/components/svg/ArrowLeft';
 import ArrowRight from '@/src/components/svg/ArrowRight';
 import Shiny from '@/src/components/svg/Shiny';
 import ErrorToast from '@/src/components/ToastError';
+import { getPuzzleStatus } from '@/src/scripts/utils';
 
 interface CalendarProps {
     puzzles: Record<string, string[]> | undefined;
@@ -25,28 +26,7 @@ function Calendar({puzzles, loading}: CalendarProps) {
     let dates: string[] = [format(today, "yyyy-MM-dd")];
     if (puzzles) {
         dates = Object.keys(puzzles);
-    }
-
-    const getPuzzleStatus = (ids: string[]) => {
-        let data: any = null;
-
-        ids.forEach(id => {
-            const userData: any = localStorage.getItem(`s_${id}`);
-            if (!userData) return;
-
-            if (!data) data = {status: 0};
-            
-            const parsed = JSON.parse(userData);
-            if (parsed.shiny != undefined && parsed.shiny.length > 0) {
-                data["shiny"] = parsed.shiny;
-            }
-            if (parsed.status > data.status) {
-                data["status"] = parsed.status;
-            }
-        })
-
-        return data;
-    }
+    }    
 
     const renderHeader = () => (
         <section className="window-info-row">
@@ -92,7 +72,8 @@ function Calendar({puzzles, loading}: CalendarProps) {
                         'hidden': !isCurrentMonth,
                         'disabled': !dates.includes(dayString) || foundToday,
                         'attempted': userData != null,
-                        'complete': userData && userData.status >= 1
+                        'complete': userData && userData.status == 1,
+                        'abandoned': userData && userData.status == -1
                     }
                 );
                 if (!foundToday && isSameDay(day, today)) foundToday = true;

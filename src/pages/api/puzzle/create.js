@@ -13,7 +13,7 @@ export default async function handler(req, res) {
   const { password, puzzle } = req.body;
   if (password != process.env.NEXT_PUBLIC_API_AUTHORIZATION_BATCH)
     return res.status(403).json({ success: false, message: "Usuário não permitido" });
-
+  
   try {
     await connect();
     const conn = getDb();

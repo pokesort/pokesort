@@ -108,10 +108,14 @@
             }
         },
         "victory": {
+            "win": "Gotcha!",
+            "lose": "Got away safely.",
+
             "streak": "Streak",
             "streak-desc": "Play Pokesort daily to increase your streak",
             "infinite-count": "Solved infinite puzzles",
             "attempts-1": "Solved in ",
+            "attempts-1-l": "Ran after ",
             "attempts-2": " attempts",
             "next-daily": "Next daily puzzle in",
             "back": "Back to Home",
@@ -124,6 +128,13 @@
             "and": "and",
             "text": "A group includes the category",
             "pair": "are in the same group"
+        },        
+        "abandon": {
+            "button": "Run",
+            "confirmation-1": "Do you really want to abandon this puzzle?",
+            "confirmation-2": "You won't be able to attempt it again.",
+            "yes": "Yes",
+            "no": "No"
         }
     },
     "groupnames": {
