@@ -128,6 +128,13 @@
             "and": "e",
             "text": "Um grupo inclui a categoria",
             "pair": "estão no mesmo grupo"
+        },
+        "abandon": {
+            "button": "Fugir",
+            "confirmation-1": "Deseja mesmo abandonar este puzzle?",
+            "confirmation-2": "Você não poderá tentá-lo novamente.",
+            "yes": "Sim",
+            "no": "Não"
         }
     },
     "groupnames": {

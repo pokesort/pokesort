@@ -28,6 +28,8 @@ import DexView from './DexView';
 import PokeSprite from './PokeSprite';
 import ChallengeSelect from './forms/ChallengeSelect';
 import { useForm } from 'react-hook-form';
+import TipIcon from './svg/TipIcon';
+import AbandonIcon from './svg/AbandonIcon';
 
 const streakKey = 'u_dailystreak';
 const infiniteCount = 'u_infinitecount';
@@ -298,6 +300,7 @@ interface GuessLogsInterface {
 const GuessLogs = React.memo(({guesses, setGuesses, availableTips, setAvailableTips, spritesMap, allTips, solvedGroupNames, puzzleRows, dictionary, viewedTips, abandoned, setAbandoned}: GuessLogsInterface) => {
     const t = useTranslations('');
     const locale = useLocale();
+    const [showAbandonModal, setShowAbandonModal] = useState<boolean>(false);
 
     const askForTip = () => {
         if (availableTips <= 0 || viewedTips.current.length == allTips.current.length) return;
@@ -364,15 +367,43 @@ const GuessLogs = React.memo(({guesses, setGuesses, availableTips, setAvailableT
     const isSolved = useMemo(() => {
         const solved = guesses.filter((g: PuzzleGuess) => g.accuracy >= 100);
 
-        return solved.length >= puzzleRows;;
-    }, [guesses, puzzleRows])
+        return solved.length >= puzzleRows || abandoned;
+    }, [guesses, puzzleRows, abandoned])
 
     return (
         <>
-            {guesses.length > 0 && allTips.current && allTips.current.length > 0 && !isSolved &&
-                <button className="ask-tip" onClick={askForTip} data-tips={availableTips}>{t(`puzzle.tips.ask`)} <span>x{availableTips}</span></button>
-            }
-            <button className="ask-tip" onClick={() => setAbandoned(true)} >Desistir</button>
+            <Modal id={"puzzle-success"} isOpen={showAbandonModal} setIsOpen={setShowAbandonModal} canClose={true} background={true}>
+                <div className="modal-content-div">
+                    <p>
+                        {t(`puzzle.abandon.confirmation-1`)}
+                    </p>
+                    <p>
+                        {t(`puzzle.abandon.confirmation-2`)}
+                    </p>
+                </div>
+                <div className="button-row">
+                    <button className="modal-content-div" onClick={() => setShowAbandonModal(false)}>
+                        <p>{t(`puzzle.abandon.no`)}</p>
+                    </button>
+                    <button className="modal-content-div" onClick={() => {setAbandoned(true); setShowAbandonModal(false)}}>
+                        <p>{t(`puzzle.abandon.yes`)}</p>
+                    </button>
+                </div>
+            </Modal>
+            <div className="guess-buttons-container">                
+                <button className="guess-button" onClick={askForTip} data-tips={availableTips}
+                    disabled={!allTips.current || availableTips <= 0 || isSolved}
+                >
+                    <TipIcon />
+                    {t(`puzzle.tips.ask`)} <span>x{availableTips}</span>
+                </button>
+                <button className="guess-button" onClick={() => setShowAbandonModal(true)}
+                    disabled={isSolved}
+                >
+                    <AbandonIcon />
+                    {t(`puzzle.abandon.button`)}
+                </button>
+            </div>
             <section className="puzzle-guess-logs">
                 {guesses.length > 0 ?
                     <>                    

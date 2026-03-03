@@ -280,9 +280,22 @@ section.solved-groups-grid {
     }
 }
 
-button.ask-tip {
+.guess-buttons-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    justify-content: stretch;
+    gap: var(--spacing);
+}
+
+button.guess-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: .25rem;
+
     background-color: color(section2);
-    min-height: 68px;
+    padding: 1rem;
+    font-size: .85rem;
     flex: 0 0;
     z-index: 10;
 
@@ -300,6 +313,11 @@ button.ask-tip {
     }
     &:active {
         transform: scale(0.85);
+    }
+    &:disabled {
+        opacity: 0.6;
+        color: color(text3);
+        pointer-events: none;
     }
 }
 
