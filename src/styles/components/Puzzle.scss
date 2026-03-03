@@ -161,15 +161,22 @@ section.solved-groups-grid {
             @media (max-width: 640px) {
                 font-size: text(small);
             }
-        }        
+        }
 
+        &.abandoned {
+            --selection: #{color(selection2)};
+        }
         &.correct {
-            border: 2px solid #{color(selection3)};
+            --selection: #{color(selection3)};
+        }
+
+        &.correct, &.abandoned {
+            border: 2px solid var(--selection);
 
             &::after {
                 display: block;
                 content: '';
-                background-color: color(selection3);
+                background-color: var(--selection);
                 height: 15%;
                 aspect-ratio: 1;
 

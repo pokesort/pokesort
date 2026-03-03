@@ -15,6 +15,7 @@ import ch2_sprite from "@/src/assets/images/challenge_2.png";
 import ch3_sprite from "@/src/assets/images/challenge_3.png";
 import ch4_sprite from "@/src/assets/images/challenge_4.png";
 import ChallengeIcon from '../svg/ChallengeIcon';
+import { getPuzzleStatus } from '@/src/scripts/utils';
 const challengeSprites: Record<string, StaticImageData> = {
   '1': ch1_sprite,
   '2': ch2_sprite,
@@ -33,9 +34,10 @@ interface InputProps {
     defaultValue?: string;
     style?: React.CSSProperties;
     onInput?: () => void;
+    challenges?: Record<number, string>;
 }
 
-export default React.memo(function Input({name="challenge", label="Challenge", minimal=true, infinite=false, form=undefined, options={}, defaultValue="", style={}, onInput=undefined}: InputProps) {
+export default React.memo(function Input({name="challenge", label="Challenge", minimal=true, infinite=false, form=undefined, options={}, defaultValue="", style={}, onInput=undefined, challenges=undefined}: InputProps) {
     const t = useTranslations();
     const challenge_options: Record<string, string> = {};
     ['1', '2', '3', '4'].forEach((challenge: string) => {
@@ -64,6 +66,19 @@ export default React.memo(function Input({name="challenge", label="Challenge", m
         setInputText(options[watched]);
     }, [watched]);
 
+    const challengeStatus = useMemo(() => {
+        const statuses: Record<number, number | null> = {};
+
+        if (challenges == undefined) return statuses;
+        
+        for (let i = 1; i <= 4; i++) {
+            const result= getPuzzleStatus([challenges[i]]) as { status: number } | null;
+            statuses[i] = result?.status ?? null;
+        }
+
+        return statuses;
+    }, [open, challenges])
+
     return (
         <>
             {minimal ?
@@ -85,8 +100,8 @@ export default React.memo(function Input({name="challenge", label="Challenge", m
             <Modal id="challenge-select-modal" title={label} background={true} isOpen={open} canClose={true} setIsOpen={setOpen}>
                 {Object.keys(challenge_options).map((value: string) => (
                     <label className={`challenge-label ${Object.keys(options).includes(value) ? "" : "disabled"}`} key={value}
-                        onClick={() => setOpen(false)}>
-                        <input type="radio" {...form.register(name)} value={value} />     
+                        onClick={() => setOpen(false)} data-status={challengeStatus[parseInt(value)]}>
+                        <input type="radio" {...form.register(name)} value={value} />
                         <img src={challengeSprites[value].src} />
                         <div>
                             <h3>

@@ -71,10 +71,9 @@ interface SolvedGroupsGridProps {
 const SolvedGroupsGrid = ({groups, dictionary, abandoned}: SolvedGroupsGridProps) => {
     const abandonedGroup = useCallback((group: string) => {
         const abandonedGroup = abandoned[group];
-        console.log(abandoned);
 
         return (
-            <div key={group} className={`solved-group ${abandonedGroup ? "" : "correct"}`}>
+            <div key={group} className={`solved-group ${abandonedGroup ? "abandoned" : "correct"}`}>
                 <GroupName query={group} dictionary={dictionary}/>
             </div>
         )
@@ -697,7 +696,7 @@ interface PuzzleProps {
     setPuzzle: (puzzle: PuzzleData) => void;
     type: 'daily' | 'infinite';
     dictionary: any;
-    challenges?: any;
+    challenges?: Record<number, string>;
     loading: boolean;
     setLoading: (loading: boolean) => void;
     error: string | null;
@@ -706,7 +705,7 @@ interface PuzzleProps {
     setSlug?: (slug: string) => void;
 }
 
-export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, challenges=null, loading, setLoading, error, setError, refreshPuzzle, setSlug}: PuzzleProps) {
+export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, challenges=undefined, loading, setLoading, error, setError, refreshPuzzle, setSlug}: PuzzleProps) {
     const t = useTranslations('puzzle');
     const locale = useLocale();
     const maxAvailableTips = 2;
@@ -813,7 +812,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
     const [abandoned, setAbandoned] = useState<boolean>(false);
 
     useEffect(() => {
-        if (challenges != null) {
+        if (challenges != undefined) {
             let newChallengeOptions: Record<string, string> = {};
             Object.keys(challenges).map((key: string) => {
                 newChallengeOptions[key] = t(`challenge.${key}`);
@@ -989,7 +988,16 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
                 </PuzzleTab> : <div></div>}
                 <PuzzleTab setVisibleTab={setVisibleTab} tab={1}>
                     {challenges != null &&
-                        <ChallengeSelect minimal={false} infinite={type == 'infinite'} label={t(`challenge.label`)} style={{width: "100%"}} defaultValue={puzzle ? puzzle.challenge : "1"} options={challengeOptions} form={form} />
+                        <ChallengeSelect
+                            minimal={false}
+                            infinite={type == 'infinite'}
+                            label={t(`challenge.label`)}
+                            style={{width: "100%"}}
+                            defaultValue={puzzle ? puzzle.challenge : "1"}
+                            options={challengeOptions}
+                            form={form}
+                            challenges={challenges}
+                        />
                     }
                     <div className="window-container puzzle-window cut-left" ref={mainTabRef}>
                         <section className="window-info-row">

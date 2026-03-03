@@ -342,3 +342,24 @@ export function adjustDateTime(date) {
 
   return date;
 }
+
+export const getPuzzleStatus = (ids) => {
+  let data = null;
+
+  ids.forEach(id => {
+      const userData = localStorage.getItem(`s_${id}`);
+      if (!userData) return;
+
+      if (!data) data = {status: -1};
+      
+      const parsed = JSON.parse(userData);
+      if (parsed.shiny != undefined && parsed.shiny.length > 0) {
+          data["shiny"] = parsed.shiny;
+      }
+      if (parsed.status > data.status) {
+          data["status"] = parsed.status;
+      }
+  })
+
+  return data;
+}
