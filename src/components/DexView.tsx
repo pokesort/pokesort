@@ -55,6 +55,7 @@ const processVarieties = (pokemon: any) => {
     }
 
     // Process other forms
+    console.log(pokemon.other_forms)
     if (!pokemon.other_forms) pokemon.other_forms = [];
     pokemon.other_forms.push({
         id: pokemon.id,
