@@ -153,6 +153,11 @@ const DexData = React.memo(({pokemon, setSearchId}: DexDataProps) => {
                 <div className="v-group">
                     <div className="block">
                         <span>{t(`groupnames.abilities.short`)}:</span>
+                        {pokemon.abilities.length < 1 && 
+                            <div className="map-container">
+                                <p>N/A</p>
+                            </div>
+                        }
                         {pokemon.abilities.map((ability: string, index: number) => (
                             <div className="map-container" key={index}>
                                 <p>{toTitleCase(ability)}</p>

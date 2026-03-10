@@ -118,7 +118,7 @@ export async function filterPokemons(query) {
   if (search != undefined) {
     filter = await handlers.handleSearch(search, filter);
   }
-  let pokemons = await db.db.collection('pokemon').find(filter, { projection: 
+  let pokemons = await db.db.collection('pokemon_test').find(filter, { projection: 
       { name: 1, id: 1, species_name: 1, dex_number: 1, 
         sprite_default: 1, sprite_shiny: 1, cry: 1, 
         isActive: 1, _id: 0 } })

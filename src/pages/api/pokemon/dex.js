@@ -330,7 +330,7 @@ export default async function handler(req, res) {
     ];
 
     const result = await db.db
-      .collection("pokemon")
+      .collection("pokemon_test")
       .aggregate(pipeline)
       .toArray();
 

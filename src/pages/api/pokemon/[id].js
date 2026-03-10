@@ -6,7 +6,7 @@ export default async function handler(req, res) {
     const db = getDb();
 
     const { id } = req.query
-    const pokemon = await db.db.collection("pokemon").findOne({ $or: [{ "id": Number(id) }, { "name": id }] });
+    const pokemon = await db.db.collection("pokemon_test").findOne({ $or: [{ "id": Number(id) }, { "name": id }] });
 
     if (!pokemon) {
       res.status(404).json({ success: false, error: "Pokemon não encontrado" })
