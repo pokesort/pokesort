@@ -87,7 +87,7 @@ export async function handlerNoLine() {
   const speciesNames = basePokemons.map(p => p.species_name);
 
   const extraForms = await db.db.collection("pokemon").find({
-    name: { $regex: /-(mega|gmax)$/ },
+    name: { $regex: /-(mega|gmax|eternamax)$/ },
     species_name: { $in: speciesNames }
   }).project({ id: 1, _id: 0 }).toArray();
 
