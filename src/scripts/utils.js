@@ -59,7 +59,7 @@ export const CHALLENGE_FIELDS = {
     step: ['no_line', 'has_split', 'is_split'],
     weak: { min: 1, max: 18 },
     strong: { min: 1, max: 18 },
-    methods: { min: 1, max: 11 },
+    methods: { min: 2, max: 11 },
     categories: [...easy, ...medium, ...hard],
   },
   4: {
@@ -73,7 +73,7 @@ export const CHALLENGE_FIELDS = {
     step: ['no_line', 'has_split', 'is_split'],
     weak: { min: 1, max: 18 },
     strong: { min: 1, max: 18 },
-    methods: { min: 1, max: 11 },
+    methods: { min: 2, max: 11 },
     abilities: { min: 1, max: 307 },
     moves: { min: 1, max: 919 },
     categories: [...easy, ...medium, ...hard, ...expert],
