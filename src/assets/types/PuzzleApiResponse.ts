@@ -35,6 +35,7 @@ export interface PuzzleData {
   groups: PuzzleGroup[];
   challenge: string;
   opening: { pt: string, en: string };
+  special: number;
   __v?: number;
 }
 
