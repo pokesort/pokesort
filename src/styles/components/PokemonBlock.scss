@@ -349,6 +349,19 @@ label.block-container:has(.list-view) {
     }
 }
 
+.egg-red img {
+    filter: hue-rotate(280deg);
+}
+.egg-blue img {
+    filter: hue-rotate(180deg);
+}
+.egg-green img {
+    filter: hue-rotate(50deg);
+}
+.egg-yellow img {
+    filter: hue-rotate(320deg);
+}
+
 @keyframes make-guess {
     0% {
         box-shadow: 0px 0 0px transparent;

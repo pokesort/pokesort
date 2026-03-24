@@ -683,6 +683,7 @@ const PuzzleGrid = React.memo(({puzzle, type, pause, setPause, pokemons, shinies
                             isIncorrect={isIncorrect}
                             onSelect={handleSelect}
                             onPress={handlePress}
+                            special={puzzle.special ?? 0}
                         />
                     )
                 })}
