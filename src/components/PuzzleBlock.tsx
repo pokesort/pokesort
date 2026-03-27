@@ -20,6 +20,7 @@ interface BlockProps {
     isAbandoned?: boolean;
     onSelect: (id: number) => void;
     onPress: (id: number) => void;
+    special?: number;
 }
 
 const itemVariants: Variants = {
@@ -45,9 +46,12 @@ function getSurname(name: string, species_name: string) {
     return surname;
 }
 
-export default React.memo(function PuzzleBlock({ pokemon, shinies, multiselect, isSelected, isSolved=false, isCorrect=false, isIncorrect=false, isAbandoned=false, onSelect, onPress }: BlockProps) {
-    const default_url = !shinies.includes(pokemon.dex_number) ? pokemon.sprite_default : pokemon.sprite_shiny;
+export default React.memo(function PuzzleBlock({ pokemon, shinies, multiselect, isSelected, isSolved=false, isCorrect=false, isIncorrect=false, isAbandoned=false, onSelect, onPress, special=0 }: BlockProps) {
+    console.log(pokemon)
     
+    let default_url = !shinies.includes(pokemon.dex_number) ? pokemon.sprite_default : pokemon.sprite_shiny;
+    let extra_class = "";
+
     const gifRef = useRef<any>(null);
     const [shiny, setShiny] = useState<boolean>(false);
     const [shinyReveal, setShinyReveal] = useState<boolean>(false);
@@ -95,6 +99,16 @@ export default React.memo(function PuzzleBlock({ pokemon, shinies, multiselect, 
     let p_name = pokemon.species_name.replaceAll('-', ' ');
     let p_surname = getSurname(pokemon.name, pokemon.species_name);
 
+    switch (special) {
+        case 1:
+            default_url = "egg.png";
+            extra_class = `egg-${pokemon.color}`;            
+            break;
+        case 2:
+            default_url = "substitute.png";
+            break;
+    }
+
     const blockClasses = clsx(
         'pokemon-block',
         {
@@ -104,7 +118,8 @@ export default React.memo(function PuzzleBlock({ pokemon, shinies, multiselect, 
             'incorrect': isIncorrect,
             'abandoned': isAbandoned,
             'selected': isSelected,
-        }
+        },
+        extra_class
     );    
 
     return (
