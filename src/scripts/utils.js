@@ -19,8 +19,6 @@ export const FIELD_OPTIONS = {
   dual: { min: 1, max: 2 },
 };
 
-export const modifiers = ['dual', 'shape']
-
 export const easy = [1, 2, 3, 11];
 export const medium = [4, 5, 12, 17];
 export const hard = [6, 13, 14, 15];

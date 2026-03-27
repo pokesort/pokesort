@@ -50,6 +50,10 @@ const puzzleSchema = new mongoose.Schema({
         type: Number,
         required: true,
     },
+    special:{
+        type: Number,
+        default: 0
+    },
     rows: {
         type: Number,
         min: 4,

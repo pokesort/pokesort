@@ -1,4 +1,5 @@
 @use "../abstract" as *;
+@use "./PokemonBlockEgg.scss";
 
 label.block-container {
     --selection: #{color(selection1)};
