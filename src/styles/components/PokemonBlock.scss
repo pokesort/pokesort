@@ -1,4 +1,5 @@
 @use "../abstract" as *;
+@use "./PokemonBlockEgg.scss";
 
 label.block-container {
     --selection: #{color(selection1)};
@@ -347,19 +348,6 @@ label.block-container:has(.list-view) {
         --x: -135%;
         --y: 0;
     }
-}
-
-.egg-red img {
-    filter: hue-rotate(280deg);
-}
-.egg-blue img {
-    filter: hue-rotate(180deg);
-}
-.egg-green img {
-    filter: hue-rotate(50deg);
-}
-.egg-yellow img {
-    filter: hue-rotate(320deg);
 }
 
 @keyframes make-guess {

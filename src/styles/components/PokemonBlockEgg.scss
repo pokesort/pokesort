@@ -1,0 +1,30 @@
+.egg-red img {
+    filter: hue-rotate(280deg);
+}
+.egg-blue img {
+    filter: hue-rotate(150deg);
+}
+.egg-green img {
+    filter: hue-rotate(50deg);
+}
+.egg-yellow img {
+    filter: hue-rotate(320deg);
+}
+.egg-black img {
+    filter: grayscale(1) brightness(0.8 );
+}
+.egg-brown img {
+    filter: hue-rotate(320deg) grayscale(0.6);
+}
+.egg-gray img {
+    filter: grayscale(1);
+}
+.egg-pink img {
+    filter: hue-rotate(250deg);
+}
+.egg-purple img {
+    filter: hue-rotate(200deg);
+}
+.egg-white img {
+    filter: grayscale(1) brightness(1.05);
+}
