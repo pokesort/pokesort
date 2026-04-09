@@ -179,7 +179,7 @@ export function validateGenerateParams(params) {
     errors.push('Geração máxima inválida');
   }
 
-  const validDifficulties = [1, 2, 3, 4];
+  const validDifficulties = [1, 2, 3, 4, 5];
   if (!challenge || !validDifficulties.includes(challengeValue)) {
     errors.push('Nível de desafio inválido para essa liga pokemon');
   }

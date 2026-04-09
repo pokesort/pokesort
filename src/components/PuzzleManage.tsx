@@ -443,7 +443,8 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
                                     '1': t(`puzzle.challenge.1`),
                                     '2': t(`puzzle.challenge.2`),
                                     '3': t(`puzzle.challenge.3`),
-                                    '4': t(`puzzle.challenge.4`)
+                                    '4': t(`puzzle.challenge.4`),
+                                    '5': t(`puzzle.challenge.5`)
                                 }} form={form} />
                                 <Input type="date" label="Data" name="date" form={form} />
                             </div>
