@@ -14,13 +14,16 @@ import ch1_sprite from "@/src/assets/images/challenge_1.png";
 import ch2_sprite from "@/src/assets/images/challenge_2.png";
 import ch3_sprite from "@/src/assets/images/challenge_3.png";
 import ch4_sprite from "@/src/assets/images/challenge_4.png";
+import ch5_sprite from "@/src/assets/images/challenge_5.png";
+
 import ChallengeIcon from '../svg/ChallengeIcon';
 import { getPuzzleStatus } from '@/src/scripts/utils';
 const challengeSprites: Record<string, StaticImageData> = {
   '1': ch1_sprite,
   '2': ch2_sprite,
   '3': ch3_sprite,
-  '4': ch4_sprite
+  '4': ch4_sprite,
+  '5': ch5_sprite,
 };
 const challengeKey = 'u_challenge';
 
@@ -40,7 +43,7 @@ interface InputProps {
 export default React.memo(function Input({name="challenge", label="Challenge", minimal=true, infinite=false, form=undefined, options={}, defaultValue="", style={}, onInput=undefined, challenges=undefined}: InputProps) {
     const t = useTranslations();
     const challenge_options: Record<string, string> = {};
-    ['1', '2', '3', '4'].forEach((challenge: string) => {
+    ['1', '2', '3', '4', '5'].forEach((challenge: string) => {
         challenge_options[`${challenge}`] = t(`puzzle.challenge.${challenge}`);
     });
 
@@ -71,13 +74,28 @@ export default React.memo(function Input({name="challenge", label="Challenge", m
 
         if (challenges == undefined) return statuses;
         
-        for (let i = 1; i <= 4; i++) {
+        for (let i = 1; i <= 5; i++) {
             const result= getPuzzleStatus([challenges[i]]) as { status: number } | null;
             statuses[i] = result?.status ?? null;
         }
 
         return statuses;
     }, [open, challenges])
+
+    const visibleChallengeValues = useMemo(() => {
+        const hasOptionFive = Object.prototype.hasOwnProperty.call(options, '5');
+        const hasChallengeFive = challenges != undefined && (
+            Object.prototype.hasOwnProperty.call(challenges, 5) ||
+            Object.prototype.hasOwnProperty.call(challenges, '5')
+        );
+
+        return Object.keys(challenge_options).filter((value: string) => {
+            if (value !== '5') return true;
+            if (infinite) return false;
+
+            return hasOptionFive || hasChallengeFive;
+        });
+    }, [infinite, options, challenges, challenge_options]);
 
     return (
         <>
@@ -98,7 +116,7 @@ export default React.memo(function Input({name="challenge", label="Challenge", m
                 </div>
             }
             <Modal id="challenge-select-modal" title={label} background={true} isOpen={open} canClose={true} setIsOpen={setOpen}>
-                {Object.keys(challenge_options).map((value: string) => (
+                {visibleChallengeValues.map((value: string) => (
                     <label className={`challenge-label ${Object.keys(options).includes(value) ? "" : "disabled"}`} key={value}
                         onClick={() => setOpen(false)} data-status={challengeStatus[parseInt(value)]}>
                         <input type="radio" {...form.register(name)} value={value} />

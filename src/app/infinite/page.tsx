@@ -16,6 +16,8 @@ import ChallengeSelect from '@/src/components/forms/ChallengeSelect';
 import ErrorToast from '@/src/components/ToastError';
 
 const challengeKey = 'u_challenge';
+const infiniteChallengeFallback = "1";
+const validInfiniteChallenges = new Set(["1", "2", "3", "4"]);
 
 export default function InfinitePage() {
     const t = useTranslations();
@@ -38,12 +40,17 @@ export default function InfinitePage() {
         return localStorage.getItem(challengeKey);
     }
 
+    const sanitizeInfiniteChallenge = (value: string | null) => {
+        if (!value) return infiniteChallengeFallback;
+        return validInfiniteChallenges.has(value) ? value : infiniteChallengeFallback;
+    };
+
     useEffect(() => {
         if (typeof window !== "undefined") {
-            const value = localStorage.getItem(challengeKey);
-            setPreferredChallenge(value ?? "4");
+            const value = getPreferredChallenge();
+            setPreferredChallenge(sanitizeInfiniteChallenge(value));
         }
-    })
+    }, [])
 
     useEffect(() => {
         if (initial) return;

@@ -144,6 +144,10 @@
             --offset-x: 0;
             --offset-y: 2.6rem;
         }
+        &[data-challenge="5"] {
+            --offset-x: -0.15rem;
+            --offset-y: 3rem;
+        }
 
         margin: 0 var(--offset-x);
         margin-top: var(--offset-y);
