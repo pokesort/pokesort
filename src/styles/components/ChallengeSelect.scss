@@ -145,8 +145,9 @@
             --offset-y: 2.6rem;
         }
         &[data-challenge="5"] {
-            --offset-x: -0.15rem;
+            --offset-x: -1rem;
             --offset-y: 3rem;
+            margin-right: .25rem;
         }
 
         margin: 0 var(--offset-x);
