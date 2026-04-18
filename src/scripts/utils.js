@@ -290,8 +290,8 @@ export function shuffleArray(array) {
 
 export function generateTips(ids, queries) {
   const pokemons = pickRandomMult(ids, Math.floor(ids.length / 2));
-
-  if (queries[0] == "?") {    
+  const isCustomGroup = queries[0] != "?";
+  if (!isCustomGroup) {    
     queries = queries.slice(1);
   }
   queries = queries.split('&');
@@ -304,7 +304,10 @@ export function generateTips(ids, queries) {
   });
   const values = pokemons;
 
-  return [
+  return isCustomGroup ? [
+    `text?${text}`,
+    `pair?${values}`
+  ] : [
     `pair?${values}`,
     `text?${text}`
   ];
