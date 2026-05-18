@@ -559,6 +559,7 @@ const PuzzleGrid = React.memo(({puzzle, type, pause, setPause, pokemons, shinies
     }, [pokemons]);
 
     const abandonPuzzle = useCallback(() => {
+        setSelectedIds(new Set());
         puzzle.groups.forEach((group: PuzzleGroup, index: number) => {
             if (solvedGroupNames.includes(group.query))
                 return;
