@@ -62,6 +62,15 @@ const recordInfiniteCount = () => {
     localStorage.setItem(infiniteCount, JSON.stringify(newStreak));
 }
 
+const scrollGuessLogs = (logs: HTMLElement) => {
+    setTimeout(() => {
+        logs.scrollBy({
+            top: logs.scrollHeight,
+            behavior: "smooth",
+        });
+    }, 250);
+}
+
 interface SolvedGroupsGridProps {
     groups: string[];
     dictionary: any;
@@ -295,17 +304,16 @@ interface GuessLogsInterface {
     viewedTips: React.RefObject<number[]>;
     abandoned: boolean;
     setAbandoned: React.Dispatch<React.SetStateAction<boolean>>;
+    logsRef: React.RefObject<HTMLElement | null>;
 }
 
-const GuessLogs = React.memo(({guesses, setGuesses, availableTips, setAvailableTips, spritesMap, allTips, solvedGroupNames, puzzleRows, dictionary, viewedTips, abandoned, setAbandoned}: GuessLogsInterface) => {
+const GuessLogs = React.memo(({guesses, setGuesses, availableTips, setAvailableTips, spritesMap, allTips, solvedGroupNames, puzzleRows, dictionary, viewedTips, abandoned, setAbandoned, logsRef}: GuessLogsInterface) => {
     const t = useTranslations('');
     const locale = useLocale();
     const [showAbandonModal, setShowAbandonModal] = useState<boolean>(false);
 
     const askForTip = () => {
         if (availableTips <= 0 || viewedTips.current.length == allTips.current.length) return;
-
-        const logs = document.querySelector('.puzzle-guess-logs');
 
         let guess: PuzzleGuess = {
             type: 1,
@@ -328,11 +336,8 @@ const GuessLogs = React.memo(({guesses, setGuesses, availableTips, setAvailableT
             }
         }
 
-        if (logs) {
-            logs.scrollBy({
-                top: logs.scrollHeight,
-                behavior: "smooth",
-            });
+        if (logsRef.current) {
+            scrollGuessLogs(logsRef.current);
         }
         setAvailableTips(prev => prev-1);
         setGuesses((prev: PuzzleGuess[]) => [...prev, guess]);
@@ -404,7 +409,7 @@ const GuessLogs = React.memo(({guesses, setGuesses, availableTips, setAvailableT
                     {t(`puzzle.abandon.button`)}
                 </button>
             </div>
-            <section className="puzzle-guess-logs">
+            <section className="puzzle-guess-logs" ref={logsRef}>
                 {guesses.length > 0 ?
                     <>                    
                         {guesses.map((guess: PuzzleGuess, index: number) => (
@@ -450,9 +455,10 @@ interface PuzzleGridProps {
     solvedGroupNames: string[];
     resetAvailableTips: () => void;
     abandoned: boolean;
+    logsRef: React.RefObject<HTMLElement | null>;
 }
 
-const PuzzleGrid = React.memo(({puzzle, type, pause, setPause, pokemons, shinies, dictionary, setGuesses, forcedGuesses=[], victoryOpen, setVictoryOpen, setCurrentDexView, scrollToTab, solvedGroupNames, resetAvailableTips, abandoned}: PuzzleGridProps) => {
+const PuzzleGrid = React.memo(({puzzle, type, pause, setPause, pokemons, shinies, dictionary, setGuesses, forcedGuesses=[], victoryOpen, setVictoryOpen, setCurrentDexView, scrollToTab, solvedGroupNames, resetAvailableTips, abandoned, logsRef}: PuzzleGridProps) => {
     const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
 
     const [incorrectGuessIds, setIncorrectGuessIds] = useState<Set<number>>(new Set());
@@ -553,6 +559,7 @@ const PuzzleGrid = React.memo(({puzzle, type, pause, setPause, pokemons, shinies
     }, [pokemons]);
 
     const abandonPuzzle = useCallback(() => {
+        setSelectedIds(new Set());
         puzzle.groups.forEach((group: PuzzleGroup, index: number) => {
             if (solvedGroupNames.includes(group.query))
                 return;
@@ -581,7 +588,6 @@ const PuzzleGrid = React.memo(({puzzle, type, pause, setPause, pokemons, shinies
             const guess = compareGroups(selectedIds);
 
             if (!guess) return;
-            const logs = document.querySelector('.puzzle-guess-logs');
             handleGuess(guess);
             
             if (guess.accuracy >= 100) {
@@ -602,11 +608,8 @@ const PuzzleGrid = React.memo(({puzzle, type, pause, setPause, pokemons, shinies
                             setVictoryOpen(true);
                         }, 1600);
                     }
-                    if (logs) {
-                        logs.scrollBy({
-                            top: logs.scrollHeight,
-                            behavior: "smooth",
-                        });
+                    if (logsRef.current) {
+                        scrollGuessLogs(logsRef.current);
                     }
                     setPause(false);
                 }, 800);
@@ -615,11 +618,8 @@ const PuzzleGrid = React.memo(({puzzle, type, pause, setPause, pokemons, shinies
                 setTimeout(() => {
                     setSelectedIds(new Set());
                     setIncorrectGuessIds(new Set());
-                    if (logs) {
-                        logs.scrollBy({
-                            top: logs.scrollHeight,
-                            behavior: "smooth",
-                        });
+                    if (logsRef.current) {
+                        scrollGuessLogs(logsRef.current);
                     }
                     setPause(false);
                 }, 800);
@@ -711,8 +711,9 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
     const locale = useLocale();
     const maxAvailableTips = 2;
     const form = useForm();
-
+    
     const mainTabRef = useRef<HTMLDivElement>(null);
+    const logsRef = useRef<HTMLElement | null>(null);
     const spritesMap = useRef<Record<number, string>>({});
     const allTips = useRef<PuzzleTip[]>([]);
     const viewedTips = useRef<number[]>([]);
@@ -984,6 +985,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
                             viewedTips={viewedTips}
                             abandoned={abandoned}
                             setAbandoned={setAbandoned}
+                            logsRef={logsRef}
                         />
                     </div>
                 </PuzzleTab> : <div></div>}
@@ -1027,6 +1029,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
                                 solvedGroupNames={solvedGroupNames}
                                 resetAvailableTips={resetAvailableAttempts}
                                 abandoned={abandoned}
+                                logsRef={logsRef}
                             />
                         )}
                     </div>
