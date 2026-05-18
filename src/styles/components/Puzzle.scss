@@ -1,5 +1,11 @@
 @use "../abstract" as *;
 
+@property --percent-gradual {
+    syntax: "<percentage>";
+    inherits: false;
+    initial-value: 0%;
+}
+
 div.tab-help {
     display: flex;
     flex-direction: column;
@@ -229,16 +235,16 @@ section.solved-groups-grid {
         }
 
         .accuracy-circle {
-            --percent: calc(1% * var(--accuracy));
+            --percent: calc(1% * var(--accuracy));            
 
             position: relative;
             width: 24px;
             aspect-ratio: 1;
             border-radius: 50%;
-            border: 2px solid color(selection2);
+            border: 2px solid color(selection1);
 
-            background-image: conic-gradient(color(selection2) var(--percent), transparent var(--percent), transparent calc(100% - var(--percent)), transparent calc(100% - var(--percent)));
-            // background-image: conic-gradient(color(selection2) calc(100% - var(--percent)), transparent calc(100% - var(--percent)), transparent var(--percent), transparent var(--percent));
+            background-image: conic-gradient(color(selection1) var(--percent), transparent var(--percent), transparent calc(100% - var(--percent)), transparent calc(100% - var(--percent)));
+            animation: accuracy-circle .75s ease 1;
         }
 
         img {
@@ -374,5 +380,15 @@ button.guess-button {
     }
     100% {
         top: calc(100% - 32px);
+    }
+}
+
+@keyframes accuracy-circle {
+    0% {
+        background-image: conic-gradient(color(selection1) var(--percent-gradual), transparent var(--percent-gradual), transparent calc(100% - var(--percent-gradual)), transparent calc(100% - var(--percent-gradual)));
+        --percent-gradual: 0%;
+    }
+    100% {
+        --percent-gradual: var(--percent);
     }
 }

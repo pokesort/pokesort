@@ -46,9 +46,7 @@ function getSurname(name: string, species_name: string) {
     return surname;
 }
 
-export default React.memo(function PuzzleBlock({ pokemon, shinies, multiselect, isSelected, isSolved=false, isCorrect=false, isIncorrect=false, isAbandoned=false, onSelect, onPress, special=0 }: BlockProps) {
-    console.log(pokemon)
-    
+export default React.memo(function PuzzleBlock({ pokemon, shinies, multiselect, isSelected, isSolved=false, isCorrect=false, isIncorrect=false, isAbandoned=false, onSelect, onPress, special=0 }: BlockProps) {   
     let default_url = !shinies.includes(pokemon.dex_number) ? pokemon.sprite_default : pokemon.sprite_shiny;
     let extra_class = "";
 
