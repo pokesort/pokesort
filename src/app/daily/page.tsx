@@ -6,10 +6,12 @@ import { useEffect, useState } from 'react';
 import { shuffleArray } from '@/src/scripts/utils';
 import Loading from '@/src/components/Loading';
 import ErrorToast from '@/src/components/ToastError';
+import { useSearchParams } from 'next/navigation';
 
 const challengeKey = 'u_challenge';
 
 export default function Daily() {
+    const challengeQuery = useSearchParams()?.get("c");
     const slug = `daily`;
 
     const [loading, setLoading] = useState<boolean>(true);
@@ -22,10 +24,11 @@ export default function Daily() {
     const [slugState, setSlugState] = useState<string>();
 
     const getPreferredChallenge = () => {
-        return localStorage.getItem(challengeKey);
+        return challengeQuery ?? localStorage.getItem(challengeKey);
     }
 
     useEffect(() => {
+        window.history.replaceState({}, document.title, window.location.pathname);
         setLoading(true);
         setError(null);
 

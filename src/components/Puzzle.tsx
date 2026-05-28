@@ -147,18 +147,20 @@ const VictoryModal = React.memo(({type, challenge=null, guesses, shinies, dateOg
     }
 
     const shareButton = () => {
-        const url = window.location.href;
+        let queries: string = "";
+        const url = window.location.href.split("?")[0];
         const emojis = getGuessEmojis();
         let text = `Pokesort · ${type == 'daily' ? formatDate(dateOg, locale, false) : t('infinite.label')}`
         if (challenge != null) {
             text += ` · ⭐${t(`challenge.${challenge}`)}`
+            queries = `?c=${challenge}`
         }
         if (type == 'daily' && streak > 1) {
             text += ` · 🔥${streak}`
         }
         
         const shareData: ShareData = {
-            text: `${text}\n${emojis}\n${url}`,
+            text: `${text}\n${emojis}\n${url+queries}`,
         };
         try {
             if (isMobile() && navigator.share) {
