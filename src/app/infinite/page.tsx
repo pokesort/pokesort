@@ -6,6 +6,7 @@ import "@/src/styles/components/Infinite.scss";
 import type { PuzzleData } from '@/src/assets/types/PuzzleApiResponse';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { FIELD_OPTIONS, CHALLENGE_FIELDS } from '@/src/scripts/utils';
+import { useSearchParams } from 'next/navigation';
 
 import Modal from '@/src/components/Modal';
 import Input from '@/src/components/forms/Input';
@@ -24,6 +25,7 @@ export default function InfinitePage() {
     const generateRef = useRef<any>(undefined);
     const form = useForm();
     const formWatch = form.watch();
+    const challengeQuery = useSearchParams()?.get("c");
 
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
@@ -37,7 +39,7 @@ export default function InfinitePage() {
     const [preferredChallenge, setPreferredChallenge] = useState<string>();
 
     const getPreferredChallenge = () => {
-        return localStorage.getItem(challengeKey);
+        return challengeQuery ?? localStorage.getItem(challengeKey);
     }
 
     const sanitizeInfiniteChallenge = (value: string | null) => {
@@ -49,11 +51,12 @@ export default function InfinitePage() {
         if (typeof window !== "undefined") {
             const value = getPreferredChallenge();
             setPreferredChallenge(sanitizeInfiniteChallenge(value));
+            window.history.replaceState({}, document.title, window.location.pathname);
         }
     }, [])
 
     useEffect(() => {
-        if (initial) return;
+        if (initial) return;        
 
         setPuzzle(undefined);
         setLoading(true);
