@@ -3,15 +3,17 @@
 import Puzzle from '@/src/components/Puzzle';
 import type { PuzzleData } from '@/src/assets/types/PuzzleApiResponse';
 import { useEffect, useState } from 'react';
-import { notFound, redirect, useParams } from 'next/navigation';
+import { notFound, redirect, useParams, useSearchParams } from 'next/navigation';
 import Loading from '@/src/components/Loading';
 import ErrorToast from '@/src/components/ToastError';
 
 const challengeKey = 'u_challenge';
 
 export default function PuzzlePage() {
-    const params = useParams();    
+    const params = useParams();
     const slug = params?.slug as string;
+
+    const challengeQuery = useSearchParams()?.get("c");
 
     if (slug === 'daily')
         redirect('/daily');
@@ -26,10 +28,11 @@ export default function PuzzlePage() {
     const [slugState, setSlugState] = useState<string>();
 
     const getPreferredChallenge = () => {
-        return localStorage.getItem(challengeKey);
+        return challengeQuery ?? localStorage.getItem(challengeKey);
     }
 
     useEffect(() => {
+        window.history.replaceState({}, document.title, window.location.pathname);
         setLoading(true);
         setError(null);
 
