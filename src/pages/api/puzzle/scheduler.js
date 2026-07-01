@@ -49,19 +49,22 @@ export default async function handler(req, res) {
 
 async function getTodayPuzzle(today, Puzzle, puzzles) {
   
-  for (let i = 1; i <= 4; i++) {
+  for (let i = 1; i <= 5; i++) {
     let todayPuzzle = await Puzzle.findOne({ date: today, challenge: i });
     if(todayPuzzle) puzzles.push(todayPuzzle);
   }
 }
 
 async function getPuzzleNoDate(today, Puzzle, puzzles) {
-  for (let i = 1; i <= 4; i++) {
-    let puzzleNoDate = await Puzzle.findOne({ date: null, challenge: i });
-    if(puzzleNoDate){
-      await Puzzle.updateOne({ _id: puzzleNoDate._id }, { $set: { date: today } });
-      puzzles.push(puzzleNoDate);
-    } 
+
+  if (Math.random() < 0.5) {
+    for (let i = 1; i <= 5; i++) {
+      let puzzleNoDate = await Puzzle.findOne({ date: null, challenge: i });
+      if(puzzleNoDate){
+        await Puzzle.updateOne({ _id: puzzleNoDate._id }, { $set: { date: today } });
+        puzzles.push(puzzleNoDate);
+      } 
+    }
   }
 }
 
