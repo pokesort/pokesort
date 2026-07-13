@@ -41,7 +41,7 @@ export default async function handler(req, res) {
     if (password != process.env.NEXT_PUBLIC_API_AUTHORIZATION_BATCH) return res.status(403).json({ success: false, message: "Usuário não permitido" });
     
     const samePuzzle = await Puzzle.findOne({ date: puzzle.date, challenge: puzzle.challenge, _id: { $ne: existingPuzzle._id } });
-    if (samePuzzle) return res.status(403).json({ success: false, message: "Já existe um puzzle com essa data e nível de desafio" });
+    if (samePuzzle && samePuzzle.date != null) return res.status(403).json({ success: false, message: "Já existe um puzzle com essa data e nível de desafio" });
     
     await update(puzzle, res, existingPuzzle);
   }

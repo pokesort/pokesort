@@ -20,7 +20,7 @@ export default async function handler(req, res) {
     const Puzzle = getPuzzleModel(conn);
 
     const samePuzzle = await Puzzle.findOne({ date: puzzle.date, challenge: puzzle.challenge });
-    if (samePuzzle) return res.status(403).json({ success: false, message: "Já existe um puzzle com essa data e nível de desafio" });
+    if (samePuzzle && samePuzzle.date != null) return res.status(403).json({ success: false, message: "Já existe um puzzle com essa data e nível de desafio" });
 
     const new_puzzle = new Puzzle(puzzle);
     new_puzzle.groups = new_puzzle.groups.slice(0, new_puzzle.rows);
