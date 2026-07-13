@@ -57,7 +57,7 @@ async function getTodayPuzzle(today, Puzzle, puzzles) {
 
 async function getPuzzleNoDate(today, Puzzle, puzzles) {
 
-  if (Math.random() < 0.5) {
+  if (Math.random() < 1) {
     for (let i = 1; i <= 5; i++) {
       let puzzleNoDate = await Puzzle.findOne({ date: null, challenge: i });
       if(puzzleNoDate){
