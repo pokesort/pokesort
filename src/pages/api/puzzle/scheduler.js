@@ -12,18 +12,25 @@ export default async function handler(req, res) {
     const Puzzle = getPuzzleModel(conn);
     const puzzles = [];
     const existingPuzzles = [];
+    const professorLevel = 5;
 
     const today = adjustDateTime(new Date()).toISOString().split('T')[0];
 
     await getTodayPuzzle(today, Puzzle, existingPuzzles);
     if(existingPuzzles.filter(puzzle => puzzle !== null).length > 0) return res.status(200).json({message: "Puzzle(s) para hoje encontrado(s)"});
 
-    await getPuzzleNoDate(today, Puzzle, existingPuzzles);
+    if (Math.random() < 1)  await getPuzzleNoDate(today, Puzzle, existingPuzzles, professorLevel);
     if(existingPuzzles.filter(puzzle => puzzle !== null).length > 0) return res.status(200).json({message: "Puzzle(s) para hoje encontrado(s)"});
 
     const { password } = req.body;
 
     for (let i = 1; i <= 4; i++) {
+
+      if (Math.random() < 0.5) {
+        await getPuzzleNoDate(today, Puzzle, puzzles, i);
+        continue;
+      }
+      
       const validatedParams = validateGenerateParams({amount:1, challenge:i, password:password});
       if (validatedParams.error) {
         
@@ -55,16 +62,12 @@ async function getTodayPuzzle(today, Puzzle, puzzles) {
   }
 }
 
-async function getPuzzleNoDate(today, Puzzle, puzzles) {
+async function getPuzzleNoDate(today, Puzzle, puzzles, challenge = 5) {
 
-  if (Math.random() < 1) {
-    for (let i = 1; i <= 5; i++) {
-      let puzzleNoDate = await Puzzle.findOne({ date: null, challenge: i });
-      if(puzzleNoDate){
-        await Puzzle.updateOne({ _id: puzzleNoDate._id }, { $set: { date: today } });
-        puzzles.push(puzzleNoDate);
-      } 
-    }
+  let puzzleNoDate = await Puzzle.findOne({ date: null, challenge: challenge });
+  if(puzzleNoDate){
+    await Puzzle.updateOne({ _id: puzzleNoDate._id }, { $set: { date: today } });
+    puzzles.push(puzzleNoDate);
   }
 }
 
