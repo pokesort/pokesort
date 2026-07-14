@@ -19,7 +19,7 @@ export default async function handler(req, res) {
     await getTodayPuzzle(today, Puzzle, existingPuzzles);
     if(existingPuzzles.filter(puzzle => puzzle !== null).length > 0) return res.status(200).json({message: "Puzzle(s) para hoje encontrado(s)"});
 
-    if (Math.random() < 1)  await getPuzzleNoDate(today, Puzzle, existingPuzzles, professorLevel);
+    if (Math.random() < 0.5)  await getPuzzleNoDate(today, Puzzle, existingPuzzles, professorLevel);
     if(existingPuzzles.filter(puzzle => puzzle !== null).length > 0) return res.status(200).json({message: "Puzzle(s) para hoje encontrado(s)"});
 
     const { password } = req.body;
