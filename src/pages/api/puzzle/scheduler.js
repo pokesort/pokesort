@@ -19,7 +19,10 @@ export default async function handler(req, res) {
     await getTodayPuzzle(today, Puzzle, existingPuzzles);
     if(existingPuzzles.filter(puzzle => puzzle !== null).length > 0) return res.status(200).json({message: "Puzzle(s) para hoje encontrado(s)"});
 
-    if (Math.random() < 0.5)  await getPuzzleNoDate(today, Puzzle, existingPuzzles, professorLevel);
+    if (Math.random() < 0.5) {
+      let puzzle = await getPuzzleNoDate(today, Puzzle, professorLevel);
+      if (puzzle) existingPuzzles.push(puzzle);
+    } 
     if(existingPuzzles.filter(puzzle => puzzle !== null).length > 0) return res.status(200).json({message: "Puzzle(s) para hoje encontrado(s)"});
 
     const { password } = req.body;
@@ -27,8 +30,11 @@ export default async function handler(req, res) {
     for (let i = 1; i <= 4; i++) {
 
       if (Math.random() < 0.5) {
-        await getPuzzleNoDate(today, Puzzle, puzzles, i);
-        continue;
+        let puzzle = await getPuzzleNoDate(today, Puzzle, i);
+        if (puzzle){
+          puzzles.push(puzzle);
+          continue;
+        }
       }
       
       const validatedParams = validateGenerateParams({amount:1, challenge:i, password:password});
@@ -62,13 +68,14 @@ async function getTodayPuzzle(today, Puzzle, puzzles) {
   }
 }
 
-async function getPuzzleNoDate(today, Puzzle, puzzles, challenge = 5) {
+async function getPuzzleNoDate(today, Puzzle, challenge = 5) {
 
   let puzzleNoDate = await Puzzle.findOne({ date: null, challenge: challenge });
   if(puzzleNoDate){
     await Puzzle.updateOne({ _id: puzzleNoDate._id }, { $set: { date: today } });
-    puzzles.push(puzzleNoDate);
+    return puzzleNoDate;
   }
+  return null;
 }
 
 async function batchPuzzles(puzzles, Puzzle) {
