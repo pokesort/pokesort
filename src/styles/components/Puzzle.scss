@@ -241,9 +241,10 @@ section.solved-groups-grid {
             width: 24px;
             aspect-ratio: 1;
             border-radius: 50%;
-            border: 2px solid color(selection1);
+            border: 2px solid color(section1);
+            background-color: color(section1);
 
-            background-image: conic-gradient(color(selection1) var(--percent), transparent var(--percent), transparent calc(100% - var(--percent)), transparent calc(100% - var(--percent)));
+            background-image: conic-gradient(color(selection3) var(--percent), transparent var(--percent), transparent calc(100% - var(--percent)), transparent calc(100% - var(--percent)));
             animation: accuracy-circle .75s ease 1;
         }
 
