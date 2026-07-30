@@ -7,6 +7,7 @@ import "@/src/styles/layout.scss";
 import { Montserrat } from 'next/font/google'
 import HeaderClient from "../components/HeaderClient";
 import Analytics from "../components/Analytics";
+import AdSense from "../components/AdSense";
 
 const montserrat = Montserrat({
   subsets: ['latin'],
@@ -45,6 +46,7 @@ export default async function RootLayout({children,}: Readonly<{children: React.
     <html lang={locale}>
       <head>
         <Analytics />
+        <AdSense />
         <link
             rel="preload"
             href="/AnimatedLoading.json"
@@ -68,7 +70,7 @@ export default async function RootLayout({children,}: Readonly<{children: React.
               {children}
           </section>
         </body>
-      </NextIntlClientProvider>
+      </NextIntlClientProvider>      
     </html>
   );
 }
