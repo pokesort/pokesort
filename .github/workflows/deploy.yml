@@ -26,8 +26,11 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT }}
           script: |
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
             cd /var/www/pokesort
             git pull origin deploy
             npm ci
             npm run build
-            pm2 restart 0
+            pm2 restart pokesort
