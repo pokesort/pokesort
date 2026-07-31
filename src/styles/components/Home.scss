@@ -108,7 +108,7 @@ section#home {
     }
 
     p#disclaimer {
-        position: fixed;
+        position: absolute;
         bottom: 0;
 
         width: min(840px, 100vw);
