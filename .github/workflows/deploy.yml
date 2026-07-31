@@ -33,4 +33,4 @@ jobs:
             git pull origin deploy
             npm ci
             npm run build
-            pm2 restart pokesort
+            pm2 restart 0
