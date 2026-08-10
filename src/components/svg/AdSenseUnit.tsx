@@ -28,16 +28,19 @@ export default function AdSenseUnit({ slot, format = '', responsive = true, clas
 
   return (
     <div
-      className={`adsbygoogle ${classes}`}
-      style={{ 
-        display: 'inline-block', 
-        width: width, 
-        height: height
-      }}
-      data-ad-client="ca-pub-5104539413199771"
-      data-ad-slot={slot}
-      data-ad-format={format}
-      data-full-width-responsive={responsive ? 'true' : 'false'}
-    />
+      className="ad-container">
+      <ins
+        className={`adsbygoogle ${classes}`}
+        style={{ 
+          display: 'inline-block', 
+          width: width, 
+          height: height
+        }}
+        data-ad-client="ca-pub-5104539413199771"
+        data-ad-slot={slot}
+        data-ad-format={format}
+        data-full-width-responsive={responsive ? 'true' : 'false'}
+      />
+    </div>
   );
 }

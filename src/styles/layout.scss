@@ -115,9 +115,14 @@ section#page {
     color: color(text1);
 }
 
+.ad-container:has(.footer-ad) {
+    display: flex;
+    flex-direction: row;
+    width: 100vw !important;
+    justify-content: center;
+}
 .footer-ad {
     background-color: color(section1);
-    margin: 0 auto;
     z-index: 90;
 
     @media (max-width: 720px) {
