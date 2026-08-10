@@ -15,7 +15,7 @@ interface AdUnitProps {
   classes?: string;
 }
 
-export default function AdSenseUnit({ slot, format = 'auto', responsive = true, classes="" }: AdUnitProps) {
+export default function AdSenseUnit({ slot, format = '', responsive = true, classes="" }: AdUnitProps) {
   useEffect(() => {
     try {
       (window.adsbygoogle = window.adsbygoogle || []).push({});
@@ -27,7 +27,7 @@ export default function AdSenseUnit({ slot, format = 'auto', responsive = true, 
   return (
     <ins
       className={`adsbygoogle ${classes}`}
-      style={{ display: 'block', width:'728px', height: '90px' }}
+      style={{ display: 'block' }}
       data-ad-client="ca-pub-5104539413199771"
       data-ad-slot={slot}
       data-ad-format={format}
