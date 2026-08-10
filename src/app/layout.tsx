@@ -70,7 +70,7 @@ export default async function RootLayout({children,}: Readonly<{children: React.
           <section id="page">
               {children}
           </section>
-          <AdSenseUnit slot="1909010821" responsive={false} />
+          <AdSenseUnit slot="1909010821" responsive={false} classes="footer-ad" />
         </body>
       </NextIntlClientProvider>      
     </html>
