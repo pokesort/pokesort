@@ -31,6 +31,7 @@ export default function InfinitePage() {
     const [error, setError] = useState<string | null>(null);
     const [refresh, setRefresh] = useState<boolean>(false);
     const [initial, setInitial] = useState<boolean>(true);
+    const [infiniteModalOpen, setInfiniteModalOpen] = useState<boolean>(true);
 
     const [puzzle, setPuzzle] = useState<PuzzleData | undefined>(undefined);
     const [dictionary, setDictionary] = useState<any>();
@@ -114,6 +115,7 @@ export default function InfinitePage() {
     }
 
     const generatePuzzle = useCallback(() => {
+        setInfiniteModalOpen(false);
         if(!loading) {
             setInitial(false);
             refreshPuzzle();
@@ -170,13 +172,10 @@ export default function InfinitePage() {
             {!preferredChallenge ?
                 <Loading expand={false} />
             :
-                <div className={`infinite-window window-container cut-left ${!initial ? "floating": ""}`}>
-                    <section className="window-info-row">
-                        <GridIcon/>
-                        <p>{t('puzzle.infinite.generate')}</p>
-                    </section>
+                <>
+                <Modal title={t('puzzle.infinite.generate')} id={"infinite-modal"} isOpen={infiniteModalOpen} setIsOpen={setInfiniteModalOpen} canClose={!initial} background={!initial}>
                     <div className="infinite-menu">
-                        <div>
+                        <div style={{paddingTop: ".5rem"}}>
                             <Input type="select" style={{width: "100%"}} label={t(`puzzle.infinite.generation`)} name="generation" defaultValue="9" options={gen_options} form={form} />
                             <ChallengeSelect minimal={true} label={t(`puzzle.challenge.label`)} style={{width: "100%"}} defaultValue={preferredChallenge} options={challenge_options} form={form} />
                         </div>
@@ -184,14 +183,23 @@ export default function InfinitePage() {
                             <Input type="select" style={{width: "100%"}} label={t('puzzle.infinite.rows')} name="rows" options={{4: '4', 5: '5'}} defaultValue="4" form={form} />
                             <Input type="select" style={{width: "100%"}} label={t('puzzle.infinite.cols')} name="cols" options={{4: '4', 5: '5', 6: '6'}} defaultValue="4" form={form} />
                         </div>
-                        <div>
+                        <div style={{paddingTop: ".5rem"}}>
                             <Input type="cloud" label={t('puzzle.infinite.exclude')} name="excludeFields" options={excludeOptions} form={form} />
                         </div>
                     </div>
                     <button className="form-button" onClick={generatePuzzle}>
                         {t('puzzle.infinite.button')}
                     </button>
-                </div>
+                </Modal>
+                {!initial &&
+                    <section id="infinite-generate-button">
+                        <button onClick={() => setInfiniteModalOpen(true)}>
+                            <GridIcon/>
+                            <p>{t('puzzle.infinite.generate')}</p>
+                        </button>
+                    </section>
+                }
+                </>
             }
         </>
     )
