@@ -28,6 +28,7 @@ body {
     min-height: 100dvh;
     max-width: 100vw;
     font-size: text(base);
+    overflow: hidden;
 }
 
 * {
@@ -114,6 +115,22 @@ section#page {
     color: color(text1);
 }
 
+.ad-container:has(.footer-ad) {
+    display: flex;
+    flex-direction: row;
+    width: 100vw !important;
+    justify-content: center;
+}
+.footer-ad {
+    background-color: color(section1);
+    z-index: 90;
+
+    @media (max-width: 720px) {
+        width: 320px !important;
+        height: 50px !important;
+    }
+}
+
 .disable-select {
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -173,12 +190,15 @@ section#page {
 }
 
 .window-container.floating {
+    --ad-height: 90px;
+
     &:not(:has(section.puzzle)) {
         height: unset;
     }
 
-    position: absolute;
-    top: calc(100% - 36px);
+    position: fixed;
+    top: calc(100% - 36px - var(--ad-height));
+    z-index: 1;
 
     min-height: unset;
     max-height: unset;
@@ -188,7 +208,7 @@ section#page {
     animation: become-floating 0.15s ease-in 0s 1;
 
     &:hover {
-        top: calc(100% - 400px);
+        top: calc(100% - 400px - var(--ad-height));
     }
 }
 
