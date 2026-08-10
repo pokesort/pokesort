@@ -26,7 +26,7 @@ export default function AdSenseUnit({ slot, format = 'auto', responsive = true }
   return (
     <ins
       className="adsbygoogle"
-      style={{ display: 'block', height: '90px' }}
+      style={{ display: 'block', width:'728px', height: '90px' }}
       data-ad-client="ca-pub-5104539413199771"
       data-ad-slot={slot}
       data-ad-format={format}

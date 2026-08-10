@@ -70,7 +70,7 @@ export default async function RootLayout({children,}: Readonly<{children: React.
           <section id="page">
               {children}
           </section>
-          <AdSenseUnit slot="1909010821" />
+          <AdSenseUnit slot="1909010821" responsive={false} />
         </body>
       </NextIntlClientProvider>      
     </html>
