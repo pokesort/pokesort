@@ -27,12 +27,12 @@ export default function AdSenseUnit({ slot, format = '', responsive = true, clas
   }, []);
 
   return (
-    <ins
+    <div
       className={`adsbygoogle ${classes}`}
       style={{ 
         display: 'inline-block', 
         width: width, 
-        height: height 
+        height: height
       }}
       data-ad-client="ca-pub-5104539413199771"
       data-ad-slot={slot}

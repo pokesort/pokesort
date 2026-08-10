@@ -119,6 +119,11 @@ section#page {
     background-color: color(section1);
     margin: 0 auto;
     z-index: 90;
+
+    @media (max-width: 720px) {
+        width: 320px !important;
+        height: 50px !important;
+    }
 }
 
 .disable-select {
