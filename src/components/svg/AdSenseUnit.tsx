@@ -13,9 +13,11 @@ interface AdUnitProps {
   format?: string;
   responsive?: boolean;
   classes?: string;
+  width?: string;
+  height?: string;
 }
 
-export default function AdSenseUnit({ slot, format = '', responsive = true, classes="" }: AdUnitProps) {
+export default function AdSenseUnit({ slot, format = '', responsive = true, classes="", width="720px", height="90px" }: AdUnitProps) {
   useEffect(() => {
     try {
       (window.adsbygoogle = window.adsbygoogle || []).push({});
@@ -27,7 +29,11 @@ export default function AdSenseUnit({ slot, format = '', responsive = true, clas
   return (
     <ins
       className={`adsbygoogle ${classes}`}
-      style={{ display: 'block' }}
+      style={{ 
+        display: 'inline-block', 
+        width: width, 
+        height: height 
+      }}
       data-ad-client="ca-pub-5104539413199771"
       data-ad-slot={slot}
       data-ad-format={format}
