@@ -381,6 +381,14 @@
             "backend": "Puzzles & Backend",
             "frontend": "UX Design & Frontend"
         },
+        "links": {
+            "title": "Links",
+            "description": "",
+
+            "twitter": "Twitter",
+            "instagram": "Instagram",
+            "github": "GitHub"
+        },
         "support": {
             "title": "Support Us",
             "description": ""
