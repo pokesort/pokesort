@@ -1,8 +1,13 @@
 import { useTranslations } from 'next-intl';
 import "@/src/styles/components/About.scss";
+import Link from 'next/link';
 
 import aboutSpartan from "@/src/assets/images/about_spartan.png";
 import aboutSammy from "@/src/assets/images/about_sammy.png";
+
+import HeaderTwitter from '@/src/components/svg/HeaderTwitter';
+import HeaderInstagram from '@/src/components/svg/HeaderInstagram';
+import HeaderGit from '@/src/components/svg/HeaderGit';
 
 export default function AboutPage() {
     const t = useTranslations("about");
@@ -36,6 +41,25 @@ export default function AboutPage() {
                             <p>{t(`team.frontend`)}</p>
                         </hgroup>
                     </li>
+                </ul>
+            </div>
+            <div className={`window-container free-size`}>
+                <section className="window-info-row">
+                    <p>{t(`links.title`)}</p>
+                </section>
+                <ul className="link-blocks">
+                <Link className="clickable" target="_blank" href="https://instagram.com/pokesortgame">
+                    <HeaderInstagram/>
+                    {t(`links.instagram`)}
+                </Link>
+                <Link className="clickable" target="_blank" href="https://x.com/pokesortgame">
+                    <HeaderTwitter/>
+                    {t(`links.twitter`)}
+                </Link>
+                <Link className="clickable" target="_blank" href="https://github.com/pokesort">
+                    <HeaderGit/>
+                    {t(`links.github`)}
+                </Link>
                 </ul>
             </div>
             {/* <div className={`window-container free-size`}>
