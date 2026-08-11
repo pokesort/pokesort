@@ -155,7 +155,7 @@ export default React.memo(function DexList() {
     if (queries == undefined || !dictionary) return;
 
     setLoading(true);
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/pokemon/get?${queries}`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/pokemon/get?${queries}&inactive=true`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",

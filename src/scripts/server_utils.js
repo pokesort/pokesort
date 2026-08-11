@@ -12,8 +12,9 @@ export async function filterPokemons(query) {
   const booleanFields = ["is_default"];
   const intFields = ['generation'];
 
-  const step = query.step;
+  const inactive = query.inactive;
 
+  const step = query.step;
   const methods = query.methods;
   const others = query.others;
   const weak = query.weak;
@@ -97,6 +98,9 @@ export async function filterPokemons(query) {
     filter.id = { $in: [0] }
   }
 
+  const allPokemonBool = inactive && inactive === "true";
+  delete query.inactive;
+
   for (const [key, value] of Object.entries(query)) {
     if (arrayFields.includes(key)) {
       filter[key] = { $all: Array.isArray(value) ? value : [value] };
@@ -118,13 +122,14 @@ export async function filterPokemons(query) {
   if (search != undefined) {
     filter = await handlers.handleSearch(search, filter);
   }
+
   let pokemons = await db.db.collection('pokemon').find(filter, { projection: 
       { name: 1, id: 1, species_name: 1, dex_number: 1, 
         sprite_default: 1, sprite_shiny: 1, cry: 1, 
         isActive: 1, _id: 0 } })
       .sort({ dex_number: 1, id: 1 }).toArray();
   
-  pokemons = pokemons.filter(p => p.isActive !== false);
+  if (!allPokemonBool) pokemons = pokemons.filter(p => p.isActive !== false);
   return pokemons;
 }
 
