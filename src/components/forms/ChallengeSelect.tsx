@@ -146,9 +146,6 @@ export default React.memo(function Input({name="challenge", label="Challenge", m
                                     }
                                 })}
                             </ul>}
-                            <p>
-                                { t(`puzzle.challenge.help.${challenge}`) }
-                            </p>
                         </div>
                     </label>
                 ))}
