@@ -5,7 +5,7 @@ div.modal-background:has(.tutorial-item) {
 }
 
 section.modal:has(.tutorial-item) {
-    min-width: 400px;
+    min-width: min(100vw, 400px);
     max-width: min(100%, 400px);
 }
 
@@ -13,12 +13,17 @@ ul.page-view > li.tutorial-item {
     height: fit-content;
     max-height: unset;
 
+    .img-container {
+        display: flex;
+        justify-content: center;
+    }
     img {
         width: 100%;
+        max-width: 80vw;
     }
 
     p {
         text-align: center;
-        font-size: text(sm);
+        font-size: text(small);
     }
 }
