@@ -44,23 +44,33 @@ export default React.memo(function Tutorial({tutorialOpen, setTutorialOpen, path
                 {tutorialOpen &&
                     <PageView>
                         <li className="tutorial-item">
-                            <img src={TutorialImage1.src}/>
+                            <div className="img-container">
+                                <img src={TutorialImage1.src}/>
+                            </div>
                             <p>{t(`text.1`)}</p>
                         </li>
                         <li className="tutorial-item">
-                            <img src={TutorialImage2.src}/>
+                            <div className="img-container">
+                                <img src={TutorialImage2.src}/>
+                            </div>
                             <p>{t(`text.2`)}</p>
                         </li>
                         <li className="tutorial-item">
-                            <img src={TutorialImage3.src}/>
+                            <div className="img-container">
+                                <img src={TutorialImage3.src}/>
+                            </div>
                             <p>{t(`text.3`)}</p>
                         </li>
                         <li className="tutorial-item">
-                            <img src={TutorialImage4.src}/>
+                            <div className="img-container">
+                                <img src={TutorialImage4.src}/>
+                            </div>
                             <p>{t(`text.4`)}</p>
                         </li>
                         <li className="tutorial-item">
-                            <img src={TutorialImage5.src}/>
+                            <div className="img-container">
+                                <img src={TutorialImage5.src}/>
+                            </div>
                             <p>{t(`text.5`)}</p>
                         </li>
                     </PageView>
