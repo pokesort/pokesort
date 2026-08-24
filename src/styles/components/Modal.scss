@@ -128,5 +128,9 @@ section.modal {
         max-width: unset;
         min-width: unset;
         clip-path: polygon(0% 27px, 27px 0%, 100% 0%, 100% 100%, 0% 100%);
+
+        div.modal-content {
+            max-height: 70vh;
+        }
     }
 }
