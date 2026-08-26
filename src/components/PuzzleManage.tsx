@@ -250,7 +250,8 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
         }
 
         const headers = { 'Content-Type': 'application/json' };
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/pokemon/get${queries}&inactive=true`, { method: 'GET', headers });
+        const separator = queries ? (queries.includes('?') ? '&' : '?') : '?';
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/pokemon/get${queries}${separator}inactive=true`, { method: 'GET', headers });
         const data = await response.json();
 
         if (target == null) return data.pokemons;
