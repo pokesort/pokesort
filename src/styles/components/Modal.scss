@@ -32,9 +32,12 @@ section.modal {
     max-width: min(100%, 560px);
     min-width: 500px;
     padding: var(--spacing);
+    position: relative;
 
     background-color: color(section1);
     clip-path: polygon(0% 27px, calc(45% - 27px) 27px, 45% 0%, 100% 0%, 100% 100%, 0% 100%);
+
+    margin-bottom: 8vh;
 
     div.button-row {
         display: flex;
@@ -60,6 +63,12 @@ section.modal {
             }
         }
     }
+
+    .modal-title {
+        position: sticky;
+        top: 0;
+    }
+    
     div.modal-content {
         display: flex;
         flex-direction: column;
@@ -67,7 +76,7 @@ section.modal {
 
         height: 100%;
         min-height: 100px;
-        max-height: 80vh;
+        max-height: min(80vh, calc(80vh - 90px));
         overflow-y: auto;
 
         h1 {
