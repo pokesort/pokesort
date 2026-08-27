@@ -47,10 +47,10 @@ export default function PageView({ children }: PageViewProps) {
             <nav className="page-view-nav">
                 <button className={currentPage == 0 ? "disabled" : ""} onClick={prevPage}>
                     <ArrowLeft />
-                    {t(`previous`)}
+                    <span>{t(`previous`)}</span>
                 </button>
                 <button className={currentPage == Math.max(0, pages.length-1) ? "disabled" : ""} onClick={nextPage}>
-                    {t(`next`)}
+                    <span>{t(`next`)}</span>
                     <ArrowRight />
                 </button>
             </nav>
