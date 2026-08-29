@@ -7,21 +7,31 @@ export default async function handler(req, res) {
     await connect();
     const db = getDb();
 
-    const attributesAmount = 5;
-    const usedPokemonIds = new Set();
+    const MAX_ATTEMPTS = 100;
+    const MAX_GROUPS = 5;
+    const MAX_POKEMON_GROUP = 6;
 
-    let secretPokemon = null;
+    let puzzle = null;
 
-    let fieldSelecteds = await getRandomFieldAndValue();
-    let pokemons = await getPokemonsByFieldAndValue(fieldSelecteds.field, fieldSelecteds.value);
+    for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+      puzzle = await generatePuzzle(db, MAX_GROUPS, MAX_POKEMON_GROUP);
 
-    secretPokemon = await selectSecretPokemon(pokemons);
-    let secretPokemonData = await getPokemonById(db, secretPokemon.id);
-
-    if (!secretPokemon) {
-      res.status(404).json({ success: false, error: "Pokemon não encontrado" })
+      if (puzzle) {
+        res.status(200).json({
+          success: true,
+          ...puzzle
+        });
+      }
     }
-    res.status(200).json({ success: true, fieldSelecteds, pokemons, secretPokemon, secretPokemonData });
+
+    if (!puzzle) {
+      res.status(500).json({
+        success: false,
+        error: "Não foi possível gerar um puzzle válido"
+      });
+
+      return;
+    }
 
   } catch (error) {
     console.error("Connection failed:", error);
@@ -52,34 +62,150 @@ async function getRandomFieldAndValue() {
   }
   else return null;
 
-  return {
-    field,
-    value
-  };
+  return { field, value };
 }
 
-async function getPokemonsByFieldAndValue(field, value) {
-    const query = {[field]: value};
+function getRandomFieldFromPokemon(pokemon, usedFields) {
+  const availableFields = Object.keys(FIELD_OPTIONS)
+    .filter(field =>
+      !usedFields.has(field) &&
+      pokemon[field] !== undefined &&
+      pokemon[field] !== null &&
+      (!Array.isArray(pokemon[field]) || pokemon[field].length > 0)
+    );
 
-    const pokemons = await filterPokemons(query);
+  if (availableFields.length === 0) return null;
 
-    if (!pokemons || pokemons.length < 6) {
-        return null;
-    }
+  return pickRandom(availableFields)[0];
+}
 
-    return pickRandom(pokemons, 6);
+function getAvailableValuesFromPokemon(pokemon, field, usedValues = new Set()) {
+  const value = pokemon[field];
+
+  if (value === undefined || value === null) return [];
+
+  const values = Array.isArray(value) ? value : [value];
+
+  return values.filter(value => !usedValues.has(value));
+}
+
+async function getPokemonsByFieldAndValue(amount_pokemon, field, value, usedPokemonIds = new Set()) {
+  const query = { [field]: value };
+
+  const pokemons = await filterPokemons(query);
+
+  const availablePokemons = pokemons.filter(pokemon => !usedPokemonIds.has(pokemon.id));
+
+  if (availablePokemons.length < amount_pokemon) return null;
+
+  return pickRandom(availablePokemons, amount_pokemon);
 }
 
 async function selectSecretPokemon(pokemons) {
-    if (!pokemons || pokemons.length !== 6) {
-        return null;
-    }
+  if (!pokemons || pokemons.length !== 6) {
+    return null;
+  }
 
-    return pickRandom(pokemons)[0];
+  return pickRandom(pokemons)[0];
 }
 
 async function getPokemonById(db, id) {
-    return await db.db.collection("pokemon").findOne({
-        id: Number(id)
-    });
+  return await db.db.collection("pokemon").findOne({
+    id: Number(id)
+  });
+}
+
+async function getGroupFromSecret(secretPokemon, usedFields, usedPokemonIds, amount_pokemon) {
+  while (true) {
+    const field = getRandomFieldFromPokemon(secretPokemon, usedFields);
+
+    // Não existem mais campos disponíveis
+    if (!field) return null;
+
+    const values = getAvailableValuesFromPokemon(secretPokemon, field);
+
+    const shuffledValues = pickRandom(values, values.length);
+
+    let foundGroup = null;
+    let selectedValue = null;
+
+    for (const value of shuffledValues) {
+      const group = await getPokemonsByFieldAndValue(amount_pokemon, field, value, usedPokemonIds);
+
+      if (group) {
+        foundGroup = group;
+        selectedValue = value;
+        break;
+      }
+    }
+
+    // Encontrou 6 Pokémon para algum valor desse campo
+    if (foundGroup) {
+      usedFields.add(field);
+
+      return {
+        field,
+        value: selectedValue,
+        pokemons: foundGroup
+      };
+    }
+
+    // Nenhum valor desse campo conseguiu formar um grupo.
+    // O campo é descartado e o while tenta outro.
+    usedFields.add(field);
+  }
+}
+
+async function generatePuzzle(db, max_groups, amount_pokemon) {
+
+  let fieldSelected = await getRandomFieldAndValue();
+
+  if (!fieldSelected) return null;
+
+  const pokemons = await getPokemonsByFieldAndValue(
+    amount_pokemon,
+    fieldSelected.field,
+    fieldSelected.value
+  );
+
+  if (!pokemons) return null;
+
+  const usedFields = new Set([fieldSelected.field]);
+  const usedPokemonIds = new Set(pokemons.map(pokemon => pokemon.id));
+
+  const secretPokemon = await selectSecretPokemon(pokemons);
+
+  if (!secretPokemon) return null;
+
+  const secretPokemonData = await getPokemonById(db, secretPokemon.id);
+
+  const groups = [
+    {
+      field: fieldSelected.field,
+      value: fieldSelected.value,
+      pokemons
+    }
+  ];
+
+  for (let i = 0; i < max_groups - 1; i++) {
+    const group = await getGroupFromSecret(
+      secretPokemonData,
+      usedFields,
+      usedPokemonIds,
+      amount_pokemon
+    );
+
+    if (!group) return null;
+
+    group.pokemons.forEach(pokemon => {usedPokemonIds.add(pokemon.id);});
+
+    groups.push(group);
+  }
+
+  return {
+    secretPokemonData,
+    groups,
+    usedFields: [...usedFields],
+    usedPokemonIds: [...usedPokemonIds]
+  };
 }
