@@ -1,6 +1,7 @@
 import { connect, getDb } from "@/lib/mongodb";
 import { pickRandom, randomInRange, FIELD_OPTIONS } from "../../../scripts/utils";
 import { filterPokemons } from "../../../scripts/server_utils";
+import * as pwUtils from "../../../scripts/pokewho_utils";
 
 export default async function handler(req, res) {
   try {
@@ -65,30 +66,6 @@ async function getRandomFieldAndValue() {
   return { field, value };
 }
 
-function getRandomFieldFromPokemon(pokemon, usedFields) {
-  const availableFields = Object.keys(FIELD_OPTIONS)
-    .filter(field =>
-      !usedFields.has(field) &&
-      pokemon[field] !== undefined &&
-      pokemon[field] !== null &&
-      (!Array.isArray(pokemon[field]) || pokemon[field].length > 0)
-    );
-
-  if (availableFields.length === 0) return null;
-
-  return pickRandom(availableFields)[0];
-}
-
-function getAvailableValuesFromPokemon(pokemon, field, usedValues = new Set()) {
-  const value = pokemon[field];
-
-  if (value === undefined || value === null) return [];
-
-  const values = Array.isArray(value) ? value : [value];
-
-  return values.filter(value => !usedValues.has(value));
-}
-
 async function getPokemonsByFieldAndValue(amount_pokemon, field, value, usedPokemonIds = new Set()) {
   const query = { [field]: value };
 
@@ -109,6 +86,7 @@ async function selectSecretPokemon(pokemons) {
   return pickRandom(pokemons)[0];
 }
 
+// Fazer função para eliminar codigo duplicado na rota pokemon/id
 async function getPokemonById(db, id) {
   return await db.db.collection("pokemon").findOne({
     id: Number(id)
@@ -117,12 +95,12 @@ async function getPokemonById(db, id) {
 
 async function getGroupFromSecret(secretPokemon, usedFields, usedPokemonIds, amount_pokemon) {
   while (true) {
-    const field = getRandomFieldFromPokemon(secretPokemon, usedFields);
+    const field = await pwUtils.getRandomFieldFromPokemon(secretPokemon, usedFields);
 
     // Não existem mais campos disponíveis
     if (!field) return null;
 
-    const values = getAvailableValuesFromPokemon(secretPokemon, field);
+    const values = await pwUtils.getAvailableValuesFromPokemon(secretPokemon, field);
 
     const shuffledValues = pickRandom(values, values.length);
 
