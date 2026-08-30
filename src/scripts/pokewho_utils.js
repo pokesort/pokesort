@@ -7,15 +7,15 @@ export async function getFieldValuesFromPokemon(pokemon, field) {
   let relations = {};
 
   switch (field) {
-    // case "types":
-    // case "color":
-    // case "region":
-    // case "shape":
-    // case "egg_groups":
+    case "types":
+    case "color":
+    case "region":
+    case "shape":
+    case "egg_groups":
     case "generation":
     case "abilities":
-    // case "moves":
-    // case "categories":
+    case "moves":
+    case "categories":
       return pokemon[field];
 
     case "dual":
@@ -23,7 +23,6 @@ export async function getFieldValuesFromPokemon(pokemon, field) {
 
     case "weak":
       if (relations.length == 0) return relations.weak;
-
       else{
         relations = await getPokemonRelations(pokemon);
         return relations.weak;
@@ -34,6 +33,8 @@ export async function getFieldValuesFromPokemon(pokemon, field) {
         relations = await getPokemonRelations(pokemon);
         return relations.strong;
       }
+    case "methods":
+      return await getEvolutionMethodsFromPokemon(pokemon);
     default:
       return undefined;
   }
@@ -89,7 +90,7 @@ export async function getPokemonRelations(pokemon) {
 
     const types = await db.db.collection("types")
         .find({
-            id: { $in: pokemon.types.map(Number) }
+            id: { $in: pokemon.types }
         })
         .project({
             _id: 0,
@@ -122,4 +123,25 @@ export async function getPokemonRelations(pokemon) {
     };
 }
 
-//CORRIGIR BUG DO RELATION TYPE, CONSOLE.LOG RETORNO
+export async function getEvolutionMethodsFromPokemon(pokemon) {
+    if (pokemon?.id === undefined || pokemon?.id === null) return [];
+
+    await connect();
+    const db = getDb();
+
+    const evolutionSteps = await db.db.collection("evolution_steps")
+        .find({
+            pokemon: Number(pokemon.id)
+        })
+        .project({
+            _id: 0,
+            methods: 1
+        })
+        .toArray();
+
+    return [
+        ...new Set(
+            evolutionSteps.flatMap(step => step.methods ?? [])
+        )
+    ];
+}
