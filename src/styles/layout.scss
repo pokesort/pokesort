@@ -288,6 +288,7 @@ body.firefox * {
 }
 ::-webkit-scrollbar-thumb {
   background-color: color(section2);
+  border: solid 2px color(section1);
   border-radius: 4px;
   transition: background-color 0.3s;
 }

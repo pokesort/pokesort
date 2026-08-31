@@ -367,6 +367,10 @@
 
             "1": "Single-type",
             "2": "Dual-type"
+        },
+        "custom": {
+            "long": "",
+            "short": "Special Categories"
         }
     },
     "about": {

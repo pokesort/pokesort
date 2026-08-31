@@ -19,10 +19,13 @@ export const FIELD_OPTIONS = {
   dual: { min: 1, max: 2 },
 };
 
-export const easy = [1, 2, 3, 11];
-export const medium = [4, 5, 12, 17];
-export const hard = [6, 13, 14, 15];
-export const expert = [7, 8, 9, 10];
+export const CHALLENGE_CATEGORIES = {
+  1: [1, 2, 3, 11],
+  2: [4, 5, 12, 17],
+  3: [6, 13, 14, 15],
+  4: [7, 8, 9, 10],
+  5: []
+}
 
 // Estrutura de desafios por nível com campos disponíveis
 export const CHALLENGE_FIELDS = {
@@ -33,7 +36,7 @@ export const CHALLENGE_FIELDS = {
     generation: { min: 1, max: 9 },
     form: ['first', 'middle', 'final'],
     dual: { min: 1, max: 2 },
-    categories: [...easy],
+    categories: [...CHALLENGE_CATEGORIES[1]],
   },
   2: {
     types: { min: 1, max: 18 },
@@ -44,7 +47,7 @@ export const CHALLENGE_FIELDS = {
     dual: { min: 1, max: 2 },
     others: { min: 1, max: 2 },
     step: ['no_line', 'has_split', 'is_split'],
-    categories: [...easy, ...medium],
+    categories: [...CHALLENGE_CATEGORIES[1], ...CHALLENGE_CATEGORIES[2]],
   },
   3: {
     types: { min: 1, max: 18 },
@@ -58,7 +61,7 @@ export const CHALLENGE_FIELDS = {
     weak: { min: 1, max: 18 },
     strong: { min: 1, max: 18 },
     methods: { min: 2, max: 11 },
-    categories: [...easy, ...medium, ...hard],
+    categories: [...CHALLENGE_CATEGORIES[1], ...CHALLENGE_CATEGORIES[2], ...CHALLENGE_CATEGORIES[3]],
   },
   4: {
     types: { min: 1, max: 18 },
@@ -74,9 +77,12 @@ export const CHALLENGE_FIELDS = {
     methods: { min: 2, max: 11 },
     abilities: { min: 1, max: 307 },
     moves: { min: 1, max: 919 },
-    categories: [...easy, ...medium, ...hard, ...expert],
+    categories: [...CHALLENGE_CATEGORIES[1], ...CHALLENGE_CATEGORIES[2], ...CHALLENGE_CATEGORIES[3], ...CHALLENGE_CATEGORIES[4]],
     shape: ['armor', 'wings', 'quadruped', 'ball', 'squiggle', 'fish', 'arms', 'blob', 'upright', 'legs', 'heads', 'bug-wings', 'humanoid', 'tentacles'],
     egg_groups: ['monster', 'dragon', 'ground', 'water1', 'bug', 'flying', 'fairy', 'plant', 'humanshape', 'water3', 'mineral', 'indeterminate', 'water2', 'ditto', 'dragon', 'no-eggs'],
+  },
+  5: {
+    custom: 'custom'
   }
 };
 
@@ -131,6 +137,23 @@ export const getNextRefresh = () => {
   tomorrow.setHours(0, 0, 0, 0);
 
   return tomorrow;
+}
+
+export const parseChallengeSelectFields = () => {
+  let fields = CHALLENGE_FIELDS;
+  let result = {};
+  let previous = [];
+  Object.keys(fields).forEach(challenge => {  
+      result[challenge] = Object.keys(fields[challenge]).filter(e => e=="categories"||!previous.includes(e));
+      previous = [...previous, ...result[challenge]];
+
+      var categoryIndex = result[challenge].indexOf("categories");
+      if (categoryIndex !== -1) {
+        result[challenge][categoryIndex] = CHALLENGE_CATEGORIES[challenge]
+      }
+  });
+
+  return result;
 }
 
 export const randomInRange = (min, max) =>
