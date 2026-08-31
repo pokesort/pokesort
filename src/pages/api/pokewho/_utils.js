@@ -1,6 +1,5 @@
-import { pickRandom, FIELD_OPTIONS } from "../scripts/utils";
 import { connect, getDb } from "@/lib/mongodb";
-import { handlerEvolutionChain, handlerEvolutionStep } from "../scripts/handlersPokemon";
+import { handlerEvolutionChain, handlerEvolutionStep } from "../../../scripts/handlersPokemon";
 
 let evolutionFormCache = null;
 let evolutionStepCache = null;
@@ -42,7 +41,7 @@ export async function getFieldValuesFromPokemon(pokemon, field) {
 
             return undefined;
         }
-       
+
         case "form": {
             const forms = await getEvolutionFormCache();
 
@@ -56,39 +55,6 @@ export async function getFieldValuesFromPokemon(pokemon, field) {
         default:
             return undefined;
     }
-}
-
-export async function getRandomFieldFromPokemon(pokemon, usedFields) {
-
-    const availableFields = [];
-
-    for (const field of Object.keys(FIELD_OPTIONS)) {
-
-        if (usedFields.has(field)) continue;
-
-        const value = await getFieldValuesFromPokemon(pokemon, field);
-
-        if (value === undefined || value === null) continue;
-
-        if (Array.isArray(value) && value.length === 0) continue;
-
-        availableFields.push(field);
-    }
-
-    if (availableFields.length === 0) return null;
-
-    return pickRandom(availableFields)[0];
-}
-
-export async function getAvailableValuesFromPokemon(pokemon, field, usedValues = new Set()) {
-
-    const value = await getFieldValuesFromPokemon(pokemon, field);
-
-    if (value === undefined || value === null) return [];
-
-    const values = Array.isArray(value) ? value : [value];
-
-    return values.filter(value => !usedValues.has(value));
 }
 
 export async function getPokemonRelations(pokemon) {
