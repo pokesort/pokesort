@@ -5,19 +5,37 @@ section#home {
     flex-direction: column;
     align-items: center;
 
-    gap: 3rem;
+    animation: home-fade-in 0.25s ease-in 1;
+    padding: 5rem 0;
 
-    animation: home-fade-in 0.5s ease-in 1;
+    h2 {
+        text-transform: uppercase;
+        color: color(text2);
+        font-size: text(small);
+        margin-top: .25rem;
+    }
+
+    main {
+        display: inherit;
+        flex-direction: inherit;
+        align-items: center;
+
+        flex-grow: 1;
+
+        gap: 1rem;
+        width: calc(min(100vw, 650px) - var(--spacing) * 2);
+    }
 
     hgroup:has(> .logo) {
         display: flex;
         flex-direction: column;
         align-items: center;
 
-        gap: 1rem;
+        gap: .5rem;
+        margin-bottom: .5rem;
     }
 
-    div.logo {
+    .logo {
         display: flex;
         gap: 1.25rem;
         align-items: center;
@@ -31,98 +49,59 @@ section#home {
         }
     }
 
-    nav {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        grid-template-rows: repeat(2, 1fr);
+    .home-card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: start;
 
-        width: min(873px, 100vw - 2rem);
-        gap: 1.25rem;
+        background-color: color(section1);
+        width: 100%;
+        gap: .75rem;
+        padding: 1rem;
+
+        clip-path: polygon(0% 0%, calc(100% - 37px) 0%, 100% 37px, 100% 37px, 100% 100%, 0% 100%);
         
+        img {
+            position: absolute;
+            top: -5px;
+            right: 0;
+        }
+
+        p {
+            font-size: text(small);
+            color: color(text2);
+        }
+
         a {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: start;
-
-            background-color: color(section1);
+            background-color: color(section2);
             width: 100%;
-            gap: var(--spacing);
-            padding: 1.75rem;
+            padding: .75rem;
+            text-align: center;
+            font-size: text(small);
 
-            clip-path: polygon(0% 20px, 20px 0%, 100% 0%, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0% 100%);
             transition:
                 transform 0.15s ease,
-                box-shadow 0.15s ease,
-                background-color 0.15s ease;
-            
-            p {
-                font-size: text(small);
-                color: color(text2);
-            }
-
-            & > svg {
-                position: absolute;
-                right: 1.75rem;
-                top: 50%;
-                transform: translateY(-50%);
-
-                width: 2rem;
-                height: 2rem;
-            }
-
-            hgroup.card-title {
-                display: flex;
-                flex-direction: row;
-                justify-content: start;
-                align-items: center;
-                text-align: start;
-
-                width: 100%;
-                gap: 0.65rem;
-
-                div {
-                    display: inherit;
-                    align-items: inherit;
-                    gap: 0.25rem;
-                    color: color(text2)
-                }
-            }
+                box-shadow 0.15s ease;
 
             &:hover {
-                // box-shadow: 0px 0 120px color(darker);
-                background-color: color(section2);
-                z-index: 50;
+                box-shadow: 0px 0 70px color(darker);
+                z-index: 60;
             }
-
             &:active {
-                transform: scale(90%);
-            }
-
-            @media (max-width: 768px) {
-                &:hover {
-                    box-shadow: unset;
-                }
+                transform: scale(0.85);
             }
         }
     }
 
     p#disclaimer {
-        position: absolute;
-        bottom: 0;
-
-        width: min(840px, 100vw);
+        width: min(100%, 600px);
         font-size: text(small);
         color: color(text2);
         text-align: center;
-        padding: 1rem;
-
-        animation: disclaimer-fade-in 1.5s ease-in 1;
     }
 
     @media(max-width: 768px) {
-        gap: 2rem;
-
         hgroup:has(> .logo) {
             font-size: text(small);
             gap: 0.5rem;
@@ -140,24 +119,9 @@ section#home {
             }
         }
 
-        nav {
-            display: flex;
-            gap: 1.25rem;
-            flex-direction: column;
-
-            a {
-                padding: 1.25rem 1.75rem;
-
-                h3 {
-                    font-size: text(base);
-                }
-
-                hgroup.card-title div {
-                    font-size: text(small);
-                }
-            }
+        .home-card {
+            padding: .75rem;
         }
-
 
         p#disclaimer {
             font-size: text(xsmall);
@@ -168,7 +132,7 @@ section#home {
 
 @keyframes home-fade-in {
     0% {
-        transform: scale(1.5);
+        transform: scale(1.15);
         opacity: 0;
     }
     100% {

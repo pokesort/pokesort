@@ -2,10 +2,29 @@
     "home": {
         "subtitle": "A daily Pokémon association puzzle",
 
-        "daily": "Solve today's puzzle",
-        "infinite": "Generate a custom puzzle",
-        "archive": "Explore previous puzzles",
-        "dex": "Get familiar with our data",
+        "modes": "Modes",
+        "extras": "Extras",
+
+        "daily": {
+            "description": "Solve a new puzzle every day",
+            "command": "Pokesort for "
+        },
+        "archive": {
+            "description": "Explore previous puzzles",
+            "command": "View more"
+        },
+        "infinite": {
+            "description": "Generate a custom puzzle",
+            "command": "Jogar"
+        },
+        "dex": {
+            "description": "Get familiar with our dada",
+            "command": "Access"
+        },
+        "about": {
+            "description": "Learn more about Pokesort",
+            "command": "Access"
+        },
 
         "disclaimer": "Pokesort is not affiliated with Nintendo and doesn't claim any rights over the Pokémon franchise."
     },

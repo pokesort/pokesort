@@ -2,10 +2,29 @@
     "home": {
         "subtitle": "Um puzzle diário de associação de Pokémon",
 
-        "daily": "Resolva nosso puzzle de hoje",
-        "infinite": "Gere um puzzle personalizado",
-        "archive": "Explore jogos de dias anteriores",
-        "dex": "Prepare-se conhecendo nossos dados",
+        "modes": "Modos",
+        "extras": "Extras",
+
+        "daily": {
+            "description": "Resolva um novo puzzle todo dia",
+            "command": "Pokesort de "
+        },
+        "archive": {
+            "description": "Explore jogos de dias anteriores",
+            "command": "Ver mais"
+        },
+        "infinite": {
+            "description": "Gere um puzzle personalizado",
+            "command": "Jogar"
+        },
+        "dex": {
+            "description": "Prepare-se conhecendo nossos dados",
+            "command": "Acessar"
+        },
+        "about": {
+            "description": "Saiba mais sobre o Pokesort",
+            "command": "Acessar"
+        },
 
         "disclaimer": "O Pokesort não é afiliado à Nintendo e não possui nem reivindica quaisquer direitos sobre as marcas registradas da franquia Pokémon."
     },
