@@ -3,6 +3,8 @@ import { initialGroup, getGroupFromSecret } from "./_secret";
 
 export default async function handler(req, res) {
   try {
+
+    //Experimentar com limites de geração
     await connect();
     const db = getDb();
 
@@ -60,10 +62,17 @@ async function generatePuzzle(db, max_groups, amount_pokemon) {
     groups.push(group);
   }
 
+  const pokemons = groups
+    .flatMap(group => group.pokemons)
+    .map(pokemon => ({
+        ...pokemon,
+        available: true
+    }));
+
   return {
-    secretPokemonData,
-    groups,
-    usedFields: [...usedFields],
-    usedPokemonIds: [...usedPokemonIds]
+    secretId: secretPokemonData.id,
+    pokemons
+    // usedFields: [...usedFields],
+    // usedPokemonIds: [...usedPokemonIds]
   };
 }
