@@ -41,7 +41,7 @@ export default function Modal({ id, title=undefined, background=true, isOpen, se
                 </div>
                 <div className="modal-content">
                     {title &&
-                        <div className="modal-content-div">
+                        <div className="modal-title modal-content-div">
                             <h1>{title}</h1>
                         </div>
                     }

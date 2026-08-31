@@ -17,14 +17,21 @@ ul.page-view {
 }
 
 nav.page-view-nav {
+    position: sticky;
+    bottom: 0;
+
     display: flex;
     width: 100%;
     gap: var(--spacing);
+    background-color: color(section1);
+
+    padding-top: var(--spacing) 0;
 
     button {
         display: flex;
         justify-content: center;
         align-items: center;
+        container-type: inline-size;
 
         width: 100%;
         gap: 0.25rem;
@@ -37,6 +44,12 @@ nav.page-view-nav {
             opacity: 0.6;
             color: color(text3);
             pointer-events: none;
+        }
+
+        @container (width < 100px) {
+            span {
+                display: none;
+            }
         }
     }
 }
