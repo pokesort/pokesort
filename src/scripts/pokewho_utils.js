@@ -1,9 +1,9 @@
 import { pickRandom, FIELD_OPTIONS } from "../scripts/utils";
 import { connect, getDb } from "@/lib/mongodb";
-import { handlerEvolutionChain } from "../scripts/handlersPokemon";
-import { Console } from "console";
+import { handlerEvolutionChain, handlerEvolutionStep } from "../scripts/handlersPokemon";
 
 let evolutionFormCache = null;
+let evolutionStepCache = null;
 let pokemonRelationsCache = new Map();
 
 export async function getFieldValuesFromPokemon(pokemon, field) {
@@ -18,18 +18,31 @@ export async function getFieldValuesFromPokemon(pokemon, field) {
         case "abilities":
         case "moves":
         case "categories":
-          return pokemon[field];
-
+            return pokemon[field];
+        case "methods":
+            return await getEvolutionMethodsFromPokemon(pokemon);
         case "dual":
-          return Array.isArray(pokemon.types) ? pokemon.types.length : undefined
+            return Array.isArray(pokemon.types) ? pokemon.types.length : undefined
+        case "others":
+            if (!Array.isArray(pokemon.other_forms) || pokemon.other_forms.length === 0) return undefined;
+            return pokemon.is_default ? 1 : 2;
 
         case "weak":
         case "strong": {
             const relations = await getPokemonRelationsCached(pokemon);
             return relations[field];
         }
-        case "methods":
-            return await getEvolutionMethodsFromPokemon(pokemon);
+
+        case "step": {
+            const steps = await getEvolutionStepCache();
+
+            if (steps.no_line.has(pokemon.id)) return "no_line";
+            if (steps.has_split.has(pokemon.id)) return "has_split";
+            if (steps.is_split.has(pokemon.id)) return "is_split";
+
+            return undefined;
+        }
+       
         case "form": {
             const forms = await getEvolutionFormCache();
 
@@ -39,9 +52,7 @@ export async function getFieldValuesFromPokemon(pokemon, field) {
 
             return undefined;
         }
-        case "others":
-            if (!Array.isArray(pokemon.other_forms) || pokemon.other_forms.length === 0) return undefined;
-            return pokemon.is_default ? 1 : 2;
+
         default:
             return undefined;
     }
@@ -181,4 +192,22 @@ export async function getPokemonRelationsCached(pokemon) {
     pokemonRelationsCache.set(pokemon.id, relations);
 
     return relations;
+}
+
+export async function getEvolutionStepCache() {
+    if (evolutionStepCache) return evolutionStepCache;
+
+    const [noLine, hasSplit, isSplit] = await Promise.all([
+        handlerEvolutionStep("no_line", null),
+        handlerEvolutionStep("has_split", null),
+        handlerEvolutionStep("is_split", null)
+    ]);
+
+    evolutionStepCache = {
+        no_line: new Set(noLine),
+        has_split: new Set(hasSplit),
+        is_split: new Set(isSplit)
+    };
+
+    return evolutionStepCache;
 }
