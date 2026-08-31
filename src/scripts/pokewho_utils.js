@@ -9,19 +9,19 @@ let pokemonRelationsCache = new Map();
 export async function getFieldValuesFromPokemon(pokemon, field) {
 
     switch (field) {
-        // case "types":
-        // case "color":
-        // case "region":
-        // case "shape":
-        // case "egg_groups":
-        // case "generation":
-        // case "abilities":
-        // case "moves":
-        // case "categories":
-        //   return pokemon[field];
+        case "types":
+        case "color":
+        case "region":
+        case "shape":
+        case "egg_groups":
+        case "generation":
+        case "abilities":
+        case "moves":
+        case "categories":
+          return pokemon[field];
 
-        // case "dual":
-        //   return Array.isArray(pokemon.types) ? pokemon.types.length : undefined
+        case "dual":
+          return Array.isArray(pokemon.types) ? pokemon.types.length : undefined
 
         case "weak":
         case "strong": {
@@ -39,6 +39,9 @@ export async function getFieldValuesFromPokemon(pokemon, field) {
 
             return undefined;
         }
+        case "others":
+            if (!Array.isArray(pokemon.other_forms) || pokemon.other_forms.length === 0) return undefined;
+            return pokemon.is_default ? 1 : 2;
         default:
             return undefined;
     }
