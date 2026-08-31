@@ -5,13 +5,13 @@ export const FIELD_OPTIONS = {
   shape: ['armor', 'wings', 'quadruped', 'ball', 'squiggle', 'fish', 'arms', 'blob', 'upright', 'legs', 'heads', 'bug-wings', 'humanoid', 'tentacles'],
   egg_groups: ['monster', 'ground', 'water1', 'bug', 'flying', 'fairy', 'plant', 'humanshape', 'water3', 'mineral', 'indeterminate', 'water2', 'ditto', 'dragon', 'no-eggs'],
   categories: { min: 1, max: 17 },
-  others: { min: 1, max: 2 },
+  others: { min: 1, max: 2 }, //#######Falta esse########
   methods: { min: 1, max: 11 },
   moves: { min: 1, max: 919 },
   generation: { min: 1, max: 9 },
   abilities: { min: 1, max: 307 },
-  // habitat: ['cave', 'forest', 'grassland', 'mountain', 'rare', 'rough-terrain', 'sea', 'urban', 'waters-edge'],
-  step: ['no_line', 'has_split', 'is_split'],
+  habitat: ['cave', 'forest', 'grassland', 'mountain', 'rare', 'rough-terrain', 'sea', 'urban', 'waters-edge'],
+  step: ['no_line', 'has_split', 'is_split'], // #######Falta esse########
   weak: { min: 1, max: 18 },
   strong: { min: 1, max: 18 },
   // immune: [1, 2, 4, 5, 8, 13, 14, 16], //normal, fighting, poison, ground, fantasma, eletrico, psychic, dragao

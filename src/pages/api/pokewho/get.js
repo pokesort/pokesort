@@ -18,7 +18,7 @@ export default async function handler(req, res) {
       puzzle = await generatePuzzle(db, MAX_GROUPS, MAX_POKEMON_GROUP);
 
       if (puzzle) {
-        res.status(200).json({
+        return res.status(200).json({
           success: true,
           ...puzzle
         });
@@ -26,7 +26,7 @@ export default async function handler(req, res) {
     }
 
     if (!puzzle) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         error: "Não foi possível gerar um puzzle válido"
       });

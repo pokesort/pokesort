@@ -1,43 +1,47 @@
 import { pickRandom, FIELD_OPTIONS } from "../scripts/utils";
 import { connect, getDb } from "@/lib/mongodb";
+import { handlerEvolutionChain } from "../scripts/handlersPokemon";
+import { Console } from "console";
 
+let evolutionFormCache = null;
+let pokemonRelationsCache = new Map();
 
 export async function getFieldValuesFromPokemon(pokemon, field) {
 
-  let relations = {};
+    switch (field) {
+        // case "types":
+        // case "color":
+        // case "region":
+        // case "shape":
+        // case "egg_groups":
+        // case "generation":
+        // case "abilities":
+        // case "moves":
+        // case "categories":
+        //   return pokemon[field];
 
-  switch (field) {
-    case "types":
-    case "color":
-    case "region":
-    case "shape":
-    case "egg_groups":
-    case "generation":
-    case "abilities":
-    case "moves":
-    case "categories":
-      return pokemon[field];
+        // case "dual":
+        //   return Array.isArray(pokemon.types) ? pokemon.types.length : undefined
 
-    case "dual":
-      return Array.isArray(pokemon.types) ? pokemon.types.length : undefined
+        case "weak":
+        case "strong": {
+            const relations = await getPokemonRelationsCached(pokemon);
+            return relations[field];
+        }
+        case "methods":
+            return await getEvolutionMethodsFromPokemon(pokemon);
+        case "form": {
+            const forms = await getEvolutionFormCache();
 
-    case "weak":
-      if (relations.length == 0) return relations.weak;
-      else{
-        relations = await getPokemonRelations(pokemon);
-        return relations.weak;
-      }
-    case "strong":
-      if (relations.length == 0) return relations.strong;
-      else{
-        relations = await getPokemonRelations(pokemon);
-        return relations.strong;
-      }
-    case "methods":
-      return await getEvolutionMethodsFromPokemon(pokemon);
-    default:
-      return undefined;
-  }
+            if (forms.first.has(pokemon.id)) return "first";
+            if (forms.middle.has(pokemon.id)) return "middle";
+            if (forms.final.has(pokemon.id)) return "final";
+
+            return undefined;
+        }
+        default:
+            return undefined;
+    }
 }
 
 export async function getRandomFieldFromPokemon(pokemon, usedFields) {
@@ -64,13 +68,13 @@ export async function getRandomFieldFromPokemon(pokemon, usedFields) {
 
 export async function getAvailableValuesFromPokemon(pokemon, field, usedValues = new Set()) {
 
-  const value = await getFieldValuesFromPokemon(pokemon, field);
+    const value = await getFieldValuesFromPokemon(pokemon, field);
 
-  if (value === undefined || value === null) return [];
+    if (value === undefined || value === null) return [];
 
-  const values = Array.isArray(value) ? value : [value];
+    const values = Array.isArray(value) ? value : [value];
 
-  return values.filter(value => !usedValues.has(value));
+    return values.filter(value => !usedValues.has(value));
 }
 
 export async function getPokemonRelations(pokemon) {
@@ -112,7 +116,7 @@ export async function getPokemonRelations(pokemon) {
             totalMultiplier *= multiplier;
         }
 
-        if (totalMultiplier >= 2)  weak.push(attackingType);
+        if (totalMultiplier >= 2) weak.push(attackingType);
 
         if (totalMultiplier > 0 && totalMultiplier < 1) strong.push(attackingType);
     }
@@ -144,4 +148,34 @@ export async function getEvolutionMethodsFromPokemon(pokemon) {
             evolutionSteps.flatMap(step => step.methods ?? [])
         )
     ];
+}
+
+export async function getEvolutionFormCache() {
+
+    if (evolutionFormCache) return evolutionFormCache;
+
+    const [first, middle, final] = await Promise.all([
+        handlerEvolutionChain("first"),
+        handlerEvolutionChain("middle"),
+        handlerEvolutionChain("final")
+    ]);
+
+    evolutionFormCache = {
+        first: new Set(first),
+        middle: new Set(middle),
+        final: new Set(final)
+    };
+
+    return evolutionFormCache;
+}
+
+export async function getPokemonRelationsCached(pokemon) {
+
+    if (pokemonRelationsCache.has(pokemon.id)) return pokemonRelationsCache.get(pokemon.id);
+
+    const relations = await getPokemonRelations(pokemon);
+
+    pokemonRelationsCache.set(pokemon.id, relations);
+
+    return relations;
 }
