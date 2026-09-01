@@ -8,12 +8,20 @@ export default async function handler(req, res) {
     }
 
     try {
-        const { secretId, ids, query } = req.body;
+        const { secretId, pokemons, query } = req.body;
 
-        const queryPokemons = (await filterPokemons(query)).map(pokemon => pokemon.id);
-        const matchingIds = ids.filter(id => queryPokemons.includes(id));
+        const queryIds = new Set((await filterPokemons(query)).map(pokemon => pokemon.id));
 
-        return res.status(200).json({ success: true, query, secretId, matchingIds, queryPokemons });
+        const secretFound = queryIds.has(secretId);
+
+        const updatedPokemons = pokemons.map(pokemon => ({
+            ...pokemon,
+            available: secretFound
+                ? queryIds.has(pokemon.id)
+                : !queryIds.has(pokemon.id)
+        }));
+        
+        return res.status(200).json({ success: true, secretFound: secretFound, updatedPokemons });
     } catch (error){
         return res.status(500).json({success: false, message: "Internal Server Error"});
     }
