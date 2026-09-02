@@ -56,7 +56,7 @@
         "empty": "Parece que não tem nada aqui..."
     },
     "tutorial": {
-        "label": "Como Jogar",
+        "label": "Como jogar",
         "text": {
             "1": "Os Pokémon presentes na grade pertencem a grupos de acordo com suas características em comum. Você deve descobrir quais são esses grupos no mínimo de tentativas possível.",
             "2": "Você pode verificar a precisão de palpites incorretos para tentar deduzir quais Pokémon pertencem ao mesmo grupo.",

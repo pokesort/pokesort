@@ -6,8 +6,9 @@ export default async function handler(req, res) {
     const db = getDb();
 
     const objectKey = req.query.by;
+    const limit = req.query.limit || 0;
 
-    let puzzles = await orderPuzzles(db, objectKey);
+    let puzzles = await orderPuzzles(db, objectKey, limit);
 
     switch (objectKey) {
       case 'date':
@@ -28,10 +29,14 @@ export default async function handler(req, res) {
   }
 }
 
-const orderPuzzles = async (db, objectKey) => {
+const orderPuzzles = async (db, objectKey, limit) => {
   switch (objectKey) {
     case 'date':
-      return await db.db.collection('puzzles').find({date: {$ne: null}}).sort({ date: 1 }).toArray();
+      return await db.db.collection('puzzles')
+        .find({date: {$ne: null}})
+        .sort({ date: 1 })
+        .limit(Number(limit) || 0)
+        .toArray();
     default:
       return await db.db.collection('puzzles')
       .aggregate([

@@ -115,6 +115,7 @@ section#home {
         padding: .75rem;
         text-align: center;
         font-size: text(small);
+        z-index: 5;
 
         transition:
             transform 0.15s ease,

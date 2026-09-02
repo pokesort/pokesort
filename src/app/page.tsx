@@ -13,6 +13,7 @@ import { useEffect, useState } from 'react';
 import PokeSprite from '../components/PokeSprite';
 import { bool } from 'yup';
 import { getDailyPokemon } from '../scripts/utils';
+import LatestPuzzles from '../components/LatestPuzzles';
 
 const streakKey = 'u_dailystreak';
 const infiniteCount = 'u_infinitecount';
@@ -40,6 +41,7 @@ const HomeCard = ({
   const locale = useLocale();
   let commandAppend = "";
   let extraElement = null;
+  let showCommand = true;
 
   switch (page) {
     case "daily":
@@ -49,8 +51,9 @@ const HomeCard = ({
       });
     break;
     case "archive":
+      showCommand = false;
       extraElement = (
-        <p>Weekly archive goes here</p>
+        <LatestPuzzles limit={7} />
       )
     break;
   }
@@ -65,6 +68,7 @@ const HomeCard = ({
           </span>
         }
       </h3>
+      
       <p>
         {isNew &&
           <span className="new-label">
@@ -76,9 +80,11 @@ const HomeCard = ({
 
       {extraElement}
 
-      <Link href={href}>
-        {t(`home.${page}.command`)}{commandAppend}
-      </Link>
+      {showCommand &&
+        <Link href={href}>
+          {t(`home.${page}.command`)}{commandAppend}
+        </Link>
+      }
 
       <PokeSprite slug={`${sprite}.png`} />
     </div>
@@ -120,7 +126,6 @@ export default function Home() {
       newCounts[mode] = streak;
     })
 
-    console.log(newCounts);
     setCounts(newCounts);
   }, [])
 
@@ -193,9 +198,6 @@ export default function Home() {
           <button>
             {t(`home.transfer`)}
           </button>
-          <Link href="/privacy-policy">
-            {t(`home.privacy`)}
-          </Link>
         </div>
 
         <p id="disclaimer">
