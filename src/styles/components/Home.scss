@@ -6,7 +6,7 @@ section#home {
     align-items: center;
 
     animation: home-fade-in 0.25s ease-in 1;
-    padding: 5rem 0;
+    padding: 2.5rem 0;
 
     h2 {
         text-transform: uppercase;
@@ -23,7 +23,7 @@ section#home {
         flex-grow: 1;
 
         gap: 1rem;
-        width: calc(min(100vw, 650px) - var(--spacing) * 2);
+        width: calc(min(100vw, 940px) - var(--spacing) * 2);
     }
 
     hgroup:has(> .logo) {
@@ -71,26 +71,79 @@ section#home {
         p {
             font-size: text(small);
             color: color(text2);
+            height: 100%;
         }
 
-        a {
-            background-color: color(section2);
-            width: 100%;
-            padding: .75rem;
-            text-align: center;
+        .new-label {
+            display: inline-block;
+            margin-right: .5rem;
+
+            color: color(selection3);
+            font-weight: bold;
+        }
+    }
+    
+    .home-card-group {
+        display: inherit;
+        flex-direction: inherit;
+        gap: inherit;
+        width: 100%;
+
+        @media(min-width: 961px) {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    .home-button-group {
+        display: flex;
+        flex-direction: column;
+
+        background-color: color(section1);
+        width: 100%;
+        gap: .75rem;
+        padding: 1rem;
+
+        @media(min-width: 961px) {
+                width: min(100%, 600px);
+        }
+    }
+
+    .home-card a, .home-button-group > * {
+        background-color: color(section2);
+        width: 100%;
+        padding: .75rem;
+        text-align: center;
+        font-size: text(small);
+
+        transition:
+            transform 0.15s ease,
+            box-shadow 0.15s ease;
+
+        &:hover {
+            box-shadow: 0px 0 70px color(darker);
+            z-index: 10;
+        }
+        &:active {
+            transform: scale(0.85);
+        }
+    }
+
+    div:has(> .coming-soon) {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+        background-color: color(section1);
+        width: 100%;
+        padding: 1rem;
+
+        p {
             font-size: text(small);
-
-            transition:
-                transform 0.15s ease,
-                box-shadow 0.15s ease;
-
-            &:hover {
-                box-shadow: 0px 0 70px color(darker);
-                z-index: 60;
-            }
-            &:active {
-                transform: scale(0.85);
-            }
+            color: color(text2);
+            height: unset;
+            text-align: center;
         }
     }
 
@@ -99,6 +152,12 @@ section#home {
         font-size: text(small);
         color: color(text2);
         text-align: center;
+    }
+
+    @media(max-width: 960px) {
+        main {
+            width: calc(min(100vw, 580px) - var(--spacing) * 2);
+        }
     }
 
     @media(max-width: 768px) {
@@ -119,7 +178,7 @@ section#home {
             }
         }
 
-        .home-card {
+        .home-card, .home-button-group, div:has(> .coming-soon) {
             padding: .75rem;
         }
 

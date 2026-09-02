@@ -122,6 +122,8 @@ export const WEIGHT_VALUES = {
   // habitat: 1,
 };
 
+export const MAX_POKEMON_ID = 1025;
+
 export const REGIONALS = ['-alola', '-galar', '-hisui', '-paldea'];
 
 export const getNextRefresh = () => {
@@ -363,4 +365,12 @@ export const getPuzzleStatus = (ids) => {
   })
 
   return data;
+}
+
+export const getDailyPokemon = () => {
+  const now = new Date();
+
+  let id = `${Math.ceil((now.getYear()*10)/now.getMonth())+now.getDate()}`
+
+  return id;
 }

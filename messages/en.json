@@ -4,6 +4,12 @@
 
         "modes": "Modes",
         "extras": "Extras",
+        "transfer": "Transfer game data",
+        "privacy": "Privacy policy",
+
+        "new-label": "NEW!",
+        "construction-1": "New modes under ",
+        "construction-2": "construction",
 
         "daily": {
             "description": "Solve a new puzzle every day",

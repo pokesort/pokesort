@@ -11,6 +11,8 @@ import StreakIcon from '@/src/components/svg/StreakIcon';
 import TickIcon from '@/src/components/svg/TickIcon';
 import { useEffect, useState } from 'react';
 import PokeSprite from '../components/PokeSprite';
+import { bool } from 'yup';
+import { getDailyPokemon } from '../scripts/utils';
 
 const streakKey = 'u_dailystreak';
 const infiniteCount = 'u_infinitecount';
@@ -28,10 +30,11 @@ interface HomeCardProps {
   href: string;
   sprite: string;
   count?: number;
+  isNew?: boolean;
 }
 
 const HomeCard = ({
-  page, href, sprite, count=0
+  page, href, sprite, count=0, isNew=false
 }: HomeCardProps) => {
   const t = useTranslations();
   const locale = useLocale();
@@ -45,7 +48,7 @@ const HomeCard = ({
         month: 'long'
       });
     break;
-    case "infinite":
+    case "archive":
       extraElement = (
         <p>Weekly archive goes here</p>
       )
@@ -62,7 +65,14 @@ const HomeCard = ({
           </span>
         }
       </h3>
-      <p>{t(`home.${page}.description`)}</p>
+      <p>
+        {isNew &&
+          <span className="new-label">
+            {t(`home.new-label`)}
+          </span>
+        }
+        {t(`home.${page}.description`)}
+      </p>
 
       {extraElement}
 
@@ -77,8 +87,9 @@ const HomeCard = ({
 
 export default function Home() {
   const t = useTranslations();
+
   const [counts, setCounts] = useState<Record<string, number>>({"daily": 0, "infinite": 0});
-  const [dailySprite, setDailySprite] = useState<string>("151");
+  const [dailySprite, setDailySprite] = useState<string>(getDailyPokemon);
   const [archiveSprite, setArchiveSprite] = useState<string>("251");
 
   useEffect(() => {
@@ -125,32 +136,67 @@ export default function Home() {
           <p>{t('home.subtitle')}</p>
         </hgroup>
 
-        <HomeCard
-          page="daily"
-          count={counts["daily"]}
-          href="/daily"
-          sprite={dailySprite} />
-        <HomeCard
-          page="archive"
-          href="/archive"
-          sprite={archiveSprite} />
+        <div className="home-card-group">
+          <HomeCard
+            page="daily"
+            count={counts["daily"]}
+            href="/daily"
+            sprite={dailySprite}
+          />
+          <HomeCard
+            page="archive"
+            href="/archive"
+            sprite={archiveSprite}
+          />
+        </div>
 
         <h2>{t(`home.modes`)}</h2>
-        <HomeCard
-          page="infinite"
-          count={counts["infinite"]}
-          href="/infinite"
-          sprite="235" />
+        <div className="home-card-group">
+          <HomeCard
+            page="infinite"
+            count={counts["infinite"]}
+            href="/infinite"
+            sprite="235"
+          />
+          <div>
+            <p className="coming-soon">
+              {t(`home.construction-1`)}<b>
+                <Link href="/construction">
+                  {t(`home.construction-2`)}
+                </Link>
+              </b>
+            </p>
+          </div>
+        </div>
 
         <h2>{t(`home.extras`)}</h2>
-        <HomeCard
-          page="dex"
-          href="/dex"
-          sprite="479" />
-        <HomeCard
-          page="about"
-          href="/about"
-          sprite="441" />
+        <div className="home-card-group">
+          <HomeCard
+            page="dex"
+            href="/dex"
+            sprite="479"
+          />
+          <HomeCard
+            page="about"
+            href="/about"
+            sprite="441"
+          />
+        </div>
+
+        <div className="home-button-group">
+          <button onClick={() => window.dispatchEvent(new CustomEvent("open-notices"))}>
+            {t(`notices.label`)}
+          </button>
+          <button onClick={() => window.dispatchEvent(new CustomEvent("open-tutorial"))}>
+            {t(`tutorial.label`)}
+          </button>
+          <button>
+            {t(`home.transfer`)}
+          </button>
+          <Link href="/privacy-policy">
+            {t(`home.privacy`)}
+          </Link>
+        </div>
 
         <p id="disclaimer">
           {t(`home.disclaimer`)}

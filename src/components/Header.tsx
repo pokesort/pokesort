@@ -38,11 +38,17 @@ export default function Header ({ pathname }: HeaderProps) {
 
     useEffect(() => {
         const handleScroll = () => setMenuOpen(false);
+        const handleTutorialOpen = () => setTutorialOpen(true);
+        const handleNoticesOpen = () => setNoticesOpen(true);
 
         document.addEventListener('scroll', handleScroll);
+        window.addEventListener('open-tutorial', handleTutorialOpen);
+        window.addEventListener('open-notices', handleNoticesOpen);
         
         return () => {
             document.removeEventListener('scroll', handleScroll);
+            window.removeEventListener('open-tutorial', handleTutorialOpen);
+            window.removeEventListener('open-notices', handleNoticesOpen);
         }
     }, [])
     
@@ -66,17 +72,6 @@ export default function Header ({ pathname }: HeaderProps) {
                             </Link>
                         ))}
                     </nav>
-                    <ul className="icons">
-                        <Link href="" onClick={() => setNoticesOpen(true)}>
-                            <HeaderNotice />
-                        </Link>                    
-                        <Link href="" onClick={() => setTutorialOpen(true)}>
-                            <HeaderHelp />
-                        </Link>
-                        <Link href="/about">
-                            <HeaderInfo />
-                        </Link>
-                    </ul>
                 </div>
                 <button id="menu-icon" onClick={() => setMenuOpen(prev => !prev)}>
                     <HamburgerIcon/>
