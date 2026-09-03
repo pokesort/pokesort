@@ -1,95 +1,17 @@
 "use client"
 
-import { useLocale, useTranslations } from 'next-intl';
-import { redirect } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 import "@/src/styles/components/Home.scss";
 import SvgLogo from '../components/svg/SvgLogo';
 import Link from 'next/link';
 
-import StreakIcon from '@/src/components/svg/StreakIcon';
-import TickIcon from '@/src/components/svg/TickIcon';
 import { useEffect, useState } from 'react';
-import PokeSprite from '../components/PokeSprite';
-import { bool } from 'yup';
 import { getDailyPokemon } from '../scripts/utils';
-import LatestPuzzles from '../components/LatestPuzzles';
+import HomeCard from '../components/HomeCatd';
 
 const streakKey = 'u_dailystreak';
 const infiniteCount = 'u_infinitecount';
-
-type Page = {
-    route: string;
-    label: string;
-    description: string;
-    icon: any;    
-    countType?: 'streak' | 'count';
-}
-
-interface HomeCardProps {
-  page: string;
-  href: string;
-  sprite: string;
-  count?: number;
-  isNew?: boolean;
-}
-
-const HomeCard = ({
-  page, href, sprite, count=0, isNew=false
-}: HomeCardProps) => {
-  const t = useTranslations();
-  const locale = useLocale();
-  let commandAppend = "";
-  let extraElement = null;
-  let showCommand = true;
-
-  switch (page) {
-    case "daily":
-      commandAppend = new Date().toLocaleDateString(locale, {
-        day: '2-digit',
-        month: 'long'
-      });
-    break;
-    case "archive":
-      showCommand = false;
-      extraElement = (
-        <LatestPuzzles limit={7} />
-      )
-    break;
-  }
-
-  return (
-    <div className="home-card">
-      <h3>
-        {t(`header.${page}`)}
-        {count > 1 &&
-          <span>
-            {count}
-          </span>
-        }
-      </h3>
-      
-      <p>
-        {isNew &&
-          <span className="new-label">
-            {t(`home.new-label`)}
-          </span>
-        }
-        {t(`home.${page}.description`)}
-      </p>
-
-      {extraElement}
-
-      {showCommand &&
-        <Link href={href}>
-          {t(`home.${page}.command`)}{commandAppend}
-        </Link>
-      }
-
-      <PokeSprite slug={`${sprite}.png`} />
-    </div>
-  )
-}
 
 export default function Home() {
   const t = useTranslations();

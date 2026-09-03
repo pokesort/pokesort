@@ -32,11 +32,25 @@ export default async function handler(req, res) {
 const orderPuzzles = async (db, objectKey, limit) => {
   switch (objectKey) {
     case 'date':
-      return await db.db.collection('puzzles')
-        .find({date: {$ne: null}})
-        .sort({ date: 1 })
-        .limit(Number(limit) || 0)
-        .toArray();
+      const parsedLimit = Number(limit) || 0;
+
+      const pipeline = [
+        { $match: { date: { $ne: null } } },
+        { $sort: { date: -1 } },
+        {
+          $group: {
+            _id: '$date',
+            puzzles: { $push: '$$ROOT' },
+          },
+        },
+        { $sort: { _id: -1 } },
+        ...(parsedLimit > 0 ? [{ $limit: parsedLimit }] : []),
+        { $unwind: '$puzzles' },
+        { $replaceRoot: { newRoot: '$puzzles' } },
+        { $sort: { date: 1 } },
+      ];
+
+      return await db.db.collection('puzzles').aggregate(pipeline).toArray();
     default:
       return await db.db.collection('puzzles')
       .aggregate([

@@ -13,6 +13,7 @@ import { getPuzzleStatus } from '@/src/scripts/utils';
 
 import "@/src/styles/components/Archive.scss";
 import ArrowRight from './svg/ArrowRight';
+import { useTranslations } from 'use-intl';
 
 interface LatestPuzzlesProps {
   limit?: number;
@@ -21,8 +22,8 @@ interface LatestPuzzlesProps {
 export default function LatestPuzzles({ limit = 7 }: LatestPuzzlesProps) {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [puzzles, setPuzzles] = useState<Record<string, string[]>>({});
   const locale = useLocale();
+  const [puzzles, setPuzzles] = useState<Record<string, string[]>>({});
 
   useEffect(() => {
     const fetchLatestPuzzles = async () => {
@@ -41,7 +42,6 @@ export default function LatestPuzzles({ limit = 7 }: LatestPuzzlesProps) {
         }
 
         const data = await res.json();
-        console.log(data.puzzles);
         setPuzzles(data.puzzles || {});
       } catch (err) {
         console.error(err);
@@ -54,10 +54,6 @@ export default function LatestPuzzles({ limit = 7 }: LatestPuzzlesProps) {
     fetchLatestPuzzles();
   }, [limit]);
 
-  if (loading) {
-    return <></>;
-  }
-
   const today = new Date();
   const pastDays = Array.from({ length: limit }, (_, i) => subDays(today, i));
 
@@ -68,10 +64,16 @@ export default function LatestPuzzles({ limit = 7 }: LatestPuzzlesProps) {
         <Link href={`archive`} className="calendar-cell">
             <ArrowRight />
         </Link>
-        {pastDays.map((day) => {
+        {pastDays.map((day, index) => {
           const dayString = format(day, 'yyyy-MM-dd');
           const hasPuzzle = Boolean(puzzles[dayString]);
           const userData: any = hasPuzzle ? getPuzzleStatus(puzzles[dayString]) : null;
+
+          if (index == 0 && userData != null) {
+            window.dispatchEvent(new CustomEvent("today-user-data", {
+              detail: userData.status
+            }))
+          }
 
           const blockClasses = clsx(
                 'calendar-cell',

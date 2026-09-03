@@ -62,6 +62,11 @@ section#home {
 
         clip-path: polygon(0% 0%, calc(100% - 37px) 0%, 100% 37px, 100% 37px, 100% 100%, 0% 100%);
         
+        h3 {
+            display: flex;
+            align-items: center;
+        }
+
         img {
             position: absolute;
             top: -5px;
@@ -72,6 +77,23 @@ section#home {
             font-size: text(small);
             color: color(text2);
             height: 100%;
+            z-index: 10;
+        }
+
+        .count {
+            display: flex;
+            align-items: inherit;
+            color: color(text3);
+            margin-left: .5rem;
+
+            svg {
+                height: 14px;
+            }
+
+            span {
+                margin-left: .15rem;
+                font-size: text(small);
+            }
         }
 
         .new-label {
@@ -127,6 +149,35 @@ section#home {
         }
         &:active {
             transform: scale(0.85);
+        }
+
+        &[data-status="0"] {
+            --selection: #{color(selection4)};
+        }
+        &[data-status="-1"] {
+            --selection: #{color(selection2)};
+        }
+        &[data-status="1"] {
+            --selection: #{color(selection3)};
+        }
+        
+        &[data-status] {
+            position: relative;
+            border: 1px solid var(--selection);
+            
+            &::after {
+                display: block;
+                content: '';
+                background-color: var(--selection);
+                width: 10px;
+                aspect-ratio: 1;
+
+                position: absolute;
+                right: -1px;
+                top: 0px;
+
+                clip-path: polygon(0% 0%, 100% 100%, 100% 0%);
+            }
         }
     }
 
