@@ -392,6 +392,10 @@
 
             "1": "Tipagem Única",
             "2": "Tipagem Dupla"
+        },
+        "custom": {
+            "long": "",
+            "short": "Categorias Especiais"
         }
     },
     "about": {

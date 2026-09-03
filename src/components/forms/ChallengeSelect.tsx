@@ -17,7 +17,7 @@ import ch4_sprite from "@/src/assets/images/challenge_4.png";
 import ch5_sprite from "@/src/assets/images/challenge_5.png";
 
 import ChallengeIcon from '../svg/ChallengeIcon';
-import { getPuzzleStatus } from '@/src/scripts/utils';
+import { parseChallengeSelectFields, getPuzzleStatus } from '@/src/scripts/utils';
 const challengeSprites: Record<string, StaticImageData> = {
   '1': ch1_sprite,
   '2': ch2_sprite,
@@ -54,6 +54,7 @@ export default React.memo(function Input({name="challenge", label="Challenge", m
 
     const [open, setOpen] = useState(false);
     const [inputText, setInputText] = useState('');
+    const [challengeFields, setChallengeFields] = useState<Record<string, Array<string | string[]>>>({});
 
     const updatePreferredChallenge = (challenge: string) => {
         localStorage.setItem(challengeKey, challenge);
@@ -72,7 +73,8 @@ export default React.memo(function Input({name="challenge", label="Challenge", m
     const challengeStatus = useMemo(() => {
         const statuses: Record<number, number | null> = {};
 
-        if (challenges == undefined) return statuses;
+        setChallengeFields(parseChallengeSelectFields());
+        if (!open || challenges == undefined) return statuses;
         
         for (let i = 1; i <= 5; i++) {
             const result= getPuzzleStatus([challenges[i]]) as { status: number } | null;
@@ -116,18 +118,34 @@ export default React.memo(function Input({name="challenge", label="Challenge", m
                 </div>
             }
             <Modal id="challenge-select-modal" title={label} background={true} isOpen={open} canClose={true} setIsOpen={setOpen}>
-                {visibleChallengeValues.map((value: string) => (
-                    <label className={`challenge-label ${Object.keys(options).includes(value) ? "" : "disabled"}`} key={value}
-                        onClick={() => setOpen(false)} data-status={challengeStatus[parseInt(value)]}>
-                        <input type="radio" {...form.register(name)} value={value} />
-                        <img src={challengeSprites[value].src} />
+                {visibleChallengeValues.map((challenge: string) => (
+                    <label className={`challenge-label ${Object.keys(options).includes(challenge) ? "" : "disabled"}`} key={challenge}
+                        onClick={() => setOpen(false)} data-status={challengeStatus[parseInt(challenge)]}>
+                        <input type="radio" {...form.register(name)} value={challenge} />
+                        <img className={`challenge-img-${challenge}`} src={challengeSprites[challenge].src} />
                         <div>
                             <h3>
-                                {challenge_options[value]}
+                                {challenge_options[challenge]}
                             </h3>
-                            <p>
-                                { t(`puzzle.challenge.help.${value}`) }
-                            </p>
+                            {challengeFields[challenge] && <ul>
+                                {challengeFields[challenge].map((field, index) => {
+                                    if (typeof field != "object") {
+                                        return (<li key={index}>
+                                            {t(`groupnames.${field}.short`)}
+                                        </li>)
+                                    } else {
+                                        return (
+                                          <React.Fragment key={index}>
+                                            {field.map((category, catIndex) => (
+                                                <li key={`${index}-${catIndex}`}>
+                                                    {t(`groupnames.categories.${category}`)}
+                                                </li>
+                                            ))}
+                                          </React.Fragment>
+                                        );
+                                    }
+                                })}
+                            </ul>}
                         </div>
                     </label>
                 ))}
