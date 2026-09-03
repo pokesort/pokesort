@@ -877,7 +877,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
             for (let i = 1; i <= 3; i++) {
                 const chance = randomInRange(1, 200);
                 if (chance == 1) {
-                    const shinyTarget = randomInRange(0, mons.length);
+                    const shinyTarget = randomInRange(0, mons.length - 1);
                     setShinies((prev) => [...prev, mons[shinyTarget]]);
                 }
             }
