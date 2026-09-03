@@ -6,11 +6,9 @@ import SvgLogo from './svg/SvgLogo';
 import HamburgerIcon from './svg/HamburgerIcon';
 import { useEffect, useState } from 'react';
 
-import HeaderHelp from './svg/HeaderHelp';
-import HeaderInfo from './svg/HeaderInfo';
-import HeaderNotice from './svg/HeaderNotice';
 import Notices from './Notices';
 import Tutorial from './Tutorial';
+import PokeSprite from './PokeSprite';
 
 type Page = {
     route: string;
@@ -61,21 +59,28 @@ export default function Header ({ pathname }: HeaderProps) {
                     <h1>POKESORT</h1>
                 </Link>
                 
-                <div className={`menu ${menuOpen ? 'open' : ''}`}>
-                    <nav>
-                        {pages && pages.map((page: Page, index: number) => (
-                            <Link
-                                key={index}
-                                href={page.route}
-                                className={pathname === page.route ? 'selected' : ''}>
-                                {page.label}{page.beta ? ' ᵇᵉᵗᵃ' : ''}
-                            </Link>
-                        ))}
-                    </nav>
+                <div className="header-group">
+                    <div className={`menu ${menuOpen ? 'open' : ''}`}>
+                        <nav>
+                            {pages && pages.map((page: Page, index: number) => (
+                                <Link
+                                    key={index}
+                                    href={page.route}
+                                    className={pathname === page.route ? 'selected' : ''}>
+                                    {page.label}{page.beta ? ' ᵇᵉᵗᵃ' : ''}
+                                </Link>
+                            ))}
+                        </nav>
+                    </div>
+                    <a className="header-button" onClick={() => setMenuOpen(prev => !prev)}>
+                        <div id="profile-icon">
+                            <PokeSprite slug="egg.png" />
+                        </div>
+                    </a>
+                    <button id="menu-icon" className="header-button" onClick={() => setMenuOpen(prev => !prev)}>
+                        <HamburgerIcon/>
+                    </button>
                 </div>
-                <button id="menu-icon" onClick={() => setMenuOpen(prev => !prev)}>
-                    <HamburgerIcon/>
-                </button>
             </header>
             <Notices noticesOpen={noticesOpen} setNoticesOpen={setNoticesOpen} />
             <Tutorial tutorialOpen={tutorialOpen} setTutorialOpen={setTutorialOpen} pathname={pathname} />
