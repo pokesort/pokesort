@@ -1,0 +1,9 @@
+@use "../abstract" as *;
+
+#construction {
+    -webkit-mask-image: url(/images/construction_mask.png);
+    mask-image: url(/images/construction_mask.png);
+    mask-repeat: no-repeat;
+
+    transform: scale(.5);
+}
