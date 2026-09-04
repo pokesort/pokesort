@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { notFound, redirect, useParams, useSearchParams } from 'next/navigation';
 import Loading from '@/src/components/Loading';
 import ErrorToast from '@/src/components/ToastError';
+import { isToday, parseISO } from 'date-fns';
 
 const challengeKey = 'u_challenge';
 
@@ -15,7 +16,7 @@ export default function PuzzlePage() {
 
     const challengeQuery = useSearchParams()?.get("c");
 
-    if (slug === 'daily')
+    if (slug === 'daily' || isToday(parseISO(slug)))
         redirect('/daily');
 
     const [loading, setLoading] = useState<boolean>(true);
