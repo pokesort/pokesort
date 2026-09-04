@@ -4,16 +4,18 @@ import Link from 'next/link';
 import '@/src/styles/components/Header.scss';
 import SvgLogo from './svg/SvgLogo';
 import HamburgerIcon from './svg/HamburgerIcon';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import Notices from './Notices';
 import Tutorial from './Tutorial';
 import PokeSprite from './PokeSprite';
+import { clsx } from 'clsx';
 
 type Page = {
-    route: string;
+    route?: string;
+    alias?: string;
     label: string;
-    beta: boolean;
+    subpages?: Page[];
 }
 
 interface HeaderProps {
@@ -28,10 +30,13 @@ export default function Header ({ pathname }: HeaderProps) {
     const [tutorialOpen, setTutorialOpen] = useState<boolean>(false);
 
     const pages = [
-        {route: '/daily', label: t('daily'), beta: false},
-        {route: '/infinite', label: t('infinite'), beta: false},
-        {route: '/archive', label: t('archive'), beta: false},
-        {route: '/dex', label: t('dex'), beta: false},
+        {route: '/daily', label: t('daily')},
+        {label: t('modes'), subpages: [
+            {route: '/infinite', label: t('infinite')},
+            {route: '/construction', label: t('who')},
+        ]},
+        {route: '/archive', label: t('archive'), alias: '/puzzle'},
+        {route: '/dex', label: t('dex')},
     ] as Page[];
 
     useEffect(() => {
@@ -49,7 +54,40 @@ export default function Header ({ pathname }: HeaderProps) {
             window.removeEventListener('open-notices', handleNoticesOpen);
         }
     }, [])
-    
+
+    const getPageClasses = (page: Page) => {
+        return clsx(
+            "header-nav-item",
+            {
+                "selected": isPageSelected(page),
+                "with-subpages": page.subpages
+            }
+        )
+    }
+
+    const isPageSelected = useCallback((page: Page) => {
+        if (pathname == null) return false;
+
+        if (page.route != undefined &&
+            pathname.includes(page.route) ||
+            page.alias != undefined &&
+            pathname.includes(page.alias)) return true;
+        
+        if (page.subpages) {
+            let isSelected = false
+
+            page.subpages.forEach((subpage: Page) => {
+                if (isPageSelected(subpage)) {
+                    isSelected = true;
+                }
+            })
+
+            return isSelected;
+        }
+
+        return false;
+
+    }, [pathname])
 
     return (
         <>
@@ -61,15 +99,26 @@ export default function Header ({ pathname }: HeaderProps) {
                 
                 <div className="header-group">
                     <div className={`menu ${menuOpen ? 'open' : ''}`}>
-                        <nav>
-                            {pages && pages.map((page: Page, index: number) => (
-                                <Link
-                                    key={index}
-                                    href={page.route}
-                                    className={pathname === page.route ? 'selected' : ''}>
-                                    {page.label}{page.beta ? ' ᵇᵉᵗᵃ' : ''}
-                                </Link>
-                            ))}
+                        <nav>                           
+                            {pages && pages.map((page: Page, index: number) => {
+                                return (
+                                    <li key={index} className="header-nav-container">
+                                        <Link
+                                            href={page.route ?? ""}
+                                            className={getPageClasses(page)}>
+                                            {page.label}
+                                        </Link>
+                                        {page.subpages && page.subpages.map((subpage: Page, subindex: number) => (
+                                            <Link
+                                                key={subindex}
+                                                href={subpage.route ?? ""}
+                                                className={getPageClasses(subpage)}>
+                                                {subpage.label}
+                                            </Link>
+                                        ))}
+                                    </li>
+                                )
+                            })}
                         </nav>
                     </div>
                     <a className="header-button" onClick={() => setMenuOpen(prev => !prev)}>

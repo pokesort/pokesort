@@ -173,7 +173,7 @@ export default function InfinitePage() {
                 <Loading expand={false} />
             :
                 <>
-                <Modal title={t('puzzle.infinite.generate')} id={"infinite-modal"} isOpen={infiniteModalOpen} setIsOpen={setInfiniteModalOpen} canClose={!initial} background={!initial}>
+                <Modal title={t('puzzle.infinite.label')} id={"infinite-modal"} isOpen={infiniteModalOpen} setIsOpen={setInfiniteModalOpen} canClose={!initial} background={!initial}>
                     <div className="infinite-menu">
                         <div style={{paddingTop: ".5rem"}}>
                             <Input type="select" style={{width: "100%"}} label={t(`puzzle.infinite.generation`)} name="generation" defaultValue="9" options={gen_options} form={form} />

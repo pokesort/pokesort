@@ -21,7 +21,7 @@
         },
         "infinite": {
             "description": "Generate a custom puzzle",
-            "command": "Jogar"
+            "command": "Play"
         },
         "dex": {
             "description": "Get familiar with our dada",
@@ -36,9 +36,11 @@
     },
     "header": {
         "daily": "Daily",
+        "modes": "Modes",
+        "infinite": "Infinite",
+        "who": "???",
         "archive": "Archive",
         "dex": "Dex",
-        "infinite": "Infinite",
         "about": "About"
     },
     "error": {

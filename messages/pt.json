@@ -36,7 +36,9 @@
     },
     "header": {
         "daily": "Diário",
+        "modes": "Modos",
         "infinite": "Infinito",
+        "who": "???",
         "archive": "Arquivo",
         "dex": "Dex",
         "about": "Sobre"

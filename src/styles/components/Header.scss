@@ -35,6 +35,7 @@ header {
 
     .header-group {
         display: inherit;
+        align-items: center;
         gap: .5rem;
     }
 
@@ -55,8 +56,8 @@ header {
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 25px;
-        height: 25px;
+        width: 32px;
+        height: 32px;
         border-radius: 50%;
         margin-left: 1rem;
         background-color: color(section1);
@@ -87,45 +88,8 @@ header {
 
     nav {
         display: flex;
-        align-items: center;
-        gap: 0.5rem;        
-
-        a {
-            display: flex;
-            align-items: center;
-            text-align: center;
-            padding: 0.5rem 1.25rem;
-            color: color(text2);
-            font-size: text(base);
-            white-space: nowrap;
-
-            clip-path: polygon(0% 10px, 10px 0%, 100% 0%, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0% 100%);
-            transition: background-color 0.15s ease, transform 0.3s ease;
-
-            &:not(.selected):hover {
-                background-color: color(section1);
-            }
-
-            &.selected {
-                background-color: color(section2);
-                color: color(text1);
-            }
-
-            &:active {
-                transform: scale(0.85);
-            }
-        }
-    }
-
-    ul.icons {
-        display: flex;
+        justify-content: end;
         gap: 0.5rem;
-
-        color: color(text2);
-
-        a {
-            padding: 0.25rem;
-        }
     }
 
     &[data-path="/"] {
@@ -139,6 +103,55 @@ header {
         #menu-icon {
             display: none;
         }
+    }
+}
+
+.header-nav-container {
+    display: flex;
+    flex-direction: column;
+    height: 31px;
+    overflow: hidden;
+
+    transition:
+        width .3s;
+
+    &:hover, &:active {
+        overflow:visible;        
+
+        .with-subpages:first-child {
+            color: color(text2);
+            background-color: unset;
+
+            &::after {
+                content: " ↓";
+            }
+        }
+    }
+}
+
+.header-nav-item {
+    text-align: center;
+    padding: 0.5rem 1.25rem;
+    color: color(text2);
+    font-size: text(base);
+    white-space: nowrap;
+    width: 100%;
+    font-size: text(small);
+
+    clip-path: polygon(0% 10px, 10px 0%, 100% 0%, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0% 100%);
+    transition: background-color 0.15s ease, transform 0.3s ease;
+
+    &:not(.selected):hover {
+        background-color: color(section1);
+    }
+
+    &.selected {
+        background-color: color(section2);
+        color: color(text1);
+    }
+
+    &:active {
+        transform: scale(0.85);
     }
 }
 
@@ -208,31 +221,23 @@ header {
             padding-bottom: 0.5rem;
 
             background-color: color(background1);
-
-            a {
-                width: 100%;
-                justify-content: center;
-                background-color: color(section1);
-                clip-path: unset;
-                font-size: text(small);
-            }            
         }
 
-        ul.icons {
-            width: 100%;
-            justify-content: center;
-            padding-bottom: .5rem;
-            background-color: color(background1);
+    }
 
-            a {
-                display: flex;
-                justify-content: center;
-                align-items: center;
+    .header-nav-container {
+        width: 100%;
+        gap: inherit;
 
-                background-color: color(section1);
-                aspect-ratio: 1;
-            }
+        &:hover, &:active {
+            height: auto;
         }
-
+    }
+    .header-nav-item {
+        width: 100%;
+        justify-content: center;
+        background-color: color(section1);
+        clip-path: unset;
+        font-size: text(small);
     }
 }
