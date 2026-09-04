@@ -14,14 +14,18 @@ export default async function handler(req, res) {
 
         const secretFound = queryIds.has(secretId);
 
-        const updatedPokemons = pokemons.map(pokemon => ({
-            ...pokemon,
-            available: secretFound
+       const updatedPokemons = pokemons.map(pokemon => {
+            const queryAvailable = secretFound
                 ? queryIds.has(pokemon.id)
-                : !queryIds.has(pokemon.id)
-        }));
+                : !queryIds.has(pokemon.id);
+
+            return {
+                ...pokemon,
+                available: pokemon.available && queryAvailable
+            };
+        });
         
-        return res.status(200).json({ success: true, secretFound: secretFound, updatedPokemons });
+        return res.status(200).json({ success: true, secretFound, secretId, pokemons: updatedPokemons });
     } catch (error){
         return res.status(500).json({success: false, message: "Internal Server Error"});
     }
