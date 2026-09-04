@@ -37,9 +37,10 @@
     "src/pages/api/groups/create.js",
     "src/scripts/utils.js",
     "src/pages/api/moves/get.js",
-    ".next/dev/types/**/*.ts"
+    ".next/dev/types/**/*.ts", 
+    "src/app/pokewho/page.jsx"
   ],
-  "exclude": [
+    "exclude": [
     "node_modules"
   ]
 }

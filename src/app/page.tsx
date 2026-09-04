@@ -34,6 +34,7 @@ export default function Home() {
       {route: '/infinite', label: t('header.infinite'), description: t('home.infinite'), icon: <GridIcon/>, countType: 'count'},
       {route: '/archive', label: t('header.archive'), description: t('home.archive'), icon: <CalendarIcon/>},
       {route: '/dex', label: t('header.dex'), description: t('home.dex'), icon: <DexIcon/>},
+      {route: '/pokewho', label: 'pokewho', description: 'home.pokewho', icon: <GridIcon/>}
   ] as Page[];
 
   useEffect(() => {
