@@ -8,6 +8,7 @@ export interface Player {
 
 export interface GameState {
   board: Pokemon[];
+  reserve: Pokemon[];
   players: Player[];
   status: "waiting" | "playing" | "finished";
   result: GameResult | null;

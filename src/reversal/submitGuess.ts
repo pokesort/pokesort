@@ -37,6 +37,8 @@ export async function submitGuess(game: GameState, playerId: string, pokemonIds:
 
   game.board = game.board.filter((pokemon) => !pokemonIds.includes(pokemon.id));
 
+  refillBoard(game);
+
   determineResult(game);
 
   return {
@@ -61,4 +63,12 @@ function determineResult(game: GameState): void {
     ? { type: "draw" }
     : { type: "winner", playerId: winner.id };
   }
+}
+
+function refillBoard(game: GameState): void {
+    const amountNeeded = 16 - game.board.length;
+
+    const newPokemon = game.reserve.splice(0, amountNeeded);
+
+    game.board.push(...newPokemon);
 }
