@@ -1,0 +1,190 @@
+.reversal-page {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.reversal-page h1 {
+    margin: 0 0 20px;
+}
+
+.game-info {
+    margin-bottom: 20px;
+}
+
+.players {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 12px 0 20px;
+}
+
+.players p {
+    margin: 0;
+}
+
+/* Tabuleiro */
+
+.pokemon-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    width: 100%;
+    margin: 20px 0;
+}
+
+.pokemon-grid button {
+    width: 100%;
+    min-width: 0;
+    min-height: 60px;
+    padding: 8px 4px;
+    box-sizing: border-box;
+    overflow-wrap: anywhere;
+}
+
+/* Características */
+
+.characteristics {
+    margin-top: 24px;
+}
+
+.characteristic-types {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 12px 0;
+}
+
+.characteristic-types button {
+    padding: 8px 12px;
+}
+
+/* Valores */
+
+.characteristic-values {
+    margin-top: 20px;
+}
+
+.characteristic-values > div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.characteristic-values button {
+    padding: 8px 12px;
+}
+
+/* Características selecionadas */
+
+.selected-characteristics {
+    margin-top: 28px;
+}
+
+.selected-characteristic {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 0 0 10px;
+}
+
+.selected-characteristic button {
+    padding: 6px 10px;
+}
+
+/* Ações */
+
+.game-actions {
+    margin-top: 24px;
+}
+
+.guess-result {
+    margin-top: 16px;
+}
+
+input {
+    max-width: 100%;
+    padding: 8px 10px;
+    box-sizing: border-box;
+}
+
+/* Desktop */
+
+@media (min-width: 768px) {
+    .reversal-page {
+        padding: 32px;
+    }
+
+    .players {
+        flex-direction: row;
+        gap: 32px;
+    }
+
+    .pokemon-grid {
+        gap: 12px;
+    }
+
+    .pokemon-grid button {
+        min-height: 80px;
+        padding: 16px 10px;
+    }
+
+    .characteristic-types {
+        gap: 10px;
+    }
+
+    .characteristic-values > div {
+        gap: 10px;
+    }
+}
+
+.reversal-page button {
+    background: #2a2a2a;
+    color: #f0f0f0;
+    border: 1px solid #444;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.reversal-page button:hover:not(:disabled) {
+    background: #353535;
+    border-color: #666;
+}
+
+.reversal-page button:disabled {
+    background: #1d1d1d;
+    color: #777;
+    border-color: #333;
+    cursor: default;
+}
+
+.pokemon-card {
+    background: #2a2a2a;
+    color: #f0f0f0;
+    border: 1px solid #444;
+    border-radius: 6px;
+    cursor: pointer;
+    transition:
+        background 0.15s,
+        border-color 0.15s,
+        transform 0.1s;
+}
+
+.pokemon-card:hover {
+    background: #353535;
+    border-color: #666;
+}
+
+.pokemon-card.selected {
+    background: #4a4a4a;
+    border: 2px solid #aaa;
+    transform: translateY(-2px);
+}
+
+.pokemon-card.selected:hover {
+    background: #555;
+}
