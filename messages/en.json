@@ -81,7 +81,8 @@
             "label": "Transfer game data",
             "description": "Save all your Pokesort data to transfer between devices.",
             "export": "Export",
-            "import": "Import"
+            "import": "Import",
+            "invalid": "This is not a valid Pokesort data file"
         }
     },
     "metadata": {

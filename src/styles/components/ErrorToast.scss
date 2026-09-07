@@ -3,7 +3,7 @@
 .error-toast {
     position: fixed;
     top: 4rem;
-    z-index: 50;
+    z-index: 80;
 
     background-color: color(background1);
     padding: 0.5rem 1rem;
@@ -29,6 +29,10 @@
     @media (max-width: 768px) {
         width: calc(100% - var(--spacing) * 2);
     }
+}
+
+.modal-background .error-toast {
+    z-index: 100;
 }
 
 @keyframes toast-in {

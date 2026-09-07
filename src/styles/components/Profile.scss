@@ -1,8 +1,7 @@
 @use "../abstract" as *;
 
 #profile-modal {
-    min-width: 400px;
-    max-width: min(100%, 460px);
+    max-width: min(100vw, 460px);
 
     p {
         font-size: text(small);
@@ -60,5 +59,9 @@
         gap: 0.25rem;
         background-color: color(section2);
         padding: 0.5rem;
+    }
+
+    @media (max-width: 240px) {
+        grid-template-columns: 1fr;
     }
 }

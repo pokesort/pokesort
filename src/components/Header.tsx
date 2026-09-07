@@ -69,10 +69,12 @@ export default function Header ({ pathname }: HeaderProps) {
         const handleScroll = () => setMenuOpen(false);
         const handleTutorialOpen = () => setTutorialOpen(true);
         const handleNoticesOpen = () => setNoticesOpen(true);
+        const handleProfileOpen = () => setProfileOpen(true);
 
         document.addEventListener('scroll', handleScroll);
         window.addEventListener('open-tutorial', handleTutorialOpen);
         window.addEventListener('open-notices', handleNoticesOpen);
+        window.addEventListener('open-profile', handleProfileOpen);
 
         setProfile(loadProfile(t));
         
@@ -80,6 +82,7 @@ export default function Header ({ pathname }: HeaderProps) {
             document.removeEventListener('scroll', handleScroll);
             window.removeEventListener('open-tutorial', handleTutorialOpen);
             window.removeEventListener('open-notices', handleNoticesOpen);
+            window.removeEventListener('open-profile', handleProfileOpen);
         }
     }, [])
 

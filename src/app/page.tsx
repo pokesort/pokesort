@@ -117,7 +117,7 @@ export default function Home() {
           <button onClick={() => window.dispatchEvent(new CustomEvent("open-tutorial"))}>
             {t(`tutorial.label`)}
           </button>
-          <button>
+          <button onClick={() => window.dispatchEvent(new CustomEvent("open-profile"))}>
             {t(`home.transfer`)}
           </button>
         </div>
