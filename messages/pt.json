@@ -41,7 +41,9 @@
         "who": "???",
         "archive": "Arquivo",
         "dex": "Dex",
-        "about": "Sobre"
+        "about": "Sobre",
+
+        "default-user": "Usuário"
     },
     "error": {
         "oops": "Ops...",
@@ -65,6 +67,21 @@
             "3": "Também é possível pedir dicas, como quais Pokémon devem ser agrupados ou a característica que define o seu grupo.",
             "4": "Ao pressionar ou clicar com o botão direito em um Pokémon, você pode verificar todas as suas informações relevantes.",
             "5": "Você vence se conseguir agrupar corretamente todos os Pokémon da grade. O número de linhas da grade dita quantos grupos há no puzzle."
+        }
+    },
+    "profile": {
+        "label": "Seu perfil",
+        "help": "Seu perfil é salvo localmente, assim como seus dados de jogo.",
+        "help-2": "Estamos preparando novas funcionalidades que farão uso dessas informações!",
+
+        "partner": "Parceiro",
+        "name": "Nome",
+
+        "transfer": {
+            "label": "Transferir dados de jogo",
+            "description": "Salve todos os seus dados do Pokesort para transferir entre dispositivos.",
+            "export": "Exportar",
+            "import": "Importar"
         }
     },
     "metadata": {

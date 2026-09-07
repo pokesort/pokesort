@@ -1,4 +1,4 @@
-import { useTranslations } from 'next-intl';
+import { _Translator, useTranslations } from 'next-intl';
 import Link from 'next/link';
 
 import '@/src/styles/components/Header.scss';
@@ -10,6 +10,10 @@ import Notices from './Notices';
 import Tutorial from './Tutorial';
 import PokeSprite from './PokeSprite';
 import { clsx } from 'clsx';
+import { type ProfileData } from '../assets/types/UserData';
+import Profile from './Profile';
+
+const profileKey = 'u_profile';
 
 type Page = {
     route?: string;
@@ -22,12 +26,28 @@ interface HeaderProps {
     pathname: string | null;
 }
 
+const saveProfile = (profile: ProfileData) => {
+    localStorage.setItem(profileKey, JSON.stringify(profile));
+}
+
+const loadProfile = (t: _Translator<Record<string, any>>): ProfileData => {
+    const data = localStorage.getItem(profileKey);
+    if (!data) {
+        return {name: t(`default-user`), partner: "egg"};
+    }
+
+    return JSON.parse(data);
+}
+
 export default function Header ({ pathname }: HeaderProps) {
     const t = useTranslations("header");
 
     const [menuOpen, setMenuOpen] = useState<boolean>(false);
     const [noticesOpen, setNoticesOpen] = useState<boolean>(false);
     const [tutorialOpen, setTutorialOpen] = useState<boolean>(false);
+    const [profileOpen, setProfileOpen] = useState<boolean>(false);
+
+    const [profile, setProfile] = useState<ProfileData>();
 
     const pages = [
         {route: '/daily', label: t('daily')},
@@ -40,6 +60,12 @@ export default function Header ({ pathname }: HeaderProps) {
     ] as Page[];
 
     useEffect(() => {
+        if (profile) {
+            saveProfile(profile);
+        }
+    }, [profile])
+
+    useEffect(() => {
         const handleScroll = () => setMenuOpen(false);
         const handleTutorialOpen = () => setTutorialOpen(true);
         const handleNoticesOpen = () => setNoticesOpen(true);
@@ -47,6 +73,8 @@ export default function Header ({ pathname }: HeaderProps) {
         document.addEventListener('scroll', handleScroll);
         window.addEventListener('open-tutorial', handleTutorialOpen);
         window.addEventListener('open-notices', handleNoticesOpen);
+
+        setProfile(loadProfile(t));
         
         return () => {
             document.removeEventListener('scroll', handleScroll);
@@ -121,18 +149,33 @@ export default function Header ({ pathname }: HeaderProps) {
                             })}
                         </nav>
                     </div>
-                    <a className="header-button" onClick={() => setMenuOpen(prev => !prev)}>
+                    <button className="header-button" onClick={() => setProfileOpen(prev => !prev)}>
                         <div id="profile-icon">
-                            <PokeSprite slug="egg.png" />
+                            <PokeSprite slug={`${profile?.partner ?? "egg"}.png`} />
                         </div>
-                    </a>
+                    </button>
                     <button id="menu-icon" className="header-button" onClick={() => setMenuOpen(prev => !prev)}>
                         <HamburgerIcon/>
                     </button>
                 </div>
             </header>
-            <Notices noticesOpen={noticesOpen} setNoticesOpen={setNoticesOpen} />
-            <Tutorial tutorialOpen={tutorialOpen} setTutorialOpen={setTutorialOpen} pathname={pathname} />
+            {profile &&
+                <Profile
+                    profileOpen={profileOpen}
+                    setProfileOpen={setProfileOpen}
+                    profile={profile}
+                    setProfile={setProfile}
+                />
+            }
+            <Notices
+                noticesOpen={noticesOpen}
+                setNoticesOpen={setNoticesOpen}
+            />
+            <Tutorial
+                tutorialOpen={tutorialOpen}
+                setTutorialOpen={setTutorialOpen}
+                pathname={pathname}
+            />
         </>
     )
 }

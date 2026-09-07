@@ -10,7 +10,7 @@ interface ModalProps {
     isOpen: boolean;
     setIsOpen?: React.Dispatch<React.SetStateAction<boolean>>;
     canClose?: boolean;
-    children?: React.ReactNode; 
+    children?: React.ReactNode;
 }
 
 export default function Modal({ id, title=undefined, background=true, isOpen, setIsOpen, canClose=true, children }: ModalProps) {

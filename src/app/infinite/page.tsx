@@ -13,7 +13,7 @@ import Input from '@/src/components/forms/Input';
 import GridIcon from '@/src/components/svg/GridIcon';
 import Loading from '@/src/components/Loading';
 import { useForm } from 'react-hook-form';
-import ChallengeSelect from '@/src/components/forms/ChallengeSelect';
+import ChallengeSelect from '@/src/components/forms/SelectChallenge';
 import ErrorToast from '@/src/components/ToastError';
 
 const challengeKey = 'u_challenge';

@@ -8,7 +8,7 @@ import Link from 'next/link';
 
 import { useEffect, useState } from 'react';
 import { getDailyPokemon } from '../scripts/utils';
-import HomeCard from '../components/HomeCatd';
+import HomeCard from '../components/HomeCard';
 
 const streakKey = 'u_dailystreak';
 const infiniteCount = 'u_infinitecount';

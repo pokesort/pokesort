@@ -41,7 +41,9 @@
         "who": "???",
         "archive": "Archive",
         "dex": "Dex",
-        "about": "About"
+        "about": "About",
+
+        "default-user": "User"
     },
     "error": {
         "oops": "Uh-oh...",
@@ -65,6 +67,21 @@
             "3": "It's also possible to ask for hints, such as which Pokémon should be grouped or what trait defines that group.",
             "4": "By pressing or right-clicking a Pokémon, you may check all its relevant information.",
             "5": "You win by correctly sorting all Pokémon on the grid into their groups. Theere are as many groups as there are rows in the puzzle grid."
+        }
+    },
+    "profile": {
+        "label": "Your Profile",
+        "help": "Your profile is stored locally, much like your game data.",
+        "help-2": "We're preparing new features that will make use of this info!",
+
+        "partner": "Partner",
+        "name": "Name",
+
+        "transfer": {
+            "label": "Transfer game data",
+            "description": "Save all your Pokesort data to transfer between devices.",
+            "export": "Export",
+            "import": "Import"
         }
     },
     "metadata": {

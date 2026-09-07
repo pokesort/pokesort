@@ -1,0 +1,64 @@
+@use "../abstract" as *;
+
+#profile-modal {
+    min-width: 400px;
+    max-width: min(100%, 460px);
+
+    p {
+        font-size: text(small);
+    }
+}
+
+.profile-form {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: var(--spacing);
+
+    .profile-sprite-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 30px;
+
+        background-color: color(section2);
+        clip-path: polygon(0% 10px, 10px 0%, 100% 0%, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0% 100%);
+    }
+
+    img {
+        width: 96px;
+        height: 96px;
+    }
+
+    @media (max-width: 240px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.profile-info {
+    display: flex;
+    gap: 5px;
+    color: color(text3);
+    margin-bottom: 1rem;
+
+    svg {
+        width: 16px;
+    }
+}
+
+.transfer-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing);
+
+    button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        container-type: inline-size;
+
+        width: 100%;
+        gap: 0.25rem;
+        background-color: color(section2);
+        padding: 0.5rem;
+    }
+}

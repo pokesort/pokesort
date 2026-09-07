@@ -60,7 +60,7 @@ export default function HomeCard({
         <div className="home-card">
             <h3>
                 {t(`header.${page}`)}
-                {count > 1 &&
+                {count > 0 &&
                     <div className="count">
                         {countIcon}
                         <span>{count}</span>

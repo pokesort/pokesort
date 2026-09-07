@@ -13,7 +13,7 @@ header {
     
     position: sticky;
     top: 0;
-    z-index: 100;    
+    z-index: 90;    
 
     a#home {
         display: flex;
@@ -64,8 +64,8 @@ header {
         overflow: hidden;
 
         img {
-            width: 200%;
-            height: 200%;
+            width: 120%;
+            height: 120%;
         }
     }
 
