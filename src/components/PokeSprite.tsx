@@ -8,7 +8,7 @@ interface SpriteProps {
     slug: string;
 }
 
-export default React.memo(function PokeSprite({ slug }: SpriteProps) {
+export default function PokeSprite({ slug }: SpriteProps) {
     const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/sprites/${slug}`
     const [loadedImage, setLoadedImage] = useState<string | null>(null);
 
@@ -25,9 +25,9 @@ export default React.memo(function PokeSprite({ slug }: SpriteProps) {
                 setLoadedImage(url);
             };
         }
-    }, [inView]);
+    }, [inView, slug]);
     
     return (
         <img ref={ref} src={loadedImage || fallback.src} />
     )
-})
+}

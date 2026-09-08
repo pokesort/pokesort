@@ -26,7 +26,7 @@ import DexIcon from '@/src/components/svg/DexIcon';
 import helpLogsImage from '@/src/assets/images/help_logs.png';
 import DexView from './DexView';
 import PokeSprite from './PokeSprite';
-import ChallengeSelect from './forms/ChallengeSelect';
+import ChallengeSelect from './forms/SelectChallenge';
 import { useForm } from 'react-hook-form';
 import TipIcon from './svg/TipIcon';
 import AbandonIcon from './svg/AbandonIcon';

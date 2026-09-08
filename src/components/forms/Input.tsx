@@ -1,13 +1,13 @@
 'use client'
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { useController, FieldValues, UseFormReturn } from "react-hook-form";
+import { useController, FieldValues, UseFormReturn, useForm } from "react-hook-form";
 
 import '@/src/styles/components/FormInput.scss';
 import SelectHandle from '../svg/SelectHandle';
 
-interface InputProps {
-    type: 'text' | 'number' | 'date' | 'select' | 'multiselect' | 'cloud';
+export interface InputProps {
+    type: 'text' | 'number' | 'date' | 'select' | 'multiselect' | 'cloud' | 'hidden';
     label?: string;
     name: string;
     form?: UseFormReturn<FieldValues, any, FieldValues>
@@ -19,7 +19,9 @@ interface InputProps {
     max?: number;
     defaultValue?: string | string[];
     style?: React.CSSProperties;
+    children?: React.ReactNode;
     onInput?: () => void;
+    onClick?: () => void;
 }
 
 export default React.memo(function Input({
@@ -35,11 +37,13 @@ export default React.memo(function Input({
     max = 0,
     defaultValue = "",
     style = {},
-    onInput
+    children,
+    onInput,
+    onClick
 }: InputProps) {
 
     if (!form) {
-        throw new Error("O componente input precisa receber um prop de formulário");
+        form = useForm();
     }
 
     // Hook up this field to react-hook-form
@@ -53,8 +57,9 @@ export default React.memo(function Input({
         case 'text':
         case 'number':
         case 'date':
+        case 'hidden':
             return (
-                <label className="form-label" style={style}>
+                <label className="form-label" style={style} onClick={onClick}>
                     {label && <span>{label}</span>}
                     <input
                         className="inner-input"
@@ -64,12 +69,13 @@ export default React.memo(function Input({
                         onBlur={field.onBlur}
                         ref={field.ref}
                         autoComplete="off"
-                        onInput={onInput}
+                        onInput={onInput}                        
                         placeholder={placeholder}
                         readOnly={readonly}
                         disabled={disabled}
                         required={required}
                     />
+                    {children}
                 </label>
             );
 

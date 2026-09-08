@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import "@/src/styles/components/Modal.scss";
 import CloseIcon from './svg/CloseIcon';
 import { createPortal } from 'react-dom';
+import ErrorToast from './ToastError';
 
 interface ModalProps {
     id: string;
@@ -10,10 +11,11 @@ interface ModalProps {
     isOpen: boolean;
     setIsOpen?: React.Dispatch<React.SetStateAction<boolean>>;
     canClose?: boolean;
-    children?: React.ReactNode; 
+    error?: string | null;
+    children?: React.ReactNode;
 }
 
-export default function Modal({ id, title=undefined, background=true, isOpen, setIsOpen, canClose=true, children }: ModalProps) {
+export default function Modal({ id, title=undefined, background=true, isOpen, setIsOpen, canClose=true, error=null, children }: ModalProps) {
     const closeModal = () => {
         if (canClose && setIsOpen)
             setIsOpen(false);
@@ -31,6 +33,7 @@ export default function Modal({ id, title=undefined, background=true, isOpen, se
     
     return createPortal(
         <div className={`modal-background ${background ? 'filter': ''}`} onClick={closeModal}>
+            <ErrorToast error={error} />
             <section id={id} className={`modal ${isOpen ? 'open' : ''}`} onClick={handleModalClick}>
                 <div className="modal-header">
                     {canClose &&
