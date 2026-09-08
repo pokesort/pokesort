@@ -27,6 +27,9 @@ const challengeSprites: Record<string, StaticImageData> = {
 };
 const challengeKey = 'u_challenge';
 
+type ChallengeFieldEntry = string | number[];
+type ChallengeFields = Record<string, ChallengeFieldEntry[]>;
+
 interface InputProps {
     name?: string;
     label?: string;
@@ -54,7 +57,7 @@ export default React.memo(function Input({name="challenge", label="Challenge", m
 
     const [open, setOpen] = useState(false);
     const [inputText, setInputText] = useState('');
-    const [challengeFields, setChallengeFields] = useState<Record<string, Array<string | string[]>>>({});
+    const [challengeFields, setChallengeFields] = useState<ChallengeFields>({});
 
     const updatePreferredChallenge = (challenge: string) => {
         localStorage.setItem(challengeKey, challenge);
@@ -70,7 +73,7 @@ export default React.memo(function Input({name="challenge", label="Challenge", m
         setInputText(options[watched]);
     }, [watched]);
 
-    const challengeStatus = useMemo(() => {
+    const challengeStatus = useMemo<Record<number, number | null>>(() => {
         const statuses: Record<number, number | null> = {};
 
         setChallengeFields(parseChallengeSelectFields());
