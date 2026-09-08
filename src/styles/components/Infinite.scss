@@ -23,6 +23,10 @@
     }
 }
 
+.modal-background:has(#infinite-modal) {
+    z-index: 40;
+}
+
 #infinite-generate-button {
     --width: min(calc(100% + (var(--spacing) * 2)), calc(140px * var(--cols, 4)));
 

@@ -7,13 +7,14 @@ header {
 
     width: 100%;
     max-width: 100vw;
+    height: var(--header-height, 60px);
     padding: 0 20%;
     background-color: color(background1);
     color: color(text1);
     
-    position: sticky;
-    top: 0;
-    z-index: 100;    
+    position: fixed;
+    top: 0px;
+    z-index: 90;
 
     a#home {
         display: flex;
@@ -24,6 +25,48 @@ header {
         svg {
             height: 35px;
             width: 35px;
+        }
+
+        @media (max-width: 240px) {
+            h1 {
+                display: none;
+            }
+        }
+    }
+
+    .header-group {
+        display: inherit;
+        align-items: center;
+        gap: .5rem;
+    }
+
+    .header-button {
+        display: flex;
+        align-items: center;
+        background-color: none;
+        height: 100%;
+        padding: 0.5rem;
+        
+        svg {
+            height: 25px;
+            width: 25px;
+        }
+    }
+
+    #profile-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        margin-left: 1rem;
+        background-color: color(section1);
+        overflow: hidden;
+
+        img {
+            width: 150%;
+            height: 150%;
         }
     }
 
@@ -46,58 +89,72 @@ header {
 
     nav {
         display: flex;
-        align-items: center;
-        gap: 0.5rem;        
-
-        a {
-            display: flex;
-            align-items: center;
-            text-align: center;
-            padding: 0.5rem 1.25rem;
-            color: color(text2);
-            font-size: text(base);
-            white-space: nowrap;
-
-            clip-path: polygon(0% 10px, 10px 0%, 100% 0%, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0% 100%);
-            transition: background-color 0.15s ease, transform 0.3s ease;
-
-            &:not(.selected):hover {
-                background-color: color(section1);
-            }
-
-            &.selected {
-                background-color: color(section2);
-                color: color(text1);
-            }
-
-            &:active {
-                transform: scale(0.85);
-            }
-        }
-    }
-
-    ul.icons {
-        display: flex;
+        justify-content: end;
         gap: 0.5rem;
-
-        color: color(text2);
-
-        a {
-            padding: 0.25rem;
-        }
     }
 
     &[data-path="/"] {
         position: fixed;
         background-color: transparent;
 
-        a#home, nav {
+        a#home, nav, .header-button {
             visibility: hidden;
             pointer-events: none;
         }
-        nav {
+        #menu-icon {
             display: none;
         }
+    }
+}
+
+.header-nav-container {
+    display: flex;
+    flex-direction: column;
+    height: 31px;
+    overflow: hidden;
+
+    transition:
+        width .3s;
+
+    &:hover, &:active {
+        overflow:visible;        
+
+        .with-subpages:first-child {
+            color: color(text2);
+            background-color: unset;
+
+            &::after {
+                content: " ↓";
+            }
+        }
+    }
+}
+
+.header-nav-item {
+    text-align: center;
+    padding: 0.5rem 1.25rem;
+    color: color(text2);
+    font-size: text(base);
+    white-space: nowrap;
+    width: 100%;
+    font-size: text(small);
+    background-color: color(background1);
+    cursor: pointer;
+
+    clip-path: polygon(0% 10px, 10px 0%, 100% 0%, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0% 100%);
+    transition: background-color 0.15s ease, transform 0.3s ease;
+
+    &:not(.selected):hover {
+        background-color: color(section1);
+    }
+
+    &.selected {
+        background-color: color(section2);
+        color: color(text1);
+    }
+
+    &:active {
+        transform: scale(0.85);
     }
 }
 
@@ -125,15 +182,7 @@ header {
         }
 
         button#menu-icon {
-            display: block;
-            background-color: none;
-            height: fit-content;
-            padding: 0.5rem;
-            
-            svg {
-                height: 25px;
-                width: 25px;
-            }
+            display: flex;
         }
 
         div#click-receptor {
@@ -175,31 +224,23 @@ header {
             padding-bottom: 0.5rem;
 
             background-color: color(background1);
-
-            a {
-                width: 100%;
-                justify-content: center;
-                background-color: color(section1);
-                clip-path: unset;
-                font-size: text(small);
-            }            
         }
 
-        ul.icons {
-            width: 100%;
-            justify-content: center;
-            padding-bottom: .5rem;
-            background-color: color(background1);
+    }
 
-            a {
-                display: flex;
-                justify-content: center;
-                align-items: center;
+    .header-nav-container {
+        width: 100%;
+        gap: inherit;
 
-                background-color: color(section1);
-                aspect-ratio: 1;
-            }
+        &:hover, &:active {
+            height: auto;
         }
-
+    }
+    .header-nav-item {
+        width: 100%;
+        justify-content: center;
+        background-color: color(section1);
+        clip-path: unset;
+        font-size: text(small);
     }
 }

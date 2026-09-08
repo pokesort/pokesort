@@ -38,7 +38,7 @@
     "src/scripts/utils.js",
     "src/pages/api/moves/get.js",
     ".next/dev/types/**/*.ts"
-  ],
+, "src/pages/api/transfer/sign.js"  ],
   "exclude": [
     "node_modules"
   ]

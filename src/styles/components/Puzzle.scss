@@ -206,14 +206,16 @@ section.solved-groups-grid {
     gap: var(--spacing);
     width: 100%;
     height: 100%;
-    overflow-y: auto;    
+    overflow-y: auto;
 
     div.puzzle-guess {
+        position: relative;
+
         display: flex;
         justify-content: space-around;
         align-items: center;
 
-        border: 2px solid color(selection2);
+        --selection: #{color(selection2)};
         background-color: color(section2);
         width: 100%;
         padding: var(--spacing);
@@ -253,7 +255,7 @@ section.solved-groups-grid {
         }
 
         &:has(.tip) {
-            border: 2px solid color(selection4);
+            --selection: #{color(selection4)};
 
             .accuracy-circle {
                 display: none;
@@ -275,7 +277,7 @@ section.solved-groups-grid {
         }
 
         &.correct {
-            border: 2px solid color(selection3);
+            --selection: #{color(selection3)};
 
             .accuracy-circle {
                 background-image: unset;
@@ -290,6 +292,20 @@ section.solved-groups-grid {
                     color: color(section2);
                 }
             }
+        }
+
+        &::after {
+            display: block;
+            content: '';
+            background-color: var(--selection, #fff);
+            width: 4%;
+            aspect-ratio: 1;
+
+            position: absolute;
+            right: 0;
+            top: 0;
+
+            clip-path: polygon(0% 0%, 100% 100%, 100% 0%);
         }
     }
 }

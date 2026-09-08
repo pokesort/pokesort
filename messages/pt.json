@@ -2,19 +2,48 @@
     "home": {
         "subtitle": "Um puzzle diário de associação de Pokémon",
 
-        "daily": "Resolva nosso puzzle de hoje",
-        "infinite": "Gere um puzzle personalizado",
-        "archive": "Explore jogos de dias anteriores",
-        "dex": "Prepare-se conhecendo nossos dados",
+        "modes": "Modos",
+        "extras": "Extras",
+        "transfer": "Transferir dados de jogo",
+        "privacy": "Política de privacidade",
+
+        "new-label": "NOVO!",
+        "construction-1": "Novos modos em ",
+        "construction-2": "construção",
+
+        "daily": {
+            "description": "Resolva um novo puzzle todo dia",
+            "command": "Pokesort de "
+        },
+        "archive": {
+            "description": "Explore jogos de dias anteriores",
+            "command": "Ver mais"
+        },
+        "infinite": {
+            "description": "Gere um puzzle personalizado",
+            "command": "Jogar"
+        },
+        "dex": {
+            "description": "Prepare-se conhecendo nossos dados",
+            "command": "Acessar"
+        },
+        "about": {
+            "description": "Saiba mais sobre o Pokesort",
+            "command": "Acessar"
+        },
 
         "disclaimer": "O Pokesort não é afiliado à Nintendo e não possui nem reivindica quaisquer direitos sobre as marcas registradas da franquia Pokémon."
     },
     "header": {
         "daily": "Diário",
+        "modes": "Modos",
         "infinite": "Infinito",
+        "who": "???",
         "archive": "Arquivo",
         "dex": "Dex",
-        "about": "Sobre"
+        "about": "Sobre",
+
+        "default-user": "Usuário"
     },
     "error": {
         "oops": "Ops...",
@@ -31,13 +60,33 @@
         "empty": "Parece que não tem nada aqui..."
     },
     "tutorial": {
-        "label": "Como Jogar",
+        "label": "Como jogar",
         "text": {
             "1": "Os Pokémon presentes na grade pertencem a grupos de acordo com suas características em comum. Você deve descobrir quais são esses grupos no mínimo de tentativas possível.",
             "2": "Você pode verificar a precisão de palpites incorretos para tentar deduzir quais Pokémon pertencem ao mesmo grupo.",
             "3": "Também é possível pedir dicas, como quais Pokémon devem ser agrupados ou a característica que define o seu grupo.",
             "4": "Ao pressionar ou clicar com o botão direito em um Pokémon, você pode verificar todas as suas informações relevantes.",
             "5": "Você vence se conseguir agrupar corretamente todos os Pokémon da grade. O número de linhas da grade dita quantos grupos há no puzzle."
+        }
+    },
+    "profile": {
+        "label": "Seu perfil",
+        "help": "Seu perfil é salvo localmente, assim como seus dados de jogo.",
+        "help-2": "Estamos preparando novas funcionalidades que farão uso dessas informações!",
+
+        "partner": "Parceiro",
+        "name": "Nome",
+
+        "transfer": {
+            "label": "Transferir dados de jogo",
+            "description": "Salve todos os seus dados do Pokesort para transferir entre dispositivos.",
+            "export": "Exportar",
+            "import": "Importar",
+            "invalid": "Este não é um arquivo de dados válido do Pokesort",
+
+            "confirmation": "Restaurar os dados deste perfil? Todo o seu progresso será substituído.",
+            "yes": "Sim",
+            "no": "Não"
         }
     },
     "metadata": {
@@ -367,6 +416,10 @@
 
             "1": "Tipagem Única",
             "2": "Tipagem Dupla"
+        },
+        "custom": {
+            "long": "",
+            "short": "Categorias Especiais"
         }
     },
     "about": {

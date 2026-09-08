@@ -1,0 +1,21 @@
+@use "../abstract" as *;
+
+#pokemon-select-modal {
+    gap: var(--spacing);
+
+    .search-container {
+        position: relative;
+        width: 100%;
+    
+        svg {
+            position: absolute;
+            right: .75rem;
+            top: calc(50% - 7px);
+    
+            color: color(text1);
+        }
+        input {
+            padding-left: 2.15rem;
+        }
+    }
+}

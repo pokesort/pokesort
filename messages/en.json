@@ -2,19 +2,48 @@
     "home": {
         "subtitle": "A daily Pokémon association puzzle",
 
-        "daily": "Solve today's puzzle",
-        "infinite": "Generate a custom puzzle",
-        "archive": "Explore previous puzzles",
-        "dex": "Get familiar with our data",
+        "modes": "Modes",
+        "extras": "Extras",
+        "transfer": "Transfer game data",
+        "privacy": "Privacy policy",
+
+        "new-label": "NEW!",
+        "construction-1": "New modes under ",
+        "construction-2": "construction",
+
+        "daily": {
+            "description": "Solve a new puzzle every day",
+            "command": "Pokesort for "
+        },
+        "archive": {
+            "description": "Explore previous puzzles",
+            "command": "View more"
+        },
+        "infinite": {
+            "description": "Generate a custom puzzle",
+            "command": "Play"
+        },
+        "dex": {
+            "description": "Get familiar with our dada",
+            "command": "Access"
+        },
+        "about": {
+            "description": "Learn more about Pokesort",
+            "command": "Access"
+        },
 
         "disclaimer": "Pokesort is not affiliated with Nintendo and doesn't claim any rights over the Pokémon franchise."
     },
     "header": {
         "daily": "Daily",
+        "modes": "Modes",
+        "infinite": "Infinite",
+        "who": "???",
         "archive": "Archive",
         "dex": "Dex",
-        "infinite": "Infinite",
-        "about": "About"
+        "about": "About",
+
+        "default-user": "User"
     },
     "error": {
         "oops": "Uh-oh...",
@@ -31,13 +60,33 @@
         "empty": "There doesn't seem to be anything here..."
     },
     "tutorial": {
-        "label": "How to Play",
+        "label": "How to play",
         "text": {
             "1": "All Pokémon on the grid belong to groups according to their common traits. You must find out what those groups are in the least attempts possible.",
             "2": "You can check the accuracy of incorrect guesses to try and deduce which Pokémon belong to the same group.",
             "3": "It's also possible to ask for hints, such as which Pokémon should be grouped or what trait defines that group.",
             "4": "By pressing or right-clicking a Pokémon, you may check all its relevant information.",
             "5": "You win by correctly sorting all Pokémon on the grid into their groups. Theere are as many groups as there are rows in the puzzle grid."
+        }
+    },
+    "profile": {
+        "label": "Your Profile",
+        "help": "Your profile is stored locally, much like your game data.",
+        "help-2": "We're preparing new features that will make use of this info!",
+
+        "partner": "Partner",
+        "name": "Name",
+
+        "transfer": {
+            "label": "Transfer game data",
+            "description": "Save all your Pokesort data to transfer between devices.",
+            "export": "Export",
+            "import": "Import",
+            "invalid": "This is not a valid Pokesort data file",
+
+            "confirmation": "Restore data for this profile? All your progress will be overwritten.",
+            "yes": "Sim",
+            "no": "Não"
         }
     },
     "metadata": {
@@ -367,6 +416,10 @@
 
             "1": "Single-type",
             "2": "Dual-type"
+        },
+        "custom": {
+            "long": "",
+            "short": "Special Categories"
         }
     },
     "about": {
