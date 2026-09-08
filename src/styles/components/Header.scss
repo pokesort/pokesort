@@ -7,13 +7,14 @@ header {
 
     width: 100%;
     max-width: 100vw;
+    height: var(--header-height, 60px);
     padding: 0 20%;
     background-color: color(background1);
     color: color(text1);
     
-    position: sticky;
-    top: 0;
-    z-index: 90;    
+    position: fixed;
+    top: 0px;
+    z-index: 90;
 
     a#home {
         display: flex;
@@ -137,6 +138,8 @@ header {
     white-space: nowrap;
     width: 100%;
     font-size: text(small);
+    background-color: color(background1);
+    cursor: pointer;
 
     clip-path: polygon(0% 10px, 10px 0%, 100% 0%, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0% 100%);
     transition: background-color 0.15s ease, transform 0.3s ease;

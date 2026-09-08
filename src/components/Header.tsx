@@ -134,11 +134,18 @@ export default function Header ({ pathname }: HeaderProps) {
                             {pages && pages.map((page: Page, index: number) => {
                                 return (
                                     <li key={index} className="header-nav-container">
-                                        <Link
-                                            href={page.route ?? ""}
-                                            className={getPageClasses(page)}>
-                                            {page.label}
-                                        </Link>
+                                        {page.route ?
+                                            <Link
+                                                href={page.route}
+                                                className={getPageClasses(page)}>
+                                                {page.label}
+                                            </Link>
+                                        :
+                                            <div
+                                                className={getPageClasses(page)}>
+                                                {page.label}
+                                            </div>
+                                        }
                                         {page.subpages && page.subpages.map((subpage: Page, subindex: number) => (
                                             <Link
                                                 key={subindex}

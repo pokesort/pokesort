@@ -4,6 +4,7 @@
     scroll-behavior: smooth;
     max-width: 100vw;
 
+    --header-height: 60px;
     --spacing: .5rem;
     @media(max-width: 768px) {
         --spacing: .35rem;
@@ -29,6 +30,7 @@ body {
     max-width: 100vw;
     font-size: text(base);
     overflow: hidden;
+    padding-top: var(--header-height, 60px);
 }
 
 * {
