@@ -11,7 +11,7 @@ import { FieldValues, useForm } from 'react-hook-form';
 import HeaderInfo from './svg/HeaderInfo';
 import { ProfileData } from '../assets/types/UserData';
 import SelectPokemon from './forms/SelectPokemon';
-import { exportData, importData } from '../lib/DataTransfer';
+import { exportData, importData, replaceTransferData } from '../lib/DataTransfer';
 
 interface ProfileProps {
     profileOpen: boolean,
@@ -20,7 +20,7 @@ interface ProfileProps {
     setProfile: React.Dispatch<React.SetStateAction<ProfileData | undefined>>
 }
 
-export default function Profile({profileOpen, setProfileOpen, profile, setProfile}: ProfileProps) {
+export default function Profile({ profileOpen, setProfileOpen, profile, setProfile }: ProfileProps) {
     const t = useTranslations("profile");
     const form = useForm({
         defaultValues: profile as FieldValues
@@ -44,7 +44,17 @@ export default function Profile({profileOpen, setProfileOpen, profile, setProfil
         }
 
         try {
-            await importData(file);
+            const data = await importData(file);
+
+            const confirmed = window.confirm(
+                'Importar este arquivo irá substituir todo o seu progresso atual. Deseja continuar?'
+            );
+
+            if (!confirmed) {
+                return;
+            }
+
+            replaceTransferData(data);
             window.location.reload();
         } catch {
             setError(t('transfer.invalid'));
@@ -65,7 +75,7 @@ export default function Profile({profileOpen, setProfileOpen, profile, setProfil
     }, [profileOpen]);
 
     return (
-        <>            
+        <>
             <Modal id="profile-modal" background={true} title={t(`label`)} isOpen={profileOpen} setIsOpen={setProfileOpen} error={error}>
                 <div className="profile-form">
                     <SelectPokemon form={form} name="partner" defaultValue={partnerId} label={t(`partner`)} />
@@ -73,7 +83,7 @@ export default function Profile({profileOpen, setProfileOpen, profile, setProfil
                 </div>
                 <div className="profile-info">
                     <HeaderInfo />
-                    <p>{t(`help`)}<br/>{t(`help-2`)}</p>
+                    <p>{t(`help`)}<br />{t(`help-2`)}</p>
                 </div>
 
                 <div className="modal-title modal-content-div">

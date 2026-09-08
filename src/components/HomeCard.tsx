@@ -51,7 +51,7 @@ export default function HomeCard({
         case "archive":
             showCommand = false;
             extraElement = (
-                <LatestPuzzles limit={7} />
+                <LatestPuzzles limit={8} />
             )
             break;
     }
