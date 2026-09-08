@@ -125,7 +125,25 @@ export async function importData(file: File) {
         throw new InvalidTransferDataError("Invalid or modified Pokesort data file");
     }
 
-    Object.entries(transferFile.data).forEach(([key, value]) => {
+    return transferFile.data;
+
+    // Object.entries(transferFile.data).forEach(([key, value]) => {
+    //     localStorage.setItem(key, value);
+    // });
+}
+
+export function replaceTransferData(data: TransferData) {
+
+    //Remove as chaves atuais presentes para não mesclar o progresso
+    const keysToRemove: string[] = [];
+    for (let index = 0; index < localStorage.length; index += 1) {
+        const key = localStorage.key(index);
+
+        if (key && transferableKeyPattern.test(key)) keysToRemove.push(key);
+    }
+    keysToRemove.forEach((key) =>  localStorage.removeItem(key));
+
+    Object.entries(data).forEach(([key, value]) => {
         localStorage.setItem(key, value);
     });
 }
