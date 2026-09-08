@@ -7,7 +7,6 @@ export async function filterPokemons(query) {
   await connect();
   const db = getDb();
 
-  console.log("filterPokemons query: ", query);
   let filter = {}
   let pokemonIdsUsed = false;
   const arrayFields = ["types", "abilities", "moves", "egg_groups", "categories", "other_forms"];

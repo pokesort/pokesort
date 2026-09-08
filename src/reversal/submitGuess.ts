@@ -26,7 +26,7 @@ export async function submitGuess(game: GameState, playerId: string, pokemonIds:
   if (selectedPokemons.length !== 4)  return invalidSubmitGuessResult;
 
   const result = await validateGuess(selectedPokemons, characteristics);
-
+  console.log("submitGuess result: ", result);
   if (!result.valid) return invalidSubmitGuessResult;
 
   const player = game.players.find((player) => player.id === playerId);

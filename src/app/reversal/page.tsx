@@ -7,6 +7,8 @@ import type { GuessCharacteristic, CharacteristicType } from "../../models/types
 import { CHARACTERISTIC_DEFINITIONS } from "../../models/types";
 import { FIELD_OPTIONS } from "../../scripts/utils";
 
+import "@/src/styles/components/Reversal.css";
+
 export default function Home() {
     const socketRef = useRef<WebSocket | null>(null);
 
@@ -141,8 +143,18 @@ export default function Home() {
         ]);
     }
 
+    function selectFieldValue(value: string) {
+        if (!activeCharacteristic) return;
+        if (submittingGuess) return;
+
+        selectCharacteristic({
+            type: activeCharacteristic,
+            value,
+        });
+    }
+
     return (
-        <main>
+        <main className="reversal-page">
             {/* Mudar o nome */}
             <h1>Reversal Mode</h1>
 
@@ -177,8 +189,7 @@ export default function Home() {
                         </button>
                     )}
                     <p>Pokemons on board: {game.board.length}</p>
-                    <div>
-
+                    <div className="players">
                         {game.players.map((player) => (
                             <p key={player.id}>
                                 {player.name}: {player.score} pontos
@@ -187,13 +198,14 @@ export default function Home() {
                         ))}
                     </div>
 
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "5px" }}>
+                    <div className="pokemon-grid">
                         {game.board.map((pokemon) => {
                             const selected = selectedPokemon.includes(pokemon.id);
 
                             return (
                                 <button
                                     key={pokemon.id}
+                                    className={selected ? "pokemon-card selected" : "pokemon-card"}
                                     onClick={() => {
 
                                         if (game.status !== "playing") return;
@@ -230,24 +242,26 @@ export default function Home() {
                     </div>
 
                     {selectedPokemon.length === 4 && (
-                        <div>
+                        <div className="characteristics">
                             <h2>Características</h2>
 
-                            {Object.keys(CHARACTERISTIC_DEFINITIONS).map((type) => (
-                                <button
-                                    key={type}
-                                    onClick={() =>
-                                        setActiveCharacteristic(
-                                            type as CharacteristicType
-                                        )
-                                    }
-                                >
-                                    {type}
-                                </button>
-                            ))}
+                            <div className="characteristic-types">
+                                {Object.keys(CHARACTERISTIC_DEFINITIONS).map((type) => (
+                                    <button
+                                        key={type}
+                                        onClick={() =>
+                                            setActiveCharacteristic(
+                                                type as CharacteristicType
+                                            )
+                                        }
+                                    >
+                                        {type}
+                                    </button>
+                                ))}
+                            </div>
 
                             {activeCharacteristic && (
-                                <div>
+                                <div className="characteristic-values">
                                     <h3>{activeCharacteristic}</h3>
 
                                     {Array.isArray(FIELD_OPTIONS[activeCharacteristic]) ? (
@@ -261,26 +275,81 @@ export default function Home() {
                                             return (
                                                 <button
                                                     key={value}
-                                                    disabled={selected}
-                                                    onClick={() => {
-                                                        if (submittingGuess) return;
-
-                                                        selectCharacteristic({
-                                                            type: activeCharacteristic,
-                                                            value,
-                                                        });
-                                                    }}
+                                                    disabled={selected || selectedCharacteristics.length >= 3}
+                                                    onClick={() => selectFieldValue(value)}
                                                 >
                                                     {value}
                                                 </button>
                                             );
                                         })
                                     ) : (
-                                        <p>
-                                            Campo com valores numéricos de{" "}
-                                            {FIELD_OPTIONS[activeCharacteristic].min} até{" "}
-                                            {FIELD_OPTIONS[activeCharacteristic].max}
-                                        </p>
+                                        (() => {
+                                            const { min, max } =
+                                                FIELD_OPTIONS[activeCharacteristic];
+
+                                            const amount = max - min + 1;
+
+                                            if (amount <= 20) {
+                                                return Array.from(
+                                                    { length: amount },
+                                                    (_, index) => String(min + index)
+                                                ).map((value) => {
+                                                    const selected = selectedCharacteristics.some(
+                                                        (characteristic) =>
+                                                            characteristic.type === activeCharacteristic &&
+                                                            characteristic.value === value
+                                                    );
+
+                                                    return (
+                                                        <button
+                                                            key={value}
+                                                            disabled={
+                                                                selected ||
+                                                                selectedCharacteristics.length >= 3
+                                                            }
+                                                            onClick={() => selectFieldValue(value)}
+                                                        >
+                                                            {value}
+                                                        </button>
+                                                    );
+                                                });
+                                            }
+
+                                            return (
+                                                <div>
+                                                    <input
+                                                        type="number"
+                                                        min={min}
+                                                        max={max}
+                                                        placeholder={`${min} - ${max}`}
+                                                        onKeyDown={(event) => {
+                                                            if (event.key !== "Enter") return;
+
+                                                            const value = event.currentTarget.value;
+
+                                                            if (!value) return;
+
+                                                            const numericValue = Number(value);
+
+                                                            if (
+                                                                numericValue < min ||
+                                                                numericValue > max
+                                                            ) {
+                                                                return;
+                                                            }
+
+                                                            selectFieldValue(value);
+                                                            event.currentTarget.value = "";
+                                                        }}
+                                                    />
+
+                                                    <p>
+                                                        Digite um valor entre {min} e {max} e pressione
+                                                        Enter.
+                                                    </p>
+                                                </div>
+                                            );
+                                        })()
                                     )}
                                 </div>
                             )}
@@ -291,21 +360,24 @@ export default function Home() {
                         Selected: {selectedPokemon.length}/4
                     </p>
 
-                    <button
-                        disabled={
-                            selectedPokemon.length !== 4 ||
-                            selectedCharacteristics.length < 1 ||
-                            submittingGuess || game?.status !== "playing"
-                        }
-                        onClick={submitGuess}
-                    >
-                        {submittingGuess
-                            ? "Enviando..."
-                            : "Enviar palpite"}
-                    </button>
+                    <div className="game-actions">
+                        <button
+                            disabled={
+                                selectedPokemon.length !== 4 ||
+                                selectedCharacteristics.length < 1 ||
+                                submittingGuess ||
+                                game?.status !== "playing"
+                            }
+                            onClick={submitGuess}
+                        >
+                            {submittingGuess
+                                ? "Enviando..."
+                                : "Enviar palpite"}
+                        </button>
+                    </div>
 
                     {guessResult && (
-                        <div>
+                        <div className="guess-result">
                             {guessResult.valid ? (
                                 <p>
                                     Palpite correto! +{guessResult.points} pontos.
@@ -318,14 +390,14 @@ export default function Home() {
                         </div>
                     )}
 
-                    <div>
+                    <div className="selected-characteristics">
                         <p>
                             Características selecionadas:{" "}
                             {selectedCharacteristics.length}/3
                         </p>
 
                         {selectedCharacteristics.map((characteristic, index) => (
-                            <p key={index}>
+                            <p key={index} className="selected-characteristic">
                                 {characteristic.type}: {characteristic.value}
                                 <button
                                     onClick={() => {

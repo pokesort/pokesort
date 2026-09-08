@@ -74,7 +74,7 @@ export async function startGame(room: Room): Promise<void> {
   // }
 
   const playerIds = Array.from(room.players.keys());
-  const pokemonBoard = await getPokemonBoard(40);
+  const pokemonBoard = await getPokemonBoard(20);
 
   room.game = createGame(playerIds, pokemonBoard);
 }
