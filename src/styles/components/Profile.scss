@@ -65,3 +65,31 @@
         grid-template-columns: 1fr;
     }
 }
+
+.profile-import-preview {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing);
+    margin: .5rem 0;
+    
+    div:has(> img) {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background-color: color(section2);
+        overflow: hidden;
+
+        img {
+            width: 150%;
+            height: 150%;
+        }
+    }
+
+    p {
+        color: color(text2);
+    }
+}

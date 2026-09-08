@@ -1,15 +1,9 @@
 // Exporta e importa os dados de localstorage do Pokesort
+import { TransferData, TransferFile } from "../assets/types/UserData";
 import { InvalidTransferDataError } from "../scripts/erros";
 
 const transferableKeyPattern = /^(u_|s_)/;
 const transferFileExtension = ".pokesortdata";
-
-type TransferData = Record<string, string>;
-type TransferFile = {
-    version: 1;
-    data: TransferData;
-    signature: string;
-};
 
 function isTransferData(value: unknown): value is TransferData {
     if (!value || typeof value !== "object" || Array.isArray(value)) {
@@ -110,7 +104,6 @@ export async function importData(file: File) {
     );
 
     if (!response.ok) {
-        console.log("Invalid or modified Pokesort data file");
         throw new InvalidTransferDataError("Invalid or modified Pokesort data file");
     }
 
@@ -126,14 +119,9 @@ export async function importData(file: File) {
     }
 
     return transferFile.data;
-
-    // Object.entries(transferFile.data).forEach(([key, value]) => {
-    //     localStorage.setItem(key, value);
-    // });
 }
 
 export function replaceTransferData(data: TransferData) {
-
     //Remove as chaves atuais presentes para não mesclar o progresso
     const keysToRemove: string[] = [];
     for (let index = 0; index < localStorage.length; index += 1) {

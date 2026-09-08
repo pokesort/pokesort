@@ -1,7 +1,7 @@
 "use client"
 
 import { useTranslations } from 'next-intl';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import '@/src/styles/components/Profile.scss';
 import Modal from './Modal';
@@ -9,7 +9,7 @@ import PokeSprite from './PokeSprite';
 import Input from './forms/Input';
 import { FieldValues, useForm } from 'react-hook-form';
 import HeaderInfo from './svg/HeaderInfo';
-import { ProfileData } from '../assets/types/UserData';
+import { ProfileData, TransferData } from '../assets/types/UserData';
 import SelectPokemon from './forms/SelectPokemon';
 import { exportData, importData, replaceTransferData } from '../lib/DataTransfer';
 
@@ -25,9 +25,25 @@ export default function Profile({ profileOpen, setProfileOpen, profile, setProfi
     const form = useForm({
         defaultValues: profile as FieldValues
     });
+    
     const partnerId = form.watch("partner");
     const importInput = useRef<HTMLInputElement>(null);
     const [error, setError] = useState<string | null>(null);
+    const [showTransferConfirm, setShowTransferConfirm] = useState<boolean>(false);
+    const [transferData, setTransferData] = useState<TransferData>({});
+
+    useEffect(() => {
+        if (profileOpen == true) {
+            form.reset(profile)
+        } else {
+            setError(null);
+            const body = form.getValues();
+            setProfile({
+                name: body.name,
+                partner: body.partner
+            } as ProfileData);
+        }
+    }, [profileOpen]);
 
     const handleExport = async () => {
         setError(null);
@@ -44,35 +60,31 @@ export default function Profile({ profileOpen, setProfileOpen, profile, setProfi
         }
 
         try {
-            const data = await importData(file);
-
-            const confirmed = window.confirm(
-                'Importar este arquivo irá substituir todo o seu progresso atual. Deseja continuar?'
-            );
-
-            if (!confirmed) {
-                return;
-            }
-
-            replaceTransferData(data);
-            window.location.reload();
+            setTransferData(await importData(file));
+            setShowTransferConfirm(true);
         } catch {
             setError(t('transfer.invalid'));
         }
     };
 
-    useEffect(() => {
-        if (profileOpen == true) {
-            form.reset(profile)
-        } else {
-            setError(null);
-            const body = form.getValues();
-            setProfile({
-                name: body.name,
-                partner: body.partner
-            } as ProfileData);
-        }
-    }, [profileOpen]);
+    const handleImportConfirm = useCallback(() => {
+        replaceTransferData(transferData)
+        window.location.reload();
+    }, [transferData])
+
+    const confirmProfile = useMemo(() => {
+        if (transferData.u_profile == undefined) return <></>;
+
+        const profile: Record<string, string> = JSON.parse(transferData.u_profile);
+        return (
+            <div className="profile-import-preview">
+                <div>
+                    <PokeSprite slug={`${profile["partner"]}.png`} />
+                </div>
+                <p>{profile["name"]}</p>
+            </div>
+        )
+    }, [transferData])
 
     return (
         <>
@@ -106,6 +118,22 @@ export default function Profile({ profileOpen, setProfileOpen, profile, setProfi
                         onChange={handleImport}
                         hidden
                     />
+                </div>
+            </Modal>
+            <Modal id="transfer-confirm" isOpen={showTransferConfirm} setIsOpen={setShowTransferConfirm} canClose={true} background={true}>
+                <div className="modal-content-div">
+                    <p>
+                        {t(`transfer.confirmation`)}
+                    </p>
+                </div>
+                {confirmProfile}
+                <div className="button-row">
+                    <button className="modal-content-div" onClick={() => setShowTransferConfirm(false)}>
+                        <p>{t(`transfer.no`)}</p>
+                    </button>
+                    <button className="modal-content-div" onClick={() => {handleImportConfirm(); setShowTransferConfirm(false)}}>
+                        <p>{t(`transfer.yes`)}</p>
+                    </button>
                 </div>
             </Modal>
         </>

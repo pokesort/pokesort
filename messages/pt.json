@@ -82,7 +82,11 @@
             "description": "Salve todos os seus dados do Pokesort para transferir entre dispositivos.",
             "export": "Exportar",
             "import": "Importar",
-            "invalid": "Este não é um arquivo de dados válido do Pokesort"
+            "invalid": "Este não é um arquivo de dados válido do Pokesort",
+
+            "confirmation": "Restaurar os dados deste perfil? Todo o seu progresso será substituído.",
+            "yes": "Sim",
+            "no": "Não"
         }
     },
     "metadata": {

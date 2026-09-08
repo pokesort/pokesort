@@ -82,7 +82,11 @@
             "description": "Save all your Pokesort data to transfer between devices.",
             "export": "Export",
             "import": "Import",
-            "invalid": "This is not a valid Pokesort data file"
+            "invalid": "This is not a valid Pokesort data file",
+
+            "confirmation": "Restore data for this profile? All your progress will be overwritten.",
+            "yes": "Sim",
+            "no": "Não"
         }
     },
     "metadata": {
