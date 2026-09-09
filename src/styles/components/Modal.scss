@@ -3,7 +3,7 @@
 div.modal-background {
     position: fixed;
     top: 0;
-    z-index: 50;
+    z-index: 100;
 
     display: flex;
     justify-content: center;
@@ -67,6 +67,8 @@ section.modal {
     .modal-title {
         position: sticky;
         top: 0;
+        text-transform: capitalize;
+        z-index: 50;
     }
     
     div.modal-content {

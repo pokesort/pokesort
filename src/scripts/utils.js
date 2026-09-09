@@ -128,6 +128,8 @@ export const WEIGHT_VALUES = {
   // habitat: 1,
 };
 
+export const MAX_POKEMON_ID = 1025;
+
 export const REGIONALS = ['-alola', '-galar', '-hisui', '-paldea'];
 
 export const getNextRefresh = () => {
@@ -139,22 +141,27 @@ export const getNextRefresh = () => {
   return tomorrow;
 }
 
+/**
+ * @returns {Record<string, Array<string | number[]>>}
+ */
 export const parseChallengeSelectFields = () => {
-  let fields = CHALLENGE_FIELDS;
-  let result = {};
+  const fields = CHALLENGE_FIELDS;
+  /** @type {Record<string, Array<string | number[]>>} */
+  const result = {};
   let previous = [];
-  Object.keys(fields).forEach(challenge => {  
-      result[challenge] = Object.keys(fields[challenge]).filter(e => e=="categories"||!previous.includes(e));
-      previous = [...previous, ...result[challenge]];
 
-      var categoryIndex = result[challenge].indexOf("categories");
-      if (categoryIndex !== -1) {
-        result[challenge][categoryIndex] = CHALLENGE_CATEGORIES[challenge]
-      }
+  Object.keys(fields).forEach((challenge) => {
+    result[challenge] = Object.keys(fields[challenge]).filter((e) => e === 'categories' || !previous.includes(e));
+    previous = [...previous, ...result[challenge]];
+
+    const categoryIndex = result[challenge].indexOf('categories');
+    if (categoryIndex !== -1) {
+      result[challenge][categoryIndex] = CHALLENGE_CATEGORIES[challenge];
+    }
   });
 
   return result;
-}
+};
 
 export const randomInRange = (min, max) =>
   Math.floor(Math.random() * (max - min + 1)) + min;
@@ -367,23 +374,36 @@ export function adjustDateTime(date) {
   return date;
 }
 
+/**
+ * @param {Array<string | number>} ids
+ * @returns {{ status: number, shiny?: string[] } | null}
+ */
 export const getPuzzleStatus = (ids) => {
+  /** @type {{ status: number, shiny?: string[] } | null} */
   let data = null;
 
-  ids.forEach(id => {
-      const userData = localStorage.getItem(`s_${id}`);
-      if (!userData) return;
+  ids.forEach((id) => {
+    const userData = localStorage.getItem(`s_${id}`);
+    if (!userData) return;
 
-      if (!data) data = {status: -1};
-      
-      const parsed = JSON.parse(userData);
-      if (parsed.shiny != undefined && parsed.shiny.length > 0) {
-          data["shiny"] = parsed.shiny;
-      }
-      if (parsed.status > data.status) {
-          data["status"] = parsed.status;
-      }
-  })
+    if (!data) data = { status: -1 };
+
+    const parsed = JSON.parse(userData);
+    if (parsed.shiny != undefined && parsed.shiny.length > 0) {
+      data.shiny = parsed.shiny;
+    }
+    if (parsed.status > data.status) {
+      data.status = parsed.status;
+    }
+  });
 
   return data;
+};
+
+export const getDailyPokemon = () => {
+  const now = new Date();
+
+  let id = `${Math.ceil((now.getYear()*10)/now.getMonth())+now.getDate()}`
+
+  return id;
 }

@@ -18,3 +18,10 @@ export class NotEnoughFieldsError extends Error {
     this.name = "NotEnoughFieldsError";
   }
 }
+
+export class InvalidTransferDataError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "InvalidTransferDataError";
+  }
+}
