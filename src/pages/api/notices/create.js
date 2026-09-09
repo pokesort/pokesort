@@ -3,7 +3,6 @@ import { getNoticeModel } from '@/src/models/Notice';
 
 export default async function handler(req, res) {
 
-  await connect();
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed' });
@@ -12,9 +11,14 @@ export default async function handler(req, res) {
   try {
     await connect();
     const conn = getDb();
+
     const Notice = getNoticeModel(conn);
 
-    const notice = new Notice(req.body);
+    let { body } = req;
+
+    if (typeof body === 'string')  body = JSON.parse(body);
+
+    const notice = new Notice(body);
 
     await notice.validate();
 
