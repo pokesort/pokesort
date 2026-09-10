@@ -32,21 +32,25 @@ export default function Profile({ profileOpen, setProfileOpen, profile, setProfi
     const [showTransferConfirm, setShowTransferConfirm] = useState<boolean>(false);
     const [transferData, setTransferData] = useState<TransferData>({});
 
+    const saveProfile = () => {
+        setError(null);
+        const body = form.getValues();
+        setProfile({
+            name: body.name,
+            partner: body.partner
+        } as ProfileData);
+    }
+
     useEffect(() => {
         if (profileOpen == true) {
             form.reset(profile)
         } else {
-            setError(null);
-            const body = form.getValues();
-            setProfile({
-                name: body.name,
-                partner: body.partner
-            } as ProfileData);
+            saveProfile();
         }
     }, [profileOpen]);
 
     const handleExport = async () => {
-        setError(null);
+        saveProfile();
         exportData();
     }
 

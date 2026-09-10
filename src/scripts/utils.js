@@ -141,22 +141,27 @@ export const getNextRefresh = () => {
   return tomorrow;
 }
 
+/**
+ * @returns {Record<string, Array<string | number[]>>}
+ */
 export const parseChallengeSelectFields = () => {
-  let fields = CHALLENGE_FIELDS;
-  let result = {};
+  const fields = CHALLENGE_FIELDS;
+  /** @type {Record<string, Array<string | number[]>>} */
+  const result = {};
   let previous = [];
-  Object.keys(fields).forEach(challenge => {
-    result[challenge] = Object.keys(fields[challenge]).filter(e => e == "categories" || !previous.includes(e));
+
+  Object.keys(fields).forEach((challenge) => {
+    result[challenge] = Object.keys(fields[challenge]).filter((e) => e === 'categories' || !previous.includes(e));
     previous = [...previous, ...result[challenge]];
 
-    var categoryIndex = result[challenge].indexOf("categories");
+    const categoryIndex = result[challenge].indexOf('categories');
     if (categoryIndex !== -1) {
-      result[challenge][categoryIndex] = CHALLENGE_CATEGORIES[challenge]
+      result[challenge][categoryIndex] = CHALLENGE_CATEGORIES[challenge];
     }
   });
 
   return result;
-}
+};
 
 export const randomInRange = (min, max) =>
   Math.floor(Math.random() * (max - min + 1)) + min;
@@ -369,10 +374,15 @@ export function adjustDateTime(date) {
   return date;
 }
 
+/**
+ * @param {Array<string | number>} ids
+ * @returns {{ status: number, shiny?: string[] } | null}
+ */
 export const getPuzzleStatus = (ids) => {
+  /** @type {{ status: number, shiny?: string[] } | null} */
   let data = null;
 
-  ids.forEach(id => {
+  ids.forEach((id) => {
     const userData = localStorage.getItem(`s_${id}`);
     if (!userData) return;
 
@@ -380,67 +390,68 @@ export const getPuzzleStatus = (ids) => {
 
     const parsed = JSON.parse(userData);
     if (parsed.shiny != undefined && parsed.shiny.length > 0) {
-      data["shiny"] = parsed.shiny;
+      data.shiny = parsed.shiny;
     }
     if (parsed.status > data.status) {
-      data["status"] = parsed.status;
+      data.status = parsed.status;
     }
-  })
+  });
 
   return data;
-}
+};
 
 //Gerar a partir de uma formula, precisa tratar mes e ano
-export const getDailyPokemon = () => {
-  const now = new Date();
-  // const now = new Date("2026-12-31T12:00:00Z");
-
-  let id = `${Math.ceil((now.getYear() * 10) / (now.getMonth() + 1)) + now.getDate()}`
-
-  // console.log(`Current date: ${now.toISOString()}`);
-
-  // console.log("getYear():", now.getYear());
-
-  // console.log("getYear() * 10:", now.getYear() * 10);
-
-  // console.log("getMonth():", now.getMonth() + 1);
-
-  // console.log("(getYear() * 10) / getMonth():", (now.getYear() * 10) / (now.getMonth() + 1));
-
-  // console.log("Math.ceil(...):", Math.ceil((now.getYear() * 10) / (now.getMonth() + 1)));
-
-  // console.log("getDate():", now.getDate());
-
-  // console.log(
-  //   "Resultado final:",
-  //   Math.ceil((now.getYear() * 10) / (now.getMonth() + 1)) + now.getDate()
-  // );
-  // console.log(`Generated daily puzzle ID: ${id}`);
-
-  return id;
-}
-
-//Gerar pokemon desde o nascimento do jogo (1 a 1025) e reiniciar no dia seguinte (Pode ser no meio do ano)
 // export const getDailyPokemon = () => {
-
-//   const startDate = new Date(2026, 0, 1);
 //   const now = new Date();
+//   //01/06/2026
+//   //31/07/2026
+//   // const now = new Date("2026-06-01T12:00:00Z");
+//   // const now = new Date("2026-07-30T12:00:00Z");
 
-//   const millisecondsPerDay = 1000 * 60 * 60 * 24;
+//   let id = `${Math.ceil((now.getYear() * 10) / (now.getMonth() + 1)) + now.getDate()}`
 
-//   const daysSinceStart = Math.floor(
-//     (now.getTime() - startDate.getTime()) / millisecondsPerDay
-//   );
+//   // console.log(`Current date: ${now.toISOString()}`);
 
-//   const id = `${(daysSinceStart % 1025) + 1}`;
+//   // console.log("getYear():", now.getYear());
 
-//   console.log("Current date:", now.toISOString());
-//   console.log("Start date:", startDate.toISOString());
-//   console.log("Days since 01/01/2026:", daysSinceStart);
-//   console.log("Generated daily puzzle ID:", id);
+//   // console.log("getYear() * 10:", now.getYear() * 10);
+
+//   // console.log("getMonth():", now.getMonth() + 1);
+
+//   // console.log("(getYear() * 10) / getMonth():", (now.getYear() * 10) / (now.getMonth() + 1));
+
+//   // console.log("Math.ceil(...):", Math.ceil((now.getYear() * 10) / (now.getMonth() + 1)));
+
+//   // console.log("getDate():", now.getDate());
+
+//   // console.log(
+//   //   "Resultado final:",
+//   //   Math.ceil((now.getYear() * 10) / (now.getMonth() + 1)) + now.getDate()
+//   // );
+//   // console.log(`Generated daily puzzle ID: ${id}`);
 
 //   return id;
 // }
+
+//Gerar pokemon desde o nascimento do jogo (1 a 1025) e reiniciar no dia seguinte (Pode ser no meio do ano)
+export const getDailyPokemon = () => {
+
+  const startDate = new Date(2026, 0, 1);
+  const now = new Date();
+  //data do reset
+  // const now = new Date("2028-10-22T12:00:00Z");
+
+
+  const millisecondsPerDay = 1000 * 60 * 60 * 24;
+
+  const daysSinceStart = Math.floor(
+    (now.getTime() - startDate.getTime()) / millisecondsPerDay
+  );
+
+  const id = `${(daysSinceStart % 1025) + 1}`;
+
+  return id;
+}
 
 //Gerar sempre o mesmo ao longo do ano (1 a 365) e reiniciar no próximo ano
 // export const getDailyPokemon = () => {
