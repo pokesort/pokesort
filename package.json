@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "ws": "node --env-file=.env --import=tsx server/websocket.ts"
+    "ws": "node --env-file=.env --import=tsx server/websocket.ts",
+    "test": "tsx scripts/run-tests.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
