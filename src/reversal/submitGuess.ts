@@ -25,31 +25,37 @@ export async function submitGuess(room: Room, playerId: string, pokemonIds: numb
 
   if (pokemonIds.length !== 4) return invalidSubmitGuessResult;
 
-  const selectedPokemons = game.board.filter((pokemon) => pokemonIds.includes(pokemon.id));
+  const selectedPokemons = game.board.filter(
+    (pokemon) => pokemonIds.includes(pokemon.id)
+  );
 
   if (selectedPokemons.length !== 4) return invalidSubmitGuessResult;
 
   const orderGuess = room.nextGuessOrder++;
-  const result = await validateGuess(selectedPokemons, characteristics);
-  if (!result.valid) return invalidSubmitGuessResult;
 
-  const player = game.players.find((player) => player.id === playerId);
-
-  if (!player) return invalidSubmitGuessResult;
-
-  //Resolvendo empate
   const pendingGuess: PendingGuess = {
     playerId,
     pokemonIds,
     characteristics,
-    points: result.points,
+    points: 0,
     timestamp: Date.now(),
     order: orderGuess,
   };
 
   room.pendingGuesses.push(pendingGuess);
 
+  const result = await validateGuess(
+    selectedPokemons,
+    characteristics
+  );
+
+  const player = game.players.find((player) => player.id === playerId);
+
+  if (!player) return invalidSubmitGuessResult;
+
   await waitForConcurrentGuesses();
+
+  if (!room.pendingGuesses.includes(pendingGuess)) return invalidSubmitGuessResult;
 
   const opponentGuess = room.pendingGuesses.find((guess) => guess.playerId !== pendingGuess.playerId);
 
@@ -64,7 +70,6 @@ export async function submitGuess(room: Room, playerId: string, pokemonIds: numb
       if (guessToRemove === pendingGuess) return invalidSubmitGuessResult;
     }
   }
-  //
 
   player.score += result.points;
 
@@ -124,10 +129,10 @@ function removePendingGuess(room: Room, pendingGuess: PendingGuess): void {
 
 function tiebreaker(pendingGuess: PendingGuess, opponentGuess: PendingGuess): PendingGuess {
 
-    if (pendingGuess.points > opponentGuess.points) return opponentGuess;
+  if (pendingGuess.points > opponentGuess.points) return opponentGuess;
 
-    if (pendingGuess.points < opponentGuess.points) return pendingGuess;
+  if (pendingGuess.points < opponentGuess.points) return pendingGuess;
 
-    // Se os pontos forem iguais, desempate pelo timestamp, retorna quem chegou por ultimo
-    return pendingGuess.order > opponentGuess.order ? pendingGuess : opponentGuess;
+  // Se os pontos forem iguais, desempate pelo timestamp, retorna quem chegou por ultimo
+  return pendingGuess.order > opponentGuess.order ? pendingGuess : opponentGuess;
 }

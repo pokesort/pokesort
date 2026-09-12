@@ -2,11 +2,23 @@ import type { ConnectedPlayer } from "./player";
 import type { GameState } from "../src/reversal/types";
 import { createGame } from "../src/reversal/createGame";
 import {getPokemonBoard} from "../src/scripts/server_utils";
+import { GuessCharacteristic } from "@/src/models/types";
+
+export interface PendingGuess {
+    playerId: string;
+    pokemonIds: number[];
+    characteristics: GuessCharacteristic[];
+    points: number;
+    timestamp: number;
+    order: number;
+}
 
 export interface Room {
   id: string;
   players: Map<string, ConnectedPlayer>;
   game?: GameState;
+  pendingGuesses: PendingGuess[];
+  nextGuessOrder: number;
 }
 
 let nextRoomId = 1;
@@ -15,6 +27,8 @@ export function createRoom(rooms: Map<string, Room>): Room {
   const room: Room = {
     id: `room-${nextRoomId}`,
     players: new Map(),
+    pendingGuesses: [],
+    nextGuessOrder: 0,
   };
 
   nextRoomId++;
@@ -77,6 +91,7 @@ export async function startGame(room: Room): Promise<void> {
   const pokemonBoard = await getPokemonBoard(20);
 
   room.game = createGame(playerIds, pokemonBoard);
+  room.pendingGuesses = [];
 }
 
 export async function restartGame(room: Room): Promise<boolean> {
@@ -89,5 +104,18 @@ export async function restartGame(room: Room): Promise<boolean> {
 
   //Garantir que n tem como falhar
   room.game = createGame(playerIds, pokemonBoard);
+  room.pendingGuesses = [];
   return true;
+}
+
+export async function resetGameForTest(room: Room): Promise<boolean> {
+    if (room.players.size !== 2) return false;
+
+    const playerIds = Array.from(room.players.keys());
+    const pokemonBoard = await getPokemonBoard(40);
+
+    room.game = createGame(playerIds, pokemonBoard);
+    room.pendingGuesses = [];
+
+    return true;
 }

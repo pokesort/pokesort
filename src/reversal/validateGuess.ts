@@ -2,13 +2,13 @@ import { CHARACTERISTIC_DEFINITIONS, GuessCharacteristic, Pokemon } from "../mod
 import { filterPokemons } from "../scripts/server_utils";
 
 export interface GuessResult {
-  valid: boolean;
-  points: number;
+    valid: boolean;
+    points: number;
 }
 
 export const falseResults: GuessResult = {
-  valid: false,
-  points: 0,
+    valid: false,
+    points: 0,
 };
 
 export async function validateGuess(selectedPokemon: Pokemon[], guess: GuessCharacteristic[]): Promise<GuessResult> {
@@ -33,7 +33,7 @@ export async function validateGuess(selectedPokemon: Pokemon[], guess: GuessChar
 
     const filteredPokemon = await filterPokemons(query);
 
-    const filteredIds = new Set(filteredPokemon.map((pokemon:{id: number}) => pokemon.id));
+    const filteredIds = new Set(filteredPokemon.map((pokemon: { id: number }) => pokemon.id));
 
     if (!selectedPokemon.every((pokemon) => filteredIds.has(pokemon.id))) return falseResults;
 
@@ -50,12 +50,12 @@ export async function validateGuess(selectedPokemon: Pokemon[], guess: GuessChar
 }
 
 function combinationsIsValid(guess: GuessCharacteristic[]): boolean {
-  const combinations = new Set(
-    guess.map(
-      (characteristic) =>
-        `${characteristic.type}:${characteristic.value}`
-    )
-  );
+    const combinations = new Set(
+        guess.map(
+            (characteristic) =>
+                `${characteristic.type}:${characteristic.value}`
+        )
+    );
 
-  return combinations.size === guess.length;
+    return combinations.size === guess.length;
 }
