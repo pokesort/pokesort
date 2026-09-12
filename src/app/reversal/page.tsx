@@ -32,8 +32,6 @@ export default function Home() {
         socket.onmessage = (event) => {
             const data = JSON.parse(event.data);
 
-            console.log("Message from server:", data);
-
             if (data.type === "connected") setPlayerId(data.playerId);
 
             if (data.type === "gameStarted") setGameState(data.game);
@@ -51,7 +49,6 @@ export default function Home() {
             }
 
             if (data.type === "gameStateUpdated") {
-                console.log("Game state updated:", data.game);
                 setGameState(data.game);
                 setSelectedPokemon([]);
                 setSelectedCharacteristics([]);
@@ -59,7 +56,6 @@ export default function Home() {
             }
 
             if (data.type === "opponentLeft") {
-                console.log("Opponent left the game");
                 setGameState(null);
                 setSelectedPokemon([]);
                 setSelectedCharacteristics([]);
@@ -83,7 +79,6 @@ export default function Home() {
 
     function submitGuess() {
 
-        console.log("submitGuess called");
         if (submittingGuess) return;
 
         const socket = socketRef.current;

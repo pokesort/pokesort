@@ -44,8 +44,6 @@ wss.on("connection", async (socket) => {
 
         await startGame(room);
 
-        console.log("Game created:", room.game);
-
         sendToRoom(room, {
             type: "gameStarted",
             game: room.game!,
