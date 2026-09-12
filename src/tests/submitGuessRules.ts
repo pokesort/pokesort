@@ -1,10 +1,8 @@
-import { time } from "console";
-
 interface PendingGuess {
     playerId: string;
     pokemonIds: number[];
     points: number;
-    timestamp: number;
+    order: number;
 }
 
 const CONCURRENCY_WINDOW_MS = 100;
@@ -71,8 +69,8 @@ function tiebreaker(pendingGuess: PendingGuess, opponentGuess: PendingGuess): Pe
 
     if (pendingGuess.points < opponentGuess.points) return pendingGuess;
 
-    // Se os pontos forem iguais, desempate pelo timestamp, retorna quem chegou por ultimo
-    return pendingGuess.timestamp > opponentGuess.timestamp ? pendingGuess : opponentGuess;
+    // Se os pontos forem iguais, desempate pelo order, retorna quem chegou por ultimo
+    return pendingGuess.order > opponentGuess.order ? pendingGuess : opponentGuess;
 }
 
 function test(
@@ -91,20 +89,20 @@ function createGuess(
     playerId: string,
     pokemonIds: number[],
     points: number,
-    timestamp: number = Date.now()
+    order: number
 ): PendingGuess {
     return {
         playerId,
         pokemonIds,
         points,
-        timestamp
+        order
     };
 }
 
 // 1. Overlap: jogador atual tem mais pontos
 {
-    const player1 = createGuess("P1", [1, 2, 3, 4], 5);
-    const player2 = createGuess("P2", [3, 4, 5, 6], 3);
+    const player1 = createGuess("P1", [1, 2, 3, 4], 5, 1);
+    const player2 = createGuess("P2", [3, 4, 5, 6], 3, 2);
 
     const pending = [player1, player2];
 
@@ -119,8 +117,8 @@ function createGuess(
 
 // 2. Overlap: jogador atual tem menos pontos
 {
-    const player1 = createGuess("P1", [1, 2, 3, 4], 3);
-    const player2 = createGuess("P2", [3, 4, 5, 6], 5);
+    const player1 = createGuess("P1", [1, 2, 3, 4], 3, 1);
+    const player2 = createGuess("P2", [3, 4, 5, 6], 5, 2);
 
     const pending = [player1, player2];
 
@@ -135,8 +133,8 @@ function createGuess(
 
 // 3. Sem overlap
 {
-    const player1 = createGuess("P1", [1, 2, 3, 4], 3);
-    const player2 = createGuess("P2", [5, 6, 7, 8], 5);
+    const player1 = createGuess("P1", [1, 2, 3, 4], 3, 1);
+    const player2 = createGuess("P2", [5, 6, 7, 8], 5, 2);
 
     const pending = [player1, player2];
 
@@ -183,7 +181,7 @@ function createGuess(
 
 // 5. Palpite sozinho
 {
-    const player1 = createGuess("P1", [1, 2, 3, 4], 5);
+    const player1 = createGuess("P1", [1, 2, 3, 4], 5, 1);
 
     const pending = [player1];
 

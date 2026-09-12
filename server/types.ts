@@ -45,9 +45,14 @@ type RestartGameMessage = {
   type: "restartGame";
 };
 
+type ResetGameForTestMessage = {
+  type: "resetGameForTest";
+};
+
 export type ClientMessage =
   | SubmitGuessMessage
-  | RestartGameMessage;
+  | RestartGameMessage
+  | ResetGameForTestMessage;
 
 export type ServerMessage =
   | ConnectedMessage

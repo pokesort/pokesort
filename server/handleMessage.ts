@@ -1,4 +1,4 @@
-import { restartGame, type Room } from "./room";
+import { resetGameForTest, restartGame, type Room } from "./room";
 import type { ConnectedPlayer } from "./player";
 import type { ClientMessage } from "./types";
 import { submitGuess } from "../src/reversal/submitGuess";
@@ -24,7 +24,7 @@ export async function handleMessage(player: ConnectedPlayer, room: Room, message
     if (!room.game) return;
 
     const result = await submitGuess(
-      room.game,
+      room,
       player.playerId,
       message.elements,
       message.characteristics
@@ -43,5 +43,17 @@ export async function handleMessage(player: ConnectedPlayer, room: Room, message
       type: "gameStateUpdated",
       game: room.game,
     });
+  }
+
+  if (message.type === "resetGameForTest") {
+    const reset = await resetGameForTest(room);
+    if (!reset) return;
+
+    sendToRoom(room, {
+      type: "gameStarted",
+      game: room.game!,
+    });
+
+    return;
   }
 }
