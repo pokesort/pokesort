@@ -23,6 +23,7 @@ export interface GuessResultMessage {
   valid: boolean;
   points: number;
   removedPokemon: number[];
+  message: string;
 }
 
 export interface GameStateUpdatedMessage {

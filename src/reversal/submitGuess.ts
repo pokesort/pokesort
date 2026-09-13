@@ -7,12 +7,28 @@ export interface SubmitGuessResult {
   valid: boolean;
   points: number;
   removedPokemon: number[];
+  message: string;
 }
 
 export const invalidSubmitGuessResult: SubmitGuessResult = {
   valid: false,
   points: 0,
   removedPokemon: [],
+  message: "Palpite inválido.",
+};
+
+export const defeatSubmitGuessResult: SubmitGuessResult = {
+  valid: false,
+  points: 0,
+  removedPokemon: [],
+  message: "Palpites acirrados, perdeu a disputa.",
+};
+
+export const successSubmitGuessResult: SubmitGuessResult = {
+  valid: true,
+  points: 0,
+  removedPokemon: [],
+  message: "",
 };
 
 const CONCURRENCY_WINDOW_MS = 500;
@@ -88,7 +104,7 @@ export async function submitGuess(room: Room, playerId: string, pokemonIds: numb
 
       removePendingGuess(room, guessToRemove);
 
-      if (guessToRemove === pendingGuess) return invalidSubmitGuessResult;
+      if (guessToRemove === pendingGuess) return defeatSubmitGuessResult;
     }
   }
 
@@ -102,11 +118,8 @@ export async function submitGuess(room: Room, playerId: string, pokemonIds: numb
 
   removePendingGuess(room, pendingGuess);
 
-  return {
-    valid: true,
-    points: result.points,
-    removedPokemon: pokemonIds,
-  };
+  successSubmitGuessResult.message = `Palpite válido. +${result.points} pontos`;
+  return successSubmitGuessResult;
 }
 
 function determineResult(game: GameState): void {

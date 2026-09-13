@@ -35,6 +35,7 @@ export async function handleMessage(player: ConnectedPlayer, room: Room, message
       valid: result.valid,
       points: result.points,
       removedPokemon: result.removedPokemon,
+      message: result.message,
     });
 
     if (!result.valid) return;

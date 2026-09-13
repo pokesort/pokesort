@@ -17,7 +17,7 @@ export default function Home() {
     const [selectedPokemon, setSelectedPokemon] = useState<number[]>([]);
     const [selectedCharacteristics, setSelectedCharacteristics] = useState<GuessCharacteristic[]>([]);
     const [activeCharacteristic, setActiveCharacteristic] = useState<CharacteristicType | null>(null);
-    const [guessResult, setGuessResult] = useState<{ valid: boolean; points: number; } | null>(null);
+    const [guessResult, setGuessResult] = useState<{ valid: boolean; points: number; message: string } | null>(null);
     const [submittingGuess, setSubmittingGuess] = useState(false);
 
     useEffect(() => {
@@ -44,6 +44,7 @@ export default function Home() {
                 setGuessResult({
                     valid: data.valid,
                     points: data.points,
+                    message: data.message
                 });
 
             }
@@ -385,15 +386,7 @@ export default function Home() {
 
                     {guessResult && (
                         <div className="guess-result">
-                            {guessResult.valid ? (
-                                <p>
-                                    Palpite correto! +{guessResult.points} pontos.
-                                </p>
-                            ) : (
-                                <p>
-                                    Palpite inválido.
-                                </p>
-                            )}
+                            <p>{guessResult.message}</p>
                         </div>
                     )}
 
