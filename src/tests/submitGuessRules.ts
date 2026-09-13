@@ -69,7 +69,7 @@ function tiebreaker(pendingGuess: PendingGuess, opponentGuess: PendingGuess): Pe
 
     if (pendingGuess.points < opponentGuess.points) return pendingGuess;
 
-    // Se os pontos forem iguais, desempate pelo order, retorna quem chegou por ultimo
+    // Se os pontos forem iguais, desempate pela ordem de chegada, retorna o perdedor (quem chegou por ultimo)
     return pendingGuess.order > opponentGuess.order ? pendingGuess : opponentGuess;
 }
 
@@ -157,7 +157,7 @@ function createGuess(
     const result = arbitrateGuess(pending, player1);
 
     test(
-        "Overlap com empate - palpite atual vence",
+        "Overlap com empate - P1 chegou primeiro e vence",
         true,
         result
     );
@@ -173,7 +173,7 @@ function createGuess(
     const result = arbitrateGuess(pending, player1);
 
     test(
-        "Overlap com empate - palpite atual vence",
+        "Overlap com empate - P2 chegou primeiro e vence",
         false,
         result
     );

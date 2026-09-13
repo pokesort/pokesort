@@ -15,7 +15,7 @@ export const invalidSubmitGuessResult: SubmitGuessResult = {
   removedPokemon: [],
 };
 
-const CONCURRENCY_WINDOW_MS = 100;
+const CONCURRENCY_WINDOW_MS = 500;
 
 export async function submitGuess(room: Room, playerId: string, pokemonIds: number[], characteristics: GuessCharacteristic[])
   : Promise<SubmitGuessResult> {
@@ -44,11 +44,25 @@ export async function submitGuess(room: Room, playerId: string, pokemonIds: numb
 
   room.pendingGuesses.push(pendingGuess);
 
-  const result = await validateGuess(
-    selectedPokemons,
-    characteristics
-  );
+  // console.log(
+  //   `[VALIDAÇÃO INÍCIO] player=${playerId} ` +
+  //   `pokemon=${pokemonIds.join(",")} ` +
+  //   `characteristics=${JSON.stringify(characteristics)}`
+  // );
 
+  const result = await validateGuess(selectedPokemons, characteristics);
+
+  if (!result.valid) {
+    removePendingGuess(room, pendingGuess);
+    return invalidSubmitGuessResult;
+  }
+
+  pendingGuess.points = result.points;
+
+  // console.log(
+  //   `[VALIDAÇÃO FIM] player=${playerId} ` +
+  //   `valid=${result.valid} points=${result.points}`
+  // );
   const player = game.players.find((player) => player.id === playerId);
 
   if (!player) return invalidSubmitGuessResult;
@@ -60,6 +74,13 @@ export async function submitGuess(room: Room, playerId: string, pokemonIds: numb
   const opponentGuess = room.pendingGuesses.find((guess) => guess.playerId !== pendingGuess.playerId);
 
   if (opponentGuess) {
+
+    // console.log(
+    //   `[ARBITRAGEM] player=${pendingGuess.playerId} ` +
+    //   `points=${pendingGuess.points} ` +
+    //   `opponent=${opponentGuess?.playerId} ` +
+    //   `opponentPoints=${opponentGuess?.points}`
+    // );
     const hasOverlap = hasPokemonOverlap(pendingGuess.pokemonIds, opponentGuess.pokemonIds);
 
     if (hasOverlap) {
@@ -129,10 +150,17 @@ function removePendingGuess(room: Room, pendingGuess: PendingGuess): void {
 
 function tiebreaker(pendingGuess: PendingGuess, opponentGuess: PendingGuess): PendingGuess {
 
+  // console.log(
+  //   `[TIEBREAKER] player=${pendingGuess.playerId} ` +
+  //   `points=${pendingGuess.points} ` +
+  //   `opponent=${opponentGuess.playerId} ` +
+  //   `opponentPoints=${opponentGuess.points}`
+  // );
+
   if (pendingGuess.points > opponentGuess.points) return opponentGuess;
 
   if (pendingGuess.points < opponentGuess.points) return pendingGuess;
 
-  // Se os pontos forem iguais, desempate pelo timestamp, retorna quem chegou por ultimo
+  // Se os pontos forem iguais, desempate pela ordem de chegada, retorna o perdedor (quem chegou por ultimo)
   return pendingGuess.order > opponentGuess.order ? pendingGuess : opponentGuess;
 }

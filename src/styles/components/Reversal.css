@@ -99,6 +99,10 @@
 
 .game-actions {
     margin-top: 24px;
+
+    button {
+        margin-right: 12px;
+    }
 }
 
 .guess-result {

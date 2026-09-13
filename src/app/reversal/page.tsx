@@ -148,6 +148,12 @@ export default function Home() {
         });
     }
 
+    const selectedPoints = selectedCharacteristics.reduce(
+        (total, characteristic) =>
+            total + CHARACTERISTIC_DEFINITIONS[characteristic.type].points,
+        0
+    );
+
     return (
         <main className="reversal-page">
             {/* Mudar o nome */}
@@ -369,6 +375,12 @@ export default function Home() {
                                 ? "Enviando..."
                                 : "Enviar palpite"}
                         </button>
+
+                        {selectedCharacteristics.length > 0 && (
+                            <span>
+                                Possíveis pontos: {selectedPoints}
+                            </span>
+                        )}
                     </div>
 
                     {guessResult && (
