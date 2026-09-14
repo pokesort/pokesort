@@ -2,10 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { GameState } from "../../reversal/types";
-import type { GuessCharacteristic, CharacteristicType } from "../../models/types";
-
-import { CHARACTERISTIC_DEFINITIONS } from "../../models/types";
-import { FIELD_OPTIONS } from "../../scripts/utils";
+import { CHALLENGE_FIELDS, getCharacteristicPoints, getAllCharacteristicTypes, getCharacteristicOptions } from "../../models/types";
+import type { ChallengeFieldType, GuessCharacteristic } from "../../models/types";
 
 import "@/src/styles/components/Reversal.css";
 
@@ -16,7 +14,7 @@ export default function Home() {
     const [game, setGameState] = useState<GameState | null>(null);
     const [selectedPokemon, setSelectedPokemon] = useState<number[]>([]);
     const [selectedCharacteristics, setSelectedCharacteristics] = useState<GuessCharacteristic[]>([]);
-    const [activeCharacteristic, setActiveCharacteristic] = useState<CharacteristicType | null>(null);
+    const [activeCharacteristic, setActiveCharacteristic] = useState<ChallengeFieldType | null>(null);
     const [guessResult, setGuessResult] = useState<{ valid: boolean; points: number; message: string } | null>(null);
     const [submittingGuess, setSubmittingGuess] = useState(false);
     const [swapRequestedBy, setSwapRequestedBy] = useState<string[]>([]);
@@ -176,13 +174,17 @@ export default function Home() {
 
     const selectedPoints = selectedCharacteristics.reduce(
         (total, characteristic) =>
-            total + CHARACTERISTIC_DEFINITIONS[characteristic.type].points,
+            total + getCharacteristicPoints(characteristic),
         0
     );
 
     const isWaitingForBoardSwap = playerId
         ? swapRequestedBy.includes(playerId)
         : false;
+
+    const activeCharacteristicOptions = activeCharacteristic
+        ? getCharacteristicOptions(activeCharacteristic)
+        : undefined;
 
     return (
         <main className="reversal-page">
@@ -220,7 +222,7 @@ export default function Home() {
                         </button>
                     )}
                     <p>Pokemons on board: {game.board.length}</p>
-                    <p>Pokemons on board: {game.reserve.length}</p>
+                    <p>Pokemons on reserve: {game.reserve.length}</p>
                     <div className="players">
                         {game.players.map((player) => (
                             <p key={player.id}>
@@ -279,14 +281,10 @@ export default function Home() {
                             <h2>Características</h2>
 
                             <div className="characteristic-types">
-                                {Object.keys(CHARACTERISTIC_DEFINITIONS).map((type) => (
+                                {getAllCharacteristicTypes().map((type) => (
                                     <button
                                         key={type}
-                                        onClick={() =>
-                                            setActiveCharacteristic(
-                                                type as CharacteristicType
-                                            )
-                                        }
+                                        onClick={() => setActiveCharacteristic(type)}
                                     >
                                         {type}
                                     </button>
@@ -297,8 +295,11 @@ export default function Home() {
                                 <div className="characteristic-values">
                                     <h3>{activeCharacteristic}</h3>
 
-                                    {Array.isArray(FIELD_OPTIONS[activeCharacteristic]) ? (
-                                        FIELD_OPTIONS[activeCharacteristic].map((value) => {
+                                    {(Array.isArray(activeCharacteristicOptions)) ? (
+                                        activeCharacteristicOptions.map((value) => {
+
+                                            const stringValue = String(value);
+
                                             const selected = selectedCharacteristics.some(
                                                 (characteristic) =>
                                                     characteristic.type === activeCharacteristic &&
@@ -307,18 +308,17 @@ export default function Home() {
 
                                             return (
                                                 <button
-                                                    key={value}
+                                                    key={stringValue}
                                                     disabled={selected || selectedCharacteristics.length >= 3}
-                                                    onClick={() => selectFieldValue(value)}
+                                                    onClick={() => selectFieldValue(stringValue)}
                                                 >
-                                                    {value}
+                                                    {stringValue}
                                                 </button>
                                             );
                                         })
                                     ) : (
                                         (() => {
-                                            const { min, max } =
-                                                FIELD_OPTIONS[activeCharacteristic];
+                                            const { min, max } = activeCharacteristicOptions as { min: number; max: number };
 
                                             const amount = max - min + 1;
 

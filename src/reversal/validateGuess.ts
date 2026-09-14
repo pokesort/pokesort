@@ -1,4 +1,4 @@
-import { CHARACTERISTIC_DEFINITIONS, GuessCharacteristic, Pokemon } from "../models/types";
+import {GuessCharacteristic, Pokemon, getCharacteristicPoints } from "../models/types";
 import { filterPokemons } from "../scripts/server_utils";
 
 export interface GuessResult {
@@ -18,7 +18,7 @@ export async function validateGuess(selectedPokemon: Pokemon[], guess: GuessChar
     if (!combinationsIsValid(guess)) return falseResults;
 
     for (const characteristic of guess) {
-        if (!CHARACTERISTIC_DEFINITIONS[characteristic.type]) {
+        if (getCharacteristicPoints(characteristic) === 0) {
             return falseResults;
         }
     }
@@ -39,7 +39,7 @@ export async function validateGuess(selectedPokemon: Pokemon[], guess: GuessChar
 
     const points = guess.reduce(
         (total, characteristic) =>
-            total + CHARACTERISTIC_DEFINITIONS[characteristic.type].points,
+            total + getCharacteristicPoints(characteristic),
         0
     );
 
