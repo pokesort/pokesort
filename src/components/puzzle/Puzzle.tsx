@@ -5,12 +5,11 @@ import React, { CSSProperties, useCallback, useEffect, useMemo, useRef, useState
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { useLocale } from 'next-intl';
 import { formatDate, isYesterday, shuffleArray, getNextRefresh, toTitleCase, decodeTips, randomInRange, isMobile } from '@/src/scripts/utils';
-import { useInView } from 'react-intersection-observer';
 import { useRouter } from 'next/navigation';
 
 import type { PuzzleData, PuzzleGroup } from '@/src/assets/types/PuzzleApiResponse';
 import "@/src/styles/components/Puzzle.scss";
-import PokemonBlock from '@/src/components/PuzzleBlock';
+import PokemonBlock from '@/src/components/puzzle/PuzzleBlock';
 import { GroupName, getNaturalGroupnames } from '@/src/components/GroupName';
 import Modal from '@/src/components/Modal';
 import Countdown from '@/src/components/Countdown';
@@ -24,12 +23,13 @@ import GridIcon from '@/src/components/svg/GridIcon';
 import LogsIcon from '@/src/components/svg/LogsIcon';
 import DexIcon from '@/src/components/svg/DexIcon';
 import helpLogsImage from '@/src/assets/images/help_logs.png';
-import DexView from './DexView';
-import PokeSprite from './PokeSprite';
-import ChallengeSelect from './forms/SelectChallenge';
+import DexView from '../DexView';
+import PokeSprite from '../PokeSprite';
+import ChallengeSelect from '../forms/SelectChallenge';
 import { useForm } from 'react-hook-form';
-import TipIcon from './svg/TipIcon';
-import AbandonIcon from './svg/AbandonIcon';
+import TipIcon from '../svg/TipIcon';
+import AbandonIcon from '../svg/AbandonIcon';
+import PuzzleTab from './PuzzleTab';
 
 const streakKey = 'u_dailystreak';
 const infiniteCount = 'u_infinitecount';
@@ -258,28 +258,6 @@ const VictoryModal = React.memo(({type, challenge=null, guesses, shinies, dateOg
     )
 })
 
-interface PuzzleTabProps {
-    setVisibleTab: React.Dispatch<React.SetStateAction<number>>;
-    tab: number;
-    children?: React.ReactNode;
-}
-
-const PuzzleTab = React.memo(({setVisibleTab, children, tab}: PuzzleTabProps) => {
-    const { ref: viewRef, inView } = useInView({ threshold: 0.1 });
-
-    useEffect(() => {
-        if (inView) {
-            setVisibleTab(tab);
-        }
-    }, [inView, tab]);
-    
-    return (
-        <li ref={viewRef} className="puzzle-tab" data-tab={tab}>
-            {children}
-        </li>
-    )
-})
-
 type PuzzleGuess = {
     type: 0 | 1 | 2; // guess | hint | dex
     accuracy: number;
@@ -443,8 +421,6 @@ const GuessLogs = React.memo(({guesses, setGuesses, availableTips, setAvailableT
 interface PuzzleGridProps {
     puzzle: PuzzleData;
     type:  'daily' | 'infinite';
-    pause: boolean,
-    setPause: (pause: boolean) => void;
     pokemons: any[];
     shinies: number[];
     dictionary: any;
@@ -460,9 +436,10 @@ interface PuzzleGridProps {
     logsRef: React.RefObject<HTMLElement | null>;
 }
 
-const PuzzleGrid = React.memo(({puzzle, type, pause, setPause, pokemons, shinies, dictionary, setGuesses, forcedGuesses=[], victoryOpen, setVictoryOpen, setCurrentDexView, scrollToTab, solvedGroupNames, resetAvailableTips, abandoned, logsRef}: PuzzleGridProps) => {
+const PuzzleGrid = React.memo(({puzzle, type, pokemons, shinies, dictionary, setGuesses, forcedGuesses=[], victoryOpen, setVictoryOpen, setCurrentDexView, scrollToTab, solvedGroupNames, resetAvailableTips, abandoned, logsRef}: PuzzleGridProps) => {
     const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
 
+    const [pause, setPause] = useState<boolean>(false);
     const [incorrectGuessIds, setIncorrectGuessIds] = useState<Set<number>>(new Set());
     const [correctGuessIds, setCorrectGuessIds] = useState<Set<number>>(new Set());
     const [solvedGroupIds, setSolvedGroupIds] = useState<Set<number>>(new Set());
@@ -803,7 +780,6 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
     const [forcedGuesses, setForcedGuesses] = useState<PuzzleGuess[]>([]);
     const [availableTips, setAvailableTips] = useState<number>(maxAvailableTips);
     const [refresh, setRefresh] = useState<boolean>(false);
-    const [pause, setPause] = useState<boolean>(false);
     const [shinies, setShinies] = useState<number[]>([]);
     const [challengeOptions, setChallengeOptions] = useState<Record<string, string>>();
 
@@ -1017,8 +993,6 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
                             <PuzzleGrid
                                 puzzle={puzzle}
                                 type={type}
-                                pause={pause}
-                                setPause={setPause}
                                 pokemons={pokemons}
                                 shinies={shinies}
                                 dictionary={dictionary}

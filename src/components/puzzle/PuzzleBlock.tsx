@@ -6,7 +6,7 @@ import { motion, AnimatePresence, Variants } from 'framer-motion';
 import clsx from 'clsx';
 
 import '@/src/styles/components/PokemonBlock.scss';
-import PokeSprite from './PokeSprite';
+import PokeSprite from '../PokeSprite';
 import ShinyGif from '@/src/assets/images/shiny.gif';
 
 interface BlockProps {
@@ -18,6 +18,7 @@ interface BlockProps {
     isCorrect?: boolean;
     isIncorrect?: boolean;
     isAbandoned?: boolean;
+    isAvailable?: boolean;
     onSelect: (id: number) => void;
     onPress: (id: number) => void;
     special?: number;
@@ -46,7 +47,7 @@ function getSurname(name: string, species_name: string) {
     return surname;
 }
 
-export default React.memo(function PuzzleBlock({ pokemon, shinies, multiselect, isSelected, isSolved=false, isCorrect=false, isIncorrect=false, isAbandoned=false, onSelect, onPress, special=0 }: BlockProps) {   
+export default React.memo(function PuzzleBlock({ pokemon, shinies, multiselect, isSelected, isSolved=false, isCorrect=false, isIncorrect=false, isAbandoned=false, isAvailable=true, onSelect, onPress, special=0 }: BlockProps) {   
     let default_url = !shinies.includes(pokemon.id) ? pokemon.sprite_default : pokemon.sprite_shiny;
     let extra_class = "";
 
@@ -116,6 +117,7 @@ export default React.memo(function PuzzleBlock({ pokemon, shinies, multiselect, 
             'incorrect': isIncorrect,
             'abandoned': isAbandoned,
             'selected': isSelected,
+            'disabled': !isAvailable
         },
         extra_class
     );    

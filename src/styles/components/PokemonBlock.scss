@@ -13,7 +13,7 @@ label.block-container {
         (100% - (var(--spacing) * (var(--cols, 4) - 1))) / var(--cols, 4)
     );
 
-    &:has(.solved) {
+    &:has(.solved), &:has(.disabled) {
         cursor: default;
         pointer-events: none;
     }
@@ -35,7 +35,8 @@ label.block-container {
         transform-origin: center;
         transition:
             transform 0.15s ease,
-            box-shadow 0.15s ease;
+            box-shadow 0.15s ease,
+            opacity 0.15 ease;
         
         img {
             position: absolute;
@@ -85,7 +86,17 @@ label.block-container {
         
         input {
             display: none;
-        }     
+        }
+
+        &.disabled {
+            opacity: 0.6;
+            color: color(text3);
+            pointer-events: none;
+
+            img {
+                filter: saturate(0)
+            }
+        }
     
         &:has(input:checked), &.has-error {
             border: 2px solid var(--selection);

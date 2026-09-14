@@ -6,7 +6,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations({ locale });
 
   return {
-    title: t(`puzzle.infinite.label`),
+    title: t(`puzzle.detective.label`),
   };
 }
 

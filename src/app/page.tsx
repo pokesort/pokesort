@@ -87,7 +87,7 @@ export default function Home() {
           />
           <HomeCard
             page="detective"
-            href="/pokewho"
+            href="/detective"
             sprite="25"
           />          
         </div>

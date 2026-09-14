@@ -108,6 +108,9 @@
             "rows": "Rows",
             "cols": "Columns",
             "button": "Generate"
+        },        
+        "detective": {
+            "label": "Detective Mode"
         },
         "from": {
             "admin": "Custom",

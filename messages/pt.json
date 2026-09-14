@@ -109,6 +109,10 @@
             "cols": "Colunas",
             "button": "Gerar"
         },
+        "detective": {
+            "label": "Modo Detetive",
+            "generate": "Gerar"
+        },
         "from": {
             "admin": "Personalizado",
             "system": "Automático",

@@ -38,7 +38,7 @@
     "src/scripts/utils.js",
     "src/pages/api/moves/get.js",
     ".next/dev/types/**/*.ts", 
-    "src/app/pokewho/page.jsx",
+    "src/app/detective/page.jsx",
     "src/pages/api/transfer/sign.js"
   ],
     "exclude": [

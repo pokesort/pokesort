@@ -10,7 +10,7 @@ export default async function handler(req, res) {
 
     const MAX_ATTEMPTS = 100;
     const MAX_GROUPS = 5;
-    const MAX_POKEMON_GROUP = 6;
+    const MAX_POKEMON_GROUP = 5;
 
     let puzzle = null;
 

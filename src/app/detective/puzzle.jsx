@@ -4,7 +4,7 @@
 import { useState } from "react";
 import { FIELD_OPTIONS } from "../../scripts/utils";
 
-export default function TestPuzzle() {
+export default function Puzzle() {
     const [puzzle, setPuzzle] = useState(null);
 
     const [queryKey, setQueryKey] = useState("");
@@ -21,7 +21,7 @@ export default function TestPuzzle() {
         setLoading(true);
 
         try {
-            const response = await fetch("/api/pokewho/get", {
+            const response = await fetch("/api/detective/get", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -64,7 +64,7 @@ export default function TestPuzzle() {
         };
 
         try {
-            const response = await fetch("/api/pokewho/question", {
+            const response = await fetch("/api/detective/question", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

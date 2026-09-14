@@ -1,7 +1,7 @@
 "use client"
 
 import { useTranslations } from 'next-intl';
-import Puzzle from '@/src/components/Puzzle';
+import Puzzle from '@/src/components/puzzle/Puzzle';
 import "@/src/styles/components/Infinite.scss";
 import type { PuzzleData } from '@/src/assets/types/PuzzleApiResponse';
 import { useCallback, useEffect, useRef, useState } from 'react';

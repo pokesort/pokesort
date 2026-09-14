@@ -6,16 +6,16 @@ import { useRouter } from 'next/navigation';
 import { FIELD_OPTIONS, MAX_SELECT, toTitleCase } from '@/src/scripts/utils';
 
 import "@/src/styles/components/PuzzleManage.scss";
-import { Group, getGroupList, getGroupnameFromQuery } from './GroupName';
+import { Group, getGroupList, getGroupnameFromQuery } from '../GroupName';
 import { useLocale, useTranslations } from 'next-intl';
-import ListBlock from './ListBlock';
-import Loading from './Loading';
+import ListBlock from '../ListBlock';
+import Loading from '../Loading';
 import EditIcon from '@/src/components/svg/EditIcon';
 import { useForm, useWatch } from 'react-hook-form';
-import Input from './forms/Input';
-import GridIcon from './svg/GridIcon';
-import SearchIcon from './svg/SearchIcon';
-import Modal from './Modal';
+import Input from '../forms/Input';
+import GridIcon from '../svg/GridIcon';
+import SearchIcon from '../svg/SearchIcon';
+import Modal from '../Modal';
 import { get } from 'http';
 
 type Range = { min: number; max: number };

@@ -1,0 +1,23 @@
+@use "../abstract" as *;
+
+.detective-sprite {
+    position: absolute;
+    top: 0;
+
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    pointer-events: none;
+
+    width: min(100%, calc(120px * var(--cols, 4)));
+    height: 36px;
+    overflow: hidden;
+    z-index: 20;
+
+    img {
+        width: 80px;
+        height: 80px;
+
+        margin-top: 2.8rem;
+    }
+}
