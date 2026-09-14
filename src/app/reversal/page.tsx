@@ -19,6 +19,7 @@ export default function Home() {
     const [activeCharacteristic, setActiveCharacteristic] = useState<CharacteristicType | null>(null);
     const [guessResult, setGuessResult] = useState<{ valid: boolean; points: number; message: string } | null>(null);
     const [submittingGuess, setSubmittingGuess] = useState(false);
+    const [swapRequestedBy, setSwapRequestedBy] = useState<string[]>([]);
 
     useEffect(() => {
         const socket = new WebSocket("ws://192.168.10.101:3001");
@@ -35,6 +36,9 @@ export default function Home() {
             if (data.type === "connected") setPlayerId(data.playerId);
 
             if (data.type === "gameStarted") setGameState(data.game);
+
+            if (data.type === "boardSwapStatus") setSwapRequestedBy(data.requestedBy);
+
 
             if (data.type === "guessResult") {
                 console.log("GUESS RESULT RECEIVED:", data);
@@ -53,7 +57,8 @@ export default function Home() {
                 setGameState(data.game);
                 setSelectedPokemon([]);
                 setSelectedCharacteristics([]);
-                // setGuessResult(null);
+                setActiveCharacteristic(null);
+                // setGuessResult(null)
             }
 
             if (data.type === "opponentLeft") {
@@ -81,6 +86,7 @@ export default function Home() {
     function submitGuess() {
 
         if (submittingGuess) return;
+        if (isWaitingForBoardSwap) return;
 
         const socket = socketRef.current;
 
@@ -123,6 +129,7 @@ export default function Home() {
 
     function selectCharacteristic(characteristic: GuessCharacteristic) {
 
+        if (isWaitingForBoardSwap) return;
         if (selectedCharacteristics.length >= 3) return;
 
         const alreadySelected = selectedCharacteristics.some(
@@ -142,6 +149,7 @@ export default function Home() {
     function selectFieldValue(value: string) {
         if (!activeCharacteristic) return;
         if (submittingGuess) return;
+        if (isWaitingForBoardSwap) return;
 
         selectCharacteristic({
             type: activeCharacteristic,
@@ -149,11 +157,32 @@ export default function Home() {
         });
     }
 
+    function requestBoardSwap() {
+
+        if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) return;
+        if (isWaitingForBoardSwap) return;
+        if (game?.status !== "playing") return;
+
+        setSelectedPokemon([]);
+        setSelectedCharacteristics([]);
+        setActiveCharacteristic(null);
+
+        socketRef.current.send(
+            JSON.stringify({
+                type: "requestBoardSwap",
+            })
+        );
+    }
+
     const selectedPoints = selectedCharacteristics.reduce(
         (total, characteristic) =>
             total + CHARACTERISTIC_DEFINITIONS[characteristic.type].points,
         0
     );
+
+    const isWaitingForBoardSwap = playerId
+        ? swapRequestedBy.includes(playerId)
+        : false;
 
     return (
         <main className="reversal-page">
@@ -191,6 +220,7 @@ export default function Home() {
                         </button>
                     )}
                     <p>Pokemons on board: {game.board.length}</p>
+                    <p>Pokemons on board: {game.reserve.length}</p>
                     <div className="players">
                         {game.players.map((player) => (
                             <p key={player.id}>
@@ -208,6 +238,7 @@ export default function Home() {
                                 <button
                                     key={pokemon.id}
                                     className={selected ? "pokemon-card selected" : "pokemon-card"}
+                                    disabled={submittingGuess || isWaitingForBoardSwap}
                                     onClick={() => {
 
                                         if (game.status !== "playing") return;
@@ -364,11 +395,20 @@ export default function Home() {
 
                     <div className="game-actions">
                         <button
+                            onClick={requestBoardSwap}
+                            disabled={isWaitingForBoardSwap || game.status != "playing"}
+                        >
+                            {isWaitingForBoardSwap
+                                ? "Aguardando outro jogador..."
+                                : "Trocar tabuleiro"}
+                        </button>
+                        <button
                             disabled={
                                 selectedPokemon.length !== 4 ||
                                 selectedCharacteristics.length < 1 ||
                                 submittingGuess ||
-                                game?.status !== "playing"
+                                game?.status !== "playing" ||
+                                isWaitingForBoardSwap
                             }
                             onClick={submitGuess}
                         >
@@ -400,6 +440,7 @@ export default function Home() {
                             <p key={index} className="selected-characteristic">
                                 {characteristic.type}: {characteristic.value}
                                 <button
+                                    disabled={submittingGuess || isWaitingForBoardSwap}
                                     onClick={() => {
                                         if (submittingGuess) return;
 

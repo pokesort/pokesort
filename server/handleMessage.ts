@@ -1,7 +1,7 @@
 import { resetGameForTest, restartGame, type Room } from "./room";
 import type { ConnectedPlayer } from "./player";
 import type { ClientMessage } from "./types";
-import { submitGuess } from "../src/reversal/submitGuess";
+import { submitGuess, swapBoard, determineResult } from "../src/reversal/submitGuess";
 import { sendMessage, sendToRoom } from "./messaging";
 
 export async function handleMessage(player: ConnectedPlayer, room: Room, message: ClientMessage): Promise<void> {
@@ -40,6 +40,16 @@ export async function handleMessage(player: ConnectedPlayer, room: Room, message
 
     if (!result.valid) return;
 
+    room.swapRequests.clear();
+
+    if (room.game.status === "playing") {
+
+      sendToRoom(room, {
+        type: "boardSwapStatus",
+        requestedBy: [],
+      });
+    }
+
     sendToRoom(room, {
       type: "gameStateUpdated",
       game: room.game,
@@ -56,5 +66,36 @@ export async function handleMessage(player: ConnectedPlayer, room: Room, message
     });
 
     return;
+  }
+
+  if (message.type === "requestBoardSwap") {
+
+    if (!room.game || room.game.status !== "playing") return;
+    if (room.swapRequests.has(player.playerId)) return;
+
+    room.swapRequests.add(player.playerId);
+
+    if (room.swapRequests.size < 2) {
+      sendToRoom(room, {
+        type: "boardSwapStatus",
+        requestedBy: Array.from(room.swapRequests),
+      });
+      return;
+    }
+
+    swapBoard(room.game);
+    room.swapRequests.clear();
+
+    determineResult(room.game);
+
+    sendToRoom(room, {
+      type: "boardSwapStatus",
+      requestedBy: [],
+    });
+
+    sendToRoom(room, {
+      type: "gameStateUpdated",
+      game: room.game,
+    });
   }
 }

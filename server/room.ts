@@ -19,6 +19,7 @@ export interface Room {
   game?: GameState;
   pendingGuesses: PendingGuess[];
   nextGuessOrder: number;
+  swapRequests: Set<string>;
 }
 
 let nextRoomId = 1;
@@ -29,6 +30,7 @@ export function createRoom(rooms: Map<string, Room>): Room {
     players: new Map(),
     pendingGuesses: [],
     nextGuessOrder: 0,
+    swapRequests: new Set(),
   };
 
   nextRoomId++;

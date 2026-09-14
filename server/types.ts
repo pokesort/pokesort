@@ -35,6 +35,11 @@ export type OpponentLeftMessage = {
   type: "opponentLeft";
 };
 
+type BoardSwapStatusMessage = {
+    type: "boardSwapStatus";
+    requestedBy: string[];
+};
+
 // Client messages
 export interface SubmitGuessMessage {
   type: "submitGuess";
@@ -50,10 +55,15 @@ type ResetGameForTestMessage = {
   type: "resetGameForTest";
 };
 
+type RequestBoardSwapMessage = {
+    type: "requestBoardSwap";
+};
+
 export type ClientMessage =
   | SubmitGuessMessage
   | RestartGameMessage
-  | ResetGameForTestMessage;
+  | ResetGameForTestMessage
+  | RequestBoardSwapMessage;
 
 export type ServerMessage =
   | ConnectedMessage
@@ -61,4 +71,5 @@ export type ServerMessage =
   | GameStartedMessage
   | GuessResultMessage
   | GameStateUpdatedMessage
-  | OpponentLeftMessage;
+  | OpponentLeftMessage
+  | BoardSwapStatusMessage;

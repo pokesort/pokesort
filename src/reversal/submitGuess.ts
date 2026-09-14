@@ -36,6 +36,8 @@ const CONCURRENCY_WINDOW_MS = 500;
 export async function submitGuess(room: Room, playerId: string, pokemonIds: number[], characteristics: GuessCharacteristic[])
   : Promise<SubmitGuessResult> {
 
+  if (room.swapRequests.has(playerId)) return invalidSubmitGuessResult;
+
   const game = room.game;
   if (!game || game.status !== "playing") return invalidSubmitGuessResult;
 
@@ -122,7 +124,7 @@ export async function submitGuess(room: Room, playerId: string, pokemonIds: numb
   return successSubmitGuessResult;
 }
 
-function determineResult(game: GameState): void {
+export function determineResult(game: GameState): void {
 
   if (game.board.length === 0) {
 
@@ -145,6 +147,11 @@ function refillBoard(game: GameState): void {
   const newPokemon = game.reserve.splice(0, amountNeeded);
 
   game.board.push(...newPokemon);
+}
+
+export function swapBoard(game: GameState): void {
+  game.board = [];
+  refillBoard(game);
 }
 
 async function waitForConcurrentGuesses(): Promise<void> {
