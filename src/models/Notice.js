@@ -25,7 +25,7 @@ const noticeSchema = new mongoose.Schema({
     required: true,
     validate: {
       validator: (arr) =>
-        arr.some((t) => t.lang === 'pt') && arr.some((t) => t.lang === 'en'),
+        arr.some((t) => t.locale === 'pt') && arr.some((t) => t.locale === 'en'),
       message: 'Translations for all supported languages are required',
     },
   },

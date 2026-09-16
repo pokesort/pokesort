@@ -10,9 +10,14 @@ export default async function handler(req, res) {
   try {
     await connect();
     const conn = getDb();
+
     const Notice = getNoticeModel(conn);
 
-    const notice = new Notice(req.body);
+    let { body } = req;
+
+    if (typeof body === 'string')  body = JSON.parse(body);
+
+    const notice = new Notice(body);
 
     await notice.validate();
 
