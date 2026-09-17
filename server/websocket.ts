@@ -15,6 +15,7 @@ import {
     createPlayerId,
     type ConnectedPlayer,
 } from "./player";
+import { JoinRoomMessage } from "./types";
 
 const PORT = 3001;
 
@@ -34,23 +35,12 @@ wss.on("connection", async (socket) => {
     const player: ConnectedPlayer = {
         playerId,
         socket,
+        joiningRoom: false
     };
 
     players.set(playerId, player);
 
-    const room = joinRoom(player, rooms);
-
-    if (room.players.size === 2) {
-
-        await startGame(room);
-
-        sendToRoom(room, {
-            type: "gameStarted",
-            game: room.game!,
-        });
-    }
-
-    console.log(`${playerId} joined ${room.id}`);
+    console.log(`${playerId} joined`);
 
     sendMessage(socket, {
         type: "connected",
@@ -67,6 +57,28 @@ wss.on("connection", async (socket) => {
 
         console.log("Message received:", data);
 
+        if (data.type === "leaveRoom") {
+            
+            if (!player.roomId) return;
+
+            leaveRoom(rooms, player);
+            return;
+        }
+
+        if (data.type === "joinRoom") {
+
+            if (player.roomId || player.joiningRoom) return;
+
+            player.joiningRoom = true;
+
+            try {
+                await handleJoinroom(player, data);
+            } finally {
+                player.joiningRoom = false;
+            }
+            return
+        }
+
         if (!player.roomId) return;
 
         const room = rooms.get(player.roomId);
@@ -78,10 +90,9 @@ wss.on("connection", async (socket) => {
 
     socket.on("close", () => {
 
-        //Talvez seja necessário buscar a sala antes de sair
-        // const room = player.roomId
-        //     ? rooms.get(player.roomId)
-        //     : undefined;
+        const room = player.roomId
+            ? rooms.get(player.roomId)
+            : undefined;
 
         leaveRoom(rooms, player);
         console.log(`${playerId} disconnected`);
@@ -97,3 +108,28 @@ wss.on("connection", async (socket) => {
         }
     });
 });
+
+async function handleJoinroom(player: ConnectedPlayer, data: JoinRoomMessage) {
+
+    if (player.roomId) return;
+
+    const room = joinRoom(
+        player,
+        rooms,
+        data.difficulty
+    );
+
+    console.log(`${player.playerId} joined ${room.id} (${room.difficulty})`);
+
+    if (room.players.size === 2) {
+
+        await startGame(room);
+
+        sendToRoom(room, {
+            type: "gameStarted",
+            game: room.game!,
+        });
+    }
+
+    return;
+}

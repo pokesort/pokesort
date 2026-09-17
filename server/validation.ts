@@ -13,6 +13,8 @@ export function parseClientMessage(
     if (data.type === "restartGame") return data as ClientMessage;
     if (data.type === "resetGameForTest") return data as ClientMessage;
     if (data.type === "requestBoardSwap") return data as ClientMessage;
+    if (data.type === "joinRoom") return data as ClientMessage;
+    if (data.type === "leaveRoom") return data as ClientMessage;
     if (data.type !== "submitGuess") return null;
 
     if (!("elements" in data) || !Array.isArray(data.elements)) return null;

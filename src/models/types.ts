@@ -5,6 +5,14 @@ export interface GuessCharacteristic {
     value: string;
 }
 
+export type GameDifficult = "easy" | "medium" | "hard";
+
+export const DIFFICULTY_POKEMON_COUNT: Record<GameDifficult, number> = {
+    easy: 24,
+    medium: 32,
+    hard: 40,
+};
+
 export interface Pokemon {
     _id: string;
     id: number;

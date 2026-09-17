@@ -4,6 +4,7 @@ export interface ConnectedPlayer {
   playerId: string;
   socket: WebSocket;
   roomId?: string;
+  joiningRoom: boolean;
 }
 
 let nextPlayerId = 1;

@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { GameState } from "../../reversal/types";
-import { CHALLENGE_FIELDS, getCharacteristicPoints, getAllCharacteristicTypes, getCharacteristicOptions } from "../../models/types";
-import type { ChallengeFieldType, GuessCharacteristic } from "../../models/types";
+import { getCharacteristicPoints, getAllCharacteristicTypes, getCharacteristicOptions } from "../../models/types";
+import type { ChallengeFieldType, GameDifficult, GuessCharacteristic } from "../../models/types";
 
 import "@/src/styles/components/Reversal.css";
 
@@ -18,6 +18,8 @@ export default function Home() {
     const [guessResult, setGuessResult] = useState<{ valid: boolean; points: number; message: string } | null>(null);
     const [submittingGuess, setSubmittingGuess] = useState(false);
     const [swapRequestedBy, setSwapRequestedBy] = useState<string[]>([]);
+    const [difficulty, setDifficulty] = useState<GameDifficult | null>(null);
+    const [searchingRoom, setSearchingRoom] = useState(false);
 
     useEffect(() => {
         const socket = new WebSocket("ws://192.168.10.101:3001");
@@ -33,7 +35,17 @@ export default function Home() {
 
             if (data.type === "connected") setPlayerId(data.playerId);
 
-            if (data.type === "gameStarted") setGameState(data.game);
+            if (data.type === "gameStarted") {
+
+                setGameState(data.game);
+                setSearchingRoom(false);
+                setSelectedPokemon([]);
+                setSelectedCharacteristics([]);
+                setActiveCharacteristic(null);
+                setGuessResult(null);
+                setSubmittingGuess(false);
+                setSwapRequestedBy([]);
+            }
 
             if (data.type === "boardSwapStatus") setSwapRequestedBy(data.requestedBy);
 
@@ -61,8 +73,14 @@ export default function Home() {
 
             if (data.type === "opponentLeft") {
                 setGameState(null);
+                setSearchingRoom(true);
+                // setDifficulty(null);
                 setSelectedPokemon([]);
                 setSelectedCharacteristics([]);
+                setActiveCharacteristic(null);
+                setGuessResult(null);
+                setSubmittingGuess(false);
+                setSwapRequestedBy([]);
             }
         };
 
@@ -80,6 +98,50 @@ export default function Home() {
             socketRef.current = null;
         };
     }, []);
+
+    function cancelSearch() {
+        const socket = socketRef.current;
+
+        if (!socket || socket.readyState !== WebSocket.OPEN) return;
+
+        socket.send(JSON.stringify({
+            type: "leaveRoom",
+        }));
+
+        setSearchingRoom(false);
+        setDifficulty(null);
+        // setSelectedPokemon([]);
+        // setSelectedCharacteristics([]);
+        // setActiveCharacteristic(null);
+        // setGuessResult(null);
+        // setSubmittingGuess(false);
+        // setSwapRequestedBy([]);
+    }
+
+    function joinGame(selectedDifficulty: GameDifficult) {
+        const socket = socketRef.current;
+
+        if (!socket || socket.readyState !== WebSocket.OPEN) {
+            console.log("WebSocket is not open");
+            return;
+        }
+
+        setDifficulty(selectedDifficulty);
+        setSearchingRoom(true);
+        setSelectedPokemon([]);
+        setSelectedCharacteristics([]);
+        setActiveCharacteristic(null);
+        setGuessResult(null);
+        setSubmittingGuess(false);
+        setSwapRequestedBy([]);
+
+        socket.send(
+            JSON.stringify({
+                type: "joinRoom",
+                difficulty: selectedDifficulty,
+            })
+        );
+    }
 
     function submitGuess() {
 
@@ -191,18 +253,53 @@ export default function Home() {
             {/* Mudar o nome */}
             <h1>Reversal Mode</h1>
 
-            <div>
-                <p>
-                    {selectedPokemon.length < 4
-                        ? "Selecione 4 pokemons"
-                        : selectedCharacteristics.length === 0
-                            ? "Escolha as características"
-                            : `Palpite: ${selectedCharacteristics.length}/3`}
-                </p>
-            </div>
+            {!game && (
+                <div className="difficulty-selection">
+                    {!searchingRoom ? (
+                        <>
+                            <h1>Escolha a dificuldade</h1>
+
+                            <button onClick={() => joinGame("easy")}>
+                                Pinsir X Heracross || Steven X Wallace
+                                <span>24 Pokémon</span>
+                            </button>
+
+                            <button onClick={() => joinGame("medium")}>
+                                Seviper X Zangoose || Gold X Silver
+                                <span>32 Pokémon</span>
+                            </button>
+
+                            <button onClick={() => joinGame("hard")}>
+                                Groudon X Kyogre || Archie X Maxie
+                                <span>40 Pokémon</span>
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            <h1>Procurando jogador...</h1>
+                            <p>Dificuldade: {difficulty}</p>
+
+                            <button onClick={cancelSearch}>
+                                Cancelar busca
+                            </button>
+                        </>
+                    )}
+                </div>
+            )}
 
             {game && (
                 <div>
+                    <p>Dificuldade da Sala: {difficulty}</p>
+                    <div>
+                        <p>
+                            {selectedPokemon.length < 4
+                                ? "Selecione 4 pokemons"
+                                : selectedCharacteristics.length === 0
+                                    ? "Escolha as características"
+                                    : `Palpite: ${selectedCharacteristics.length}/3`}
+                        </p>
+                    </div>
+
                     {/* <p>Game status: {game.status}</p> */}
 
                     {game.status === "finished" && game.result && (

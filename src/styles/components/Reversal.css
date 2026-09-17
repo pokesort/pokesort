@@ -25,6 +25,19 @@
     margin: 0;
 }
 
+/* Dificuldade */
+
+.difficulty-selection{
+    display: flex;
+    gap: 5px;
+
+    button{
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+}
+
 /* Tabuleiro */
 
 .pokemon-grid {

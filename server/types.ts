@@ -1,5 +1,6 @@
 import type { GameState } from "../src/reversal/types";
-import type { GuessCharacteristic } from "../src/models/types";
+import type { GameDifficult, GuessCharacteristic } from "../src/models/types";
+import { leaveRoom } from "./room";
 
 // Server messages
 export interface RoomJoinedMessage {
@@ -59,11 +60,22 @@ type RequestBoardSwapMessage = {
     type: "requestBoardSwap";
 };
 
+export type JoinRoomMessage = {
+    type: "joinRoom";
+    difficulty: GameDifficult;
+};
+
+export type LeaveRoomMessage = {
+    type: "leaveRoom";
+};
+
 export type ClientMessage =
   | SubmitGuessMessage
   | RestartGameMessage
   | ResetGameForTestMessage
-  | RequestBoardSwapMessage;
+  | RequestBoardSwapMessage
+  | JoinRoomMessage
+  | LeaveRoomMessage;
 
 export type ServerMessage =
   | ConnectedMessage
