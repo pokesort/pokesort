@@ -108,15 +108,12 @@ export async function restartGame(room: Room): Promise<boolean> {
   return true;
 }
 
-//TODO: Adaptar ao teste
 export async function resetGameForTest(room: Room): Promise<boolean> {
     if (room.players.size !== 2) return false;
 
     const playerIds = Array.from(room.players.keys());
-    // Se precisar subsituir
-    // const pokemonCount = DIFFICULTY_POKEMON_COUNT[room.difficulty];
-    // const pokemonBoard = await getPokemonBoard(pokemonCount);
-    const pokemonBoard = await getPokemonBoard(40);
+    const pokemonCount = DIFFICULTY_POKEMON_COUNT[room.difficulty];
+    const pokemonBoard = await getPokemonBoard(pokemonCount);
 
     room.game = createGame(playerIds, pokemonBoard);
     room.pendingGuesses = [];

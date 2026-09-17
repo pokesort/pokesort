@@ -14,6 +14,7 @@ interface Pokemon {
 
 interface GameState {
     board: Pokemon[];
+    reserve: Pokemon[];
 }
 
 interface GuessResultMessage {
@@ -36,9 +37,10 @@ type TestClient = {
 const CHARACTERISTIC_POINTS: Record<string, number> = {
     types: 1,
     region: 1,
-    generation: 2,
+    generation: 1,
     color: 2,
-    shape: 3,
+    habitat: 3,
+    shape: 4,
 };
 
 let testFailed = false;
@@ -51,7 +53,12 @@ async function main(): Promise<void> {
     const player1 = await connectClient();
     const player2 = await connectClient();
 
+    await joinRoom(player1.socket, "easy");
+    await joinRoom(player2.socket, "easy");
+
     let game = await waitForGame(player1, player2);
+    assert(game.board.length === 16, "A dificuldade easy deveria iniciar com 16 Pokémon");
+    assert(game.reserve.length === 8, "Easy deveria ter 8 Pokémon na reserva");
 
     console.log("Game iniciado.");
 
@@ -142,6 +149,13 @@ function connectClient(): Promise<TestClient> {
 
         socket.once("error", reject);
     });
+}
+
+async function joinRoom(socket: WebSocket, difficulty: "easy" | "medium" | "hard"): Promise<void> {
+    socket.send(JSON.stringify({
+        type: "joinRoom",
+        difficulty,
+    }));
 }
 
 async function waitForGame(player1: TestClient, player2: TestClient): Promise<GameState> {
@@ -329,14 +343,14 @@ function assert(condition: boolean, message: string): void {
 }
 
 main().then(() => {
-        if (testFailed) {
-            console.error("\nFAIL: Um ou mais testes falharam.");
-            process.exitCode = 1;
-            return;
-        }
+    if (testFailed) {
+        console.error("\nFAIL: Um ou mais testes falharam.");
+        process.exitCode = 1;
+        return;
+    }
 
-        console.log("\nPASS: cenário de concorrência funcionando.");
-    })
+    console.log("\nPASS: cenário de concorrência funcionando.");
+})
     .catch((error) => {
         console.error(`FAIL: ${error.message}`);
         process.exitCode = 1;

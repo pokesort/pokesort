@@ -24,13 +24,6 @@ export const defeatSubmitGuessResult: SubmitGuessResult = {
   message: "Palpites acirrados, perdeu a disputa.",
 };
 
-export const successSubmitGuessResult: SubmitGuessResult = {
-  valid: true,
-  points: 0,
-  removedPokemon: [],
-  message: "",
-};
-
 const CONCURRENCY_WINDOW_MS = 500;
 
 export async function submitGuess(room: Room, playerId: string, pokemonIds: number[], characteristics: GuessCharacteristic[])
@@ -120,8 +113,12 @@ export async function submitGuess(room: Room, playerId: string, pokemonIds: numb
 
   removePendingGuess(room, pendingGuess);
 
-  successSubmitGuessResult.message = `Palpite válido. +${result.points} pontos`;
-  return successSubmitGuessResult;
+  return {
+    valid: true,
+    points: result.points,
+    removedPokemon: pokemonIds,
+    message: `Palpite válido. +${result.points} pontos`,
+  };
 }
 
 export function determineResult(game: GameState): void {
