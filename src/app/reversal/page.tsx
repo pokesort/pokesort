@@ -5,7 +5,12 @@ import type { GameState } from "../../reversal/types";
 import { getCharacteristicPoints, getAllCharacteristicTypes, getCharacteristicOptions } from "../../models/types";
 import type { ChallengeFieldType, GameDifficult, GuessCharacteristic } from "../../models/types";
 
+import RoomSelection from "../../components/reversal/RoomSelection";
+import PokemonGrid from "@/src/components/reversal/PokemonGrid";
+import GameActions from "@/src/components/reversal/GameActions";
+
 import "@/src/styles/components/Reversal.css";
+import GameStatus from "@/src/components/reversal/GameStatus";
 
 export default function Home() {
     const socketRef = useRef<WebSocket | null>(null);
@@ -20,9 +25,10 @@ export default function Home() {
     const [swapRequestedBy, setSwapRequestedBy] = useState<string[]>([]);
     const [difficulty, setDifficulty] = useState<GameDifficult | null>(null);
     const [searchingRoom, setSearchingRoom] = useState(false);
+    const [roomMode, setRoomMode] = useState<"selection" | "public" | "private">("selection");
 
     useEffect(() => {
-        const socket = new WebSocket("ws://192.168.10.101:3001");
+        const socket = new WebSocket("ws://192.168.222.86:3001");
 
         socketRef.current = socket;
 
@@ -254,37 +260,14 @@ export default function Home() {
             <h1>Reversal Mode</h1>
 
             {!game && (
-                <div className="difficulty-selection">
-                    {!searchingRoom ? (
-                        <>
-                            <h1>Escolha a dificuldade</h1>
-
-                            <button onClick={() => joinGame("easy")}>
-                                Pinsir X Heracross || Steven X Wallace
-                                <span>24 Pokémon</span>
-                            </button>
-
-                            <button onClick={() => joinGame("medium")}>
-                                Seviper X Zangoose || Gold X Silver
-                                <span>32 Pokémon</span>
-                            </button>
-
-                            <button onClick={() => joinGame("hard")}>
-                                Groudon X Kyogre || Archie X Maxie
-                                <span>40 Pokémon</span>
-                            </button>
-                        </>
-                    ) : (
-                        <>
-                            <h1>Procurando jogador...</h1>
-                            <p>Dificuldade: {difficulty}</p>
-
-                            <button onClick={cancelSearch}>
-                                Cancelar busca
-                            </button>
-                        </>
-                    )}
-                </div>
+                <RoomSelection
+                    roomMode={roomMode}
+                    setRoomMode={setRoomMode}
+                    searchingRoom={searchingRoom}
+                    difficulty={difficulty}
+                    joinGame={joinGame}
+                    cancelSearch={cancelSearch}
+                />
             )}
 
             {game && (
@@ -302,76 +285,18 @@ export default function Home() {
 
                     {/* <p>Game status: {game.status}</p> */}
 
-                    {game.status === "finished" && game.result && (
-                        <div>
-                            {game.result.type === "draw" ? (
-                                <p>Empate!</p>
-                            ) : game.result.playerId === playerId ? (
-                                <p>Você venceu!</p>
-                            ) : (
-                                <p>Você perdeu!</p>
-                            )}
-                        </div>
-                    )}
-                    {game?.status === "finished" && (
-                        <button onClick={restartGame}>
-                            Jogar novamente
-                        </button>
-                    )}
-                    <p>Pokemons on board: {game.board.length}</p>
-                    <p>Pokemons on reserve: {game.reserve.length}</p>
-                    <div className="players">
-                        {game.players.map((player) => (
-                            <p key={player.id}>
-                                {player.name}: {player.score} pontos
-                                {player.id === playerId && " (você)"}
-                            </p>
-                        ))}
-                    </div>
+                    <GameStatus game={game} playerId={playerId} restartGame={restartGame} />
 
-                    <div className="pokemon-grid">
-                        {game.board.map((pokemon) => {
-                            const selected = selectedPokemon.includes(pokemon.id);
-
-                            return (
-                                <button
-                                    key={pokemon.id}
-                                    className={selected ? "pokemon-card selected" : "pokemon-card"}
-                                    disabled={submittingGuess || isWaitingForBoardSwap}
-                                    onClick={() => {
-
-                                        if (game.status !== "playing") return;
-                                        if (submittingGuess) return;
-
-                                        if (selected) {
-                                            setSelectedPokemon((current) =>
-                                                current.filter((id) => id !== pokemon.id)
-                                            );
-
-                                            //Ao remover pokemon, também removemos as características selecionadas e o activeCharacteristic
-                                            setSelectedCharacteristics([]);
-                                            setActiveCharacteristic(null);
-
-                                            return;
-                                        }
-
-                                        if (selectedPokemon.length >= 4) {
-                                            return;
-                                        }
-
-                                        setGuessResult(null);
-
-                                        setSelectedPokemon((current) => [
-                                            ...current,
-                                            pokemon.id,
-                                        ]);
-                                    }}
-                                >
-                                    {pokemon.name}
-                                </button>
-                            );
-                        })}
-                    </div>
+                    <PokemonGrid
+                        game={game}
+                        selectedPokemon={selectedPokemon}
+                        setSelectedPokemon={setSelectedPokemon}
+                        setSelectedCharacteristics={setSelectedCharacteristics}
+                        setActiveCharacteristic={setActiveCharacteristic}
+                        setGuessResult={setGuessResult}
+                        submittingGuess={submittingGuess}
+                        isWaitingForBoardSwap={isWaitingForBoardSwap}
+                    />
 
                     {selectedPokemon.length === 4 && (
                         <div className="characteristics">
@@ -490,36 +415,16 @@ export default function Home() {
                         Selected: {selectedPokemon.length}/4
                     </p>
 
-                    <div className="game-actions">
-                        <button
-                            onClick={requestBoardSwap}
-                            disabled={isWaitingForBoardSwap || game.status != "playing"}
-                        >
-                            {isWaitingForBoardSwap
-                                ? "Aguardando outro jogador..."
-                                : "Trocar tabuleiro"}
-                        </button>
-                        <button
-                            disabled={
-                                selectedPokemon.length !== 4 ||
-                                selectedCharacteristics.length < 1 ||
-                                submittingGuess ||
-                                game?.status !== "playing" ||
-                                isWaitingForBoardSwap
-                            }
-                            onClick={submitGuess}
-                        >
-                            {submittingGuess
-                                ? "Enviando..."
-                                : "Enviar palpite"}
-                        </button>
-
-                        {selectedCharacteristics.length > 0 && (
-                            <span>
-                                Possíveis pontos: {selectedPoints}
-                            </span>
-                        )}
-                    </div>
+                    <GameActions
+                        game={game}
+                        selectedPokemon={selectedPokemon}
+                        selectedCharacteristics={selectedCharacteristics}
+                        submittingGuess={submittingGuess}
+                        isWaitingForBoardSwap={isWaitingForBoardSwap}
+                        selectedPoints={selectedPoints}
+                        requestBoardSwap={requestBoardSwap}
+                        submitGuess={submitGuess}
+                    />
 
                     {guessResult && (
                         <div className="guess-result">
