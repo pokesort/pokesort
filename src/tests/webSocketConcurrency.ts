@@ -2,6 +2,20 @@ import WebSocket from "ws";
 
 const WS_URL = process.env.WS_URL ?? "ws://localhost:3001";
 
+class ServerConnectionError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = "ServerConnectionError";
+    }
+}
+
+class ServerApiError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = "ServerApiError";
+    }
+}
+
 interface Pokemon {
     id: number;
     name: string;
@@ -57,8 +71,16 @@ async function main(): Promise<void> {
     await joinRoom(player2.socket, "easy");
 
     let game = await waitForGame(player1, player2);
-    assert(game.board.length === 16, "A dificuldade easy deveria iniciar com 16 Pokémon");
-    assert(game.reserve.length === 8, "Easy deveria ter 8 Pokémon na reserva");
+
+    assert(
+        game.board.length === 16,
+        "A dificuldade easy deveria iniciar com 16 Pokémon"
+    );
+
+    assert(
+        game.reserve.length === 8,
+        "Easy deveria ter 8 Pokémon na reserva"
+    );
 
     console.log("Game iniciado.");
 
@@ -67,12 +89,36 @@ async function main(): Promise<void> {
     for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
         console.log(`Procurando cenário na partida ${attempt}...`);
 
-        const fullBoard = await getFullPokemons(game.board);
-        scenario = findScenario(fullBoard);
+        try {
+            const fullBoard = await getFullPokemons(game.board);
+            scenario = findScenario(fullBoard);
 
-        if (scenario) {
-            console.log(`Cenário encontrado na partida ${attempt}.`);
-            break;
+            if (scenario) {
+                console.log(`Cenário encontrado na partida ${attempt}.`);
+                break;
+            }
+        } catch (error) {
+            if (error instanceof ServerConnectionError) {
+                console.error(
+                    "FAIL: Teste interrompido porque não foi possível conectar ao servidor."
+                );
+                testFailed = true;
+                break;
+            }
+
+            if (error instanceof ServerApiError) {
+                console.error(
+                    `FAIL: Erro da API na partida ${attempt}: ${error.message}`
+                );
+                testFailed = true;
+                continue;
+            }
+
+            console.error(
+                `FAIL: Erro inesperado na partida ${attempt}: ${(error as Error).message}`
+            );
+            testFailed = true;
+            continue;
         }
 
         if (attempt < MAX_ATTEMPTS) {
@@ -81,12 +127,20 @@ async function main(): Promise<void> {
             const nextGame = await restartGame(player1.socket);
 
             if (!nextGame) {
-                console.log("Não foi possível reiniciar a partida. Tentando novamente...");
+                console.log(
+                    "Não foi possível reiniciar a partida. Tentando novamente..."
+                );
                 continue;
             }
 
             game = nextGame;
         }
+    }
+
+    if (testFailed) {
+        player1.socket.close();
+        player2.socket.close();
+        return;
     }
 
     if (!scenario) {
@@ -124,11 +178,20 @@ async function main(): Promise<void> {
     ]);
 
     assert(result1.valid === true, "P1 deveria ser válido");
-    assert(result1.points === scenario.highPoints.points, "P1 deveria receber a pontuação maior");
+    assert(
+        result1.points === scenario.highPoints.points,
+        "P1 deveria receber a pontuação maior"
+    );
     assert(result2.valid === false, "P2 deveria ser inválido");
     assert(result2.points === 0, "P2 deveria receber 0 pontos");
-    assert(result2.removedPokemon.length === 0, "P2 não deveria remover Pokémon");
-    assert(result1.removedPokemon.length === 4, "P1 deveria remover exatamente 4 Pokémon");
+    assert(
+        result2.removedPokemon.length === 0,
+        "P2 não deveria remover Pokémon"
+    );
+    assert(
+        result1.removedPokemon.length === 4,
+        "P1 deveria remover exatamente 4 Pokémon"
+    );
 
     player1.socket.close();
     player2.socket.close();
@@ -309,24 +372,47 @@ function findSharedCharacteristics(pokemon: Pokemon[]) {
 }
 
 async function getFullPokemons(board: Pokemon[]): Promise<Pokemon[]> {
-    const response = await fetch("http://localhost:3000/api/pokemon/ids", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            ids: board.map((pokemon) => pokemon.id),
-        }),
-    });
+    let response: Response;
 
-    if (!response.ok) {
-        throw new Error(`Erro ao buscar Pokémon: ${response.status}`);
+    try {
+        response = await fetch(
+            "http://localhost:3000/api/pokemon/ids",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    ids: board.map((pokemon) => pokemon.id),
+                }),
+            }
+        );
+    } catch (error) {
+        throw new ServerConnectionError(
+            `Não foi possível conectar ao servidor: ${(error as Error).message}`
+        );
     }
 
-    const data = await response.json();
+    if (!response.ok) {
+        throw new ServerApiError(
+            `Erro ao buscar Pokémon: HTTP ${response.status}`
+        );
+    }
+
+    let data: any;
+
+    try {
+        data = await response.json();
+    } catch (error) {
+        throw new ServerApiError(
+            `Resposta inválida do servidor: ${(error as Error).message}`
+        );
+    }
 
     if (!data.success) {
-        throw new Error(data.error ?? "Erro ao buscar Pokémon");
+        throw new ServerApiError(
+            data.error ?? "Erro ao buscar Pokémon"
+        );
     }
 
     return data.pokemons;
