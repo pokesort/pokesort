@@ -17,15 +17,22 @@ export default function Home() {
 
     const [playerId, setPlayerId] = useState<string | null>(null);
     const [game, setGameState] = useState<GameState | null>(null);
+    const [searchingRoom, setSearchingRoom] = useState(false);
+    const [difficulty, setDifficulty] = useState<GameDifficult | null>(null);
+
     const [selectedPokemon, setSelectedPokemon] = useState<number[]>([]);
     const [selectedCharacteristics, setSelectedCharacteristics] = useState<GuessCharacteristic[]>([]);
     const [activeCharacteristic, setActiveCharacteristic] = useState<ChallengeFieldType | null>(null);
+
     const [guessResult, setGuessResult] = useState<{ valid: boolean; points: number; message: string } | null>(null);
     const [submittingGuess, setSubmittingGuess] = useState(false);
     const [swapRequestedBy, setSwapRequestedBy] = useState<string[]>([]);
-    const [difficulty, setDifficulty] = useState<GameDifficult | null>(null);
-    const [searchingRoom, setSearchingRoom] = useState(false);
+
     const [roomMode, setRoomMode] = useState<"selection" | "public" | "private">("selection");
+    const [privateRoomStep, setPrivateRoomStep] = useState<"selection" | "create" | "join" | "waiting">("selection");
+    const [privateRoomCode, setPrivateRoomCode] = useState<string | null>(null);
+    const [privateRoomJoinCode, setPrivateRoomJoinCode] = useState("");
+    const [privateRoomError, setPrivateRoomError] = useState<string | null>(null);
 
     useEffect(() => {
         const socket = new WebSocket("ws://192.168.222.86:3001");
@@ -53,8 +60,9 @@ export default function Home() {
                 setSwapRequestedBy([]);
             }
 
-            if (data.type === "boardSwapStatus") setSwapRequestedBy(data.requestedBy);
+            if (data.type == "privateRoomCreated") setPrivateRoomCode(data.code);
 
+            if (data.type === "boardSwapStatus") setSwapRequestedBy(data.requestedBy);
 
             if (data.type === "guessResult") {
                 console.log("GUESS RESULT RECEIVED:", data);
@@ -88,6 +96,8 @@ export default function Home() {
                 setSubmittingGuess(false);
                 setSwapRequestedBy([]);
             }
+
+            if (data.type === "privateRoomJoinFailed") setPrivateRoomError(data.message);
         };
 
         socket.onclose = () => {
@@ -147,6 +157,44 @@ export default function Home() {
                 difficulty: selectedDifficulty,
             })
         );
+    }
+
+    function createPrivateRoom(selectedDifficulty: GameDifficult) {
+        const socket = socketRef.current;
+
+        if (!socket || socket.readyState !== WebSocket.OPEN) {
+            console.log("WebSocket is not open");
+            return;
+        }
+
+        setDifficulty(selectedDifficulty);
+        setPrivateRoomCode(null);
+        setPrivateRoomStep("waiting");
+
+        socket.send(JSON.stringify({
+            type: "createPrivateRoom",
+            difficulty: selectedDifficulty,
+        }));
+    }
+
+    function joinPrivateRoom() {
+        const socket = socketRef.current;
+
+        if (!socket || socket.readyState !== WebSocket.OPEN) {
+            console.log("WebSocket is not open");
+            return;
+        }
+
+        const code = privateRoomJoinCode.trim().toUpperCase();
+
+        if (!code) return;
+
+        setPrivateRoomError(null);
+
+        socket.send(JSON.stringify({
+            type: "joinPrivateRoom",
+            code,
+        }));
     }
 
     function submitGuess() {
@@ -267,6 +315,15 @@ export default function Home() {
                     difficulty={difficulty}
                     joinGame={joinGame}
                     cancelSearch={cancelSearch}
+                    privateRoomStep={privateRoomStep}
+                    privateRoomCode={privateRoomCode}
+                    createPrivateRoom={createPrivateRoom}
+                    setPrivateRoomStep={setPrivateRoomStep}
+                    privateRoomJoinCode={privateRoomJoinCode}
+                    setPrivateRoomJoinCode={setPrivateRoomJoinCode}
+                    privateRoomError={privateRoomError}
+                    setPrivateRoomError={setPrivateRoomError}
+                    joinPrivateRoom={joinPrivateRoom}
                 />
             )}
 
