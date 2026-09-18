@@ -41,6 +41,16 @@ type BoardSwapStatusMessage = {
     requestedBy: string[];
 };
 
+export interface PrivateRoomCreatedMessage {
+    type: "privateRoomCreated";
+    code: string;
+}
+
+export interface PrivateRoomJoinFailedMessage {
+    type: "privateRoomJoinFailed";
+    message: string;
+}
+
 // Client messages
 export interface SubmitGuessMessage {
   type: "submitGuess";
@@ -69,13 +79,25 @@ export type LeaveRoomMessage = {
     type: "leaveRoom";
 };
 
+export interface CreatePrivateRoomMessage {
+    type: "createPrivateRoom";
+    difficulty: GameDifficult;
+}
+
+export interface JoinPrivateRoomMessage {
+    type: "joinPrivateRoom";
+    code: string;
+}
+
 export type ClientMessage =
   | SubmitGuessMessage
   | RestartGameMessage
   | ResetGameForTestMessage
   | RequestBoardSwapMessage
   | JoinRoomMessage
-  | LeaveRoomMessage;
+  | LeaveRoomMessage
+  | CreatePrivateRoomMessage
+  | JoinPrivateRoomMessage;
 
 export type ServerMessage =
   | ConnectedMessage
@@ -84,4 +106,6 @@ export type ServerMessage =
   | GuessResultMessage
   | GameStateUpdatedMessage
   | OpponentLeftMessage
-  | BoardSwapStatusMessage;
+  | BoardSwapStatusMessage
+  | PrivateRoomJoinFailedMessage
+  | PrivateRoomCreatedMessage;

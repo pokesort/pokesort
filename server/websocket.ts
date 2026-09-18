@@ -5,6 +5,8 @@ import { handleMessage } from "./handleMessage";
 import { parseClientMessage } from "./validation";
 
 import {
+    createPrivateRoom,
+    joinPrivateRoom,
     joinRoom,
     leaveRoom,
     startGame,
@@ -15,7 +17,7 @@ import {
     createPlayerId,
     type ConnectedPlayer,
 } from "./player";
-import { JoinRoomMessage } from "./types";
+import { CreatePrivateRoomMessage, JoinPrivateRoomMessage, JoinRoomMessage } from "./types";
 
 const PORT = 3001;
 
@@ -59,25 +61,31 @@ wss.on("connection", async (socket) => {
         console.log("Message received:", data);
 
         if (data.type === "leaveRoom") {
-            
+
             if (!player.roomId) return;
 
             leaveRoom(rooms, player);
             return;
         }
 
-        if (data.type === "joinRoom") {
+        if (data.type === "joinRoom" || data.type === "createPrivateRoom" || data.type === "joinPrivateRoom") {
 
             if (player.roomId || player.joiningRoom) return;
 
             player.joiningRoom = true;
 
             try {
-                await handleJoinroom(player, data);
+                if (data.type === "joinRoom") await handleJoinroom(player, data);
+
+                else if (data.type === "createPrivateRoom") handleCreatePrivateRoom(player, data);
+
+                else await handleJoinPrivateRoom(player, data);
+
             } finally {
                 player.joiningRoom = false;
             }
-            return
+
+            return;
         }
 
         if (!player.roomId) return;
@@ -112,8 +120,6 @@ wss.on("connection", async (socket) => {
 
 async function handleJoinroom(player: ConnectedPlayer, data: JoinRoomMessage) {
 
-    if (player.roomId) return;
-
     const room = joinRoom(
         player,
         rooms,
@@ -133,4 +139,57 @@ async function handleJoinroom(player: ConnectedPlayer, data: JoinRoomMessage) {
     }
 
     return;
+}
+
+function handleCreatePrivateRoom(player: ConnectedPlayer, data: CreatePrivateRoomMessage) {
+
+    const room = createPrivateRoom(
+        rooms,
+        data.difficulty,
+        player
+    );
+
+    console.log(`${player.playerId} created private room ${room.code} (${room.difficulty})`);
+
+    if (!room.code) return;
+
+    sendMessage(player.socket, {
+        type: "privateRoomCreated",
+        code: room.code,
+    });
+
+    return;
+
+}
+
+async function handleJoinPrivateRoom(player: ConnectedPlayer, data: JoinPrivateRoomMessage) {
+
+    const room = joinPrivateRoom(
+        player,
+        rooms,
+        data.code
+    );
+
+    if (!room) {
+        sendMessage(player.socket, {
+            type: "privateRoomJoinFailed",
+            message: "Sala não encontrada ou cheia.",
+        });
+
+        return;
+    }
+
+    console.log(`${player.playerId} joined private room ${room.id} (${room.code})`);
+
+    if (room.players.size === 2) {
+
+        await startGame(room);
+
+        sendToRoom(room, {
+            type: "gameStarted",
+            game: room.game!,
+        });
+    }
+
+    return
 }
