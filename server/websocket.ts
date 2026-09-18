@@ -25,6 +25,7 @@ const wss = new WebSocketServer({
 
 const players = new Map<string, ConnectedPlayer>();
 const rooms = new Map<string, Room>();
+//Considerar criar novo map usando codigo pras salas privadas
 
 console.log(`WebSocket server running on ws://localhost:${PORT}`);
 
