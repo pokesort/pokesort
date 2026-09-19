@@ -135,6 +135,7 @@ async function handleJoinroom(player: ConnectedPlayer, data: JoinRoomMessage) {
         sendToRoom(room, {
             type: "gameStarted",
             game: room.game!,
+            difficulty: room.difficulty
         });
     }
 
@@ -188,6 +189,7 @@ async function handleJoinPrivateRoom(player: ConnectedPlayer, data: JoinPrivateR
         sendToRoom(room, {
             type: "gameStarted",
             game: room.game!,
+            difficulty: room.difficulty
         });
     }
 

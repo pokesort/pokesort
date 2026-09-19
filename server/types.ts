@@ -1,6 +1,5 @@
 import type { GameState } from "../src/reversal/types";
 import type { GameDifficult, GuessCharacteristic } from "../src/models/types";
-import { leaveRoom } from "./room";
 
 // Server messages
 export interface RoomJoinedMessage {
@@ -17,6 +16,7 @@ export interface ConnectedMessage {
 export interface GameStartedMessage {
   type: "gameStarted";
   game: GameState;
+  difficulty: GameDifficult
 }
 
 export interface GuessResultMessage {

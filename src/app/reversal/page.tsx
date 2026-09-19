@@ -29,13 +29,18 @@ export default function Home() {
     const [swapRequestedBy, setSwapRequestedBy] = useState<string[]>([]);
 
     const [roomMode, setRoomMode] = useState<"selection" | "public" | "private">("selection");
+    const roomModeRef = useRef<"selection" | "public" | "private">("selection");
     const [privateRoomStep, setPrivateRoomStep] = useState<"selection" | "create" | "join" | "waiting">("selection");
     const [privateRoomCode, setPrivateRoomCode] = useState<string | null>(null);
     const [privateRoomJoinCode, setPrivateRoomJoinCode] = useState("");
     const [privateRoomError, setPrivateRoomError] = useState<string | null>(null);
 
     useEffect(() => {
-        const socket = new WebSocket("ws://192.168.222.86:3001");
+        roomModeRef.current = roomMode;
+    }, [roomMode])
+
+    useEffect(() => {
+        const socket = new WebSocket("ws://192.168.10.101:3001");
 
         socketRef.current = socket;
 
@@ -51,6 +56,7 @@ export default function Home() {
             if (data.type === "gameStarted") {
 
                 setGameState(data.game);
+                setDifficulty(data.difficulty)
                 setSearchingRoom(false);
                 setSelectedPokemon([]);
                 setSelectedCharacteristics([]);
@@ -86,9 +92,24 @@ export default function Home() {
             }
 
             if (data.type === "opponentLeft") {
+
+                console.log("opponentLeft - roomMode:", roomModeRef);
+                
+                if (roomModeRef.current === "private") {
+                    socketRef.current?.send(JSON.stringify({
+                        type: "leaveRoom",
+                    }));
+
+                    setPrivateRoomStep("selection");
+                    setPrivateRoomCode(null);
+                    setPrivateRoomJoinCode("");
+                    setPrivateRoomError(null);
+                    setSearchingRoom(false);
+                } else {
+                    setSearchingRoom(true);
+                }
+
                 setGameState(null);
-                setSearchingRoom(true);
-                // setDifficulty(null);
                 setSelectedPokemon([]);
                 setSelectedCharacteristics([]);
                 setActiveCharacteristic(null);
@@ -326,7 +347,6 @@ export default function Home() {
                     joinPrivateRoom={joinPrivateRoom}
                 />
             )}
-
             {game && (
                 <div>
                     <p>Dificuldade da Sala: {difficulty}</p>

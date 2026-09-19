@@ -14,6 +14,7 @@ export async function handleMessage(player: ConnectedPlayer, room: Room, message
     sendToRoom(room, {
       type: "gameStarted",
       game: room.game!,
+      difficulty: room.difficulty
     });
 
     return;
@@ -63,6 +64,7 @@ export async function handleMessage(player: ConnectedPlayer, room: Room, message
     sendToRoom(room, {
       type: "gameStarted",
       game: room.game!,
+      difficulty: room.difficulty
     });
 
     return;
