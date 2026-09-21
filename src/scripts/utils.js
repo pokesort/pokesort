@@ -400,39 +400,6 @@ export const getPuzzleStatus = (ids) => {
   return data;
 };
 
-//Gerar a partir de uma formula, precisa tratar mes e ano
-// export const getDailyPokemon = () => {
-//   const now = new Date();
-//   //01/06/2026
-//   //31/07/2026
-//   // const now = new Date("2026-06-01T12:00:00Z");
-//   // const now = new Date("2026-07-30T12:00:00Z");
-
-//   let id = `${Math.ceil((now.getYear() * 10) / (now.getMonth() + 1)) + now.getDate()}`
-
-//   // console.log(`Current date: ${now.toISOString()}`);
-
-//   // console.log("getYear():", now.getYear());
-
-//   // console.log("getYear() * 10:", now.getYear() * 10);
-
-//   // console.log("getMonth():", now.getMonth() + 1);
-
-//   // console.log("(getYear() * 10) / getMonth():", (now.getYear() * 10) / (now.getMonth() + 1));
-
-//   // console.log("Math.ceil(...):", Math.ceil((now.getYear() * 10) / (now.getMonth() + 1)));
-
-//   // console.log("getDate():", now.getDate());
-
-//   // console.log(
-//   //   "Resultado final:",
-//   //   Math.ceil((now.getYear() * 10) / (now.getMonth() + 1)) + now.getDate()
-//   // );
-//   // console.log(`Generated daily puzzle ID: ${id}`);
-
-//   return id;
-// }
-
 //Gerar pokemon desde o nascimento do jogo (1 a 1025) e reiniciar no dia seguinte (Pode ser no meio do ano)
 export const getDailyPokemon = () => {
 
@@ -452,23 +419,3 @@ export const getDailyPokemon = () => {
 
   return id;
 }
-
-//Gerar sempre o mesmo ao longo do ano (1 a 365) e reiniciar no próximo ano
-// export const getDailyPokemon = () => {
-//   // const now = new Date();
-//   const now = new Date("2026-12-31T12:00:00Z");
-
-//   const startOfYear = new Date(now.getFullYear(), 0, 1);
-
-//   const id = `${Math.floor(
-//     (now.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24)
-//   ) + 1}`;
-
-//   // const id = dayOfYear.toString().padStart(4, "0");
-
-//   console.log("Current date:", now.toISOString());
-//   // console.log("Day of year:", dayOfYear);
-//   console.log("Generated daily puzzle ID:", id);
-
-//   return id;
-// }
