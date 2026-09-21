@@ -9,9 +9,14 @@ import "@/src/styles/components/PuzzleDetective.scss";
 import SearchIcon from "../svg/SearchIcon";
 import DexIcon from "../svg/DexIcon";
 import LogsIcon from "../svg/LogsIcon";
+import TipIcon from '../svg/TipIcon';
 import PuzzleBlock from "./PuzzleBlock";
 
 import ch_sprite from "@/src/assets/images/challenge_d.png";
+import DexView from "../DexView";
+import AbandonIcon from "../svg/AbandonIcon";
+import Modal from "../Modal";
+import QueryFilter from "../forms/QueryFilter";
 
 const containerVariants: Variants = {
   hidden: { opacity: 1 },
@@ -25,6 +30,51 @@ export type PuzzleDetective = {
     secretId: number,
     success: true
 }
+
+interface GuessLogsProps {
+
+}
+
+const GuessLogs = React.memo(({}: GuessLogsProps) => {
+    const t = useTranslations('');
+    // const locale = useLocale();
+    const [showAbandonModal, setShowAbandonModal] = useState<boolean>(false);
+
+    return (
+        <>
+            <Modal id={"puzzle-abandon"} isOpen={showAbandonModal} setIsOpen={setShowAbandonModal} canClose={true} background={true}>
+                <div className="modal-content-div">
+                    <p>
+                        {t(`puzzle.abandon.confirmation-1`)}
+                    </p>
+                    <p>
+                        {t(`puzzle.abandon.confirmation-2`)}
+                    </p>
+                </div>
+                <div className="button-row">
+                    <button className="modal-content-div" onClick={() => setShowAbandonModal(false)}>
+                        <p>{t(`puzzle.abandon.no`)}</p>
+                    </button>
+                    <button className="modal-content-div" onClick={() => {setAbandoned(true); setShowAbandonModal(false)}}>
+                        <p>{t(`puzzle.abandon.yes`)}</p>
+                    </button>
+                </div>
+            </Modal>
+            <div className="guess-buttons-container">                
+                <button className="guess-button">
+                    <TipIcon />
+                    {t('puzzle.detective.question')}
+                </button>
+                <button className="guess-button" onClick={() => setShowAbandonModal(true)}
+                    // disabled={isSolved}
+                >
+                    <AbandonIcon />
+                    {t(`puzzle.abandon.button`)}
+                </button>
+            </div>
+        </>
+    )
+})
 
 interface PuzzleGridProps {
     pokemons: Pokemon[];
@@ -93,6 +143,7 @@ export default React.memo(function Puzzle({puzzle}: PuzzleDetectiveProps) {
     const mainTabRef = useRef<HTMLDivElement>(null);
     const [visibleTab, setVisibleTab] = useState<number>(1);
     const [currentDexView, setCurrentDexView] = useState<number>();
+    const [questionModalOpen, setQuestionModalOpen] = useState<boolean>(false);
 
     const scrollToTab = useCallback((target: number, behavior: ('smooth' | 'instant') = 'smooth') => {
         if (target !== visibleTab || behavior == 'instant') {
@@ -105,8 +156,35 @@ export default React.memo(function Puzzle({puzzle}: PuzzleDetectiveProps) {
        return mainTabRef.current?.offsetHeight;
     }, [puzzle, visibleTab, refresh]);
 
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            scrollToTab(1, 'instant');
+        }, 0);
+
+        return () => clearTimeout(timer);
+    }, [puzzle])
+
+    useEffect(() => {
+        const handleResize = () => {
+            scrollToTab(1, 'instant');
+            setRefresh(prev => !prev);
+        };
+
+        window.addEventListener("resize", handleResize);
+
+        return () => {
+            window.removeEventListener("resize", handleResize);
+        };
+    }, []);
+
     return (
         <>
+            <Modal id="detective-question-modal" isOpen={questionModalOpen} setIsOpen={setQuestionModalOpen}>
+                <QueryFilter />
+                <button className="modal-content-div">
+                    Submit
+                </button>
+            </Modal>
             <ul className="puzzle-tabs-container" style={{'--height': `${tabsHeight}px`, '--cols': 5, '--rows': 5} as React.CSSProperties}>
                 <PuzzleTab setVisibleTab={setVisibleTab} tab={0}>
                     <div className="window-container cut-left">
@@ -114,21 +192,8 @@ export default React.memo(function Puzzle({puzzle}: PuzzleDetectiveProps) {
                             <LogsIcon/>
                             <p>{t('logs')}<span>0</span></p>
                         </section>
-                        {/* <GuessLogs
-                            guesses={guesses}
-                            setGuesses={setGuesses}
-                            availableTips={availableTips}
-                            setAvailableTips={setAvailableTips}
-                            spritesMap={spritesMap}
-                            allTips={allTips}
-                            solvedGroupNames={solvedGroupNames}
-                            puzzleRows={puzzle ? puzzle.rows : 4}
-                            dictionary={dictionary}
-                            viewedTips={viewedTips}
-                            abandoned={abandoned}
-                            setAbandoned={setAbandoned}
-                            logsRef={logsRef}
-                        /> */}
+                        <GuessLogs
+                        />
                     </div>
                 </PuzzleTab>
                 <PuzzleTab setVisibleTab={setVisibleTab} tab={1}>
@@ -153,7 +218,7 @@ export default React.memo(function Puzzle({puzzle}: PuzzleDetectiveProps) {
                             <DexIcon/>
                             <p>{t('dex')}</p>
                         </section>
-                        {/* <DexView pokemonId={currentDexView} /> */}
+                        <DexView pokemonId={currentDexView} />
                     </div>
                 </PuzzleTab>
             </ul>
@@ -168,6 +233,12 @@ export default React.memo(function Puzzle({puzzle}: PuzzleDetectiveProps) {
                     {t('dex')}
                 </button>
             </nav>
+            <section id="detective-question-button" className="puzzle-extra-button">
+                <button onClick={() => setQuestionModalOpen(true)}>
+                    <TipIcon/>
+                    <p>{t('detective.question')}</p>
+                </button>
+            </section>
         </>
     )
 })

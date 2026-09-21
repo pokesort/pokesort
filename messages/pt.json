@@ -111,7 +111,9 @@
         },
         "detective": {
             "label": "Modo Detetive",
-            "generate": "Gerar"
+            "generate": "Gerar",
+
+            "question": "Fazer Pergunta"
         },
         "from": {
             "admin": "Personalizado",

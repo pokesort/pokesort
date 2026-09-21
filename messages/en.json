@@ -110,7 +110,10 @@
             "button": "Generate"
         },        
         "detective": {
-            "label": "Detective Mode"
+            "label": "Detective Mode",
+            "generate": "Generate",
+
+            "question": "Ask Question"
         },
         "from": {
             "admin": "Custom",

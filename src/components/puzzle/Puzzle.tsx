@@ -357,7 +357,7 @@ const GuessLogs = React.memo(({guesses, setGuesses, availableTips, setAvailableT
 
     return (
         <>
-            <Modal id={"puzzle-success"} isOpen={showAbandonModal} setIsOpen={setShowAbandonModal} canClose={true} background={true}>
+            <Modal id={"puzzle-abandon"} isOpen={showAbandonModal} setIsOpen={setShowAbandonModal} canClose={true} background={true}>
                 <div className="modal-content-div">
                     <p>
                         {t(`puzzle.abandon.confirmation-1`)}

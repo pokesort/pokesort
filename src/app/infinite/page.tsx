@@ -192,7 +192,7 @@ export default function InfinitePage() {
                     </button>
                 </Modal>
                 {!initial &&
-                    <section id="infinite-generate-button">
+                    <section id="infinite-generate-button" className="puzzle-extra-button">
                         <button onClick={() => setInfiniteModalOpen(true)}>
                             <GridIcon/>
                             <p>{t('puzzle.infinite.generate')}</p>
