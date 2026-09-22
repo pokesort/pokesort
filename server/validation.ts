@@ -40,6 +40,15 @@ function isSubmitGuessMessage(data: Record<string, unknown>): boolean {
     return data.type === "submitGuess" && Array.isArray(data.elements) && Array.isArray(data.characteristics);
 }
 
+function isReconnectMessage(data: Record<string, unknown>): boolean {
+
+    return data.type === "reconnect"
+        && typeof data.playerId === "string"
+        && data.playerId.trim().length > 0
+        && typeof data.reconnectToken === "string"
+        && data.reconnectToken.trim().length > 0;
+}
+
 export function parseClientMessage(rawMessage: string): ClientMessage | null {
     try {
         const data: unknown = JSON.parse(rawMessage);
@@ -59,6 +68,8 @@ export function parseClientMessage(rawMessage: string): ClientMessage | null {
         if (isJoinPrivateRoomMessage(message)) return message as ClientMessage;
 
         if (isSubmitGuessMessage(message)) return message as ClientMessage;
+
+        if (isReconnectMessage(message)) return message as ClientMessage;
 
         return null;
     } catch {

@@ -40,18 +40,52 @@ export default function Home() {
     }, [roomMode])
 
     useEffect(() => {
-        const socket = new WebSocket("ws://192.168.10.101:3001");
+        const socket = new WebSocket("ws://10.88.154.87:3001");
 
         socketRef.current = socket;
 
         socket.onopen = () => {
-            console.log("Connected to WebSocket server");
+
+            const playerId = sessionStorage.getItem("playerId");
+            const reconnectToken = sessionStorage.getItem("reconnectToken");
+
+            if (playerId && reconnectToken) {
+                socket.send(JSON.stringify({
+                    type: "reconnect",
+                    playerId,
+                    reconnectToken,
+                }));
+
+                return;
+            }
         };
 
         socket.onmessage = (event) => {
             const data = JSON.parse(event.data);
 
-            if (data.type === "connected") setPlayerId(data.playerId);
+            if (data.type === "reconnected") {
+                setGameState(data.game);
+                setDifficulty(data.difficulty);
+                setSearchingRoom(false);
+
+                setSelectedPokemon([]);
+                setSelectedCharacteristics([]);
+                setActiveCharacteristic(null);
+                setGuessResult(null);
+                setSubmittingGuess(false);
+                setSwapRequestedBy([]);
+
+                return;
+            }
+
+            if (data.type === "connected") {
+
+                setPlayerId(data.playerId);
+
+                //Usado para testar entre abas, trocar para LocalStorage
+                sessionStorage.setItem("playerId", data.playerId);
+                sessionStorage.setItem("reconnectToken", data.reconnectToken);
+            }
 
             if (data.type === "gameStarted") {
 
@@ -94,7 +128,7 @@ export default function Home() {
             if (data.type === "opponentLeft") {
 
                 console.log("opponentLeft - roomMode:", roomModeRef);
-                
+
                 if (roomModeRef.current === "private") {
                     socketRef.current?.send(JSON.stringify({
                         type: "leaveRoom",

@@ -1,4 +1,4 @@
-import type { ConnectedPlayer } from "./player";
+import type { Player } from "./player";
 import type { GameState } from "../src/reversal/types";
 import { createGame } from "../src/reversal/createGame";
 import {getPokemonBoard} from "../src/scripts/server_utils";
@@ -18,7 +18,7 @@ export interface PendingGuess {
 export interface Room {
   id: string;
   type: RoomType;
-  players: Map<string, ConnectedPlayer>;
+  players: Map<string, Player>;
   game?: GameState;
   code?: string;
   pendingGuesses: PendingGuess[];
@@ -52,7 +52,7 @@ export function createRoom(rooms: Map<string, Room>, difficulty: GameDifficult, 
   return room;
 }
 
-export function createPrivateRoom(rooms: Map<string, Room>, difficulty: GameDifficult, player: ConnectedPlayer): Room {
+export function createPrivateRoom(rooms: Map<string, Room>, difficulty: GameDifficult, player: Player): Room {
 
     const code = generateRoomCode(rooms);
 
@@ -95,7 +95,7 @@ export function findAvailableRoom(rooms: Map<string, Room>, difficulty: GameDiff
   return undefined;
 }
 
-export function joinRoom(player: ConnectedPlayer, rooms: Map<string, Room>, difficulty: GameDifficult): Room {
+export function joinRoom(player: Player, rooms: Map<string, Room>, difficulty: GameDifficult): Room {
   
   let room = findAvailableRoom(rooms, difficulty);
 
@@ -107,7 +107,7 @@ export function joinRoom(player: ConnectedPlayer, rooms: Map<string, Room>, diff
   return room;
 }
 
-export function joinPrivateRoom(player: ConnectedPlayer, rooms: Map<string, Room>,code: string): Room | null {
+export function joinPrivateRoom(player: Player, rooms: Map<string, Room>,code: string): Room | null {
 
     code = code.trim().toUpperCase();
 
@@ -128,7 +128,7 @@ export function joinPrivateRoom(player: ConnectedPlayer, rooms: Map<string, Room
     return room;
 }
 
-export function leaveRoom(rooms: Map<string, Room>, player: ConnectedPlayer): Room | undefined {
+export function leaveRoom(rooms: Map<string, Room>, player: Player): Room | undefined {
 
   if (!player.roomId) return undefined;
 

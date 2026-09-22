@@ -1,10 +1,10 @@
 import { resetGameForTest, restartGame, type Room } from "./room";
-import type { ConnectedPlayer } from "./player";
+import type { Player } from "./player";
 import type { ClientMessage } from "./types";
 import { submitGuess, swapBoard, determineResult } from "../src/reversal/submitGuess";
 import { sendMessage, sendToRoom } from "./messaging";
 
-export async function handleMessage(player: ConnectedPlayer, room: Room, message: ClientMessage): Promise<void> {
+export async function handleMessage(player: Player, room: Room, message: ClientMessage): Promise<void> {
 
   if (message.type === "restartGame") {
     const restarted = await restartGame(room);
@@ -22,7 +22,7 @@ export async function handleMessage(player: ConnectedPlayer, room: Room, message
 
   if (message.type === "submitGuess") {
 
-    if (!room.game) return;
+    if (!room.game || !player.socket) return;
 
     const result = await submitGuess(
       room,

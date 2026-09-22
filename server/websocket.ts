@@ -3,6 +3,8 @@ import { WebSocketServer } from "ws";
 import { sendMessage, sendToRoom } from "./messaging";
 import { handleMessage } from "./handleMessage";
 import { parseClientMessage } from "./validation";
+import { CreatePrivateRoomMessage, JoinPrivateRoomMessage, JoinRoomMessage } from "./types";
+import crypto from "crypto";
 
 import {
     createPrivateRoom,
@@ -15,9 +17,9 @@ import {
 
 import {
     createPlayerId,
-    type ConnectedPlayer,
+    reconnectPlayer,
+    type Player,
 } from "./player";
-import { CreatePrivateRoomMessage, JoinPrivateRoomMessage, JoinRoomMessage } from "./types";
 
 const PORT = 3001;
 
@@ -25,7 +27,9 @@ const wss = new WebSocketServer({
     port: PORT,
 });
 
-const players = new Map<string, ConnectedPlayer>();
+const RECONNECT_TIME = 30_000;
+
+const players = new Map<string, Player>();
 const rooms = new Map<string, Room>();
 //Considerar criar novo map usando codigo pras salas privadas
 
@@ -35,10 +39,12 @@ wss.on("connection", async (socket) => {
 
     const playerId = createPlayerId();
 
-    const player: ConnectedPlayer = {
+    let player: Player = {
         playerId,
         socket,
-        joiningRoom: false
+        joiningRoom: false,
+        connected: true,
+        reconnectToken: generateReconnectToken()
     };
 
     players.set(playerId, player);
@@ -48,6 +54,7 @@ wss.on("connection", async (socket) => {
     sendMessage(socket, {
         type: "connected",
         playerId,
+        reconnectToken: player.reconnectToken
     });
 
     socket.on("message", async (message) => {
@@ -59,6 +66,35 @@ wss.on("connection", async (socket) => {
         }
 
         console.log("Message received:", data);
+
+        if (data.type === "reconnect") {
+
+            const reconnectedPlayer = reconnectPlayer(
+                players,
+                socket,
+                data.playerId,
+                data.reconnectToken
+            );
+
+            if (!reconnectedPlayer) return;
+
+            players.delete(player.playerId);
+            player = reconnectedPlayer;
+
+            if (!player .roomId) return;
+
+            const room = rooms.get(player.roomId);
+
+            if (!room || !room.game) return;
+
+            sendMessage(socket, {
+                type: "reconnected",
+                game: room.game,
+                difficulty: room.difficulty,
+            });
+
+            return;
+        }
 
         if (data.type === "leaveRoom") {
 
@@ -99,26 +135,40 @@ wss.on("connection", async (socket) => {
 
     socket.on("close", () => {
 
-        const room = player.roomId
-            ? rooms.get(player.roomId)
-            : undefined;
+        if (player.socket !== socket) return;
 
-        leaveRoom(rooms, player);
+        player.connected = false;
+        player.socket = null;
         console.log(`${playerId} disconnected`);
 
-        if (room && room.players.size === 1) {
-            const remainingPlayer = room.players.values().next().value;
+        player.reconnectTimeout = setTimeout(() => {
 
-            if (remainingPlayer) {
-                sendMessage(remainingPlayer.socket, {
-                    type: "opponentLeft",
-                });
+            if (player.connected) return;
+
+            console.log(`${playerId} reconnection timeout expired`);
+
+            const room = player.roomId
+                ? rooms.get(player.roomId)
+                : undefined;
+
+            leaveRoom(rooms, player);
+
+
+            if (room && room.players.size === 1) {
+                const remainingPlayer = room.players.values().next().value;
+
+                if (remainingPlayer && remainingPlayer.socket) {
+                    sendMessage(remainingPlayer.socket, {
+                        type: "opponentLeft",
+                    });
+                }
             }
-        }
+
+        }, RECONNECT_TIME);
     });
 });
 
-async function handleJoinroom(player: ConnectedPlayer, data: JoinRoomMessage) {
+async function handleJoinroom(player: Player, data: JoinRoomMessage) {
 
     const room = joinRoom(
         player,
@@ -142,7 +192,7 @@ async function handleJoinroom(player: ConnectedPlayer, data: JoinRoomMessage) {
     return;
 }
 
-function handleCreatePrivateRoom(player: ConnectedPlayer, data: CreatePrivateRoomMessage) {
+function handleCreatePrivateRoom(player: Player, data: CreatePrivateRoomMessage) {
 
     const room = createPrivateRoom(
         rooms,
@@ -153,6 +203,7 @@ function handleCreatePrivateRoom(player: ConnectedPlayer, data: CreatePrivateRoo
     console.log(`${player.playerId} created private room ${room.code} (${room.difficulty})`);
 
     if (!room.code) return;
+    if (!player.socket) return;
 
     sendMessage(player.socket, {
         type: "privateRoomCreated",
@@ -163,7 +214,7 @@ function handleCreatePrivateRoom(player: ConnectedPlayer, data: CreatePrivateRoo
 
 }
 
-async function handleJoinPrivateRoom(player: ConnectedPlayer, data: JoinPrivateRoomMessage) {
+async function handleJoinPrivateRoom(player: Player, data: JoinPrivateRoomMessage) {
 
     const room = joinPrivateRoom(
         player,
@@ -172,11 +223,13 @@ async function handleJoinPrivateRoom(player: ConnectedPlayer, data: JoinPrivateR
     );
 
     if (!room) {
-        sendMessage(player.socket, {
-            type: "privateRoomJoinFailed",
-            message: "Sala não encontrada ou cheia.",
-        });
 
+        if (player.socket) {
+            sendMessage(player.socket, {
+                type: "privateRoomJoinFailed",
+                message: "Sala não encontrada ou cheia.",
+            });
+        }
         return;
     }
 
@@ -194,4 +247,9 @@ async function handleJoinPrivateRoom(player: ConnectedPlayer, data: JoinPrivateR
     }
 
     return
+}
+
+function generateReconnectToken(): string {
+
+    return crypto.randomBytes(32).toString("hex");
 }

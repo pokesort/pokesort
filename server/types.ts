@@ -11,6 +11,13 @@ export interface RoomJoinedMessage {
 export interface ConnectedMessage {
   type: "connected";
   playerId: string;
+  reconnectToken: string;
+}
+
+export interface ReconnectedMessage {
+    type: "reconnected";
+    game: GameState;
+    difficulty: GameDifficult;
 }
 
 export interface GameStartedMessage {
@@ -89,6 +96,12 @@ export interface JoinPrivateRoomMessage {
     code: string;
 }
 
+export interface ReconnectMessage {
+    type: "reconnect";
+    playerId: string;
+    reconnectToken: string;
+}
+
 export type ClientMessage =
   | SubmitGuessMessage
   | RestartGameMessage
@@ -97,7 +110,8 @@ export type ClientMessage =
   | JoinRoomMessage
   | LeaveRoomMessage
   | CreatePrivateRoomMessage
-  | JoinPrivateRoomMessage;
+  | JoinPrivateRoomMessage
+  | ReconnectMessage;
 
 export type ServerMessage =
   | ConnectedMessage
@@ -108,4 +122,5 @@ export type ServerMessage =
   | OpponentLeftMessage
   | BoardSwapStatusMessage
   | PrivateRoomJoinFailedMessage
-  | PrivateRoomCreatedMessage;
+  | PrivateRoomCreatedMessage
+  | ReconnectedMessage;
