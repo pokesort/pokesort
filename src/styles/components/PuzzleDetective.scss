@@ -21,3 +21,9 @@
         margin-top: 2.8rem;
     }
 }
+
+@media(min-width: 1480px) {
+    #detective-question-button {
+        display: none;
+    }
+}

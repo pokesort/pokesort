@@ -94,7 +94,7 @@ export default function InfinitePage() {
             <ErrorToast error={error} />
             {!initial &&
                 (!loading && puzzle != undefined ?
-                    <Puzzle puzzle={puzzle}/>
+                    <Puzzle puzzle={puzzle} setPuzzle={setPuzzle} />
                     :
                     <>
                         <div className={`window-container cut-left`}>
@@ -112,15 +112,6 @@ export default function InfinitePage() {
                     {t('puzzle.detective.generate')}
                 </button>
             </Modal>
-            {!initial &&
-                <></>
-                // <section id="infinite-generate-button">
-                //     <button onClick={() => setInfiniteModalOpen(true)}>
-                //         <GridIcon/>
-                //         <p>{t('puzzle.infinite.generate')}</p>
-                //     </button>
-                // </section>
-            }
         </>
     )
 }

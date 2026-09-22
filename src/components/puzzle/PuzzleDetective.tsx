@@ -17,6 +17,8 @@ import DexView from "../DexView";
 import AbandonIcon from "../svg/AbandonIcon";
 import Modal from "../Modal";
 import QueryFilter from "../forms/QueryFilter";
+import { useForm } from "react-hook-form";
+import { form } from "framer-motion/client";
 
 const containerVariants: Variants = {
   hidden: { opacity: 1 },
@@ -32,10 +34,10 @@ export type PuzzleDetective = {
 }
 
 interface GuessLogsProps {
-
+    setQuestionModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const GuessLogs = React.memo(({}: GuessLogsProps) => {
+const GuessLogs = React.memo(({setQuestionModalOpen}: GuessLogsProps) => {
     const t = useTranslations('');
     // const locale = useLocale();
     const [showAbandonModal, setShowAbandonModal] = useState<boolean>(false);
@@ -55,13 +57,13 @@ const GuessLogs = React.memo(({}: GuessLogsProps) => {
                     <button className="modal-content-div" onClick={() => setShowAbandonModal(false)}>
                         <p>{t(`puzzle.abandon.no`)}</p>
                     </button>
-                    <button className="modal-content-div" onClick={() => {setAbandoned(true); setShowAbandonModal(false)}}>
+                    <button className="modal-content-div" onClick={() => {setShowAbandonModal(false)}}>
                         <p>{t(`puzzle.abandon.yes`)}</p>
                     </button>
                 </div>
             </Modal>
             <div className="guess-buttons-container">                
-                <button className="guess-button">
+                <button className="guess-button" onClick={() => setQuestionModalOpen(true)}>
                     <TipIcon />
                     {t('puzzle.detective.question')}
                 </button>
@@ -131,11 +133,40 @@ const PuzzleGrid = ({pokemons, setCurrentDexView, scrollToTab}: PuzzleGridProps)
     )
 }
 
-interface PuzzleDetectiveProps {
-    puzzle: PuzzleDetective
+interface QuestionModalProps {
+    questionModalOpen: boolean,
+    setQuestionModalOpen: React.Dispatch<React.SetStateAction<boolean>>,
+    askQuestion: (query: Record<string, string>) => void
 }
 
-export default React.memo(function Puzzle({puzzle}: PuzzleDetectiveProps) {
+const QuestionModal = React.memo(({questionModalOpen, setQuestionModalOpen, askQuestion}: QuestionModalProps) => {
+    const form = useForm();
+    const query = form.watch("query");
+
+    const filterPokemonsByQuery = useCallback(() => {
+        let queryObject: Record<string, string> = {};
+        const querySplit = query.split("=");
+        queryObject[querySplit[0]] = querySplit[1];
+
+        askQuestion(queryObject);
+    }, [query])
+    
+    return (
+        <Modal id="detective-question-modal" isOpen={questionModalOpen} setIsOpen={setQuestionModalOpen}>
+            <QueryFilter form={form} />
+            <button className="modal-content-div" onClick={filterPokemonsByQuery}>
+                Submit
+            </button>
+        </Modal>
+    )
+})
+
+interface PuzzleDetectiveProps {
+    puzzle: PuzzleDetective,
+    setPuzzle: React.Dispatch<React.SetStateAction<PuzzleDetective | undefined>>
+}
+
+export default React.memo(function Puzzle({puzzle, setPuzzle}: PuzzleDetectiveProps) {
     const t = useTranslations('puzzle');
     
     const [refresh, setRefresh] = useState<boolean>(false);
@@ -155,6 +186,33 @@ export default React.memo(function Puzzle({puzzle}: PuzzleDetectiveProps) {
     const tabsHeight = useMemo(() => {
        return mainTabRef.current?.offsetHeight;
     }, [puzzle, visibleTab, refresh]);
+
+    const askQuestion = async (query: Record<string, string>) => {
+        try {
+            const response = await fetch("/api/detective/question", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    secretId: puzzle.secretId,
+                    pokemons: puzzle.pokemons,
+                    query,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error("Erro ao enviar pergunta");
+            }
+
+            const data = await response.json();
+
+            setPuzzle(data);
+            setQuestionModalOpen(false);
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -179,12 +237,11 @@ export default React.memo(function Puzzle({puzzle}: PuzzleDetectiveProps) {
 
     return (
         <>
-            <Modal id="detective-question-modal" isOpen={questionModalOpen} setIsOpen={setQuestionModalOpen}>
-                <QueryFilter />
-                <button className="modal-content-div">
-                    Submit
-                </button>
-            </Modal>
+            <QuestionModal
+                questionModalOpen={questionModalOpen}
+                setQuestionModalOpen={setQuestionModalOpen}
+                askQuestion={askQuestion}
+            />
             <ul className="puzzle-tabs-container" style={{'--height': `${tabsHeight}px`, '--cols': 5, '--rows': 5} as React.CSSProperties}>
                 <PuzzleTab setVisibleTab={setVisibleTab} tab={0}>
                     <div className="window-container cut-left">
@@ -193,6 +250,7 @@ export default React.memo(function Puzzle({puzzle}: PuzzleDetectiveProps) {
                             <p>{t('logs')}<span>0</span></p>
                         </section>
                         <GuessLogs
+                            setQuestionModalOpen={setQuestionModalOpen}
                         />
                     </div>
                 </PuzzleTab>

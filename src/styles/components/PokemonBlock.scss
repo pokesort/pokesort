@@ -94,7 +94,8 @@ label.block-container {
             pointer-events: none;
 
             img {
-                filter: saturate(0)
+                filter: saturate(0);
+                opacity: 0.6;
             }
         }
     
