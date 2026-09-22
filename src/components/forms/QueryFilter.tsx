@@ -10,9 +10,10 @@ import Input from './Input';
 interface QueryFilterProps {
     name?: string;
     form?: UseFormReturn<FieldValues, any, FieldValues>
+    limit?: 1 | 2 | 3
 }
 
-export default React.memo(function QueryFilter({name="query", form}: QueryFilterProps) {
+export default React.memo(function QueryFilter({name="query", form, limit=3}: QueryFilterProps) {
     const t = useTranslations();
 
     if (!form) {

@@ -82,14 +82,19 @@ interface PuzzleGridProps {
     pokemons: Pokemon[];
     setCurrentDexView: React.Dispatch<React.SetStateAction<number | undefined>>;
     scrollToTab: (target: number, behavior?: "instant" | "smooth") => void;
+    correctIds: number[];
+    incorrectIds: number[];
+    makeGuess: (id: number) => void;
 }
 
-const PuzzleGrid = ({pokemons, setCurrentDexView, scrollToTab}: PuzzleGridProps) => {
+const PuzzleGrid = ({pokemons, setCurrentDexView, scrollToTab, makeGuess, correctIds, incorrectIds}: PuzzleGridProps) => {
     const [pause, setPause] = useState<boolean>(false);
     const [selectedId, setSelectedId] = useState<number>(0);
 
     const handleSelect = useCallback((id: number) => {
         if (pause) return;
+
+        makeGuess(id);
 
         selectedId == id ? setSelectedId(0) : setSelectedId(id);
     }, [selectedId, pause]);
@@ -109,8 +114,8 @@ const PuzzleGrid = ({pokemons, setCurrentDexView, scrollToTab}: PuzzleGridProps)
             <AnimatePresence>
                 {pokemons.map((p: any, index: number) => {
                     const isSelected = false;
-                    const isCorrect = false;
-                    const isIncorrect = false;
+                    const isCorrect = correctIds.includes(p.id);
+                    const isIncorrect = incorrectIds.includes(p.id);
 
                     return (
                         <PuzzleBlock
@@ -153,7 +158,7 @@ const QuestionModal = React.memo(({questionModalOpen, setQuestionModalOpen, askQ
     
     return (
         <Modal id="detective-question-modal" isOpen={questionModalOpen} setIsOpen={setQuestionModalOpen}>
-            <QueryFilter form={form} />
+            <QueryFilter form={form} limit={1} />
             <button className="modal-content-div" onClick={filterPokemonsByQuery}>
                 Submit
             </button>
@@ -175,6 +180,8 @@ export default React.memo(function Puzzle({puzzle, setPuzzle}: PuzzleDetectivePr
     const [visibleTab, setVisibleTab] = useState<number>(1);
     const [currentDexView, setCurrentDexView] = useState<number>();
     const [questionModalOpen, setQuestionModalOpen] = useState<boolean>(false);
+    const [correctIds, setCorrectIds] = useState<number[]>([]);
+    const [incorrectIds, setIncorrectIds] = useState<number[]>([]);
 
     const scrollToTab = useCallback((target: number, behavior: ('smooth' | 'instant') = 'smooth') => {
         if (target !== visibleTab || behavior == 'instant') {
@@ -187,7 +194,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle}: PuzzleDetectivePr
        return mainTabRef.current?.offsetHeight;
     }, [puzzle, visibleTab, refresh]);
 
-    const askQuestion = async (query: Record<string, string>) => {
+    const askQuestion = useCallback(async (query: Record<string, string>) => {
         try {
             const response = await fetch("/api/detective/question", {
                 method: "POST",
@@ -206,13 +213,34 @@ export default React.memo(function Puzzle({puzzle, setPuzzle}: PuzzleDetectivePr
             }
 
             const data = await response.json();
+            if (data.secretFound) {
+                setIncorrectIds([]);
+                setCorrectIds(data.affected);
+            } else {
+                setCorrectIds([]);
+                setIncorrectIds(data.affected);
+            }
 
             setPuzzle(data);
             setQuestionModalOpen(false);
         } catch (error) {
             console.error(error);
         }
-    }
+    }, [puzzle])
+
+    const makeGuess = useCallback((id: number) => {
+        if (id == puzzle.secretId) {
+            setCorrectIds([id]);
+            return;
+        }
+
+        const updatedPokemons = puzzle.pokemons.map((p: any) => {
+            if (p.id == id) p.available = false;
+            return p;
+        })
+        setIncorrectIds([id]);
+        setPuzzle({...puzzle, pokemons: updatedPokemons})
+    }, [puzzle])
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -267,6 +295,9 @@ export default React.memo(function Puzzle({puzzle, setPuzzle}: PuzzleDetectivePr
                             pokemons={puzzle.pokemons}
                             setCurrentDexView={setCurrentDexView}
                             scrollToTab={scrollToTab}
+                            makeGuess={makeGuess}
+                            correctIds={correctIds}
+                            incorrectIds={incorrectIds}
                         />
                     </div>
                 </PuzzleTab>

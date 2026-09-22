@@ -66,6 +66,7 @@ export default function InfinitePage() {
                 ]);
               
                setPuzzle(puzzleData);
+               console.log(puzzleData);
             } catch (e) {
                 console.error(e);
                 setError('Não foi possível conectar ao servidor. Tente novamente.');
