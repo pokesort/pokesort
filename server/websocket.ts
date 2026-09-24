@@ -37,25 +37,22 @@ console.log(`WebSocket server running on ws://localhost:${PORT}`);
 
 wss.on("connection", async (socket) => {
 
-    const playerId = createPlayerId();
+    //Cria o player assim que conecta. Removido pois a tentativa de conexão pode ser uma reconexão
+    // const playerId = createPlayerId();
 
-    let player: Player = {
-        playerId,
-        socket,
-        joiningRoom: false,
-        connected: true,
-        reconnectToken: generateReconnectToken()
-    };
+    // let player: Player = {
+    //     playerId,
+    //     socket,
+    //     joiningRoom: false,
+    //     connected: true,
+    //     reconnectToken: generateReconnectToken()
+    // };
 
-    players.set(playerId, player);
+    // players.set(playerId, player);
+    // console.log(`${playerId} joined`);
 
-    console.log(`${playerId} joined`);
-
-    sendMessage(socket, {
-        type: "connected",
-        playerId,
-        reconnectToken: player.reconnectToken
-    });
+    let player: Player | null = null;
+    let identified = false;
 
     socket.on("message", async (message) => {
         const data = parseClientMessage(message.toString());
@@ -76,12 +73,18 @@ wss.on("connection", async (socket) => {
                 data.reconnectToken
             );
 
-            if (!reconnectedPlayer) return;
+            if (!reconnectedPlayer) {
+                sendMessage(socket, {
+                    type: "reconnectFailed",
+                    message: "Não foi possível reconectar."
+                });
+                return;
+            }
 
-            players.delete(player.playerId);
             player = reconnectedPlayer;
+            identified = true;
 
-            if (!player .roomId) return;
+            if (!player.roomId) return;
 
             const room = rooms.get(player.roomId);
 
@@ -96,8 +99,33 @@ wss.on("connection", async (socket) => {
             return;
         }
 
+        if (!identified) {
+
+            const playerId = createPlayerId();
+
+            player = {
+                playerId,
+                socket,
+                joiningRoom: false,
+                connected: true,
+                reconnectToken: generateReconnectToken()
+            }
+
+            players.set(playerId, player);
+            identified = true;
+
+            console.log(`${playerId} joined`);
+
+            sendMessage(socket, {
+                type: "connected",
+                playerId: player.playerId,
+                reconnectToken: player.reconnectToken
+            });
+        }
+
         if (data.type === "leaveRoom") {
 
+            if (!player) return;
             if (!player.roomId) return;
 
             leaveRoom(rooms, player);
@@ -106,6 +134,7 @@ wss.on("connection", async (socket) => {
 
         if (data.type === "joinRoom" || data.type === "createPrivateRoom" || data.type === "joinPrivateRoom") {
 
+            if (!player) return;
             if (player.roomId || player.joiningRoom) return;
 
             player.joiningRoom = true;
@@ -124,7 +153,8 @@ wss.on("connection", async (socket) => {
             return;
         }
 
-        if (!player.roomId) return;
+        
+        if (!player || !player.roomId) return;
 
         const room = rooms.get(player.roomId);
 
@@ -135,15 +165,19 @@ wss.on("connection", async (socket) => {
 
     socket.on("close", () => {
 
+        if (!player) return;
         if (player.socket !== socket) return;
+
+        const playerId = player.playerId;
 
         player.connected = false;
         player.socket = null;
+
         console.log(`${playerId} disconnected`);
 
         player.reconnectTimeout = setTimeout(() => {
 
-            if (player.connected) return;
+            if (!player || player.connected) return;
 
             console.log(`${playerId} reconnection timeout expired`);
 

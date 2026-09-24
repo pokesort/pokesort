@@ -40,132 +40,152 @@ export default function Home() {
     }, [roomMode])
 
     useEffect(() => {
-        const socket = new WebSocket("ws://10.88.154.87:3001");
 
-        socketRef.current = socket;
+        let shouldReconnect = true;
 
-        socket.onopen = () => {
+        const connect = () => {
+            const socket = new WebSocket("ws://192.168.10.101:3001");
 
-            const playerId = sessionStorage.getItem("playerId");
-            const reconnectToken = sessionStorage.getItem("reconnectToken");
+            socketRef.current = socket;
 
-            if (playerId && reconnectToken) {
-                socket.send(JSON.stringify({
-                    type: "reconnect",
-                    playerId,
-                    reconnectToken,
-                }));
+            socket.onopen = () => {
+                const playerId = sessionStorage.getItem("playerId");
+                const reconnectToken = sessionStorage.getItem("reconnectToken");
 
-                return;
-            }
-        };
-
-        socket.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-
-            if (data.type === "reconnected") {
-                setGameState(data.game);
-                setDifficulty(data.difficulty);
-                setSearchingRoom(false);
-
-                setSelectedPokemon([]);
-                setSelectedCharacteristics([]);
-                setActiveCharacteristic(null);
-                setGuessResult(null);
-                setSubmittingGuess(false);
-                setSwapRequestedBy([]);
-
-                return;
-            }
-
-            if (data.type === "connected") {
-
-                setPlayerId(data.playerId);
-
-                //Usado para testar entre abas, trocar para LocalStorage
-                sessionStorage.setItem("playerId", data.playerId);
-                sessionStorage.setItem("reconnectToken", data.reconnectToken);
-            }
-
-            if (data.type === "gameStarted") {
-
-                setGameState(data.game);
-                setDifficulty(data.difficulty)
-                setSearchingRoom(false);
-                setSelectedPokemon([]);
-                setSelectedCharacteristics([]);
-                setActiveCharacteristic(null);
-                setGuessResult(null);
-                setSubmittingGuess(false);
-                setSwapRequestedBy([]);
-            }
-
-            if (data.type == "privateRoomCreated") setPrivateRoomCode(data.code);
-
-            if (data.type === "boardSwapStatus") setSwapRequestedBy(data.requestedBy);
-
-            if (data.type === "guessResult") {
-                console.log("GUESS RESULT RECEIVED:", data);
-
-                setSubmittingGuess(false);
-
-                setGuessResult({
-                    valid: data.valid,
-                    points: data.points,
-                    message: data.message
-                });
-
-            }
-
-            if (data.type === "gameStateUpdated") {
-                setGameState(data.game);
-                setSelectedPokemon([]);
-                setSelectedCharacteristics([]);
-                setActiveCharacteristic(null);
-                // setGuessResult(null)
-            }
-
-            if (data.type === "opponentLeft") {
-
-                console.log("opponentLeft - roomMode:", roomModeRef);
-
-                if (roomModeRef.current === "private") {
-                    socketRef.current?.send(JSON.stringify({
-                        type: "leaveRoom",
+                if (playerId && reconnectToken) {
+                    socket.send(JSON.stringify({
+                        type: "reconnect",
+                        playerId,
+                        reconnectToken,
                     }));
+                    return;
+                }
+            };
 
-                    setPrivateRoomStep("selection");
-                    setPrivateRoomCode(null);
-                    setPrivateRoomJoinCode("");
-                    setPrivateRoomError(null);
+            socket.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+
+                if (data.type === "reconnected") {
+                    setGameState(data.game);
+                    setDifficulty(data.difficulty);
                     setSearchingRoom(false);
-                } else {
-                    setSearchingRoom(true);
+
+                    setSelectedPokemon([]);
+                    setSelectedCharacteristics([]);
+                    setActiveCharacteristic(null);
+                    setGuessResult(null);
+                    setSubmittingGuess(false);
+                    setSwapRequestedBy([]);
+
+                    return;
                 }
 
-                setGameState(null);
-                setSelectedPokemon([]);
-                setSelectedCharacteristics([]);
-                setActiveCharacteristic(null);
-                setGuessResult(null);
-                setSubmittingGuess(false);
-                setSwapRequestedBy([]);
-            }
+                if (data.type === "reconnectFailed") {
+                    console.log("Reconexão falhou:", data.message);
 
-            if (data.type === "privateRoomJoinFailed") setPrivateRoomError(data.message);
-        };
+                    sessionStorage.removeItem("playerId");
+                    sessionStorage.removeItem("reconnectToken");
 
-        socket.onclose = () => {
-            //tratar reconexão, se possível
-            console.log("Disconnected from WebSocket server");
+                    return;
+                }
 
-            if (socketRef.current === socket) {
+                if (data.type === "connected") {
+
+                    setPlayerId(data.playerId);
+
+                    //Usado para testar entre abas, trocar para LocalStorage
+                    sessionStorage.setItem("playerId", data.playerId);
+                    sessionStorage.setItem("reconnectToken", data.reconnectToken);
+                }
+
+                if (data.type === "gameStarted") {
+
+                    setGameState(data.game);
+                    setDifficulty(data.difficulty)
+                    setSearchingRoom(false);
+                    setSelectedPokemon([]);
+                    setSelectedCharacteristics([]);
+                    setActiveCharacteristic(null);
+                    setGuessResult(null);
+                    setSubmittingGuess(false);
+                    setSwapRequestedBy([]);
+                }
+
+                if (data.type == "privateRoomCreated") setPrivateRoomCode(data.code);
+
+                if (data.type === "boardSwapStatus") setSwapRequestedBy(data.requestedBy);
+
+                if (data.type === "guessResult") {
+                    console.log("GUESS RESULT RECEIVED:", data);
+
+                    setSubmittingGuess(false);
+
+                    setGuessResult({
+                        valid: data.valid,
+                        points: data.points,
+                        message: data.message
+                    });
+
+                }
+
+                if (data.type === "gameStateUpdated") {
+                    setGameState(data.game);
+                    setSelectedPokemon([]);
+                    setSelectedCharacteristics([]);
+                    setActiveCharacteristic(null);
+                    // setGuessResult(null)
+                }
+
+                if (data.type === "opponentLeft") {
+
+                    console.log("opponentLeft - roomMode:", roomModeRef);
+
+                    if (roomModeRef.current === "private") {
+                        socketRef.current?.send(JSON.stringify({
+                            type: "leaveRoom",
+                        }));
+
+                        setPrivateRoomStep("selection");
+                        setPrivateRoomCode(null);
+                        setPrivateRoomJoinCode("");
+                        setPrivateRoomError(null);
+                        setSearchingRoom(false);
+                    } else {
+                        setSearchingRoom(true);
+                    }
+
+                    setGameState(null);
+                    setSelectedPokemon([]);
+                    setSelectedCharacteristics([]);
+                    setActiveCharacteristic(null);
+                    setGuessResult(null);
+                    setSubmittingGuess(false);
+                    setSwapRequestedBy([]);
+                }
+
+                if (data.type === "privateRoomJoinFailed") setPrivateRoomError(data.message);
+            };
+
+            socket.onclose = () => {
+                console.log("Disconnected from WebSocket server");
+
+                if (socketRef.current !== socket) return;
+
                 socketRef.current = null;
-            }
-        };
+
+                if (!shouldReconnect) return;
+
+                setTimeout(() => {
+                    connect();
+                }, 1000)
+            };
+        }
+
+        connect();
 
         return () => {
-            socket.close();
+            shouldReconnect = false;
+            socketRef.current?.close();
             socketRef.current = null;
         };
     }, []);
