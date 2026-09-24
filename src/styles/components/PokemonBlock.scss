@@ -127,7 +127,7 @@ label.block-container {
         }
 
         &.correct {
-            --selection: #{color(selection3)};
+            --selection: #{color(selection3)};            
         }
         &.incorrect, &.has-error {
             --selection: #{color(selection2)};

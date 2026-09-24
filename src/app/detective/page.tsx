@@ -12,6 +12,7 @@ import { useForm } from 'react-hook-form';
 import ChallengeSelect from '@/src/components/forms/SelectChallenge';
 import ErrorToast from '@/src/components/ToastError';
 import Puzzle, { PuzzleDetective } from '@/src/components/puzzle/PuzzleDetective';
+import { shuffleArray } from '@/src/scripts/utils';
 
 export default function InfinitePage() {
     const t = useTranslations();
@@ -65,6 +66,7 @@ export default function InfinitePage() {
                     puzzleResponse.json(),
                 ]);
               
+                puzzleData.pokemons = shuffleArray(puzzleData.pokemons);
                setPuzzle(puzzleData);
                console.log(puzzleData);
             } catch (e) {
@@ -95,7 +97,11 @@ export default function InfinitePage() {
             <ErrorToast error={error} />
             {!initial &&
                 (!loading && puzzle != undefined ?
-                    <Puzzle puzzle={puzzle} setPuzzle={setPuzzle} />
+                    <Puzzle
+                        puzzle={puzzle}
+                        setPuzzle={setPuzzle}
+                        refreshPuzzle={refreshPuzzle}
+                    />
                     :
                     <>
                         <div className={`window-container cut-left`}>
