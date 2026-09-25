@@ -12,11 +12,12 @@ import HomeCard from '../components/HomeCard';
 
 const streakKey = 'u_dailystreak';
 const infiniteCount = 'u_infinitecount';
+const detectiveCount = 'u_detectivecount';
 
 export default function Home() {
   const t = useTranslations();
 
-  const [counts, setCounts] = useState<Record<string, number>>({"daily": 0, "infinite": 0});
+  const [counts, setCounts] = useState<Record<string, number>>({"daily": 0, "infinite": 0, "detective": 0});
   const [dailySprite, setDailySprite] = useState<string>(getDailyPokemon);
   const [archiveSprite, setArchiveSprite] = useState<string>("251");
 
@@ -37,9 +38,16 @@ export default function Home() {
           break;
 
         case "infinite":
-          const streakData = localStorage.getItem(infiniteCount);
-          if (streakData != null) {
-            streak = parseInt(streakData);
+          const infiniteStreakData = localStorage.getItem(infiniteCount);
+          if (infiniteStreakData != null) {
+            streak = parseInt(infiniteStreakData);
+          }
+          break;
+
+        case "detective":
+          const detectiveStreakData = localStorage.getItem(detectiveCount);
+          if (detectiveStreakData != null) {
+            streak = parseInt(detectiveStreakData);
           }
           break;
 
@@ -87,6 +95,7 @@ export default function Home() {
           />
           <HomeCard
             page="detective"
+            count={counts["detective"]}
             href="/detective"
             sprite="25"
           />          

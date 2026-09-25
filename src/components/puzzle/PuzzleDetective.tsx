@@ -33,6 +33,13 @@ const containerVariants: Variants = {
   }
 };
 
+const recordDetectiveCount = () => {
+    const streak = localStorage.getItem(detectiveCount) || '0';
+    const newStreak = parseInt(streak) + 1;
+
+    localStorage.setItem(detectiveCount, JSON.stringify(newStreak));
+}
+
 export type PuzzleDetective = {
     pokemons: Pokemon[],
     secretId: number,
@@ -64,7 +71,7 @@ const VictoryModal = React.memo(({guesses=[], victoryOpen, setVictoryOpen, refre
 
     useEffect(() => {
         const streakData = localStorage.getItem(detectiveCount);
-        if (streakData != null) setStreak(JSON.parse(streakData).streak);
+        if (streakData != null) setStreak(JSON.parse(streakData));
     }, [victoryOpen])
 
     const getGuessEmojis = (): string => {
@@ -357,7 +364,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, refreshPuzzle}: Pu
         }
     }, [puzzle])
 
-    const makeGuess = useCallback((id: number) => {
+    const makeGuess = useCallback((id: number, abandon=false) => {
         console.log(puzzle.pokemons);
         let updatedPokemons: any[] = [];
         if (id == puzzle.secretId) {
@@ -366,7 +373,8 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, refreshPuzzle}: Pu
             updatedPokemons = puzzle.pokemons.map((p: any) => {
                 if (p.id != id) p.available = false;
                 return p;
-            })
+            });
+            if (!abandon) recordDetectiveCount();
             setTimeout(() => {
                 setVictoryOpen(true);
             }, 800);
@@ -385,7 +393,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, refreshPuzzle}: Pu
     const abandonPuzzle = useCallback(() => {
         setAbandoned(true);
         setIsSolved(true);
-        makeGuess(puzzle.secretId)
+        makeGuess(puzzle.secretId, true);
     }, [puzzle])
 
     useEffect(() => {
