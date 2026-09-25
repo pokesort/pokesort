@@ -19,12 +19,14 @@ div.modal-background {
 
     &.filter {
         background-color: #12121Bbc;
+        &:has(.modal.open) {
+            pointer-events: all;
+        }
     }
-
     &:has(.modal.open) {
         opacity: 1;
-        pointer-events: all;
     }
+
 }
 
 section.modal {
@@ -32,13 +34,17 @@ section.modal {
     max-width: min(100%, 560px);
     min-width: 500px;
     padding: var(--spacing);
-    position: relative;
+    position: relative;    
 
     background-color: color(section1);
     clip-path: polygon(0% 27px, calc(45% - 27px) 27px, 45% 0%, 100% 0%, 100% 100%, 0% 100%);
 
     margin-bottom: 8vh;
 
+    pointer-events: all;
+    &:not(.modal.open) {
+        pointer-events: none;
+    }
     div.button-row {
         display: flex;
         gap: var(--spacing);
