@@ -62,7 +62,7 @@ const recordInfiniteCount = () => {
     localStorage.setItem(infiniteCount, JSON.stringify(newStreak));
 }
 
-const scrollGuessLogs = (logs: HTMLElement) => {
+export const scrollGuessLogs = (logs: HTMLElement) => {
     setTimeout(() => {
         logs.scrollBy({
             top: logs.scrollHeight,
@@ -239,10 +239,7 @@ const VictoryModal = React.memo(({type, challenge=null, guesses, shinies, dateOg
                 <div className="modal-content-div">
                     <p>{t(`victory.next-daily`)}:</p>
                     <h1><Countdown targetDate={getNextRefresh()} active={victoryOpen} /></h1>
-                </div>
-                <button className="modal-content-div" onClick={ () => router.push('/') }>
-                    <p>{t(`victory.back`)}</p>
-                </button>
+                </div>                
                 </>
             ) : (
                 <>
@@ -253,6 +250,9 @@ const VictoryModal = React.memo(({type, challenge=null, guesses, shinies, dateOg
                     }
                 </>
             )}
+            <button className="modal-content-div" onClick={ () => router.push('/') }>
+                <p>{t(`victory.back`)}</p>
+            </button>
             </>
         </Modal>
     )

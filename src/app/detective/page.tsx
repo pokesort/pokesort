@@ -26,10 +26,12 @@ export default function InfinitePage() {
     const [detectiveModalOpen, setDetectiveModalOpen] = useState<boolean>(true);
 
     const [puzzle, setPuzzle] = useState<PuzzleDetective | undefined>(undefined);
+    const [isSolved, setIsSolved] = useState<boolean>(false);
 
     useEffect(() => {
-        if (initial) return;        
+        if (initial) return;
 
+        setIsSolved(false);
         setPuzzle(undefined);
         setLoading(true);
         setError(null);
@@ -101,6 +103,8 @@ export default function InfinitePage() {
                         puzzle={puzzle}
                         setPuzzle={setPuzzle}
                         refreshPuzzle={refreshPuzzle}
+                        isSolved={isSolved}
+                        setIsSolved={setIsSolved}
                     />
                     :
                     <>
@@ -114,11 +118,20 @@ export default function InfinitePage() {
                 )
             }
             <Modal title={t('puzzle.detective.label')} id={"detective-modal"} isOpen={detectiveModalOpen} setIsOpen={setDetectiveModalOpen} canClose={!initial} background={!initial}>
-                Whoa
+                <p>{t(`puzzle.detective.description-1`)}</p>
+                <p>{t(`puzzle.detective.description-2`)}</p>
                 <button className="form-button" onClick={generatePuzzle}>
                     {t('puzzle.detective.generate')}
                 </button>
             </Modal>
+            {isSolved &&
+                <section id="detective-generate-button" className="puzzle-extra-button">
+                    <button onClick={() => setDetectiveModalOpen(true)}>
+                        <GridIcon/>
+                        <p>{t('puzzle.detective.generate')}</p>
+                    </button>
+                </section>
+            }
         </>
     )
 }

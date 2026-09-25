@@ -12,6 +12,7 @@ import LogsIcon from "../svg/LogsIcon";
 import TipIcon from '../svg/TipIcon';
 import PuzzleBlock from "./PuzzleBlock";
 
+import helpLogsImage from '@/src/assets/images/help_logs.png';
 import ch_sprite from "@/src/assets/images/challenge_d.png";
 import DexView from "../DexView";
 import AbandonIcon from "../svg/AbandonIcon";
@@ -23,6 +24,8 @@ import { useRouter } from "next/navigation";
 import { formatDate, isMobile } from "@/src/scripts/utils";
 import TickIcon from "../svg/TickIcon";
 import ShareIcon from "../svg/ShareIcon";
+import PokeSprite from "../PokeSprite";
+import { scrollGuessLogs } from "./Puzzle";
 
 const detectiveCount = 'u_detectivecount';
 
@@ -48,7 +51,7 @@ export type PuzzleDetective = {
 
 type PuzzleGuess = {
     type: 0 | 1; // guess | question
-    pokemon: number[];
+    pokemons?: number[];
     query: string | null;
     answer: boolean;
 }
@@ -61,7 +64,7 @@ interface VictoryModalProps {
     refreshPuzzle?: () => void;
 }
 
-const VictoryModal = React.memo(({guesses=[], victoryOpen, setVictoryOpen, refreshPuzzle, abandoned}: VictoryModalProps) => {
+const VictoryModal = React.memo(({guesses, victoryOpen, setVictoryOpen, refreshPuzzle, abandoned}: VictoryModalProps) => {
     const t = useTranslations('puzzle');
     const router = useRouter();
     const realGuesses = guesses.filter((g: PuzzleGuess) => g.type != 1);
@@ -76,13 +79,11 @@ const VictoryModal = React.memo(({guesses=[], victoryOpen, setVictoryOpen, refre
 
     const getGuessEmojis = (): string => {
         let output: string = '';
-        guesses.forEach(guess => {
-            if (guess.pokemon.length > 0) { // correct
+        realGuesses.forEach(guess => {
+            if (guess.answer) { // correct
                 output += "🟩"
-            } else if (guess.type == 0) { // incorrect
+            } else { // incorrect
                 output += "🟥"
-            } else { // question
-                output += ""
             }
         })
         return output;
@@ -135,7 +136,7 @@ const VictoryModal = React.memo(({guesses=[], victoryOpen, setVictoryOpen, refre
             <div className="modal-content-div">
                 <div className="guesses-container">
                     {realGuesses.map((guess: PuzzleGuess, index: number) => (
-                        <li key={index} className={`guess-${guess.pokemon.length > 0 ? '1' : '0'}`}></li>
+                        <li key={index} className={`guess-${guess.answer ? '1' : '0'}`}></li>
                     ))}
                 </div>
                 <div className="guesses-container">
@@ -162,12 +163,15 @@ const VictoryModal = React.memo(({guesses=[], victoryOpen, setVictoryOpen, refre
 })
 
 interface GuessLogsProps {
+    guesses: PuzzleGuess[];
     setQuestionModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
     abandonPuzzle: () => void;
-    isSolved: boolean
+    isSolved: boolean;
+    logsRef: React.RefObject<HTMLElement | null>;
+    spritesMap:  React.RefObject<Record<number, string>>;
 }
 
-const GuessLogs = React.memo(({setQuestionModalOpen, abandonPuzzle, isSolved}: GuessLogsProps) => {
+const GuessLogs = React.memo(({guesses, setQuestionModalOpen, abandonPuzzle, isSolved, logsRef, spritesMap}: GuessLogsProps) => {
     const t = useTranslations('');
     const [showAbandonModal, setShowAbandonModal] = useState<boolean>(false);
 
@@ -205,6 +209,33 @@ const GuessLogs = React.memo(({setQuestionModalOpen, abandonPuzzle, isSolved}: G
                     {t(`puzzle.abandon.button`)}
                 </button>
             </div>
+            <section className="puzzle-guess-logs" ref={logsRef}>
+                {guesses.length > 0 ?
+                    <>                    
+                        {guesses.map((guess: PuzzleGuess, index: number) => (
+                            <div key={index} className={`puzzle-guess detective-guess type-${guess.type} ${guess.answer ? 'correct' : ''}`}>
+                                {guess.type == 0 ?
+                                    <div className="guess-group">
+                                        {guess.pokemons?.map((pokemon: number) => (
+                                            spritesMap.current ? <PokeSprite key={pokemon} slug={spritesMap.current[pokemon]}/> : null
+                                        ) )}
+                                    </div>
+                                :
+                                    <p>
+                                        {guess.query}?
+                                        {guess.answer ? "Sim" : "Não"}
+                                    </p>
+                                }
+                            </div>
+                        ))}
+                    </>
+                    :
+                    <div className="tab-help">
+                        <img src={helpLogsImage.src}/>
+                        <p>{t('puzzle.help.logs')}</p>
+                    </div>
+                }
+            </section>
         </>
     )
 })
@@ -217,9 +248,10 @@ interface PuzzleGridProps {
     incorrectIds: number[];
     makeGuess: (id: number) => void;
     isSolved: boolean;
+    abandoned: boolean;
 }
 
-const PuzzleGrid = ({pokemons, setCurrentDexView, scrollToTab, makeGuess, correctIds, incorrectIds, isSolved}: PuzzleGridProps) => {
+const PuzzleGrid = ({pokemons, setCurrentDexView, scrollToTab, makeGuess, correctIds, incorrectIds, isSolved, abandoned}: PuzzleGridProps) => {
     const [pause, setPause] = useState<boolean>(false);
     const [selectedId, setSelectedId] = useState<number>(0);
 
@@ -253,13 +285,15 @@ const PuzzleGrid = ({pokemons, setCurrentDexView, scrollToTab, makeGuess, correc
                         <PuzzleBlock
                             key={p.id}
                             pokemon={p}
+                            mode="detective"
                             shinies={[]}
                             multiselect={false}
                             isSelected={isSelected}
-                            isSolved={false}
+                            isSolved={isSolved}
                             isCorrect={isCorrect}
                             isIncorrect={isIncorrect}
                             isAvailable={p.available}
+                            isAbandoned={abandoned}
                             onSelect={handleSelect}
                             onPress={handlePress}
                         />
@@ -300,16 +334,21 @@ const QuestionModal = React.memo(({questionModalOpen, setQuestionModalOpen, askQ
 
 interface PuzzleDetectiveProps {
     puzzle: PuzzleDetective,
-    setPuzzle: React.Dispatch<React.SetStateAction<PuzzleDetective | undefined>>,
-    refreshPuzzle: () => void
+    refreshPuzzle: () => void,
+    isSolved: boolean,
+    setIsSolved: React.Dispatch<React.SetStateAction<boolean>>,
 }
 
-export default React.memo(function Puzzle({puzzle, setPuzzle, refreshPuzzle}: PuzzleDetectiveProps) {
+export default React.memo(function Puzzle({puzzle, refreshPuzzle, isSolved, setIsSolved}: PuzzleDetectiveProps) {
     const t = useTranslations('puzzle');
     
     const [refresh, setRefresh] = useState<boolean>(false);
 
     const mainTabRef = useRef<HTMLDivElement>(null);
+    const logsRef = useRef<HTMLElement | null>(null);
+    const spritesMap = useRef<Record<number, string>>({});
+
+    const [pokemonData, setPokemonData] = useState<any[]>([]);
     const [visibleTab, setVisibleTab] = useState<number>(1);
     const [currentDexView, setCurrentDexView] = useState<number>();
     const [questionModalOpen, setQuestionModalOpen] = useState<boolean>(false);
@@ -317,7 +356,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, refreshPuzzle}: Pu
     const [correctIds, setCorrectIds] = useState<number[]>([]);
     const [incorrectIds, setIncorrectIds] = useState<number[]>([]);
     const [abandoned, setAbandoned] = useState<boolean>(false);
-    const [isSolved, setIsSolved] = useState<boolean>(false);
+    const [guesses, setGuesses] = useState<PuzzleGuess[]>([]);
 
     const scrollToTab = useCallback((target: number, behavior: ('smooth' | 'instant') = 'smooth') => {
         if (target !== visibleTab || behavior == 'instant') {
@@ -357,46 +396,89 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, refreshPuzzle}: Pu
                 setIncorrectIds(data.affected);
             }
 
-            setPuzzle(data);
+            setGuesses((prev: PuzzleGuess[]) => [...prev, generateQuestionGuess(query, data.secretFound)]);
+            if (logsRef.current) scrollGuessLogs(logsRef.current);
+
+            scrollToTab(1, 'instant');
+            setPokemonData(data.pokemons);
             setQuestionModalOpen(false);
         } catch (error) {
             console.error(error);
         }
-    }, [puzzle])
+    }, [puzzle, setGuesses])
+
+    const generateQuestionGuess = (query:  Record<string, string>, answer: boolean) => {
+        return {
+            type: 1,
+            query: `${Object.keys(query)[0]}=${Object.values(query)[0]}`,
+            answer: answer
+        } as PuzzleGuess;
+    }
 
     const makeGuess = useCallback((id: number, abandon=false) => {
-        console.log(puzzle.pokemons);
-        let updatedPokemons: any[] = [];
-        if (id == puzzle.secretId) {
+        scrollToTab(1, 'instant');
+        const isCorrect = id == puzzle.secretId;
+        let guess: PuzzleGuess = {
+            type: 0,
+            pokemons: [id],
+            query: "",
+            answer: false
+        };
+
+        if (isCorrect) {
             setIncorrectIds([]);
             setCorrectIds([id]);
-            updatedPokemons = puzzle.pokemons.map((p: any) => {
-                if (p.id != id) p.available = false;
-                return p;
-            });
-            if (!abandon) recordDetectiveCount();
+            setIsSolved(true);
+
+            if (!abandon) {
+                recordDetectiveCount();
+                guess.answer = true;
+            }
+
             setTimeout(() => {
                 setVictoryOpen(true);
             }, 800);
-            setIsSolved(true);
         } else {
             setCorrectIds([]);
             setIncorrectIds([id]);
-            updatedPokemons = puzzle.pokemons.map((p: any) => {
-                if (p.id == id) p.available = false;
-                return p;
-            })
         }
-        setPuzzle({...puzzle, pokemons: updatedPokemons})
-    }, [puzzle])
+
+        if (!abandon) setGuesses((prev: PuzzleGuess[]) => [...prev, guess]);
+        if (logsRef.current) scrollGuessLogs(logsRef.current);
+        setPokemonData(currentData => {
+            if (!currentData) return currentData;
+
+            return currentData.map((pokemon: any) => ({
+                    ...pokemon,
+                    available: isCorrect
+                        ? pokemon.id == id
+                        : pokemon.id == id
+                            ? false
+                            : pokemon.available,
+                }));
+        });
+    }, [puzzle.secretId, setPokemonData])
 
     const abandonPuzzle = useCallback(() => {
+        scrollToTab(1);
         setAbandoned(true);
         setIsSolved(true);
         makeGuess(puzzle.secretId, true);
     }, [puzzle])
 
+    const updateSpritesMap = (pokemons: any[]) => {
+        const processedSprites: Record<number, string> = {};
+        
+        pokemons.forEach((p: any) => {
+            processedSprites[p.id] = p.sprite_default;
+        });
+
+        spritesMap.current = processedSprites;
+    }
+
     useEffect(() => {
+        setPokemonData(puzzle.pokemons);
+        updateSpritesMap(puzzle.pokemons);
         const timer = setTimeout(() => {
             scrollToTab(1, 'instant');
         }, 0);
@@ -425,7 +507,7 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, refreshPuzzle}: Pu
                 askQuestion={askQuestion}
             />
             <VictoryModal
-                guesses={[]}
+                guesses={guesses}
                 victoryOpen={victoryOpen}
                 setVictoryOpen={setVictoryOpen}
                 abandoned={abandoned}
@@ -439,9 +521,12 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, refreshPuzzle}: Pu
                             <p>{t('logs')}<span>0</span></p>
                         </section>
                         <GuessLogs
+                            guesses={guesses}
                             setQuestionModalOpen={setQuestionModalOpen}
                             abandonPuzzle={abandonPuzzle}
                             isSolved={isSolved}
+                            logsRef={logsRef}
+                            spritesMap={spritesMap}
                         />
                     </div>
                 </PuzzleTab>
@@ -455,13 +540,14 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, refreshPuzzle}: Pu
                             <p>{t(`detective.label`)}</p>
                         </section>
                         <PuzzleGrid
-                            pokemons={puzzle.pokemons}
+                            pokemons={pokemonData}
                             setCurrentDexView={setCurrentDexView}
                             scrollToTab={scrollToTab}
                             makeGuess={makeGuess}
                             correctIds={correctIds}
                             incorrectIds={incorrectIds}
                             isSolved={isSolved}
+                            abandoned={abandoned}
                         />
                     </div>
                 </PuzzleTab>
@@ -486,12 +572,14 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, refreshPuzzle}: Pu
                     {t('dex')}
                 </button>
             </nav>
-            <section id="detective-question-button" className="puzzle-extra-button">
-                <button onClick={() => setQuestionModalOpen(true)}>
-                    <TipIcon/>
-                    <p>{t('detective.question')}</p>
-                </button>
-            </section>
+            {!isSolved &&
+                <section id="detective-question-button" className="puzzle-extra-button">
+                    <button onClick={() => setQuestionModalOpen(true)}>
+                        <TipIcon/>
+                        <p>{t('detective.question')}</p>
+                    </button>
+                </section>
+            }
         </>
     )
 })

@@ -111,7 +111,10 @@
         },
         "detective": {
             "label": "Modo Detetive",
-            "generate": "Gerar",
+            "generate": "Gerar Puzzle",
+
+            "description-1": "Tente descobrir quem é o Pokémon oculto na grade!",
+            "description-2": "Faça perguntas para filtrar as opções e acertar em menos palpites.",
 
             "question": "Fazer Pergunta"
         },
@@ -182,8 +185,8 @@
             "attempts-1": "Resolvido em ",
             "attempts-1-l": "Fugiu após ",
             "attempts-2": " palpites",
-            "questions-1": "Você fez ",
-            "questions-2": " perguntas",
+            "questions-1": "Você fez",
+            "questions-2": "perguntas",
             "next-daily": "Próximo puzzle diário em",
             "back": "Voltar ao Início",
             "generate": "Gerar Novo Puzzle",

@@ -139,24 +139,11 @@ label.block-container {
             &.abandoned {
                 --border-color: transparent;
             }
-
-            background-color: unset;
-            animation: solved-background 1.0s ease 1;
+            
             border: 2px solid;
             border-color: transparent;
 
-            h3, h4 {
-                opacity: 0;
-                visibility: hidden;
-                animation: solved-text 1.0s ease 1;
-            }
-
-            img {
-                transform: scale(var(--scale, 1)) translate(var(--x, 0), var(--y, 0));
-                animation: solved-image 1.25s ease 1;
-            }
-
-            &:not(.abandoned)::after {
+            &::after {
                 opacity: 0;
                 visibility: none;
 
@@ -170,8 +157,44 @@ label.block-container {
                 right: 0;
                 top: -1px;
     
-                clip-path: polygon(0% 0%, 100% 100%, 100% 0%);
-                animation: solved-text 1.0s ease 1;
+                clip-path: polygon(0% 0%, 100% 100%, 100% 0%);                
+            }
+
+            &.mode-classic {
+                animation: solved-background 1.0s ease 1;
+                background-color: unset;
+
+                &:not(.abandoned)::after {
+                    animation: solved-text 1.0s ease 1;
+                }
+                
+                h3, h4 {
+                    opacity: 0;
+                    visibility: hidden;
+                    animation: solved-text 1.0s ease 1;
+                }
+
+                img {
+                    transform: scale(var(--scale, 1)) translate(var(--x, 0), var(--y, 0));
+                    animation: solved-image 1.25s ease 1;
+                }
+            }
+
+            &.mode-detective.correct {
+                border-color: color(selection3);
+
+                &::after {
+                    opacity: 1;
+                    visibility: visible;
+                }
+
+                &.abandoned {
+                    border-color: color(selection2);
+
+                    &::after {
+                        background-color: color(selection2);
+                    }
+                }
             }
         }
     
