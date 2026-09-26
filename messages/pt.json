@@ -68,7 +68,7 @@
     "tutorial": {
         "label": "Como jogar",
         "text": {
-            "1": "Os Pokémon presentes na grade pertencem a grupos de acordo com suas características em comum. Você deve descobrir quais são esses grupos no mínimo de tentativas possível.",
+            "1": "Os Pokémon presentes na grade pertencem a grupos de acordo com suas características em comum. Você deve descobrir quais são esses grupos no mínimo de palpites possível.",
             "2": "Você pode verificar a precisão de palpites incorretos para tentar deduzir quais Pokémon pertencem ao mesmo grupo.",
             "3": "Também é possível pedir dicas, como quais Pokémon devem ser agrupados ou a característica que define o seu grupo.",
             "4": "Ao pressionar ou clicar com o botão direito em um Pokémon, você pode verificar todas as suas informações relevantes.",
@@ -116,6 +116,11 @@
             "description-1": "Tente descobrir quem é o Pokémon oculto na grade!",
             "description-2": "Faça perguntas para filtrar as opções e acertar em menos palpites.",
 
+            "correct": "Correto",
+            "incorrect": "Incorreto",
+            "question-yes": "Sim",
+            "question-no": "Não",
+
             "question": "Fazer Pergunta"
         },
         "from": {
@@ -136,7 +141,8 @@
         "custom-groups-2": "Tente pensar fora da caixa!",
         "okay": "Okay!",
         "help": {
-            "logs": "A precisão de cada uma de suas tentativas será exibida aqui.",
+            "logs": "A precisão de cada um de seus palpites será exibido aqui.",
+            "logs-detective": "Todos os seus palpites e perguntas serão exibidos aqui.",
             "dex": "Pressione um bloco ou clique com o botão direito para pesquisar na Dex."
         },
         "challenge": {

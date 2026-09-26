@@ -1,5 +1,6 @@
 import { connect, getDb } from "@/lib/mongodb";
 import { initialGroup, getGroupFromSecret } from "./_secret";
+import { populateMovesAbilities } from "../puzzle/_utils";
 
 export default async function handler(req, res) {
   try {
@@ -20,7 +21,8 @@ export default async function handler(req, res) {
       if (puzzle) {
         return res.status(200).json({
           success: true,
-          ...puzzle
+          ...puzzle,
+          dictionary: await populateMovesAbilities()
         });
       }
     }

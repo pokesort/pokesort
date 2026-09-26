@@ -355,6 +355,20 @@ export function decodeTips(tip) {
   }
 }
 
+export function queryToObject(query) {
+  let object = {key: "", value: ""};
+  try {
+    const split = query.split("=");
+    return {
+      key: split[0],
+      value: split[1]
+    }
+  } catch (e) {
+    console.error(e);
+    return object;
+  }
+}
+
 export function isMobile() {
   const userAgent = navigator.userAgent || navigator.vendor || window.opera;
   return /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);

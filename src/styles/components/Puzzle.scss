@@ -26,6 +26,12 @@ div.tab-help {
         color: color(text2);
         width: 80%;
     }
+
+    @media(max-width: 768px) {
+        p {
+            font-size: text(small);
+        }
+    }
 }
 
 ul.puzzle-tabs-container {
@@ -233,6 +239,7 @@ section.solved-groups-grid {
             display: inherit;
             gap: var(--spacing);
             justify-content: space-between;
+            align-items: center;
             min-width: 65%;
         }
 
@@ -252,6 +259,17 @@ section.solved-groups-grid {
 
         img {
             width: 48px;
+        }
+
+        p {
+            width: 100%;
+            text-align: center
+        }
+
+        .detective-status {
+            height: fit-content;
+            width: 50%;
+            text-align: center;
         }
 
         &:has(.tip) {

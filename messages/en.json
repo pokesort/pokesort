@@ -113,6 +113,14 @@
             "label": "Detective Mode",
             "generate": "Generate",
 
+            "description-1": "Try and find who the hidden Pokémon is!",
+            "description-2": "Ask questions to filter your options and ge it right on fewer guesses.",
+
+            "correct": "Correct",
+            "incorrect": "Incorrect",
+            "question-yes": "Yes",
+            "question-no": "No",
+
             "question": "Ask Question"
         },
         "from": {
@@ -133,7 +141,8 @@
         "custom-groups-2": "Try thinking outside the box!",
         "okay": "Got it!",
         "help": {
-            "logs": "Each of your attempts and its accuracy will be shown here.",
+            "logs": "Each of your guesses and its accuracy will be shown here.",
+            "logs-detective": "All your guesses and questions will be shown here.",
             "dex": "Press and hold a block or right-click it to search on the Dex."
         },
         "challenge": {

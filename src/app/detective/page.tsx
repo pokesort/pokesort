@@ -26,6 +26,7 @@ export default function InfinitePage() {
     const [detectiveModalOpen, setDetectiveModalOpen] = useState<boolean>(true);
 
     const [puzzle, setPuzzle] = useState<PuzzleDetective | undefined>(undefined);
+    const [dictionary, setDictionary] = useState<any>({});
     const [isSolved, setIsSolved] = useState<boolean>(false);
 
     useEffect(() => {
@@ -60,6 +61,7 @@ export default function InfinitePage() {
                     
                     setError(errorData.message);
                     setPuzzle(undefined);
+                    setDictionary({});
                     setLoading(false);
                     setInitial(true);
                     return;
@@ -70,7 +72,7 @@ export default function InfinitePage() {
               
                 puzzleData.pokemons = shuffleArray(puzzleData.pokemons);
                setPuzzle(puzzleData);
-               console.log(puzzleData);
+               setDictionary(puzzleData.dictionary)
             } catch (e) {
                 console.error(e);
                 setError('Não foi possível conectar ao servidor. Tente novamente.');
@@ -101,7 +103,7 @@ export default function InfinitePage() {
                 (!loading && puzzle != undefined ?
                     <Puzzle
                         puzzle={puzzle}
-                        setPuzzle={setPuzzle}
+                        dictionary={dictionary}
                         refreshPuzzle={refreshPuzzle}
                         isSolved={isSolved}
                         setIsSolved={setIsSolved}
