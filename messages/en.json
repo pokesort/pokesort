@@ -140,6 +140,7 @@
         "custom-groups-1": "This puzzle includes custom categories.",
         "custom-groups-2": "Try thinking outside the box!",
         "okay": "Got it!",
+        "submit": "Submit",
         "help": {
             "logs": "Each of your guesses and its accuracy will be shown here.",
             "logs-detective": "All your guesses and questions will be shown here.",

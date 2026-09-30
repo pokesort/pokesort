@@ -16,8 +16,7 @@ import ch_sprite from "@/src/assets/images/challenge_d.png";
 import DexView from "../DexView";
 import AbandonIcon from "../svg/AbandonIcon";
 import Modal from "../Modal";
-import QueryFilter from "../forms/QueryFilter";
-import { useForm } from "react-hook-form";
+import QueryFilter, { QueryFilterValue } from "../forms/QueryFilter";
 import { form } from "framer-motion/client";
 import { useRouter } from "next/navigation";
 import { formatDate, isMobile, queryToObject } from "@/src/scripts/utils";
@@ -318,26 +317,29 @@ const PuzzleGrid = ({pokemons, setCurrentDexView, scrollToTab, makeGuess, correc
 interface QuestionModalProps {
     questionModalOpen: boolean,
     setQuestionModalOpen: React.Dispatch<React.SetStateAction<boolean>>,
+    dictionary: Record<string, string[]>;
+    usedProperties: string[];
     askQuestion: (query: Record<string, string>) => void
 }
 
-const QuestionModal = React.memo(({questionModalOpen, setQuestionModalOpen, askQuestion}: QuestionModalProps) => {
-    const form = useForm();
-    const query = form.watch("query");
+const QuestionModal = React.memo(({questionModalOpen, setQuestionModalOpen, dictionary, usedProperties, askQuestion}: QuestionModalProps) => {
+    const t = useTranslations("puzzle");
+    const submitButton = useRef<HTMLButtonElement | null>(null);
+    const [query, setQuery] = useState<QueryFilterValue | null>(null);
+
+    useEffect(() => {
+        if (questionModalOpen) setQuery(null);
+    }, [questionModalOpen]);
 
     const filterPokemonsByQuery = useCallback(() => {
-        let queryObject: Record<string, string> = {};
-        const querySplit = query.split("=");
-        queryObject[querySplit[0]] = querySplit[1];
-
-        askQuestion(queryObject);
-    }, [query])
+        if (query) askQuestion({ [query.key]: query.value });
+    }, [askQuestion, query]);
     
     return (
         <Modal id="detective-question-modal" isOpen={questionModalOpen} setIsOpen={setQuestionModalOpen}>
-            <QueryFilter form={form} limit={1} />
-            <button className="modal-content-div" onClick={filterPokemonsByQuery}>
-                Submit
+            <QueryFilter dictionary={dictionary} isOpen={questionModalOpen} onChange={setQuery} submitButtonRef={submitButton} usedProperties={usedProperties} />
+            <button ref={submitButton} className="modal-content-div" disabled={!query} onClick={filterPokemonsByQuery}>
+                {t(`submit`)}
             </button>
         </Modal>
     )
@@ -361,6 +363,7 @@ export default React.memo(function Puzzle({puzzle, dictionary, refreshPuzzle, is
     const spritesMap = useRef<Record<number, string>>({});
 
     const [pokemonData, setPokemonData] = useState<any[]>([]);
+    const [usedProperties, setUsedProperties] = useState<string[]>([]);
     const [visibleTab, setVisibleTab] = useState<number>(1);
     const [currentDexView, setCurrentDexView] = useState<number>();
     const [questionModalOpen, setQuestionModalOpen] = useState<boolean>(false);
@@ -400,6 +403,10 @@ export default React.memo(function Puzzle({puzzle, dictionary, refreshPuzzle, is
             }
 
             const data = await response.json();
+            const usedProperty = Object.keys(query)[0];
+            setUsedProperties((previous) => previous.includes(usedProperty)
+                ? previous
+                : [...previous, usedProperty]);
             if (data.secretFound) {
                 setIncorrectIds([]);
                 setCorrectIds(data.affected);
@@ -490,6 +497,7 @@ export default React.memo(function Puzzle({puzzle, dictionary, refreshPuzzle, is
 
     useEffect(() => {
         setPokemonData(puzzle.pokemons);
+        setUsedProperties([]);
         updateSpritesMap(puzzle.pokemons);
         const timer = setTimeout(() => {
             scrollToTab(1, 'instant');
@@ -516,6 +524,8 @@ export default React.memo(function Puzzle({puzzle, dictionary, refreshPuzzle, is
             <QuestionModal
                 questionModalOpen={questionModalOpen}
                 setQuestionModalOpen={setQuestionModalOpen}
+                dictionary={dictionary}
+                usedProperties={usedProperties}
                 askQuestion={askQuestion}
             />
             <VictoryModal
@@ -576,7 +586,7 @@ export default React.memo(function Puzzle({puzzle, dictionary, refreshPuzzle, is
             </ul>
             <nav className="puzzle-tab-nav">
                 <button onClick={() => scrollToTab(0)} className={visibleTab == 0 ? 'active' : ''}>
-                    {t('logs')}<span>0</span>
+                    {t('logs')}<span>{guesses.length}</span>
                 </button>
                 <button onClick={() => scrollToTab(1)} className={visibleTab == 1 ? 'active' : ''}>
                     {t('puzzle')}

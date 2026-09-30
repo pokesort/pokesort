@@ -71,8 +71,8 @@ export default function InfinitePage() {
                 ]);
               
                 puzzleData.pokemons = shuffleArray(puzzleData.pokemons);
-               setPuzzle(puzzleData);
-               setDictionary(puzzleData.dictionary)
+                setPuzzle(puzzleData);
+                setDictionary(puzzleData.dictionary)
             } catch (e) {
                 console.error(e);
                 setError('Não foi possível conectar ao servidor. Tente novamente.');
