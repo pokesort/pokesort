@@ -97,7 +97,7 @@ export default function Home() {
             page="detective"
             count={counts["detective"]}
             href="/detective"
-            sprite="25"
+            sprite="detective"
           />          
         </div>
 

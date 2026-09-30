@@ -468,6 +468,13 @@
             "instagram": "Instagram",
             "github": "GitHub"
         },
+        "credits": {
+            "title": "Credits",
+            "description": "",
+
+            "pokeapi": "PokeAPI: Sprites and data",
+            "detective-pikachu": "KoreyRiera: Detetive Pikachu Sprite"
+        },
         "support": {
             "title": "Support Us",
             "description": ""

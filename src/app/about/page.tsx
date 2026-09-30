@@ -11,6 +11,10 @@ import HeaderGit from '@/src/components/svg/HeaderGit';
 
 export default function AboutPage() {
     const t = useTranslations("about");
+    const credits: Record<string, string> = {
+        "pokeapi": "https://pokeapi.co/",
+        "detective-pikachu": "https://www.deviantart.com/koreyriera/art/Detective-Pikachu-Sprite-(Update)-799083031"
+    }
 
     return (
         <section id="about">
@@ -60,6 +64,18 @@ export default function AboutPage() {
                     <HeaderGit/>
                     {t(`links.github`)}
                 </Link>
+                </ul>
+            </div>
+            <div className={`window-container free-size`}>
+                <section className="window-info-row">
+                    <p>{t(`credits.title`)}</p>
+                </section>
+                <ul className="link-blocks vertical">
+                    {Object.keys(credits).map((key: string) => (
+                        <Link className="clickable" target="_blank" href={credits[key]}>
+                            {t(`credits.${key}`)}
+                        </Link>
+                    ))}
                 </ul>
             </div>
             {/* <div className={`window-container free-size`}>
