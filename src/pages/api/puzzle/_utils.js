@@ -73,19 +73,21 @@ export const populateMovesAbilities = async () => {
   let dictionary = { moves: {}, abilities: {} };
 
   const [moves, abilities] = await Promise.all([
-  db.db.collection('moves')
-    .find({}, { projection: { name: 1, id: 1 } })
-    .sort({ id: 1 })
-    .toArray(),
-    
-  db.db.collection('abilities')
-    .find({}, { projection: { name: 1, id: 1 } })
-    .sort({ id: 1 })
-    .toArray()
+    db.db.collection('moves')
+      .find({}, { projection: { name: 1, id: 1 } })
+      .collation({ locale: 'en', numericOrdering: true })
+      .sort({ id: 1 })
+      .toArray(),
+
+    db.db.collection('abilities')
+      .find({}, { projection: { name: 1, id: 1 } })
+      .collation({ locale: 'en', numericOrdering: true })
+      .sort({ id: 1 })
+      .toArray()
   ]);
 
-  dictionary.moves = moves.map(e => e.name);
-  dictionary.abilities = abilities.map(e => e.name);
+  dictionary.moves = [null, ...moves.map(e => e.name)];
+  dictionary.abilities = [null, ...abilities.map(e => e.name)];
 
   return dictionary;
-}
+};
