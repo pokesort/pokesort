@@ -72,7 +72,7 @@ export default function AboutPage() {
                 </section>
                 <ul className="link-blocks vertical">
                     {Object.keys(credits).map((key: string) => (
-                        <Link className="clickable" target="_blank" href={credits[key]}>
+                        <Link className="clickable" target="_blank" href={credits[key]} key={key}>
                             {t(`credits.${key}`)}
                         </Link>
                     ))}
