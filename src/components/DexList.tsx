@@ -42,9 +42,6 @@ function DexFilters ({queries, setQueries, openFilter, setOpenFilter, dictionary
     }
 
     for (let i = min; i <= max; i++) {
-      if (key == 'categories' && i == 16)
-        continue;
-
       if (['abilities', 'moves'].includes(key)) {
         if (dictionary && dictionary[key]) {
             record[`${i}`] = `${toTitleCase(dictionary[key][i])}`;
