@@ -13,10 +13,13 @@ export default async function handler(req, res) {
     const MAX_GROUPS = 5;
     const MAX_POKEMON_GROUP = 5;
 
+    // const { generation } = req.body ||;
+    const generation = req.body?.generation || 3;
+
     let puzzle = null;
 
     for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-      puzzle = await generatePuzzle(db, MAX_GROUPS, MAX_POKEMON_GROUP);
+      puzzle = await generatePuzzle(db, MAX_GROUPS, MAX_POKEMON_GROUP, generation);
 
       if (puzzle) {
         return res.status(200).json({
@@ -42,19 +45,21 @@ export default async function handler(req, res) {
   }
 }
 
-async function generatePuzzle(db, max_groups, amount_pokemon) {
+async function generatePuzzle(db, max_groups, amount_pokemon, generation = 9) {
 
-  let firstGroup = await initialGroup(db, amount_pokemon);
+  let firstGroup = await initialGroup(db, amount_pokemon, generation);
   if (!firstGroup) return null;
 
   const [secretPokemonData, groups, usedFields, usedPokemonIds] = firstGroup;
 
+  // console.log("Secret Pokemon:", secretPokemonData.name, "Groups:", groups.length, "Used Fields:", usedFields.size, "Used Pokemon IDs:", usedPokemonIds.size);
   for (let i = 0; i < max_groups - 1; i++) {
     const group = await getGroupFromSecret(
       secretPokemonData,
       usedFields,
       usedPokemonIds,
-      amount_pokemon
+      amount_pokemon,
+      generation
     );
 
     if (!group) return null;

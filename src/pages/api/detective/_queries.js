@@ -28,8 +28,8 @@ export async function getRandomFieldAndValue() {
   return { field, value };
 }
 
-export async function getPokemonsByFieldAndValue(amount_pokemon, field, value, usedPokemonIds = new Set()) {
-  const query = { [field]: value };
+export async function getPokemonsByFieldAndValue(amount_pokemon, field, value, generation, usedPokemonIds = new Set()) {
+  const query = { [field]: value, max_generation: generation };
 
   const pokemons = await filterPokemons(query);
 

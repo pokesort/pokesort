@@ -12,7 +12,7 @@ export async function getPokemonById(db, id) {
   return await db.db.collection("pokemon").findOne({id: Number(id)});
 }
 
-export async function getGroupFromSecret(secretPokemon, usedFields, usedPokemonIds, amount_pokemon) {
+export async function getGroupFromSecret(secretPokemon, usedFields, usedPokemonIds, amount_pokemon, generation) {
   while (true) {
     const field = await QG.getRandomFieldFromPokemon(secretPokemon, usedFields);
 
@@ -27,7 +27,7 @@ export async function getGroupFromSecret(secretPokemon, usedFields, usedPokemonI
     let selectedValue = null;
 
     for (const value of shuffledValues) {
-      const group = await QG.getPokemonsByFieldAndValue(amount_pokemon, field, value, usedPokemonIds);
+      const group = await QG.getPokemonsByFieldAndValue(amount_pokemon, field, value, generation, usedPokemonIds);
 
       if (group) {
         foundGroup = group;
@@ -53,7 +53,7 @@ export async function getGroupFromSecret(secretPokemon, usedFields, usedPokemonI
   }
 }
 
-export async function initialGroup(db, amount_pokemon){
+export async function initialGroup(db, amount_pokemon, generation){
 
     let fieldSelected = await QG.getRandomFieldAndValue();
 
@@ -62,7 +62,8 @@ export async function initialGroup(db, amount_pokemon){
     const pokemons = await QG.getPokemonsByFieldAndValue(
         amount_pokemon,
         fieldSelected.field,
-        fieldSelected.value
+        fieldSelected.value,
+        generation,
     );
 
     if (!pokemons) return null;
