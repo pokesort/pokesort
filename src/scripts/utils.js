@@ -4,7 +4,7 @@ export const FIELD_OPTIONS = {
   region: ['kanto', 'johto', 'hoenn', 'sinnoh', 'unova', 'kalos', 'alola', 'galar', 'hisui', 'paldea'],
   shape: ['armor', 'wings', 'quadruped', 'ball', 'squiggle', 'fish', 'arms', 'blob', 'upright', 'legs', 'heads', 'bug-wings', 'humanoid', 'tentacles'],
   egg_groups: ['monster', 'ground', 'water1', 'bug', 'flying', 'fairy', 'plant', 'humanshape', 'water3', 'mineral', 'indeterminate', 'water2', 'ditto', 'dragon', 'no-eggs'],
-  categories: { min: 1, max: 19 },
+  categories: { min: 1, max: 20 },
   others: { min: 1, max: 2 },
   methods: { min: 1, max: 11 },
   moves: { min: 1, max: 919 },
@@ -20,10 +20,10 @@ export const FIELD_OPTIONS = {
 };
 
 export const CHALLENGE_CATEGORIES = {
-  1: [1, 2, 3, 11],
-  2: [4, 5, 12, 17],
-  3: [6, 13, 14, 15, 18],
-  4: [7, 8, 9, 10, 19],
+  1: [1, 2, 3, 11, 19],
+  2: [4, 5, 12, 16, 20],
+  3: [6, 13, 14, 15, 17],
+  4: [7, 8, 9, 10, 18],
   5: []
 }
 
