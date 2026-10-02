@@ -177,3 +177,22 @@ export async function getEvolutionStepCache() {
 
     return evolutionStepCache;
 }
+
+export function chooseProperties(challenge) {
+
+    if (challenge == null) return [];
+
+    switch (Number(challenge)) {
+        case 1:
+            return ["shape", "egg_groups", "habitat", "color"];
+
+        case 2:
+            return ["moves", "abilities", "step", "others"];
+
+        case 3:
+            return ["types", "generation", "region", "form"];
+
+        default:
+            return [];
+    }
+}

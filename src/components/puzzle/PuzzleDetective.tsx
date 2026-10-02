@@ -46,6 +46,7 @@ const recordDetectiveCount = () => {
 export type PuzzleDetective = {
     pokemons: Pokemon[],
     secretId: number,
+    usedProperties: string[],
     success: true
 }
 
@@ -497,7 +498,7 @@ export default React.memo(function Puzzle({puzzle, dictionary, refreshPuzzle, is
 
     useEffect(() => {
         setPokemonData(puzzle.pokemons);
-        setUsedProperties([]);
+        setUsedProperties(puzzle.usedProperties ?? []);
         updateSpritesMap(puzzle.pokemons);
         const timer = setTimeout(() => {
             scrollToTab(1, 'instant');

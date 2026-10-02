@@ -1,6 +1,7 @@
 import { connect, getDb } from "@/lib/mongodb";
 import { initialGroup, getGroupFromSecret } from "./_secret";
 import { populateMovesAbilities } from "../puzzle/_utils";
+import { chooseProperties } from "./_utils";
 
 export default async function handler(req, res) {
   try {
@@ -13,19 +14,20 @@ export default async function handler(req, res) {
     const MAX_GROUPS = 5;
     const MAX_POKEMON_GROUP = 5;
 
-    // const { generation } = req.body ||;
-    const generation = req.body?.generation || 3;
+    const { generation, max_tries, can_repeat, challenge } = req.body;
 
     let puzzle = null;
 
     for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-      puzzle = await generatePuzzle(db, MAX_GROUPS, MAX_POKEMON_GROUP, generation);
+      puzzle = await generatePuzzle(db, MAX_GROUPS, MAX_POKEMON_GROUP, generation, challenge);
 
       if (puzzle) {
         return res.status(200).json({
           success: true,
           ...puzzle,
-          dictionary: await populateMovesAbilities()
+          dictionary: await populateMovesAbilities(),
+          max_tries,
+          can_repeat
         });
       }
     }
@@ -45,14 +47,13 @@ export default async function handler(req, res) {
   }
 }
 
-async function generatePuzzle(db, max_groups, amount_pokemon, generation = 9) {
+async function generatePuzzle(db, max_groups, amount_pokemon, generation = 9, challenge = null) {
 
   let firstGroup = await initialGroup(db, amount_pokemon, generation);
   if (!firstGroup) return null;
 
   const [secretPokemonData, groups, usedFields, usedPokemonIds] = firstGroup;
 
-  // console.log("Secret Pokemon:", secretPokemonData.name, "Groups:", groups.length, "Used Fields:", usedFields.size, "Used Pokemon IDs:", usedPokemonIds.size);
   for (let i = 0; i < max_groups - 1; i++) {
     const group = await getGroupFromSecret(
       secretPokemonData,
@@ -69,6 +70,8 @@ async function generatePuzzle(db, max_groups, amount_pokemon, generation = 9) {
     groups.push(group);
   }
 
+  const usedProperties = chooseProperties(challenge);
+
   const pokemons = groups
     .flatMap(group => group.pokemons)
     .map(pokemon => ({
@@ -78,7 +81,8 @@ async function generatePuzzle(db, max_groups, amount_pokemon, generation = 9) {
 
   return {
     secretId: secretPokemonData.id,
-    pokemons
+    pokemons,
+    usedProperties,
     // usedFields: [...usedFields],
     // usedPokemonIds: [...usedPokemonIds]
   };

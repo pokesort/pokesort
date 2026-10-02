@@ -43,7 +43,7 @@ export default function InfinitePage() {
                 const headers = {
                     'Content-Type': 'application/json'
                 };
-                const body = {...formWatch};
+                const body = {...formWatch, challenge: "3", generation: 4, max_tries: 3, can_repeat: false, excludeFields: formWatch.excludeFields ?? []};
                 if (body.excludeFields == false) body.excludeFields = [];
                 
                 const [puzzleResponse] = await Promise.all([
@@ -69,7 +69,7 @@ export default function InfinitePage() {
                 const [puzzleData] = await Promise.all([
                     puzzleResponse.json(),
                 ]);
-              
+
                 puzzleData.pokemons = shuffleArray(puzzleData.pokemons);
                 setPuzzle(puzzleData);
                 setDictionary(puzzleData.dictionary)
