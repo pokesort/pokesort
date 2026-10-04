@@ -10,7 +10,7 @@ export const FIELD_OPTIONS = {
   moves: { min: 1, max: 919 },
   generation: { min: 1, max: 9 },
   abilities: { min: 1, max: 307 },
-  // habitat: ['cave', 'forest', 'grassland', 'mountain', 'rare', 'rough-terrain', 'sea', 'urban', 'waters-edge'],
+  habitat: ['cave', 'forest', 'grassland', 'mountain', 'rare', 'rough-terrain', 'sea', 'urban', 'waters-edge'],
   step: ['no_line', 'has_split', 'is_split'],
   weak: { min: 1, max: 18 },
   strong: { min: 1, max: 18 },

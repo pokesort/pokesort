@@ -1,7 +1,7 @@
 import { connect, getDb } from "@/lib/mongodb";
 import * as handlers from "../scripts/handlersPokemon";
 
-export async function filterPokemons(query) {
+export async function filterPokemons(query, limit) {
 
   await connect();
   const db = getDb();
@@ -123,13 +123,23 @@ export async function filterPokemons(query) {
     filter = await handlers.handleSearch(search, filter);
   }
 
-  let pokemons = await db.db.collection('pokemon').find(filter, { projection: 
-      { name: 1, id: 1, species_name: 1, dex_number: 1, 
-        sprite_default: 1, sprite_shiny: 1, cry: 1, 
-        isActive: 1, _id: 0 } })
-      .sort({ dex_number: 1, id: 1 }).toArray();
-  
+  let pokemons = await db.db.collection('pokemon').find(filter, {
+    projection:
+    {
+      name: 1, id: 1, species_name: 1, dex_number: 1,
+      sprite_default: 1, sprite_shiny: 1, cry: 1,
+      isActive: 1, _id: 0
+    }
+  }).sort({ dex_number: 1, id: 1 }).toArray();
+
   if (!allPokemonBool) pokemons = pokemons.filter(p => p.isActive !== false);
+
+  if (limit !== undefined) {
+    pokemons = pokemons
+      .sort(() => Math.random() - 0.5)
+      .slice(0, limit);
+  }
+
   return pokemons;
 }
 
