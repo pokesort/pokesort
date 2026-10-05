@@ -64,10 +64,10 @@ export type CrosswordPuzzle = {
 
 //Consts
 export const ANSWERS_BY_SIZE = {
-    7: 8,
-    8: 11,
-    9: 14,
-    10: 18,
-    11: 21,
-    12: 25
+    7: 4,
+    8: 6,
+    9: 9,
+    10: 12,
+    11: 15,
+    12: 18
 };

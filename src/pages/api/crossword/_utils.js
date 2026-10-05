@@ -46,16 +46,38 @@ export function createAnchorPlacement(answer, size) {
 }
 
 export function placeWord(grid, answer, placement) {
-    const { row, col, direction } = placement;
+
+    const changedCells = [];
 
     for (let i = 0; i < answer.answer.length; i++) {
-        
-        const currentRow = direction === "horizontal" ? row : row + i;
-        const currentCol = direction === "horizontal" ? col + i : col;
 
-        grid[currentRow][currentCol] = {
-            type: "letter",
-            letter: answer.answer[i]
+        const row = placement.direction === "horizontal"
+            ? placement.row
+            : placement.row + i;
+
+        const col = placement.direction === "horizontal"
+            ? placement.col + i
+            : placement.col;
+
+        const cell = grid[row][col];
+
+        if (cell.type === "blocked") {
+            changedCells.push({row, col});
+
+            grid[row][col] = {
+                type: "letter",
+                letter: answer.answer[i]
+            };
+        }
+    }
+
+    return changedCells;
+}
+
+export function removeWord(grid, changedCells) {
+    for (const { row, col } of changedCells) {
+        grid[row][col] = {
+            type: "blocked"
         };
     }
 }
