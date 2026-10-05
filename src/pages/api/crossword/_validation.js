@@ -6,7 +6,7 @@ export function isValidPlacement(grid, placements, answerMap, answer, placement)
 
     if (!hasValidCollisions(grid, placements, answerMap, answer, placement)) return false;
 
-    if (hasInvalidNeighbors(grid, placements, answerMap, answer, placement)) return false;
+    if (hasInvalidNeighbors(grid, answer, placement)) return false;
 
     return true;
 }
@@ -65,7 +65,7 @@ export function hasValidCollisions(grid, placements, answerMap, answer, placemen
     return true;
 }
 
-export function hasInvalidNeighbors(grid, placements, answerMap, answer, placement) {
+export function hasInvalidNeighbors(grid, answer, placement) {
 
     const { direction, row, col } = placement;
 
@@ -79,6 +79,9 @@ export function hasInvalidNeighbors(grid, placements, answerMap, answer, placeme
         const currentCol = direction === "horizontal"
             ? col + i
             : col;
+
+        const currentCell = grid[currentRow][currentCol];
+        if (currentCell.type === "letter") continue;
 
         const neighbors = direction === "horizontal"
             ? [
@@ -101,16 +104,8 @@ export function hasInvalidNeighbors(grid, placements, answerMap, answer, placeme
             }
 
             const neighbor = grid[neighborRow][neighborCol];
-
-            if (neighbor.type !== "letter") continue;
-
-            const neighborPlacements = getPlacementsAtCell(placements, answerMap, neighborRow, neighborCol);
-
-            const isPartOfPerpendicularWord = neighborPlacements.some(
-                    (existing) => existing.direction !== placement.direction
-                );
-
-            if (!isPartOfPerpendicularWord) return true;
+            
+            if (neighbor.type === "letter") return true;
         }
     }
 
