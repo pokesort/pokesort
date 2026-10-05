@@ -20,23 +20,12 @@ export async function getWords(query, amount) {
     return words;
 }
 
-export function initializeCrossword(words, size) {
-
-    const selectedWords = utils.getWordsForGrid(words, size);
-
-    if (selectedWords.length === 0) throw new Error("No words available for crossword");
+export function initializeCrossword(size) {
 
     const grid = utils.createEmptyGrid(size);
     const placements = [];
 
-    const anchor = selectedWords[0];
-    const anchorPlacement = utils.createAnchorPlacement(anchor, size);
-
-    utils.placeWord(grid, anchor, anchorPlacement);
-    placements.push(anchorPlacement);
-
     return {
-        selectedWords,
         grid,
         placements
     };
@@ -72,10 +61,6 @@ export function findCandidatePlacements(grid, placements, answerMap, answer) {
 }
 
 export function generateCrossword(grid, placements, words, answerMap, index) {
-
-    console.log("generateCrossword:", index,
-        index < words.length ? words[index].answer : "DONE"
-    );
 
     if (index >= words.length) return true;
 
@@ -119,19 +104,47 @@ export function tryGenerateCrossword(words, size) {
 
     if (selectedWords.length === 0) return null;
 
-    const { grid, placements} = initializeCrossword(selectedWords, size);
-
     const answerMap = new Map(selectedWords.map((word) => [word.id, word]));
 
-    const success = generateCrossword(grid, placements, selectedWords, answerMap, 1);
+    const anchorCandidates = utils.getAnchorCandidates(selectedWords, size);
+    console.log(
+        "Âncoras possíveis:",
+        [...new Set(anchorCandidates.map((candidate) => candidate.anchor.answer))]
+    );
 
-    if (!success) return null;
+    for (const candidate of anchorCandidates) {
 
-    return {
-        selectedWords,
-        grid,
-        placements
-    };
+        console.log(
+            "Tentando âncora:",
+            candidate.anchor.answer,
+            candidate.placement
+        );
+
+        const { grid, placements } = initializeCrossword(size);
+
+        utils.placeWord(grid, candidate.anchor, candidate.placement);
+        placements.push(candidate.placement);
+
+        const generationWords = [
+            candidate.anchor,
+            ...selectedWords.filter(
+                (word) => word.id !== candidate.anchor.id
+            )
+        ];
+
+        const success = generateCrossword(grid, placements, generationWords, answerMap, 1);
+
+        if (success) {
+            return {
+                selectedWords,
+                grid,
+                placements
+            };
+        }
+
+    }
+
+    return null;
 }
 
 export function generateCrosswordBySize(words, minSize, maxSize) {

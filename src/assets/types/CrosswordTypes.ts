@@ -38,13 +38,6 @@ type CrosswordAnswer = {
     clue: CrosswordClue;
 };
 
-type CrosswordPlacement = {
-    answerId: number;
-    direction: CrosswordDirection;
-    row: number;
-    col: number;
-};
-
 export type CrosswordCell = {
     type: CrosswordCellType;
     letter?: string;
@@ -65,9 +58,9 @@ export type CrosswordPuzzle = {
 //Consts
 export const ANSWERS_BY_SIZE = {
     7: 4,
-    8: 6,
-    9: 9,
-    10: 12,
-    11: 15,
-    12: 18
+    8: 5,
+    9: 6,
+    10: 7,
+    11: 8,
+    12: 9
 };

@@ -45,6 +45,58 @@ export function createAnchorPlacement(answer, size) {
     };
 }
 
+export function getAnchorCandidates(words, size) {
+    const candidates = [];
+
+    const anchorLength = words[0].answer.length;
+    const anchorWords = words.filter(
+        (word) => word.answer.length === anchorLength
+    );
+
+    const center = Math.floor(size / 2);
+    const offsets = [0, -1, 1, -2, 2, -3, 3];
+
+    for (const anchor of anchorWords) {
+
+        for (const offset of offsets) {
+            const row = center + offset;
+            const col = center - Math.floor(anchorLength / 2);
+    
+            if (col >= 0 && col + anchorLength <= size && row >= 0 && row < size) {
+
+                candidates.push({
+                    anchor,
+                    placement: {
+                        direction: "horizontal",
+                        row,
+                        col,
+                        answerId: anchor.id
+                    }
+                });
+            }
+        }
+    
+        for (const offset of offsets) {
+            const row = center - Math.floor(anchorLength / 2);
+            const col = center + offset;
+    
+            if (row >= 0 && row + anchorLength <= size && col >= 0 && col < size) {
+                candidates.push({
+                    anchor,
+                    placement: {
+                        direction: "vertical",
+                        row,
+                        col,
+                        answerId: anchor.id
+                    }
+                });
+            }
+        }
+    }
+
+    return candidates;
+}
+
 export function placeWord(grid, answer, placement) {
 
     const changedCells = [];
