@@ -2,7 +2,11 @@
 
 .challenge-label {
     display: grid;
-    grid-template-columns: 80px auto;
+
+    // grid-template-columns: 80px auto;
+    &.detective-mode {
+        grid-template-columns: auto;
+    }
     
     background-color: color(section2);
     width: 100%;
@@ -194,7 +198,7 @@
     .challenge-label {
         grid-template-columns: auto;
 
-        > div {
+        &:not(.detective-mode) > div {
             min-height: calc(80px + var(--spacing) * 2);
         }
 

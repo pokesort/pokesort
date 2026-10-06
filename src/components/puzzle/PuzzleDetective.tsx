@@ -47,7 +47,8 @@ export type PuzzleDetective = {
     pokemons: Pokemon[],
     secretId: number,
     usedProperties: string[],
-    success: true
+    success: true,
+    guess_limit: 0 | 5 | 1,
 }
 
 type PuzzleGuess = {
@@ -80,10 +81,12 @@ const VictoryModal = React.memo(({guesses, victoryOpen, setVictoryOpen, refreshP
 
     const getGuessEmojis = (): string => {
         let output: string = '';
-        realGuesses.forEach(guess => {
-            if (guess.answer) { // correct
+        guesses.forEach(guess => {
+            if (guess.type == 1) { // question
+                output += "🟨"
+            } else if (guess.answer) { // correct guess
                 output += "🟩"
-            } else { // incorrect
+            } else { // incorrect guess
                 output += "🟥"
             }
         })
@@ -373,6 +376,7 @@ export default React.memo(function Puzzle({puzzle, dictionary, refreshPuzzle, is
     const [incorrectIds, setIncorrectIds] = useState<number[]>([]);
     const [abandoned, setAbandoned] = useState<boolean>(false);
     const [guesses, setGuesses] = useState<PuzzleGuess[]>([]);
+    const [guessLimit, setGuessLimit] = useState<0 | 1 | 5>(0);
 
     const scrollToTab = useCallback((target: number, behavior: ('smooth' | 'instant') = 'smooth') => {
         if (target !== visibleTab || behavior == 'instant') {
@@ -497,9 +501,19 @@ export default React.memo(function Puzzle({puzzle, dictionary, refreshPuzzle, is
     }
 
     useEffect(() => {
+        if (guessLimit == 0) return;
+
+        const realGuesses = guesses.filter((g: PuzzleGuess) => g.type == 0 && g.answer == false);
+        if (realGuesses.length == guessLimit) {
+            abandonPuzzle();
+        }
+    }, [guessLimit, guesses]);
+
+    useEffect(() => {
         setPokemonData(puzzle.pokemons);
         setUsedProperties(puzzle.usedProperties ?? []);
         updateSpritesMap(puzzle.pokemons);
+        setGuessLimit(puzzle.guess_limit);
         const timer = setTimeout(() => {
             scrollToTab(1, 'instant');
         }, 0);

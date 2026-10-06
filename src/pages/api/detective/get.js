@@ -14,7 +14,7 @@ export default async function handler(req, res) {
     const MAX_GROUPS = 5;
     const MAX_POKEMON_GROUP = 5;
 
-    const { generation, max_tries, can_repeat, challenge } = req.body;
+    const { generation, guess_limit, challenge } = req.body;
 
     let puzzle = null;
 
@@ -26,8 +26,7 @@ export default async function handler(req, res) {
           success: true,
           ...puzzle,
           dictionary: await populateMovesAbilities(),
-          max_tries,
-          can_repeat
+          guess_limit
         });
       }
     }

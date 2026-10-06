@@ -111,7 +111,8 @@
         },        
         "detective": {
             "label": "Detective Mode",
-            "generate": "Generate",
+            "generate": "Generate Puzzle",
+            "generate-button": "Generate",
 
             "description-1": "Try and find who the hidden Pokémon is!",
             "description-2": "Ask questions to filter your options and ge it right on fewer guesses.",
@@ -120,6 +121,12 @@
             "incorrect": "Incorrect",
             "question-yes": "Yes",
             "question-no": "No",
+
+            "generation": "Generation Limit",
+            "guess-limit": "Guess Limit",
+            "limit-0": "No Limit",
+            "limit-1": "1",
+            "limit-5": "5",
 
             "question": "Ask Question"
         },
@@ -153,12 +160,14 @@
             "3": "Elite",
             "4": "Champion",
             "5": "Professor",
-            "help": {
-                "1": "Start your journey here. 4x4 puzzles including groups of type, region, generation, evolution step, number of types and categories such as babies, mythicals, legendaries and starters.",
-                "2": "Test your skills in a gym challenge. 4x5 or 5x4 puzzles adding groups of alternate forms, evolution chains and categories such as Mega Evolutions, Ultra Beasts and fossils.",
-                "3": "Show that your skills are among the best. 5x5 or 6x4 puzzles adding groups of weaknesses, resistances, evolution methods and categories such as Gigantamax, paradoxes and regional variants.",
-                "4": "Show that your skill is the very best. 6x5 puzzles adding groups of abilities, known moves, shape, egg group and categories such as exclusive Z-Moves, ability to switch forms and gender differences.",
-                "5": "Here your knowledge is put to the test, worthy of a true Pokémon Professor. Puzzles of any size and custom categories. Try thinking outside the pokéball!"
+            
+            "detective": {
+                "help": "The challenge level makes it so you can't ask questions with the following properties.",
+                "no-limit": "No disabled questions",
+                "1": "Default",
+                "2": "Average",
+                "3": "Difficult",
+                "4": "Detective"
             }
         },
         "dex-tabs": {
@@ -182,7 +191,7 @@
         },
         "victory": {
             "win": "Gotcha!",
-            "lose": "Got away safely.",
+            "lose": "You lost.",
 
             "streak": "Streak",
             "streak-desc": "Play Pokesort daily to increase your streak",
@@ -190,7 +199,7 @@
             "infinite-count": "Solved infinite puzzles",
             "detective-count": "Solved detective puzzles",
             "attempts-1": "Solved in ",
-            "attempts-1-l": "Ran after ",
+            "attempts-1-l": "Lost after ",
             "attempts-2": " guesses",
             "questions-1": "You asked ",
             "questions-2": " questions",

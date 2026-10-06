@@ -9,10 +9,10 @@ import Input from '@/src/components/forms/Input';
 import GridIcon from '@/src/components/svg/GridIcon';
 import Loading from '@/src/components/Loading';
 import { useForm } from 'react-hook-form';
-import ChallengeSelect from '@/src/components/forms/SelectChallenge';
 import ErrorToast from '@/src/components/ToastError';
 import Puzzle, { PuzzleDetective } from '@/src/components/puzzle/PuzzleDetective';
 import { shuffleArray } from '@/src/scripts/utils';
+import SelectDetectiveChallenge from '@/src/components/forms/SelectDetectiveChallenge';
 
 export default function InfinitePage() {
     const t = useTranslations();
@@ -43,8 +43,7 @@ export default function InfinitePage() {
                 const headers = {
                     'Content-Type': 'application/json'
                 };
-                const body = {...formWatch, challenge: "3", generation: 4, max_tries: 3, can_repeat: false, excludeFields: formWatch.excludeFields ?? []};
-                if (body.excludeFields == false) body.excludeFields = [];
+                const body = {...formWatch};
                 
                 const [puzzleResponse] = await Promise.all([
                     fetch(`/api/detective/get`, {
@@ -72,6 +71,7 @@ export default function InfinitePage() {
 
                 puzzleData.pokemons = shuffleArray(puzzleData.pokemons);
                 setPuzzle(puzzleData);
+                console.log(puzzleData);
                 setDictionary(puzzleData.dictionary)
             } catch (e) {
                 console.error(e);
@@ -96,6 +96,15 @@ export default function InfinitePage() {
         }
     }, [loading])
 
+    const gen_options: Record<string, string> = {};
+    [1, 2, 3, 4, 5, 6, 7, 8, 9].forEach((gen: number) => {
+        gen_options[`${gen}`] = t(`groupnames.generation.long`)+t(`groupnames.generation.${gen}`);
+    });
+    const challenge_options: Record<string, string> = {};
+    [1, 2, 3, 4].forEach((challenge: number) => {
+        challenge_options[`${challenge}`] = t(`puzzle.challenge.detective.${challenge}`);
+    });
+    
     return (
         <>
             <ErrorToast error={error} />
@@ -122,8 +131,17 @@ export default function InfinitePage() {
             <Modal title={t('puzzle.detective.label')} id={"detective-modal"} isOpen={detectiveModalOpen} setIsOpen={setDetectiveModalOpen} canClose={!initial} background={!initial}>
                 <p>{t(`puzzle.detective.description-1`)}</p>
                 <p>{t(`puzzle.detective.description-2`)}</p>
+                <div className="infinite-menu">
+                    <div style={{paddingTop: ".5rem"}}>
+                        <Input type="select" style={{width: "100%"}} label={t(`puzzle.infinite.generation`)} name="generation" defaultValue="9" options={gen_options} form={form} />
+                        <Input type="select" style={{width: "100%"}} label={t('puzzle.detective.guess-limit')} name="guess_limit" options={{0: t(`puzzle.detective.limit-0`), 5: '5', 1: '1'}} defaultValue="0" form={form} />
+                    </div>
+                    <div>
+                        <SelectDetectiveChallenge minimal={true} label={t(`puzzle.challenge.label`)} style={{width: "100%"}} defaultValue={'1'} options={challenge_options} form={form} />
+                    </div>
+                </div>
                 <button className="form-button" onClick={generatePuzzle}>
-                    {t('puzzle.detective.generate')}
+                    {t('puzzle.detective.generate-button')}
                 </button>
             </Modal>
             {isSolved &&

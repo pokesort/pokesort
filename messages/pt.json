@@ -112,6 +112,7 @@
         "detective": {
             "label": "Modo Detetive",
             "generate": "Gerar Puzzle",
+            "generate-button": "Gerar",
 
             "description-1": "Tente descobrir quem é o Pokémon oculto na grade!",
             "description-2": "Faça perguntas para filtrar as opções e acertar em menos palpites.",
@@ -120,6 +121,12 @@
             "incorrect": "Incorreto",
             "question-yes": "Sim",
             "question-no": "Não",
+
+            "generation": "Limite de Geração",
+            "guess-limit": "Limite de Palpites",
+            "limit-0": "Sem limite",
+            "limit-1": "1",
+            "limit-5": "5",
 
             "question": "Fazer Pergunta"
         },
@@ -153,12 +160,14 @@
             "3": "Elite",
             "4": "Campeão",
             "5": "Professor",
-            "help": {
-                "1": "Dê início à sua jornada. Puzzles 4x4 incluindo grupos de tipos, região, geração, passo evolutivo, número de tipos e categorias como bebês, míticos, lendários e iniciais.",
-                "2": "Teste suas habilidades em um ginásio. Puzzles 4x5 ou 5x4 adicionando grupos de formas alternativas, cadeia evolutiva e categorias como Mega Evoluções, Ultra Beasts e fósseis.",
-                "3": "Mostre que sua habilidade está entre as melhores. Puzzles 5x5 ou 6x4 adicionando grupos de fraquezas, resistências, métodos evolutivos e categorias como Gigantamax, paradoxos e formas regionais",
-                "4": "Mostre que sua habilidade é a melhor das melhores. Puzzles 6x5 adicionando grupos de habilidades, movimentos, formato, grupo de reprodução e categorias como Z-Moves exclusivos, habilidade de trocar de formas e diferenças de gênero.",
-                "5": "Aqui seus conhecimentos são postos à prova, dignos de um verdadeiro Professor Pokémon. Puzzles de qualquer tamanho e categorias customizadas. Tente pensar fora da pokébola!"
+
+            "detective": {
+                "help": "O nível de desafio impede que você faça perguntas com as propriedades abaixo.",
+                "no-limit": "Nenhum pergunta desabilitada",
+                "1": "Padrão",
+                "2": "Médio",
+                "3": "Difícil",
+                "4": "Detetive"
             }
         },
         "dex-tabs": {
@@ -182,7 +191,7 @@
         },
         "victory": {
             "win": "Gotcha!",
-            "lose": "Você fugiu.",
+            "lose": "Você perdeu.",
 
             "streak": "Sequência",
             "streak-desc": "Jogue o Pokesort diariamente para aumentar sua sequência",
@@ -190,7 +199,7 @@
             "infinite-count": "Puzzles infinitos resolvidos",
             "detective-count": "Puzzles detetive resolvidos",
             "attempts-1": "Resolvido em ",
-            "attempts-1-l": "Fugiu após ",
+            "attempts-1-l": "Perdeu após ",
             "attempts-2": " palpites",
             "questions-1": "Você fez",
             "questions-2": "perguntas",
