@@ -13,18 +13,20 @@ div.modal-background {
     pointer-events: none;
     
     width: 100vw;
-    height: 100dvh;
+    height: 100vh;
 
     transition: opacity 0.3s ease;
 
     &.filter {
         background-color: #12121Bbc;
+        &:has(.modal.open) {
+            pointer-events: all;
+        }
     }
-
     &:has(.modal.open) {
         opacity: 1;
-        pointer-events: all;
     }
+
 }
 
 section.modal {
@@ -32,13 +34,17 @@ section.modal {
     max-width: min(100%, 560px);
     min-width: 500px;
     padding: var(--spacing);
-    position: relative;
+    position: relative;    
 
     background-color: color(section1);
     clip-path: polygon(0% 27px, calc(45% - 27px) 27px, 45% 0%, 100% 0%, 100% 100%, 0% 100%);
 
     margin-bottom: 8vh;
 
+    pointer-events: all;
+    &:not(.modal.open) {
+        pointer-events: none;
+    }
     div.button-row {
         display: flex;
         gap: var(--spacing);
@@ -78,8 +84,10 @@ section.modal {
 
         height: 100%;
         min-height: 100px;
+        height: 100%;
         max-height: min(80vh, calc(80vh - 90px));
         overflow-y: auto;
+        justify-content: space-between;
 
         h1 {
             font-size: text(large);
@@ -97,12 +105,17 @@ section.modal {
             background-color: color(section2);
             text-align: center;
         }
-        button {
+        button:not(.flat) {
             font-weight: 700;
             transition:
                 transform 0.15s ease,
                 box-shadow 0.15s ease;
 
+            &:disabled {
+                opacity: 0.6;
+                color: color(text3);
+                pointer-events: none;
+            }
             &:hover {
                 box-shadow: 0px 0 70px color(darker);
                 z-index: 60;

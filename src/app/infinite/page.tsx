@@ -1,7 +1,7 @@
 "use client"
 
 import { useTranslations } from 'next-intl';
-import Puzzle from '@/src/components/Puzzle';
+import Puzzle from '@/src/components/puzzle/Puzzle';
 import "@/src/styles/components/Infinite.scss";
 import type { PuzzleData } from '@/src/assets/types/PuzzleApiResponse';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -187,12 +187,12 @@ export default function InfinitePage() {
                             <Input type="cloud" label={t('puzzle.infinite.exclude')} name="excludeFields" options={excludeOptions} form={form} />
                         </div>
                     </div>
-                    <button className="form-button" onClick={generatePuzzle}>
+                    <button className="form-button" style={{marginTop: ".5rem"}} onClick={generatePuzzle}>
                         {t('puzzle.infinite.button')}
                     </button>
                 </Modal>
                 {!initial &&
-                    <section id="infinite-generate-button">
+                    <section id="infinite-generate-button" className="puzzle-extra-button">
                         <button onClick={() => setInfiniteModalOpen(true)}>
                             <GridIcon/>
                             <p>{t('puzzle.infinite.generate')}</p>

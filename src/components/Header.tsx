@@ -53,7 +53,7 @@ export default function Header ({ pathname }: HeaderProps) {
         {route: '/daily', label: t('daily')},
         {label: t('modes'), subpages: [
             {route: '/infinite', label: t('infinite')},
-            {route: '/construction', label: t('who')},
+            {route: '/detective', label: t('detective')},
         ]},
         {route: '/archive', label: t('archive'), alias: '/puzzle'},
         {route: '/dex', label: t('dex')},

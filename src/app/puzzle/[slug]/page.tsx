@@ -1,6 +1,6 @@
 "use client"
 
-import Puzzle from '@/src/components/Puzzle';
+import Puzzle from '@/src/components/puzzle/Puzzle';
 import type { PuzzleData } from '@/src/assets/types/PuzzleApiResponse';
 import { useEffect, useState } from 'react';
 import { notFound, redirect, useParams, useSearchParams } from 'next/navigation';

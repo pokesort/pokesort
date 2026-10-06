@@ -8,6 +8,7 @@ export interface Pokemon {
   sprite_regular?: string;
   sprite_shiny?: string;
   cry?: string;
+  available?: boolean;
   species_name: string;
 }
 

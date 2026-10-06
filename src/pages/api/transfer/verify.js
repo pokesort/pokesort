@@ -42,7 +42,6 @@ export default function handler(req,res) {
             receivedBuffer.length !== expectedBuffer.length ||
             !crypto.timingSafeEqual(receivedBuffer, expectedBuffer)
         ) {
-            console.log("Assinatura inválida. Esperado:", expectedSignature, "Recebido:", signature);
             return res.status(401).json({
                 error: "Assinatura inválida.",
             });

@@ -10,7 +10,7 @@ export const FIELD_OPTIONS = {
   moves: { min: 1, max: 919 },
   generation: { min: 1, max: 9 },
   abilities: { min: 1, max: 307 },
-  // habitat: ['cave', 'forest', 'grassland', 'mountain', 'rare', 'rough-terrain', 'sea', 'urban', 'waters-edge'],
+  habitat: ['cave', 'forest', 'grassland', 'mountain', 'rare', 'rough-terrain', 'sea', 'urban', 'waters-edge'],
   step: ['no_line', 'has_split', 'is_split'],
   weak: { min: 1, max: 18 },
   strong: { min: 1, max: 18 },
@@ -79,7 +79,7 @@ export const CHALLENGE_FIELDS = {
     moves: { min: 1, max: 919 },
     categories: [...CHALLENGE_CATEGORIES[1], ...CHALLENGE_CATEGORIES[2], ...CHALLENGE_CATEGORIES[3], ...CHALLENGE_CATEGORIES[4]],
     shape: ['armor', 'wings', 'quadruped', 'ball', 'squiggle', 'fish', 'arms', 'blob', 'upright', 'legs', 'heads', 'bug-wings', 'humanoid', 'tentacles'],
-    egg_groups: ['monster', 'dragon', 'ground', 'water1', 'bug', 'flying', 'fairy', 'plant', 'humanshape', 'water3', 'mineral', 'indeterminate', 'water2', 'ditto', 'dragon', 'no-eggs'],
+    egg_groups: ['monster', 'ground', 'water1', 'bug', 'flying', 'fairy', 'plant', 'humanshape', 'water3', 'mineral', 'indeterminate', 'water2', 'ditto', 'dragon', 'no-eggs'],
   },
   5: {
     custom: 'custom'
@@ -352,6 +352,20 @@ export function decodeTips(tip) {
 
   return {
     type, values
+  }
+}
+
+export function queryToObject(query) {
+  let object = {key: "", value: ""};
+  try {
+    const split = query.split("=");
+    return {
+      key: split[0],
+      value: split[1]
+    }
+  } catch (e) {
+    console.error(e);
+    return object;
   }
 }
 
