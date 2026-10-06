@@ -98,6 +98,7 @@ export default function Home() {
             count={counts["detective"]}
             href="/detective"
             sprite="detective"
+            isNew={true}
           />          
         </div>
 
