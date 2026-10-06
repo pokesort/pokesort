@@ -178,6 +178,7 @@ export async function getEvolutionStepCache() {
     return evolutionStepCache;
 }
 
+//Transformar em varável comum pra usar junto com a seleção de dificuldade do front
 export function chooseProperties(challenge) {
 
     if (challenge == null) return [];

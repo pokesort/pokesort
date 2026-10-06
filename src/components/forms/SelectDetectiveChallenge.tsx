@@ -56,9 +56,9 @@ export default React.memo(function Input({name="challenge", label="Challenge", m
     const [inputText, setInputText] = useState('');
     const [challengeFields, setChallengeFields] = useState<ChallengeFields>({
         1: [],
-        2: ["shape", "egg_groups", "habitat", "color"],
-        3: ["moves", "abilities", "step", "others"],
-        4: ["types", "generation", "region", "form"]
+        2: ["shape", "egg_groups", "habitat", "color", "dual"],
+        3: ["moves", "abilities", "step", "others", "dual"],
+        4: ["types", "generation", "region", "form", "dual"],
     });
 
     useEffect(() => {
