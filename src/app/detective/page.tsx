@@ -71,7 +71,6 @@ export default function InfinitePage() {
 
                 puzzleData.pokemons = shuffleArray(puzzleData.pokemons);
                 setPuzzle(puzzleData);
-                console.log(puzzleData);
                 setDictionary(puzzleData.dictionary)
             } catch (e) {
                 console.error(e);
