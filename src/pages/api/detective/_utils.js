@@ -184,13 +184,13 @@ export function chooseProperties(challenge) {
 
     switch (Number(challenge)) {
         case 2:
-            return ["shape", "egg_groups", "habitat", "color"];
+            return ["shape", "egg_groups", "habitat", "color", "dual"];
 
         case 3:
-            return ["moves", "abilities", "step", "others"];
+            return ["moves", "abilities", "step", "others", "dual"];
 
         case 4:
-            return ["types", "generation", "region", "form"];
+            return ["types", "generation", "region", "form", "dual"];
 
         default:
             return [];
