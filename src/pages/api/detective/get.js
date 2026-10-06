@@ -1,7 +1,7 @@
 import { connect, getDb } from "@/lib/mongodb";
 import { initialGroup, getGroupFromSecret } from "../../../lib/detective/secret";
 import { populateMovesAbilities } from "../puzzle/_utils";
-import { chooseProperties } from "../../../lib/detective/utils";
+import { challengeProperties } from "../../../lib/detective/challengeProperties";
 
 export default async function handler(req, res) {
   try {
@@ -69,7 +69,7 @@ async function generatePuzzle(db, max_groups, amount_pokemon, generation = 9, ch
     groups.push(group);
   }
 
-  const usedProperties = chooseProperties(challenge);
+  const usedProperties = challengeProperties[challenge];
 
   const pokemons = groups
     .flatMap(group => group.pokemons)

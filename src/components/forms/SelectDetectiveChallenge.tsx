@@ -16,7 +16,7 @@ import ch3_sprite from "@/src/assets/images/challenge_d.png";
 import ch4_sprite from "@/src/assets/images/challenge_d.png";
 
 import ChallengeIcon from '../svg/ChallengeIcon';
-import { parseChallengeSelectFields, getPuzzleStatus } from '@/src/scripts/utils';
+import { challengeProperties } from "@/src/lib/detective/challengeProperties";
 const challengeSprites: Record<string, StaticImageData> = {
   '1': ch1_sprite,
   '2': ch2_sprite,
@@ -54,12 +54,7 @@ export default React.memo(function Input({name="challenge", label="Challenge", m
 
     const [open, setOpen] = useState(false);
     const [inputText, setInputText] = useState('');
-    const [challengeFields, setChallengeFields] = useState<ChallengeFields>({
-        1: [],
-        2: ["shape", "egg_groups", "habitat", "color", "dual"],
-        3: ["moves", "abilities", "step", "others", "dual"],
-        4: ["types", "generation", "region", "form", "dual"],
-    });
+    const [challengeFields, setChallengeFields] = useState<ChallengeFields>(challengeProperties);
 
     useEffect(() => {
         form.setValue(name, defaultValue);

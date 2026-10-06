@@ -177,23 +177,3 @@ export async function getEvolutionStepCache() {
 
     return evolutionStepCache;
 }
-
-//Transformar em varável comum pra usar junto com a seleção de dificuldade do front
-export function chooseProperties(challenge) {
-
-    if (challenge == null) return [];
-
-    switch (Number(challenge)) {
-        case 2:
-            return ["shape", "egg_groups", "habitat", "color", "dual"];
-
-        case 3:
-            return ["moves", "abilities", "step", "others", "dual"];
-
-        case 4:
-            return ["types", "generation", "region", "form", "dual"];
-
-        default:
-            return [];
-    }
-}
