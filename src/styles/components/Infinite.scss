@@ -23,6 +23,11 @@
     }
 }
 
-.modal-background:has(#infinite-modal) {
+.infinite-menu-p {
+    color: color(text2);
+    font-size: text(small);
+}
+
+.modal-background:has(.infinite-menu) {
     z-index: 40;
 }

@@ -187,7 +187,7 @@ export default function InfinitePage() {
                             <Input type="cloud" label={t('puzzle.infinite.exclude')} name="excludeFields" options={excludeOptions} form={form} />
                         </div>
                     </div>
-                    <button className="form-button" onClick={generatePuzzle}>
+                    <button className="form-button" style={{marginTop: ".5rem"}} onClick={generatePuzzle}>
                         {t('puzzle.infinite.button')}
                     </button>
                 </Modal>

@@ -128,8 +128,12 @@ export default function InfinitePage() {
                 )
             }
             <Modal title={t('puzzle.detective.label')} id={"detective-modal"} isOpen={detectiveModalOpen} setIsOpen={setDetectiveModalOpen} canClose={!initial} background={!initial}>
-                <p>{t(`puzzle.detective.description-1`)}</p>
-                <p>{t(`puzzle.detective.description-2`)}</p>
+                <p className="infinite-menu-p">
+                    {t(`puzzle.detective.description-1`)}
+                </p>
+                <p className="infinite-menu-p">
+                    {t(`puzzle.detective.description-2`)}
+                </p>
                 <div className="infinite-menu">
                     <div style={{paddingTop: ".5rem"}}>
                         <Input type="select" style={{width: "100%"}} label={t(`puzzle.infinite.generation`)} name="generation" defaultValue="9" options={gen_options} form={form} />
@@ -139,7 +143,7 @@ export default function InfinitePage() {
                         <SelectDetectiveChallenge minimal={true} label={t(`puzzle.challenge.label`)} style={{width: "100%"}} defaultValue={'1'} options={challenge_options} form={form} />
                     </div>
                 </div>
-                <button className="form-button" onClick={generatePuzzle}>
+                <button className="form-button" style={{marginTop: ".5rem"}} onClick={generatePuzzle}>
                     {t('puzzle.detective.generate-button')}
                 </button>
             </Modal>

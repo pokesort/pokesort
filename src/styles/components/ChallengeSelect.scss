@@ -3,7 +3,7 @@
 .challenge-label {
     display: grid;
 
-    // grid-template-columns: 80px auto;
+    grid-template-columns: 80px auto;
     &.detective-mode {
         grid-template-columns: auto;
     }

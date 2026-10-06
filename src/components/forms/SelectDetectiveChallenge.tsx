@@ -90,7 +90,7 @@ export default React.memo(function Input({name="challenge", label="Challenge", m
                 </div>
             }
             <Modal id="challenge-select-modal" title={label} background={true} isOpen={open} canClose={true} setIsOpen={setOpen}>
-                <p>{t(`puzzle.challenge.detective.help`)}</p>
+                <p className="infinite-menu-p">{t(`puzzle.challenge.detective.help`)}</p>
                 {visibleChallengeValues.map((challenge: string) => (
                     <label className={`challenge-label detective-mode ${Object.keys(options).includes(challenge) ? "" : "disabled"}`} key={challenge}
                         onClick={() => setOpen(false)}>
