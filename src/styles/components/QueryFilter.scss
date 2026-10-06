@@ -1,0 +1,115 @@
+@use "../abstract" as *;
+
+#detective-question-modal .modal-content {
+    --modal-height: 480px;
+    min-height: var(--modal-height);
+}
+
+.query-filter {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.query-filter-input {
+    display: flex;
+    align-items: center;
+    min-height: 2.5rem;
+    gap: 0.35rem;
+    padding: 0.5rem 0.75rem;
+    background-color: color(section2);
+    clip-path: polygon(0% 10px, 10px 0%, 100% 0%, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0% 100%);
+
+    input {
+        width: 100%;
+        min-width: 0;
+        padding: 0;
+        border: 0;
+        outline: 0;
+        color: color(text1);
+        background: transparent;
+        font-size: text(small);
+    }
+
+    input::placeholder {
+        color: color(text3);
+    }
+}
+
+.query-filter-property {
+    font-weight: 700;
+}
+
+.query-filter-token {
+    display: inline-flex;
+    align-items: center;
+    flex: 0 0 auto;
+    gap: 0.25rem;
+    max-width: 55%;
+    padding: 0.2rem 0.35rem;
+    color: color(text1);
+    background-color: rgba(0, 234, 255, 0.16);
+    font-size: text(small);
+    font-weight: 600;
+
+    &:nth-child(2n) {
+        margin-left: -0.35rem;
+        padding-left: 0;
+    }
+
+    & > span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    button {
+        flex: 0 0 auto;
+        padding: 0;
+        border: 0;
+        color: color(text1);
+        background: transparent;
+        font: inherit;
+        line-height: 1;
+        cursor: pointer;
+    }
+}
+
+.query-filter-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 90;
+    width: 100%;
+    max-height: calc(var(--modal-height) - 90px);
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    background-color: color(section1);
+    // clip-path: polygon(0% 10px, 10px 0%, 100% 0%, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0% 100%);
+    list-style: none;
+
+    button {
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        margin: 2px 0;
+        border: 0;
+        color: color(text1);
+        background-color: color(section2);
+        font-size: text(small);
+        text-align: left;
+
+        &:disabled {
+            opacity: 0.6;
+            color: color(text3);
+            pointer-events: none;
+        }
+    }
+
+    button:hover,
+    button:focus-visible {
+        background-color: rgba(0, 234, 255, 0.12);
+        outline: 0;
+        z-index: 20;
+    }
+}

@@ -52,19 +52,5 @@ async function getTodayPuzzle(today, challenge=null){
     }
   }
 
-  // if (!todayPuzzle){
-
-  //   const puzzleNoDate = await data.db.collection('puzzles').findOne({ date: null });
-    
-  //   if (puzzleNoDate) {
-  //     await data.db.collection('puzzles').updateOne(
-  //       { _id: puzzleNoDate._id },
-  //       { $set: { date: today } }
-  //     );
-
-  //     todayPuzzle = { ...puzzleNoDate, date: today };
-  //   }
-  // }
-
   return todayPuzzle;
 }

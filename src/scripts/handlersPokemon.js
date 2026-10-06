@@ -208,7 +208,7 @@ export async function handlerHasSplit() {
 
 export async function handlerOtherForms(others, filter) {
   filter.other_forms = { $exists: true, $ne: [] };
-  filter.is_default = others == 1 ? true : false;
+  filter.is_default = others == 1;
 }
 
 export async function handlerRelationTo(typeIdsOrSingle, expression) {

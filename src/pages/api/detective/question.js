@@ -1,0 +1,33 @@
+import { connect, getDb } from "@/lib/mongodb";
+import { filterPokemons } from "../../../scripts/server_utils";
+
+export default async function handler(req, res) {
+
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Method Not Allowed' });
+    }
+
+    try {
+        const { secretId, pokemons, query } = req.body;
+
+        const queryIds = new Set((await filterPokemons(query)).map(pokemon => pokemon.id));
+
+        const secretFound = queryIds.has(secretId);
+        const affected = pokemons.filter(p => queryIds.has(p.id) && p.available).map(p => p.id);
+
+        const updatedPokemons = pokemons.map(pokemon => {
+            const queryAvailable = secretFound
+                ? queryIds.has(pokemon.id)
+                : !queryIds.has(pokemon.id);
+
+            return {
+                ...pokemon,
+                available: pokemon.available && queryAvailable
+            };
+        });
+        
+        return res.status(200).json({ success: true, secretFound, secretId, pokemons: updatedPokemons, affected });
+    } catch (error){
+        return res.status(500).json({success: false, message: "Internal Server Error"});
+    }
+}

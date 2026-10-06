@@ -32,12 +32,6 @@ export default async function handler(req, res) {
 
     await new_puzzle.validate();
 
-    // if (puzzle.date) {
-    //   const existing = await Puzzle.findOne({ date: puzzle.date });
-    //   if (existing) {
-    //     return res.status(400).json({ success: false, error: 'Já existe um puzzle com esta data.' });
-    //   }
-    // }
     const savedPuzzle = await new_puzzle.save();
 
     return res.status(201).json({ success: true, data: savedPuzzle });
