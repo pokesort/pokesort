@@ -1,5 +1,5 @@
 import { connect, getDb } from "@/lib/mongodb";
-import { handlerEvolutionChain, handlerEvolutionStep } from "../../../scripts/handlersPokemon";
+import { handlerEvolutionChain, handlerEvolutionStep } from "../../scripts/handlersPokemon";
 
 let evolutionFormCache = null;
 let evolutionStepCache = null;

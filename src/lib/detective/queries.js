@@ -1,8 +1,8 @@
 
-import { FIELD_OPTIONS } from "../../../scripts/utils";
-import { pickRandom, randomInRange } from "../../../scripts/utils";
-import { filterPokemons } from "../../../scripts/server_utils";
-import { getFieldValuesFromPokemon } from "./_utils"; 
+import { FIELD_OPTIONS } from "../../scripts/utils";
+import { pickRandom, randomInRange } from "../../scripts/utils";
+import { filterPokemons } from "../../scripts/server_utils";
+import { getFieldValuesFromPokemon } from "./utils";
 
 export async function getRandomFieldAndValue() {
   const fields = Object.keys(FIELD_OPTIONS);
@@ -42,33 +42,33 @@ export async function getPokemonsByFieldAndValue(amount_pokemon, field, value, g
 
 export async function getAvailableValuesFromPokemon(pokemon, field, usedValues = new Set()) {
 
-    const value = await getFieldValuesFromPokemon(pokemon, field);
+  const value = await getFieldValuesFromPokemon(pokemon, field);
 
-    if (value === undefined || value === null) return [];
+  if (value === undefined || value === null) return [];
 
-    const values = Array.isArray(value) ? value : [value];
+  const values = Array.isArray(value) ? value : [value];
 
-    return values.filter(value => !usedValues.has(value));
+  return values.filter(value => !usedValues.has(value));
 }
 
 export async function getRandomFieldFromPokemon(pokemon, usedFields) {
 
-    const availableFields = [];
+  const availableFields = [];
 
-    for (const field of Object.keys(FIELD_OPTIONS)) {
+  for (const field of Object.keys(FIELD_OPTIONS)) {
 
-        if (usedFields.has(field)) continue;
+    if (usedFields.has(field)) continue;
 
-        const value = await getFieldValuesFromPokemon(pokemon, field);
+    const value = await getFieldValuesFromPokemon(pokemon, field);
 
-        if (value === undefined || value === null) continue;
+    if (value === undefined || value === null) continue;
 
-        if (Array.isArray(value) && value.length === 0) continue;
+    if (Array.isArray(value) && value.length === 0) continue;
 
-        availableFields.push(field);
-    }
+    availableFields.push(field);
+  }
 
-    if (availableFields.length === 0) return null;
+  if (availableFields.length === 0) return null;
 
-    return pickRandom(availableFields)[0];
+  return pickRandom(availableFields)[0];
 }

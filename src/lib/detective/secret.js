@@ -1,5 +1,5 @@
-import { pickRandom } from "../../../scripts/utils";
-import * as QG from "./_queries";
+import { pickRandom } from "../../scripts/utils";
+import * as QG from "./queries";
 
 export async function selectSecretPokemon(pokemons, amount_pokemon) {
   if (!pokemons || pokemons.length !== amount_pokemon) return null;
@@ -9,7 +9,7 @@ export async function selectSecretPokemon(pokemons, amount_pokemon) {
 
 // Fazer função para eliminar codigo duplicado na rota pokemon/id
 export async function getPokemonById(db, id) {
-  return await db.db.collection("pokemon").findOne({id: Number(id)});
+  return await db.db.collection("pokemon").findOne({ id: Number(id) });
 }
 
 export async function getGroupFromSecret(secretPokemon, usedFields, usedPokemonIds, amount_pokemon, generation) {
@@ -53,37 +53,37 @@ export async function getGroupFromSecret(secretPokemon, usedFields, usedPokemonI
   }
 }
 
-export async function initialGroup(db, amount_pokemon, generation){
+export async function initialGroup(db, amount_pokemon, generation) {
 
-    let fieldSelected = await QG.getRandomFieldAndValue();
+  let fieldSelected = await QG.getRandomFieldAndValue();
 
-    if (!fieldSelected) return null;
+  if (!fieldSelected) return null;
 
-    const pokemons = await QG.getPokemonsByFieldAndValue(
-        amount_pokemon,
-        fieldSelected.field,
-        fieldSelected.value,
-        generation,
-    );
+  const pokemons = await QG.getPokemonsByFieldAndValue(
+    amount_pokemon,
+    fieldSelected.field,
+    fieldSelected.value,
+    generation,
+  );
 
-    if (!pokemons) return null;
+  if (!pokemons) return null;
 
-    const usedFields = new Set([fieldSelected.field]);
-    const usedPokemonIds = new Set(pokemons.map(pokemon => pokemon.id));
+  const usedFields = new Set([fieldSelected.field]);
+  const usedPokemonIds = new Set(pokemons.map(pokemon => pokemon.id));
 
-    const secretPokemon = await selectSecretPokemon(pokemons, amount_pokemon);
+  const secretPokemon = await selectSecretPokemon(pokemons, amount_pokemon);
 
-    if (!secretPokemon) return null;
+  if (!secretPokemon) return null;
 
-    const secretPokemonData = await getPokemonById(db, secretPokemon.id);
+  const secretPokemonData = await getPokemonById(db, secretPokemon.id);
 
-    const groups = [
-        {
-        field: fieldSelected.field,
-        value: fieldSelected.value,
-        pokemons
-        }
-    ];
+  const groups = [
+    {
+      field: fieldSelected.field,
+      value: fieldSelected.value,
+      pokemons
+    }
+  ];
 
-    return [secretPokemonData, groups, usedFields, usedPokemonIds];
+  return [secretPokemonData, groups, usedFields, usedPokemonIds];
 }
