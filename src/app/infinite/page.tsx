@@ -52,7 +52,7 @@ export default function InfinitePage() {
         if (typeof window !== "undefined") {
             const value = getPreferredChallenge();
             setPreferredChallenge(sanitizeInfiniteChallenge(value));
-            window.history.replaceState({}, document.title, window.location.pathname);
+            window.history.replaceState(window.history.state, document.title, window.location.pathname);
         }
     }, [])
 

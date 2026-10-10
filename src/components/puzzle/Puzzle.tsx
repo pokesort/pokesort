@@ -888,10 +888,13 @@ export default React.memo(function Puzzle({puzzle, setPuzzle, type, dictionary, 
         puzzle?.groups.forEach((group: any) => {
             output = output || !group.query.includes('?');
         });
-        if (output) setCustomGroupsOpen(true);
 
         return output;
-    }, [puzzle, mountVictoryModal]);
+    }, [puzzle]);
+
+    useEffect(() => {
+        if (hasCustomGroups) setCustomGroupsOpen(true);
+    }, [puzzle, hasCustomGroups]);
 
     const resetAvailableAttempts = () => {
         setAvailableTips(maxAvailableTips);
