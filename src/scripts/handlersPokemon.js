@@ -536,6 +536,8 @@ export async function handleMaxGeneration(max_generation, filter) {
 }
 
 export async function handleSearch(search, filter) {
+
+  console.log("Search:", search, "Search Trim: ", search.trim());
   const newAnd = [];
 
   if (filter.$and) {
@@ -545,7 +547,10 @@ export async function handleSearch(search, filter) {
   }
 
   if (search && search.trim() !== "") {
-    newAnd.push({ name: { $regex: search, $options: "i" } });
+
+    if (!isNaN(Number(search))) newAnd.push({ dex_number: Number(search) });
+
+    else newAnd.push({ name: { $regex: search, $options: "i" } });
   }
 
   filter = { $and: newAnd };
