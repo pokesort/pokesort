@@ -33,7 +33,7 @@ export default function PuzzlePage() {
     }
 
     useEffect(() => {
-        window.history.replaceState({}, document.title, window.location.pathname);
+        window.history.replaceState(window.history.state, document.title, window.location.pathname);
         setLoading(true);
         setError(null);
 
