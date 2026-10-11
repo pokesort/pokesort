@@ -28,7 +28,7 @@ interface Checks {
 
 const confirmIntegrity = async (puzzle: PuzzleData, fetchPokemonPool: (target: number | null, filters: string | any, queries?: string) => Promise<any>): Promise<Checks> => {  
     //Checar se existem mons repetidos
-    const mons = puzzle.groups.flatMap(group => group.pokemons);
+    const mons = puzzle.groups.slice(0, puzzle.rows).flatMap(group => group.pokemons);
     const duplicates = mons.filter((id, index, arr) => arr.indexOf(id) !== index);
     if (duplicates.length > 0) {
         return {
@@ -40,9 +40,9 @@ const confirmIntegrity = async (puzzle: PuzzleData, fetchPokemonPool: (target: n
 
     //Checar se há mons que não pertencem ao seu grupo
     const results = await Promise.all(
-        puzzle.groups.map(async (group: PuzzleGroup) => {
+        puzzle.groups.slice(0, puzzle.rows).map(async (group: PuzzleGroup) => {
             const groupPool = await fetchPokemonPool(null, group.query);
-            let poolIds = groupPool.flatMap((mon: any) => mon.id);
+            let poolIds = (groupPool ?? []).flatMap((mon: any) => mon.id);
 
             return group.pokemons.filter(
                 (mon: number) => !poolIds.includes(mon)
@@ -237,7 +237,7 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
     };
     
     const fetchPokemonPool = async (target: number | null, body: string | any, queries: string = "") => {
-        if (Object.keys(body).length < 1 || (Object.keys(body).length == 1 && body.search == "")) return;
+        if (Object.keys(body).length < 1 || (Object.keys(body).length == 1 && body.search == "")) return [];
         
         if (typeof body == "string" && body[0] == "?") {
             queries = body;
@@ -252,7 +252,7 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/pokemon/get${queries}${separator}inactive=true`, { method: 'GET', headers });
         const data = await response.json();
 
-        if (target == null) return data.pokemons;
+        if (target == null) return data.pokemons ?? [];
 
         setGroupPokemonPool(prev => ({
             ...prev,
@@ -267,7 +267,7 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
                 const [abilitiesResponse, movesResponse, pokemonResponse] = await Promise.all([
                     fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/abilities/get`, { method: 'GET', headers }),
                     fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/moves/get`, { method: 'GET', headers }),
-                    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/pokemon/get`, { method: 'GET', headers }),
+                    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/pokemon/get?inactive=true`, { method: 'GET', headers }),
                 ]);
                 if (!abilitiesResponse.ok || !movesResponse.ok || !pokemonResponse.ok) {
                     setError('Erro ao obter informações.');
@@ -477,7 +477,9 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
                                     </p>
                                     <ul className="group-mons">
                                         {colCounter.map((colIndex) => {
-                                            if (!group.pokemons[colIndex])
+                                            const selectedPokemon = dictionary.pokemons[group.pokemons[colIndex]];
+
+                                            if (!selectedPokemon)
                                                 return (
                                                     <label className="block-container" key={colIndex}>
                                                         <div className="pokemon-block">
@@ -498,7 +500,7 @@ export default function PuzzleManage ({error, setError, puzzle=undefined}: Puzzl
                                                 return (
                                                     <ListBlock
                                                         key={colIndex}
-                                                        pokemon={dictionary.pokemons[group.pokemons[colIndex]]}
+                                                        pokemon={selectedPokemon}
                                                         multiselect={false}
                                                         isSelected={false}
                                                         hasError={errorCases.includes(group.pokemons[colIndex])}

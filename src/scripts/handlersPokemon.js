@@ -537,7 +537,6 @@ export async function handleMaxGeneration(max_generation, filter) {
 
 export async function handleSearch(search, filter) {
 
-  console.log("Search:", search, "Search Trim: ", search.trim());
   const newAnd = [];
 
   if (filter.$and) {
